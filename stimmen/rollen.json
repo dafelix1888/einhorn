@@ -5,23 +5,43 @@
     "funkel": {
       "beschreibung": "Funkel, das Einhorn: hell, fröhlich, verspielt",
       "voice_id": "cgSgspJ2msm6clMCkdW9",
-      "einstellungen": { "stability": 0.35, "similarity_boost": 0.75, "style": 0.6, "use_speaker_boost": true },
+      "einstellungen": {
+        "stability": 0.6,
+        "similarity_boost": 0.8,
+        "style": 0.2,
+        "use_speaker_boost": true
+      },
       "tempo": 1
     },
     "spiegel": {
       "beschreibung": "Der Zauberspiegel: warmer, geheimnisvoller Erzähler für die Wegsätze",
       "voice_id": "JBFqnCBsd6RMkjVDRZzb",
-      "einstellungen": { "stability": 0.5, "similarity_boost": 0.75, "style": 0.4, "use_speaker_boost": true },
+      "einstellungen": {
+        "stability": 0.5,
+        "similarity_boost": 0.75,
+        "style": 0.4,
+        "use_speaker_boost": true
+      },
       "tempo": 1
     },
     "fridolin": {
       "beschreibung": "Fridolin, der Fuchs: frech, verlegen, etwas heiser",
       "voice_id": "N2lVS1w4EtoT3dxV8ru9",
-      "einstellungen": { "stability": 0.3, "similarity_boost": 0.75, "style": 0.7, "use_speaker_boost": true },
+      "einstellungen": {
+        "stability": 0.3,
+        "similarity_boost": 0.75,
+        "style": 0.7,
+        "use_speaker_boost": true
+      },
       "tempo": 1
     }
   },
   "zuordnung": {
-    "spiegel": ["s2.weg", "s3.weg", "s4.weg", "s5.weg"]
+    "spiegel": [
+      "s2.weg",
+      "s3.weg",
+      "s4.weg",
+      "s5.weg"
+    ]
   }
 }
