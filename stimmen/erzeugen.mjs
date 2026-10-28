@@ -38,15 +38,17 @@ function stueck(von, bis) {
   if (a < 0 || e < 0) fehler('Textstelle „' + von + '“ in der App nicht gefunden.');
   return app.slice(a, e);
 }
-const code = stueck('var STATIONS=[', '/* ---------- Varianten') + '\n' + stueck('var T_START=', 'var TEXTE=texte();') + '\nTEXTE=texte();';
-const sandbox = { TEXTE: null };
+const code = stueck('var STATIONS=[', '/* ---------- Varianten') + '\n' + stueck('var T_START=', 'var TEXTE=texte();') + '\nTEXTE=texte();'
+  + (app.includes('/* ---------- Kakapups ----------') ? '\n' + stueck('/* ---------- Kakapups ----------', '/* ---------- Kakapups Ende') + '\nKAKATEXTE=kakaTexte();' : '');
+const sandbox = { TEXTE: null, KAKATEXTE: [] };
 vm.runInNewContext(code, sandbox, { timeout: 2000 });
-const saetze = sandbox.TEXTE.map((t) => ({ key: t.key, label: t.label, text: t.text }));
+const saetze = sandbox.TEXTE.concat(sandbox.KAKATEXTE || []).map((t) => ({ key: t.key, label: t.label, text: t.text }));
 
 // 3) Rollen zuordnen
 const rollen = JSON.parse(readFileSync(WURZEL + 'stimmen/rollen.json', 'utf8'));
 function rolleFuer(k) {
   for (const [r, keys] of Object.entries(rollen.zuordnung || {})) if (keys.includes(k)) return r;
+  for (const [p, r] of Object.entries(rollen.praefix || {})) if (k.startsWith(p)) return r;
   return rollen.standard;
 }
 for (const s of saetze) {
@@ -56,7 +58,8 @@ for (const s of saetze) {
 
 if (nurListe) {
   for (const s of saetze) console.log(`${s.key.padEnd(18)} ${s.rolle.padEnd(10)} ${s.text}`);
-  console.log(`\n${saetze.length} Sätze.`);
+  for (const [k, g] of Object.entries(rollen.geraeusche || {})) console.log(`${k.padEnd(18)} ${'geräusch'.padEnd(10)} ${g.text}`);
+  console.log(`\n${saetze.length} Sätze, ${Object.keys(rollen.geraeusche || {}).length} Geräusche.`);
   process.exit(0);
 }
 
@@ -99,6 +102,23 @@ for (const s of saetze) {
   aus.clips[s.key] = { type: 'audio/mpeg', b64: mp3.toString('base64'), rate: f.tempo || 1, h: fassung, rolle: s.rolle, vorlauf: gepolstert ? VORLAUF : 0 };
   neu++;
   console.log(`neu: ${s.key} (${s.rolle}, ${Math.round(mp3.length / 1024)} KB)`);
+}
+
+// 5) Geräusche (z. B. Kakapups' Pupse) über ElevenLabs Sound Effects
+for (const [k, g] of Object.entries(rollen.geraeusche || {})) {
+  const fassung = createHash('sha256').update(JSON.stringify(['geraeusch', g.text, g.dauer, FORMAT])).digest('hex').slice(0, 16);
+  const vorher = alt.clips && alt.clips[k];
+  if (vorher && vorher.h === fassung) { aus.clips[k] = vorher; behalten++; continue; }
+  const r = await fetch(`https://api.elevenlabs.io/v1/sound-generation?output_format=${FORMAT}`, {
+    method: 'POST',
+    headers: { 'xi-api-key': apiKey, 'content-type': 'application/json', accept: 'audio/mpeg' },
+    body: JSON.stringify({ text: g.text, duration_seconds: g.dauer, prompt_influence: 0.6 }),
+  });
+  if (!r.ok) fehler(`ElevenLabs lehnt Geräusch ${k} ab: HTTP ${r.status} ${(await r.text()).slice(0, 300)}`);
+  const mp3 = Buffer.from(await r.arrayBuffer());
+  aus.clips[k] = { type: 'audio/mpeg', b64: mp3.toString('base64'), rate: 1, h: fassung, rolle: 'geraeusch', vorlauf: VORLAUF };
+  neu++;
+  console.log(`neu: ${k} (Geräusch, ${Math.round(mp3.length / 1024)} KB)`);
 }
 
 writeFileSync(ziel, JSON.stringify(aus));
