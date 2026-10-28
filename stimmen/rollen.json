@@ -34,6 +34,18 @@
         "use_speaker_boost": true
       },
       "tempo": 1
+    },
+    "kakapups": {
+      "beschreibung": "Professor Kakapups: schrulliger, zittriger Uropa-Professor, liest die Aufgaben vor",
+      "voice_id": "LRpNiUBlcqgIsKUzcrlN",
+      "einstellungen": {
+        "stability": 0.45,
+        "similarity_boost": 0.8,
+        "style": 0.35,
+        "use_speaker_boost": true,
+        "speed": 1.12
+      },
+      "tempo": 1
     }
   },
   "zuordnung": {
@@ -43,5 +55,22 @@
       "s4.weg",
       "s5.weg"
     ]
+  },
+  "praefix": {
+    "k.": "kakapups"
+  },
+  "geraeusche": {
+    "g.pups1": {
+      "text": "A short, squeaky, funny cartoon fart sound for a children's game. Comedic, clean, no voice.",
+      "dauer": 0.8
+    },
+    "g.pups2": {
+      "text": "A long, trumpeting, wobbly cartoon fart sound for a children's cartoon. Silly and comedic, no voice.",
+      "dauer": 1.4
+    },
+    "g.pups3": {
+      "text": "A quick double toot cartoon fart, playful and bouncy, for a kids' animation. Comedic, no voice.",
+      "dauer": 1.0
+    }
   }
 }
