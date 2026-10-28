@@ -46,6 +46,66 @@
         "speed": 1.12
       },
       "tempo": 1
+    },
+    "rudi": {
+      "beschreibung": "Rudi, die ratlose Ratte: nervös, verplant, quiekt",
+      "voice_id": "JSV4pJFuHRMCWZTxkpoQ",
+      "einstellungen": {
+        "stability": 0.45,
+        "similarity_boost": 0.8,
+        "style": 0.45,
+        "use_speaker_boost": true,
+        "speed": 1.05
+      },
+      "tempo": 1
+    },
+    "alfonso": {
+      "beschreibung": "Alfonso, die alberne Ameise: hoch, kichernd, albern",
+      "voice_id": "caLprdce6X3bbfnOgQhr",
+      "einstellungen": {
+        "stability": 0.45,
+        "similarity_boost": 0.8,
+        "style": 0.45,
+        "use_speaker_boost": true,
+        "speed": 1.05
+      },
+      "tempo": 1
+    },
+    "bruno": {
+      "beschreibung": "Bruno, der brummige Bär: tief, brummig, gemütlich",
+      "voice_id": "pfvZahoGcT3NdpxRuNkg",
+      "einstellungen": {
+        "stability": 0.55,
+        "similarity_boost": 0.8,
+        "style": 0.35,
+        "use_speaker_boost": true,
+        "speed": 1.08
+      },
+      "tempo": 1
+    },
+    "charly": {
+      "beschreibung": "Charly, der coole Clown: lässig, frech",
+      "voice_id": "9VeBtouyYRANyE97rZR1",
+      "einstellungen": {
+        "stability": 0.5,
+        "similarity_boost": 0.8,
+        "style": 0.4,
+        "use_speaker_boost": true,
+        "speed": 1.08
+      },
+      "tempo": 1
+    },
+    "dagobert": {
+      "beschreibung": "Dagobert, der dusslige Dachs: gutmütig, tollpatschig",
+      "voice_id": "aHb0rsWUX1Fsr1L8EX7f",
+      "einstellungen": {
+        "stability": 0.5,
+        "similarity_boost": 0.8,
+        "style": 0.4,
+        "use_speaker_boost": true,
+        "speed": 1.05
+      },
+      "tempo": 1
     }
   },
   "zuordnung": {
@@ -57,7 +117,12 @@
     ]
   },
   "praefix": {
-    "k.": "kakapups"
+    "k.": "kakapups",
+    "e.rudi.": "rudi",
+    "e.alfonso.": "alfonso",
+    "e.bruno.": "bruno",
+    "e.charly.": "charly",
+    "e.dagobert.": "dagobert"
   },
   "geraeusche": {
     "g.pups1": {
@@ -71,6 +136,26 @@
     "g.pups3": {
       "text": "A quick double toot cartoon fart, playful and bouncy, for a kids' animation. Comedic, no voice.",
       "dauer": 1.0
+    },
+    "g.rudi": {
+      "text": "A quick nervous cartoon rat squeak, two short high squeaks, comedic, no voice.",
+      "dauer": 0.8
+    },
+    "g.alfonso": {
+      "text": "A silly cartoon boing spring sound with a tiny high giggle, playful, for kids, no words.",
+      "dauer": 1.0
+    },
+    "g.bruno": {
+      "text": "A deep, grumpy but friendly cartoon bear grumble, a short low growl like 'hmmm', comedic, no words.",
+      "dauer": 1.2
+    },
+    "g.charly": {
+      "text": "A clown bicycle horn honking twice, honk honk, comedic circus sound.",
+      "dauer": 1.0
+    },
+    "g.dagobert": {
+      "text": "A cartoon bonk sound of someone bumping their head, followed by a short twinkle of stars, comedic.",
+      "dauer": 1.2
     }
   }
 }

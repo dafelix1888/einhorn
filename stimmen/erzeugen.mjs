@@ -39,10 +39,11 @@ function stueck(von, bis) {
   return app.slice(a, e);
 }
 const code = stueck('var STATIONS=[', '/* ---------- Varianten') + '\n' + stueck('var T_START=', 'var TEXTE=texte();') + '\nTEXTE=texte();'
-  + (app.includes('/* ---------- Kakapups ----------') ? '\n' + stueck('/* ---------- Kakapups ----------', '/* ---------- Kakapups Ende') + '\nKAKATEXTE=kakaTexte();' : '');
-const sandbox = { TEXTE: null, KAKATEXTE: [] };
+  + (app.includes('/* ---------- Kakapups ----------') ? '\n' + stueck('/* ---------- Kakapups ----------', '/* ---------- Kakapups Ende') + '\nKAKATEXTE=kakaTexte();' : '')
+  + (app.includes('/* ---------- Erzähler ----------') ? '\n' + stueck('/* ---------- Erzähler ----------', '/* ---------- Erzähler Ende') + '\nERZTEXTE=erzTexte();' : '');
+const sandbox = { TEXTE: null, KAKATEXTE: [], ERZTEXTE: [] };
 vm.runInNewContext(code, sandbox, { timeout: 2000 });
-const saetze = sandbox.TEXTE.concat(sandbox.KAKATEXTE || []).map((t) => ({ key: t.key, label: t.label, text: t.text }));
+const saetze = sandbox.TEXTE.concat(sandbox.KAKATEXTE || [], sandbox.ERZTEXTE || []).map((t) => ({ key: t.key, label: t.label, text: t.text }));
 
 // 3) Rollen zuordnen
 const rollen = JSON.parse(readFileSync(WURZEL + 'stimmen/rollen.json', 'utf8'));
