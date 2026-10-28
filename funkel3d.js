@@ -131,7 +131,7 @@ function start(el) {
   let renderer;
   try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' }); }
   catch (e) { el.hidden = true; return; }    // kein WebGL: Funkel bleibt einfach weg
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));   // Canvas ist so groß wie der Spiegel, 1,5 reicht und schont das iPad
   renderer.setClearColor(0x000000, 0);
   el.appendChild(renderer.domElement);
 
