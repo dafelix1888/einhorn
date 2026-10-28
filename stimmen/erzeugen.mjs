@@ -7,6 +7,7 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createHash, webcrypto } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import vm from 'node:vm';
 
 const WURZEL = new URL('..', import.meta.url).pathname;
@@ -65,13 +66,26 @@ const alt = existsSync(ziel) ? JSON.parse(readFileSync(ziel, 'utf8')) : { clips:
 const MODELL = rollen.modell || 'eleven_multilingual_v2';
 const FORMAT = 'mp3_44100_64';
 const aus = { version: 2, rate: 1, clips: {} };
+const VORLAUF = 250;   // ms Stille vor jedem Satz, sonst verschluckt das iPad (v. a. mit Bluetooth) die erste Silbe
+
+function mitVorlauf(mp3) {
+  const r = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', 'pipe:0', '-af', `adelay=${VORLAUF}:all=1`, '-c:a', 'libmp3lame', '-b:a', '64k', '-ar', '44100', '-f', 'mp3', 'pipe:1'], { input: mp3, maxBuffer: 64 * 1024 * 1024 });
+  if (r.status !== 0 || !r.stdout || r.stdout.length < 1000) { console.warn('Hinweis: ffmpeg fehlt oder scheitert, Satz bleibt ohne Vorlauf.'); return null; }
+  return r.stdout;
+}
 let neu = 0, behalten = 0;
 
 for (const s of saetze) {
   const f = rollen.figuren[s.rolle];
   const fassung = createHash('sha256').update(JSON.stringify([s.text, f.voice_id, f.einstellungen || {}, MODELL, FORMAT])).digest('hex').slice(0, 16);
   const vorher = alt.clips && alt.clips[s.key];
-  if (vorher && vorher.h === fassung) { aus.clips[s.key] = vorher; behalten++; continue; }
+  if (vorher && vorher.h === fassung) {
+    if (vorher.vorlauf !== VORLAUF) {          // ältere Fassung ohne Vorlauf: nachrüsten, kostet keine Credits
+      const p = mitVorlauf(b(vorher.b64));
+      if (p) { vorher.b64 = p.toString('base64'); vorher.vorlauf = VORLAUF; vorher.h = fassung; }
+    }
+    aus.clips[s.key] = vorher; behalten++; continue;
+  }
 
   const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${f.voice_id}?output_format=${FORMAT}`, {
     method: 'POST',
@@ -79,8 +93,10 @@ for (const s of saetze) {
     body: JSON.stringify({ text: s.text, model_id: MODELL, voice_settings: f.einstellungen || undefined }),
   });
   if (!r.ok) fehler(`ElevenLabs lehnt ${s.key} (${s.rolle}) ab: HTTP ${r.status} ${(await r.text()).slice(0, 300)}`);
-  const mp3 = Buffer.from(await r.arrayBuffer());
-  aus.clips[s.key] = { type: 'audio/mpeg', b64: mp3.toString('base64'), rate: f.tempo || 1, h: fassung, rolle: s.rolle };
+  let mp3 = Buffer.from(await r.arrayBuffer());
+  const gepolstert = mitVorlauf(mp3);
+  if (gepolstert) mp3 = gepolstert;
+  aus.clips[s.key] = { type: 'audio/mpeg', b64: mp3.toString('base64'), rate: f.tempo || 1, h: fassung, rolle: s.rolle, vorlauf: gepolstert ? VORLAUF : 0 };
   neu++;
   console.log(`neu: ${s.key} (${s.rolle}, ${Math.round(mp3.length / 1024)} KB)`);
 }
