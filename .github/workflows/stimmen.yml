@@ -1,0 +1,46 @@
+name: Stimmen erzeugen
+
+# Läuft, wenn sich die App oder die Rollen ändern, oder per Hand unter Actions → „Stimmen erzeugen“ → Run workflow.
+on:
+  push:
+    branches: [main]
+    paths: ['index.html', 'stimmen/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: stimmen
+  cancel-in-progress: false
+
+jobs:
+  erzeugen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Sätze und Rollen
+        env:
+          ZAUBERWORT: ${{ secrets.ZAUBERWORT }}
+        run: node stimmen/erzeugen.mjs --liste
+      - name: Stimmen bei ElevenLabs erzeugen
+        env:
+          ZAUBERWORT: ${{ secrets.ZAUBERWORT }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: node stimmen/erzeugen.mjs
+      - name: Neue Stimmen-Datei einchecken
+        run: |
+          if git diff --quiet -- funkel-stimme.json; then echo "Keine Änderung."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add funkel-stimme.json
+          git commit -m "Stimmen neu erzeugt"
+          git push
+          # Pushes dieses Workflows lösen GitHub Pages nicht immer selbst aus, darum ausdrücklich neu bauen
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages-Neubau nicht angestoßen, die Seite aktualisiert sich beim nächsten Push."
+        env:
+          GH_TOKEN: ${{ github.token }}
