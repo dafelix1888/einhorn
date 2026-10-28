@@ -4,7 +4,7 @@ name: Stimmen erzeugen
 on:
   push:
     branches: [main]
-    paths: ['index.html', 'stimmen/**']
+    paths: ['index.html', 'stimmen/**', '.github/workflows/stimmen.yml']
   workflow_dispatch:
 
 permissions:
@@ -23,6 +23,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: ffmpeg für den Vorlauf vor jedem Satz
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
       - name: Sätze und Rollen
         env:
           ZAUBERWORT: ${{ secrets.ZAUBERWORT }}
