@@ -1,6 +1,6 @@
-// Funkels Zauberspiegel: hält Seite und Stimmen-Datei für unterwegs ohne Empfang bereit.
+// Funkels Zauberspiegel: hält Seite, Stimmen-Datei und Funkel in 3D für unterwegs ohne Empfang bereit.
 var CACHE='zauberspiegel-v1';
-var DATEIEN=['./','./index.html','./funkel-stimme.json'];
+var DATEIEN=['./','./index.html','./funkel-stimme.json','./funkel3d.js','./three.module.min.js'];
 self.addEventListener('install', function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){
     return Promise.all(DATEIEN.map(function(u){ return c.add(u)['catch'](function(){}); }));
