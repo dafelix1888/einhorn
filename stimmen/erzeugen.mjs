@@ -70,7 +70,7 @@ const VORLAUF = 250;   // ms Stille vor jedem Satz, sonst verschluckt das iPad (
 
 function mitVorlauf(mp3) {
   const r = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', 'pipe:0', '-af', `adelay=${VORLAUF}:all=1`, '-c:a', 'libmp3lame', '-b:a', '64k', '-ar', '44100', '-f', 'mp3', 'pipe:1'], { input: mp3, maxBuffer: 64 * 1024 * 1024 });
-  if (r.status !== 0 || !r.stdout || r.stdout.length < 1000) { console.warn('Hinweis: ffmpeg fehlt oder scheitert, Satz bleibt ohne Vorlauf.'); return null; }
+  if (r.status !== 0 || !r.stdout || r.stdout.length < 1000) { fehler('ffmpeg fehlt oder scheitert, kein Vorlauf möglich: ' + String(r.error || r.stderr || '').slice(0, 300)); }
   return r.stdout;
 }
 let neu = 0, behalten = 0;
