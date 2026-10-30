@@ -17,7 +17,7 @@ const apiKey = process.env.ELEVENLABS_API_KEY;
 if (!zauberwort) fehler('ZAUBERWORT fehlt (GitHub: Settings → Secrets and variables → Actions).');
 if (!nurListe && !apiKey) fehler('ELEVENLABS_API_KEY fehlt (GitHub: Settings → Secrets and variables → Actions).');
 
-function fehler(t) { console.error('Fehler: ' + t); process.exit(1); }
+function fehler(t) { console.error('Fehler: ' + t); if (process.env.GITHUB_ACTIONS) console.log('::error title=Stimmen::' + String(t).replace(/\r?\n/g, ' ')); process.exit(1); }
 const b = (s) => Buffer.from(s, 'base64');
 
 // 1) App entschlüsseln
