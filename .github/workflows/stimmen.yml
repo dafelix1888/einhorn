@@ -35,6 +35,7 @@ jobs:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
         run: node stimmen/erzeugen.mjs
       - name: Neue Stimmen-Datei einchecken
+        if: success() || failure()
         run: |
           if git diff --quiet -- funkel-stimme.json; then echo "Keine Änderung."; exit 0; fi
           git config user.name "github-actions[bot]"
