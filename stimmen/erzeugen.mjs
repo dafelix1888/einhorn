@@ -78,6 +78,7 @@ function mitVorlauf(mp3) {
   return r.stdout;
 }
 let neu = 0, behalten = 0;
+const fehlerListe = [];   // Fehler bei einzelnen Sätzen brechen nicht ab: Erzeugtes wird trotzdem gespeichert
 
 for (const s of saetze) {
   const f = rollen.figuren[s.rolle];
@@ -96,7 +97,7 @@ for (const s of saetze) {
     headers: { 'xi-api-key': apiKey, 'content-type': 'application/json', accept: 'audio/mpeg' },
     body: JSON.stringify({ text: s.text, model_id: MODELL, voice_settings: f.einstellungen || undefined }),
   });
-  if (!r.ok) fehler(`ElevenLabs lehnt ${s.key} (${s.rolle}) ab: HTTP ${r.status} ${(await r.text()).slice(0, 300)}`);
+  if (!r.ok) { fehlerListe.push(`ElevenLabs lehnt ${s.key} (${s.rolle}) ab: HTTP ${r.status} ${(await r.text()).slice(0, 300)}`); if (vorher) aus.clips[s.key] = vorher; continue; }
   let mp3 = Buffer.from(await r.arrayBuffer());
   const gepolstert = mitVorlauf(mp3);
   if (gepolstert) mp3 = gepolstert;
@@ -115,7 +116,7 @@ for (const [k, g] of Object.entries(rollen.geraeusche || {})) {
     headers: { 'xi-api-key': apiKey, 'content-type': 'application/json', accept: 'audio/mpeg' },
     body: JSON.stringify({ text: g.text, duration_seconds: g.dauer, prompt_influence: 0.6 }),
   });
-  if (!r.ok) fehler(`ElevenLabs lehnt Geräusch ${k} ab: HTTP ${r.status} ${(await r.text()).slice(0, 300)}`);
+  if (!r.ok) { fehlerListe.push(`ElevenLabs lehnt Geräusch ${k} ab: HTTP ${r.status} ${(await r.text()).slice(0, 300)}`); if (vorher) aus.clips[k] = vorher; continue; }
   const mp3 = Buffer.from(await r.arrayBuffer());
   aus.clips[k] = { type: 'audio/mpeg', b64: mp3.toString('base64'), rate: 1, h: fassung, rolle: 'geraeusch', vorlauf: VORLAUF };
   neu++;
@@ -124,3 +125,4 @@ for (const [k, g] of Object.entries(rollen.geraeusche || {})) {
 
 writeFileSync(ziel, JSON.stringify(aus));
 console.log(`\nFertig: ${neu} neu erzeugt, ${behalten} unverändert, ${saetze.length} Sätze insgesamt.`);
+if (fehlerListe.length) fehler(fehlerListe.length + ' Sätze fehlen (das Übrige ist gespeichert): ' + fehlerListe.join(' | '));
