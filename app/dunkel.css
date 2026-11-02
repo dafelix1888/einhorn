@@ -61,3 +61,7 @@ input:focus{border-color:var(--akzent);outline:none}
 .jetzt-karte p{color:#D9D2E8;margin:0 0 14px}
 .fertig-karte{background:#123321;border-radius:18px;padding:18px}
 .fertig-karte p{color:#B9E8C9;margin:4px 0 0}
+/* Weg zurück zur Übersicht (Bibliothek) */
+.heim-link{width:44px;height:44px;border-radius:50%;background:var(--karte);color:var(--text)!important;display:grid;place-items:center;flex:0 0 auto}
+.heim-link:hover{background:var(--hover)}
+.heim-link svg{width:20px;height:20px}
