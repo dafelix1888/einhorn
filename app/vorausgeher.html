@@ -5,22 +5,54 @@
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="dunkel.css">
 <style>
-.start{background:linear-gradient(130deg,#3B2A64,#1F1929);border-radius:16px;padding:16px;margin:10px 0 14px}
-.start b{font-size:1.6rem;display:block}
-#karte{height:46vh;min-height:260px;border-radius:14px;margin-bottom:14px}
-.leaflet-container{background:#1F1929}
+.kopf{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:4px 0 12px}
+.kopf b{font-size:1.1rem}
+.pille{background:var(--hover);border-radius:999px;padding:6px 12px;font-size:.9rem;text-align:right}
+.balken{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;margin-bottom:8px}
+.balken i{display:block;height:6px;border-radius:3px;background:var(--hover)}
+.balken i.fertig{background:var(--gruen)}
+.balken i.jetzt{background:var(--akzent)}
+.unter{color:var(--leise);font-size:.9rem;margin:0 0 14px}
+.fokus{background:linear-gradient(130deg,#3B2A64,var(--karte));border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+.fokus .klein-oben{color:var(--leise);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.fokus h1{font-size:1.6rem;margin:0}
+.weg{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.weg b{font-size:2.4rem;line-height:1}
+.weg span{color:var(--leise)}
+.weg .ort{color:var(--text);font-size:1.15rem;font-weight:700}
+.fokus .knopf{align-self:flex-start;min-height:44px;display:inline-flex;align-items:center;gap:8px}
+.fokus .knopf svg{width:18px;height:18px}
+.hinlegen{background:var(--karte);border-radius:16px;padding:14px;margin-bottom:12px}
+.hinlegen>b{display:block;margin-bottom:4px}
+.hinlegen label{display:flex;gap:12px;align-items:center;min-height:44px;padding:6px 0;border-top:1px solid var(--linie);font-weight:400;margin:0;cursor:pointer}
+.hinlegen input{width:24px;height:24px;flex:0 0 auto;accent-color:var(--gruen)}
+.hinlegen label:has(input:checked) span{color:var(--leise);text-decoration:line-through}
+.gruppe{color:var(--leise);font-size:.9rem;margin:8px 0 0}
+.weiter{display:block;width:100%;height:60px;border:0;border-radius:999px;background:var(--gruen);color:#062B12;font-weight:800;font-size:1.15rem;margin:4px 0 18px}
+.fertig-karte{background:#123321;border-radius:20px;padding:20px;margin-bottom:14px}
+.fertig-karte h1{font-size:1.5rem;margin:0 0 6px}
+.fertig-karte p{color:#B9E8C9;margin:0}
+details.alle{background:var(--karte);border-radius:16px;margin:0 0 14px}
+details.alle summary{list-style:none;cursor:pointer;min-height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-weight:800}
+details.alle summary::-webkit-details-marker{display:none}
+details.alle summary svg{width:20px;height:20px;transition:transform .2s}
+details.alle[open] summary svg{transform:rotate(180deg)}
+.alle-innen{padding:0 12px 12px}
+#karte{height:46vh;min-height:260px;border-radius:14px;margin-bottom:12px}
+.leaflet-container{background:#17121F}
 .nr-marker{background:var(--akzent-tief);color:#fff;font-weight:800;border-radius:50%;width:34px!important;height:34px!important;margin:-17px 0 0 -17px!important;display:grid;place-items:center;border:3px solid #fff;font-size:15px}
 .nr-marker.fertig{background:#16A34A}
+.nr-marker svg{width:16px;height:16px}
 .ich{width:18px!important;height:18px!important;margin:-9px 0 0 -9px!important;border-radius:50%;background:#38BDF8;border:3px solid #fff;box-shadow:0 0 0 6px rgba(56,189,248,.3)}
-.station{background:var(--karte);border-radius:14px;padding:14px;margin-bottom:10px;display:grid;grid-template-columns:40px 1fr;gap:12px}
-.station.fertig{opacity:.6}
+.station{background:var(--panel);border-radius:14px;padding:12px;margin-bottom:8px;display:grid;grid-template-columns:40px 1fr;gap:12px}
+.station.fertig{opacity:.7}
 .station .nr{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--akzent-tief)}
 .station.fertig .nr{background:#16A34A}
-.station b{display:block;font-size:1.05rem}
-.station ul{margin:8px 0;padding-left:1.1rem;color:var(--text)}
-.station li{margin:3px 0}
+.station .nr svg{width:18px;height:18px}
+.station b{display:block}
+.station ul{margin:6px 0;padding-left:1.1rem}
 .station .wo{color:var(--leise);font-size:.92rem}
-.station .dist{color:var(--akzent);font-weight:700;font-size:.92rem}
+.station .knopf{min-height:44px}
 </style></head><body>
 <main class="seite" id="seite"><p class="leise">Lädt …</p></main>
 <div class="toast" id="toast" hidden></div>
@@ -32,8 +64,11 @@
   'use strict';
   var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
   if(q.get('plan')){ try{ Party.ausLinkUebernehmen(thema, q.get('plan')); }catch(e){} q.delete('plan'); try{ history.replaceState(null,'',location.pathname+'?'+q.toString()); }catch(e){} }
-  var party=Party.lesen(thema), plan=Party.plan(thema), tour=null, ich=null, karte=null, marker=[], ichMarker=null;
+  var party=Party.lesen(thema), plan=Party.plan(thema), tour=null, ich=null, karte=null, ebene=null, ichMarker=null;
   var RAUM={'Küche':1,'Flur':2,'Treppe':3,'Türen':4,'Kissenberg':5,'Sofa':6};
+  var HAKEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var PFEIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  var PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3000); }
@@ -41,6 +76,9 @@
   if(!party){ $('seite').innerHTML='<h1>Vorausgeher</h1><p class="leise">Auf diesem Handy ist noch keine Party. Bitte die Gastgeber um den Link für den Vorausgeher.</p>'; return; }
   var v=Party.variante(party), drinnen=v==='c';
   party.aufgebaut=party.aufgebaut||{};
+  // Haken „hingelegt“ je Sache: nur auf diesem Handy, eigener Schlüssel (ein neuer Plan-Link überschreibt ihn nicht)
+  var GELEGT='sj.gelegt.'+thema, gelegt={};
+  try{ gelegt=JSON.parse(localStorage.getItem(GELEGT)||'{}')||{}; }catch(e){}
 
   // Was wohin: Packliste der Vorausgeher-Tasche den Stationen zuordnen
   function wasWohin(){
@@ -63,46 +101,105 @@
       return {i:i, titel:s.title||(s.steps&&s.steps[0].title)||'', name:drinnen?(o.wo||s.wo):(p.name||s.name), wo:o.wo||s.wo, lat:p.lat, lng:p.lng, sachen:je[i]||[], vorOrt:o.vorOrt||s.vorOrt};
     }).filter(Boolean);
   }
+  function hinlaufLink(s){ return 'https://www.google.com/maps/dir/?api=1&travelmode=walking&destination='+s.lat+','+s.lng; }
+  function ortText(s){ return esc(s.name)+(s.wo&&s.wo!==s.name?' · '+esc(s.wo):''); }
+
+  // Zeit bis zum Start der Gruppe
+  function startText(){
+    var d=Party.datum(party); if(!d) return '';
+    var min=Math.round((d-Date.now())/60000);
+    if(min<=0) return 'Gruppe ist <b>unterwegs</b>';
+    if(min<=120) return 'Gruppe startet in <b>'+min+' Min.</b>';
+    if(Party.tageBis(party)===0) return 'Gruppe startet um <b>'+esc(party.start)+' Uhr</b>';
+    return 'Party am <b>'+esc(Party.datumText(d))+'</b>';
+  }
+
+  // Grundgerüst einmal bauen; danach nur die Teile neu, die sich ändern (die Karte bleibt stehen)
+  function geruest(){
+    $('seite').innerHTML=
+      '<div class="kopf"><b>Vorausgeher</b><span class="pille" id="start"></span></div>'+
+      '<div class="balken" id="balken" role="img"></div>'+
+      '<p class="unter">'+esc(party.kind&&party.kind.name?party.kind.name+'s Party · ':'')+'Losgehen um '+Party.uhr(party,-20)+' Uhr. '+(drinnen?'Station 6 und 7 bei geschlossener Tür aufbauen.':'Mit der Tasche vorgehen und Station für Station aufbauen.')+'</p>'+
+      '<div id="fokus"></div>'+
+      '<details class="alle" id="alle"><summary><span id="alleTitel">Alle Stationen</span>'+PFEIL+'</summary><div class="alle-innen">'+(drinnen?'':'<div id="karte"></div>')+'<div id="liste"></div></div></details>'+
+      '<p class="hinweis">Die Haken sieht bisher nur dieses Handy. Dass das iPad live mitsieht, kommt mit dem Server.</p>';
+    $('alle').addEventListener('toggle', function(){ if($('alle').open && !drinnen){ if(karte===null) karteBauen(); else if(karte) karte.invalidateSize(); } });
+  }
+
   function zeichnen(){
     if(!tour) return;
-    var l=stationsListe(), fertig=l.filter(function(s){ return party.aufgebaut[s.i]; }).length, naechste=l.filter(function(s){ return !party.aufgebaut[s.i]; })[0];
-    var h='<div class="oben"><span class="leise">'+esc(party.kind&&party.kind.name?party.kind.name+'s Party':'Party')+'</span><span class="leise">'+fertig+' von '+l.length+' aufgebaut</span></div>'+
-      '<h1>Vorausgeher</h1><div class="start"><span class="leise">Losgehen um</span><b>'+Party.uhr(party,-20)+' Uhr</b><span class="leise">Die Gruppe startet um '+esc(party.start)+' Uhr. '+(drinnen?'Station 6 und 7 bei geschlossener Tür aufbauen.':'Mit der Tasche vorgehen und Station für Station aufbauen.')+'</span></div>'+
-      (drinnen?'':'<div id="karte"></div>');
-    l.forEach(function(s){
-      var an=!!party.aufgebaut[s.i], dist=(ich && s.lat!=null) ? PlanerKern.meter(ich, s) : null;
-      h+='<div class="station'+(an?' fertig':'')+'"><span class="nr">'+(an?'✓':s.i+1)+'</span><div><b>'+esc(s.titel)+'</b><div class="wo">'+esc(s.name)+(s.wo&&s.wo!==s.name?' · '+esc(s.wo):'')+'</div>'+
-        (dist!=null && s===naechste?'<div class="dist">noch '+km(dist)+'</div>':'')+
-        (s.sachen.length?'<ul>'+s.sachen.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>':'<p class="leise" style="margin:8px 0">Nichts aufbauen, nur vorbeigehen.</p>')+
-        (s.vorOrt?'<p class="leise" style="font-size:.9rem">Für die Gruppe: '+esc(s.vorOrt)+'</p>':'')+
-        '<div class="reihe">'+(s.lat!=null&&!drinnen?'<a class="knopf klein leer" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&travelmode=walking&destination='+s.lat+','+s.lng+'">Hinlaufen</a>':'')+
-        '<button class="knopf klein'+(an?' leer':'')+'" data-auf="'+s.i+'">'+(an?'Doch noch nicht':'Aufgebaut')+'</button></div></div></div>';
-    });
-    h+='<p class="hinweis">Die Haken sieht bisher nur dieses Handy. Dass das iPad live mitsieht, kommt mit dem Server.</p>';
-    var y=window.scrollY; $('seite').innerHTML=h; window.scrollTo(0,y);
-    if(!drinnen) karteZeichnen(l);
+    var l=stationsListe(), fertig=l.filter(function(s){ return party.aufgebaut[s.i]; }).length, n=l.filter(function(s){ return !party.aufgebaut[s.i]; })[0];
+    $('start').innerHTML=startText();
+    $('balken').innerHTML=l.map(function(s){ return '<i class="'+(party.aufgebaut[s.i]?'fertig':s===n?'jetzt':'')+'"></i>'; }).join('');
+    $('balken').setAttribute('aria-label', fertig+' von '+l.length+' Stationen aufgebaut');
+    $('alleTitel').textContent='Alle Stationen ('+fertig+' von '+l.length+' stehen)';
+
+    var h='';
+    if(n){
+      var dist=(!drinnen && ich && n.lat!=null) ? PlanerKern.meter(ich, n) : null;
+      h+='<section class="fokus" aria-label="Nächste Station"><div class="klein-oben">Nächste Station · '+(n.i+1)+' von '+tour.stationen.length+'</div><h1>'+esc(n.titel)+'</h1>'+
+        '<div class="weg">'+(dist!=null ? '<b>'+km(dist)+'</b><span>'+ortText(n)+'</span>' : '<span class="ort">'+ortText(n)+'</span>')+'</div>'+
+        (n.lat!=null && !drinnen ? '<a class="knopf leer" target="_blank" rel="noopener" href="'+hinlaufLink(n)+'">'+PIN+'Hinlaufen mit Karte</a>' : '')+'</section>';
+      h+='<div class="hinlegen"><b>Hier hinlegen</b>'+
+        (n.sachen.length ? n.sachen.map(function(x,k){ var id=n.i+':'+k; return '<label><input type="checkbox" data-gelegt="'+id+'"'+(gelegt[id]?' checked':'')+'><span>'+esc(x)+'</span></label>'; }).join('') : '<p class="leise" style="margin:6px 0 0">Nichts aufbauen, nur vorbeigehen.</p>')+
+        (n.vorOrt ? '<p class="gruppe">Für die Gruppe: '+esc(n.vorOrt)+'</p>' : '')+'</div>';
+      h+='<button type="button" class="weiter" data-weiter="'+n.i+'">Station steht, weiter</button>';
+    } else {
+      var letzte=l[l.length-1];
+      h+='<section class="fertig-karte"><h1>Alles aufgebaut!</h1><p>Warte an der letzten Station'+(letzte?' ('+esc(letzte.name)+')':'')+' und versteck dich, wenn die Gruppe kommt.</p></section>';
+    }
+    $('fokus').innerHTML=h;
+
+    $('liste').innerHTML=l.map(function(s){
+      var an=!!party.aufgebaut[s.i];
+      return '<div class="station'+(an?' fertig':'')+'"><span class="nr">'+(an?HAKEN:s.i+1)+'</span><div><b>'+esc(s.titel)+'</b><div class="wo">'+ortText(s)+'</div>'+
+        (s.sachen.length?'<ul>'+s.sachen.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>':'')+
+        '<div class="reihe" style="margin-top:6px">'+(s.lat!=null&&!drinnen?'<a class="knopf klein leer" target="_blank" rel="noopener" href="'+hinlaufLink(s)+'">Hinlaufen</a>':'')+
+        '<button type="button" class="knopf klein'+(an?' leer':'')+'" data-auf="'+s.i+'">'+(an?'Doch noch nicht':'Aufgebaut')+'</button></div></div></div>';
+    }).join('');
+    if(karte) markerZeichnen(l);
   }
-  function karteZeichnen(l){
-    var punkte=l.filter(function(s){ return s.lat!=null; }); if(!punkte.length){ $('karte').outerHTML='<p class="hinweis">Noch keine Route geplant. Die Gastgeber planen sie im Planer.</p>'; return; }
+
+  function karteBauen(){
+    var l=stationsListe(), punkte=l.filter(function(s){ return s.lat!=null; });
+    if(!punkte.length){ $('karte').outerHTML='<p class="hinweis" style="margin-bottom:12px">Noch keine Route geplant. Die Gastgeber planen sie im Planer.</p>'; karte=false; return; }
     karte=L.map('karte',{zoomControl:true}); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© OpenStreetMap'}).addTo(karte);
     var route=(Party.plan(thema)||{}).route; if(route) L.polyline(route,{color:'#A78BFA', weight:5, opacity:.8}).addTo(karte);
-    punkte.forEach(function(s){ L.marker([s.lat,s.lng],{icon:L.divIcon({className:'nr-marker'+(party.aufgebaut[s.i]?' fertig':''), html:party.aufgebaut[s.i]?'✓':String(s.i+1), iconSize:[34,34]})}).addTo(karte).bindTooltip((s.i+1)+' · '+s.name); });
-    if(ich) ichMarker=L.marker([ich.lat,ich.lng],{icon:L.divIcon({className:'ich', iconSize:[18,18]})}).addTo(karte);
+    ebene=L.layerGroup().addTo(karte);
+    markerZeichnen(l);
     karte.fitBounds(L.latLngBounds(punkte.map(function(s){ return [s.lat,s.lng]; }).concat(ich?[[ich.lat,ich.lng]]:[])).pad(0.15));
   }
-  document.addEventListener('click', function(e){
-    var b=e.target.closest('[data-auf]'); if(!b) return;
-    var i=b.getAttribute('data-auf'); party.aufgebaut[i]=!party.aufgebaut[i];
+  function markerZeichnen(l){
+    ebene.clearLayers();
+    l.forEach(function(s){ if(s.lat==null) return; var an=!!party.aufgebaut[s.i];
+      L.marker([s.lat,s.lng],{icon:L.divIcon({className:'nr-marker'+(an?' fertig':''), html:an?HAKEN:String(s.i+1), iconSize:[34,34]})}).addTo(ebene).bindTooltip((s.i+1)+' · '+s.name); });
+    if(ich){ if(ichMarker) ichMarker.setLatLng([ich.lat,ich.lng]); else ichMarker=L.marker([ich.lat,ich.lng],{icon:L.divIcon({className:'ich', iconSize:[18,18]})}).addTo(karte); }
+  }
+
+  function setzen(i, an){
+    party.aufgebaut[i]=an;
     try{ var alt=Party.lesen(thema)||party; alt.aufgebaut=party.aufgebaut; localStorage.setItem('sj.party.'+thema, JSON.stringify(alt)); }catch(x){}
-    if(party.aufgebaut[i]) toast('Station '+(+i+1)+' steht.');
+    if(an) toast('Station '+(+i+1)+' steht.');
     zeichnen();
+  }
+  document.addEventListener('click', function(e){
+    var w=e.target.closest('[data-weiter]');
+    if(w){ setzen(w.getAttribute('data-weiter'), true); window.scrollTo(0,0); return; }
+    var b=e.target.closest('[data-auf]'); if(!b) return;
+    var i=b.getAttribute('data-auf'); setzen(i, !party.aufgebaut[i]);
+  });
+  document.addEventListener('change', function(e){
+    var c=e.target.closest('[data-gelegt]'); if(!c) return;
+    gelegt[c.getAttribute('data-gelegt')]=c.checked;
+    try{ localStorage.setItem(GELEGT, JSON.stringify(gelegt)); }catch(x){}
   });
   var letzte=0;
   if(!drinnen && navigator.geolocation) navigator.geolocation.watchPosition(function(p){
     ich={lat:p.coords.latitude, lng:p.coords.longitude};
     if(Date.now()-letzte>8000){ letzte=Date.now(); zeichnen(); }               // alle paar Sekunden: Abstand und eigener Punkt
   }, function(){}, {enableHighAccuracy:true, maximumAge:5000});
-  fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }).then(function(t){ tour=t; zeichnen(); })
+  setInterval(function(){ if(tour) $('start').innerHTML=startText(); }, 30000);
+  fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }).then(function(t){ tour=t; geruest(); zeichnen(); })
     ['catch'](function(){ $('seite').innerHTML='<p>Thema lässt sich nicht laden. Einmal mit Netz öffnen.</p>'; });
 })();
 </script>

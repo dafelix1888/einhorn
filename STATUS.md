@@ -1,6 +1,6 @@
 # Zauberspiegel: Status und nächste Schritte
 
-Stand: 2. November 2026. Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
+Stand: 2. November 2026 (nach PR #39). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
 
 ## Worum es geht
 
@@ -9,18 +9,18 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 - Live: <https://dafelix1888.github.io/einhorn/app/> (GitHub Pages, Repo `dafelix1888/einhorn`, öffentlich)
 - Original vom Geburtstag: `/index.html`, verschlüsselt mit dem Zauberwort (GitHub-Secret `ZAUBERWORT`). Es bleibt unverändert.
 
-## Was fertig ist (PR #31 bis #36)
+## Was fertig ist (PR #31 bis #39)
 
 | Bereich | Dateien | Stand |
 |---|---|---|
-| Startseite | `app/index.html` | Katalog im Spotify-Stil: Kacheln (Einhorn spielbar, 6 Platzhalter), Detailseite mit Hörprobe, Stationen, Figuren, Ausrüstung, Merkliste, Spalte „Deine nächste Party“ |
-| Party | `app/party.html`, `app/party.js` | Assistent (Kind, Termin, Gäste, Ort mit Plan B), Übersicht mit nächstem Schritt, Zeitplan mit Kalender-Export, Einkaufsliste mit Mengen, Plan-B-Umschalter, Links zum Teilen |
-| Planer | `app/planer.html`, `planer.js`, `planer-kern.js` | Adresse, Richtung, Strecke → Route aus OpenStreetMap mit passenden Orten je Station (Straßenübergang, Zaun, Kreuzung, Hügel, Bank), Höhenprofil, Rundkurs, Stationen per Finger verschieben mit Live-Strecke und -Dauer |
-| Spiel | `app/spiel.html`, `tour-laden.js` | Zauberspiegel mit allen Funktionen des Originals, Inhalte aus `themen/einhorn/tour.json`, Punkte aus dem Plan, Ortsansagen live über den Worker (sobald eingerichtet) |
+| Startseite | `app/index.html` | Katalog im Spotify-Stil: Kacheln (Einhorn spielbar, 6 Platzhalter), Detailseite mit Hörprobe, Stationen, Figuren, Ausrüstung, Merkliste, Spalte „Deine nächste Party“ mit „Jetzt dran“. Auf dem Handy: eigene Party zuerst, dann Einhorn groß, „Bald verfügbar“ als Reihe |
+| Party | `app/party.html`, `app/party.js` | Assistent in 3 Schritten (Für wen und wann, Wer und wo, Fertig; Plan B, Ausdrucke, Vorausgeher voreingestellt). Übersicht mit 6 gebündelten Schritten (Einladen, Bestellen, Route + Probelauf, Bastel- und Druckabend, iPad startklar, Partytag), Karte „Jetzt dran“, Kalender-Export, Einkaufsliste, Plan-B-Umschalter, Links zum Teilen. Alte Einzelhaken bleiben als Teilschritte gültig |
+| Planer | `app/planer.html`, `planer.js`, `planer-kern.js`, `stil.css` | Dunkel: Karte über den ganzen Bildschirm, unten „Euer Weg“ mit gewählter Station, „Andere Route“ und „Route übernehmen“. Adresse, Richtung, Strecke → Route aus OpenStreetMap mit passenden Orten je Station, Höhenprofil, Rundkurs, Stationen per Finger verschieben (aufklappbar „Alle Stationen, Höhen, Link“) |
+| Spiel | `app/spiel.html`, `tour-laden.js` | Zauberspiegel mit allen Funktionen des Originals, jetzt im dunklen Nachthimmel-Stil (Spiegelinneres bleibt hell). Kopfzeile mit Regenbogen und „Station X von 7“, Ablauf und Einrichten hinter dem Knopf „Erwachsene“, großer Hauptknopf, Hinweise als Zeile „Für Erwachsene“. Funkel in 3D (`funkel3d.js`), Inhalte aus `tour.json`, Ortsansagen live über den Worker (sobald eingerichtet) |
 | Druck | `app/druck.html` | Einladung (2 pro Blatt und als Text), Urkunde je Kind, schlafende Wolke |
-| Einladung | `app/einladung.html` | Seite für Gast-Eltern, Daten stecken im Link, Zusage per WhatsApp, Kalender, Hörprobe |
-| Vorausgeher | `app/vorausgeher.html` | Startzeit, Karte mit Stationen und eigenem Standort, was wo hingelegt wird, Haken „aufgebaut“ (nur auf dem eigenen Handy) |
-| Bereit-Check | `app/bereit.html` | Ton, Stimmen offline laden, GPS, Akku, Sperre, Offline-Speicher |
+| Einladung | `app/einladung.html` | Seite für Gast-Eltern: Funkel im Goldrand mit Hörprobe, Wann/Wo/Abholen als Kacheln, „Wir kommen!“ (WhatsApp oder Text kopieren), danach Bestätigung mit Kalender. Daten stecken im Link |
+| Vorausgeher | `app/vorausgeher.html` | Fokus auf die nächste Station: Entfernung, „Hier hinlegen“ zum Abhaken, „Station steht, weiter“; Countdown bis zum Gruppenstart; Karte und alle Stationen aufklappbar. Haken nur auf dem eigenen Handy |
+| Startklar | `app/bereit.html` | Bereit-Check und Partytag auf einer Seite: Stimmen, Offline, GPS, Akku prüfen sich selbst, Ton und Sperre bestätigt man; darunter Uhrzeiten für Kreidespur, Vorausgeher (mit Link) und Start |
 | Stimmen | `stimmen/`, `stimmen/pakete/` | Feste Sätze per GitHub Action bei ElevenLabs; `aufteilen.mjs` teilt in Pakete (Geschichte 2,4 MB, je Erzähler etwa 5 MB); das Spiel lädt nur, was fehlt |
 | Live-Stimmen | `worker/` | Cloudflare Worker für Ortsansagen, nur Vorlagen-Sätze, mit Cache. **Noch nicht eingerichtet** (siehe unten) |
 
@@ -40,7 +40,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 3. **Server wählen** (Cloudflare KV/D1 + R2 oder Supabase). Daran hängen: Live-Haken des Vorausgehers, Party auf mehreren Geräten, Namens-Sätze speichern, später Konten und Käufe.
 4. **Etappe 2: Funkel kennt das Kind.** Namens-Sätze an den drei Stellen, Probehören, Aussprache-Feld, Grenze für Neuerzeugungen, später hinter einer Bezahlschranke.
 5. **Anpassen mit Leitplanken:** Prompt-Eingabe, KI schätzt Umfang und ändert Sätze, Eltern prüfen die Änderungen, dann Vertonung. Braucht Server und Bezahlung.
-6. **Planer und Spiel im dunklen Stil** angleichen (bisher hell).
+6. ~~Planer und Spiel im dunklen Stil~~ erledigt in PR #39. Offen: echter Test auf iPad und Handy (dunkle OSM-Karte mit echten Kacheln, Ziehen per Touch).
 7. **Zweites Thema**, damit die Engine wirklich generisch ist: Bilder (`PIC`), Regenbogen-Fortschritt und Farben stecken noch in `spiel.html` und müssen ins Thema wandern.
 8. **Partnerlinks** in `tour.json` → `utensilien[].link` eintragen (Partner-ID von Felix nötig).
 

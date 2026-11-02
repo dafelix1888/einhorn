@@ -5,20 +5,38 @@
 <title>Einladung · Zauberspiegel</title>
 <link rel="stylesheet" href="dunkel.css">
 <style>
-.held{text-align:center;padding:24px 0 8px}
-.held img{width:min(260px,70vw);aspect-ratio:1;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
-.held .art{color:var(--leise);font-weight:600;margin-top:18px}
-.held h1{font-size:clamp(2.4rem,9vw,3.6rem);margin:6px 0 4px}
-.daten{display:grid;gap:1px;background:var(--linie);border-radius:14px;overflow:hidden;margin:20px 0}
-.daten div{background:var(--karte);padding:14px 16px;display:grid;grid-template-columns:7.5rem 1fr;gap:10px}
-.daten span{color:var(--leise)}
-.daten b{font-weight:700}
-.antwort{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.antwort .knopf{text-align:center}
-.probe{display:flex;align-items:center;gap:14px;background:var(--karte);border-radius:14px;padding:12px;margin:14px 0}
-.probe button{width:52px;height:52px;border-radius:50%;border:0;background:var(--akzent);color:#160C2B;display:grid;place-items:center;flex:0 0 auto}
-.probe svg{width:22px;height:22px}
-.fuss{margin-top:28px;border-top:1px solid var(--linie);padding-top:18px}
+body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no-repeat,var(--bg)}
+.seite{max-width:30rem;display:flex;flex-direction:column;gap:16px;padding-top:24px}
+.spiegel{position:relative;width:min(240px,64vw);aspect-ratio:1;margin:0 auto}
+.ring{width:100%;height:100%;border-radius:50%;padding:10px;background:linear-gradient(135deg,#F7DE9A,#C8922A 45%,#F2D27A 70%,#B8862B);box-shadow:0 12px 40px rgba(0,0,0,.55)}
+.ring div{width:100%;height:100%;border-radius:50%;overflow:hidden}
+.ring img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.6);transform-origin:50% 66%}
+#probe{position:absolute;right:0;bottom:8px;width:56px;height:56px;border-radius:50%;border:3px solid var(--bg);background:var(--akzent);color:#160C2B;display:grid;place-items:center;padding:0}
+#probe svg{width:22px;height:22px}
+.titel{text-align:center}
+.titel .von{color:var(--leise);font-size:.9rem;font-weight:600}
+.titel h1{font-size:clamp(2.2rem,9vw,3rem);line-height:1.05;margin:4px 0 8px}
+.titel p{margin:0;color:#D9D2E8}
+.kacheln{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center}
+.kacheln div{background:var(--karte);border-radius:12px;padding:10px 6px;overflow-wrap:anywhere}
+.kacheln span{display:block;color:var(--leise);font-size:.78rem}
+.kacheln small{display:block;font-size:.85rem}
+.mit{margin:0;text-align:center;color:var(--leise);font-size:.92rem}
+.antwort{display:flex;flex-direction:column;gap:10px}
+.antwort .ja,.antwort .nein{font:inherit;display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:999px;text-align:center}
+.antwort .ja{font-weight:800;font-size:1.1rem;min-height:56px;border:0;background:var(--gruen);color:#062B12}
+.antwort .nein{font-weight:700;min-height:48px;border:1.5px solid var(--leise);background:none;color:var(--text)}
+.frist{margin:0;text-align:center;color:var(--leise);font-size:.85rem}
+.danke{border-radius:16px;padding:16px;text-align:center}
+.danke.gut{background:#123321}
+.danke.gut p{color:#B9E8C9}
+.danke.schade{background:var(--karte)}
+.danke b{font-size:1.15rem}
+.danke p{margin:4px 0 12px}
+.danke .kal{font:inherit;font-weight:800;border:0;background:var(--gruen);color:#062B12;border-radius:999px;padding:0 20px;min-height:44px}
+.danke .zurueck{font:inherit;background:none;border:0;color:var(--leise);text-decoration:underline;min-height:44px;padding:0 10px;display:block;margin:6px auto 0}
+.fuss{margin-top:12px;border-top:1px solid var(--linie);padding-top:18px;text-align:center;font-size:.92rem}
+.fuss a{display:inline-flex;align-items:center;min-height:44px}
 </style></head><body>
 <main class="seite" id="seite"></main>
 <audio id="ton" preload="none"></audio>
@@ -27,15 +45,16 @@
 <script>
 (function(){
   'use strict';
-  var PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg>', PAUSE='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
+  var PLAY='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>', PAUSE='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3000); }
   var e=null; try{ e=Party.decode(new URLSearchParams(location.search).get('e')||''); }catch(x){}
-  if(!e || !e.d){ $('seite').innerHTML='<h1>Einladung nicht gefunden</h1><p class="leise">Der Link ist unvollständig. Bitte die Gastgeber, ihn noch einmal zu schicken.</p>'; return; }
-  var name=String(e.n||'').slice(0,30), alter=e.a, start=new Date(e.d+'T'+(e.s||'15:00')+':00');
+  if(!e || !e.d){ $('seite').innerHTML='<h1>Einladung nicht gefunden</h1><p class="leise">Der Link ist unvollständig. Bitte die Gastgeber, ihn noch einmal zu schicken.</p><div class="fuss"><a href="index.html">Zur Startseite</a></div>'; return; }
+  var name=String(e.n||'').slice(0,30), alter=e.a, start=new Date(e.d+'T'+(e.s||'15:00')+':00'), thema=String(e.t||'einhorn').replace(/[^a-z0-9-]/gi,'');
   var datumLang=start.toLocaleDateString('de-DE',{weekday:'long', day:'numeric', month:'long'});
-  var bis=e.r ? new Date(e.r+'T12:00:00').toLocaleDateString('de-DE',{day:'numeric', month:'long'}) : '';
+  var datumKurz=start.toLocaleDateString('de-DE',{weekday:'short', day:'numeric', month:'numeric'});
+  var bis=e.r ? new Date(e.r+'T12:00:00').toLocaleDateString('de-DE',{weekday:'short', day:'numeric', month:'numeric'}) : '';
   var draussen=e.o!=='drinnen';
   document.title=name+' wird '+alter+'! · Einladung';
 
@@ -52,24 +71,51 @@
       'DTSTART:'+f(start),'DTEND:'+f(ende),'SUMMARY:'+name+'s Einhorn-Party','LOCATION:'+String(e.w||'').replace(/[,;]/g,'\\$&'),'DESCRIPTION:Abholen um '+(e.b||'')+' Uhr'+(draussen?'. Feste Schuhe und Kleidung für draußen.':''),'END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';
   }
   var ja=antwortLink(true), nein=antwortLink(false);
+
+  // Antwort-Bereich: erst die zwei Knöpfe, nach dem Tippen eine Bestätigung. Die Antwort geht nur über WhatsApp oder den kopierten Text an die Gastgeber.
+  function antwortZeichnen(stand){
+    var h;
+    if(stand==='ja'){
+      h='<div class="danke gut" role="status"><b>Schön, ihr seid dabei!</b><p>'+(ja?'Schickt die Nachricht in WhatsApp ab, dann wissen die Gastgeber Bescheid.':'Schickt den kopierten Text an die Gastgeber, dann wissen sie Bescheid.')+'</p>'+
+        '<button type="button" class="kal" id="kal">In den Kalender</button><button type="button" class="zurueck" data-zurueck>Antwort ändern</button></div>';
+    } else if(stand==='nein'){
+      h='<div class="danke schade" role="status"><b>Schade!</b><p class="leise">'+(ja?'Schickt die Nachricht in WhatsApp ab, dann wissen die Gastgeber Bescheid.':'Schickt den kopierten Text an die Gastgeber, dann wissen sie Bescheid.')+'</p>'+
+        '<button type="button" class="zurueck" data-zurueck>Antwort ändern</button></div>';
+    } else {
+      h='<div class="antwort">'+(ja
+        ? '<a class="ja" href="'+ja+'" target="_blank" rel="noopener" data-gewaehlt="ja">Wir kommen!</a><a class="nein" href="'+nein+'" target="_blank" rel="noopener" data-gewaehlt="nein">Wir können leider nicht</a>'
+        : '<button type="button" class="ja" data-antwort="1">Wir kommen!</button><button type="button" class="nein" data-antwort="0">Wir können leider nicht</button>')+'</div>'+
+        (bis?'<p class="frist">Bitte bis '+esc(bis)+' Bescheid geben.</p>':'');
+    }
+    $('antwort').innerHTML=h;
+  }
+
   $('seite').innerHTML=
-    '<div class="held"><img src="themen/'+String(e.t||'einhorn').replace(/[^a-z0-9-]/gi,'')+'/cover.svg" alt=""><div class="art">Einladung zum Kindergeburtstag</div><h1>'+esc(name)+' wird '+esc(alter)+'!</h1>'+
-    '<p class="leise">Komm mit auf Funkels Regenbogen-Abenteuer: eine Einhorn-Schnitzeljagd, bei der ein sprechender Zauberspiegel die Kinder von Station zu Station führt.</p></div>'+
-    '<div class="daten"><div><span>Wann</span><b>'+esc(datumLang)+', '+esc(e.s)+' Uhr</b></div><div><span>Wo</span><b>'+esc(e.w)+'</b></div><div><span>Abholen</span><b>'+esc(e.b)+' Uhr</b></div>'+
-    (draussen?'<div><span>Mitbringen</span><b>Feste Schuhe und Kleidung für draußen</b></div>':'')+'</div>'+
-    (bis?'<p class="leise">Bitte sagt bis '+esc(bis)+' Bescheid.</p>':'')+
-    '<div class="antwort">'+(ja?'<a class="knopf" href="'+ja+'" target="_blank" rel="noopener">Wir kommen</a><a class="knopf leer" href="'+nein+'" target="_blank" rel="noopener">Wir können nicht</a>':'<button class="knopf" data-antwort="1">Zusage kopieren</button><button class="knopf leer" data-antwort="0">Absage kopieren</button>')+'</div>'+
-    '<div class="reihe" style="margin-top:12px"><button class="knopf leer klein" id="kal">In den Kalender</button></div>'+
-    '<div class="probe"><button id="probe" aria-label="Hörprobe abspielen">'+PLAY+'</button><div><b>So klingt Funkel</b><br><span class="leise">Der Anfang der Geschichte, 21 Sekunden</span></div></div>'+
-    '<div class="fuss"><p class="leise">Selbst bald eine Party? Funkels Regenbogen plant die Schnitzeljagd für jeden Park und jede Wohnung.</p><a href="index.html#/abenteuer/einhorn">Mehr erfahren</a></div>';
+    '<div class="spiegel"><div class="ring"><div><img src="themen/'+thema+'/cover.svg" alt="Funkel, das Einhorn"></div></div><button type="button" id="probe" aria-label="Funkels Gruß anhören">'+PLAY+'</button></div>'+
+    '<div class="titel"><div class="von">Funkel lädt ein</div><h1>'+esc(name)+' wird '+esc(alter)+'!</h1><p>Eine Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.</p></div>'+
+    '<div class="kacheln"><div><span>Wann</span><b>'+esc(datumKurz)+'</b><small>'+esc(e.s)+' Uhr</small></div><div><span>Wo</span><b>'+esc(e.w)+'</b></div><div><span>Abholen</span><b>'+esc(e.b)+'</b><small>Uhr</small></div></div>'+
+    (draussen?'<p class="mit">Bitte feste Schuhe und Kleidung für draußen.</p>':'')+
+    '<div id="antwort"></div>'+
+    '<div class="fuss"><p class="leise">Selbst bald eine Party? Funkels Regenbogen plant die Schnitzeljagd für jeden Park und jede Wohnung.</p><a href="index.html#/abenteuer/einhorn">So funktioniert der Zauberspiegel</a></div>';
+  antwortZeichnen('');
+
   document.addEventListener('click', function(ev){
+    var g=ev.target.closest('[data-gewaehlt]');
+    if(g){ var s=g.getAttribute('data-gewaehlt'); setTimeout(function(){ antwortZeichnen(s); }, 0); return; }   // erst nach dem Öffnen von WhatsApp umbauen
     var b=ev.target.closest('[data-antwort]');
-    if(b){ var t=antwortText(b.getAttribute('data-antwort')==='1'); if(navigator.share){ navigator.share({text:t})['catch'](function(){}); return; } try{ navigator.clipboard.writeText(t).then(function(){ toast('Text kopiert. An die Gastgeber schicken.'); }); }catch(x){ prompt('Text kopieren:', t); } return; }
+    if(b){
+      var jaW=b.getAttribute('data-antwort')==='1', t=antwortText(jaW);
+      antwortZeichnen(jaW?'ja':'nein');
+      if(navigator.share){ navigator.share({text:t})['catch'](function(){}); return; }
+      try{ navigator.clipboard.writeText(t).then(function(){ toast('Text kopiert. An die Gastgeber schicken.'); }, function(){ prompt('Text kopieren:', t); }); }catch(x){ prompt('Text kopieren:', t); }
+      return;
+    }
+    if(ev.target.closest('[data-zurueck]')){ antwortZeichnen(''); return; }
     if(ev.target.closest('#kal')){ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics()],{type:'text/calendar'})); a.download='einladung.ics'; document.body.appendChild(a); a.click(); a.remove(); return; }
-    if(ev.target.closest('#probe')){ var au=$('ton'); if(!au.paused){ au.pause(); return; } if(!au.src) au.src='themen/'+String(e.t||'einhorn').replace(/[^a-z0-9-]/gi,'')+'/hoerprobe.mp3'; au.play()['catch'](function(){}); }
+    if(ev.target.closest('#probe')){ var au=$('ton'); if(!au.paused){ au.pause(); return; } if(!au.src) au.src='themen/'+thema+'/hoerprobe.mp3'; au.play()['catch'](function(){}); }
   });
-  $('ton').addEventListener('play', function(){ $('probe').innerHTML=PAUSE; });
-  $('ton').addEventListener('pause', function(){ $('probe').innerHTML=PLAY; });
+  $('ton').addEventListener('play', function(){ $('probe').innerHTML=PAUSE; $('probe').setAttribute('aria-label','Anhalten'); });
+  $('ton').addEventListener('pause', function(){ $('probe').innerHTML=PLAY; $('probe').setAttribute('aria-label','Funkels Gruß anhören'); });
 })();
 </script>
 </body></html>

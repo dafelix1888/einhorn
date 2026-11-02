@@ -40,3 +40,24 @@ input:focus{border-color:var(--akzent);outline:none}
 .fortschritt i.an{background:var(--akzent)}
 .hinweis{background:color-mix(in srgb,var(--akzent) 14%,var(--karte));border-radius:12px;padding:12px 14px;font-size:.95rem}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text);color:#111;padding:12px 18px;border-radius:12px;z-index:50;max-width:90vw}
+/* Ergänzungen fürs Redesign (Party, Startklar): nur neue Klassen, Bestehendes bleibt */
+.knopf.mittel{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:10px 18px}
+.knopf.breit{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;font-size:1.1rem;text-align:center}
+.knopf.still{background:var(--hover);color:var(--leise)}
+.textknopf{background:none;border:0;padding:10px 0;min-height:44px;font-weight:700;color:var(--akzent);text-decoration:none;display:inline-flex;align-items:center}
+.punkt{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.85rem;flex:0 0 auto;background:var(--hover);color:var(--text)}
+.punkt svg{width:16px;height:16px}
+.punkt.ok{background:var(--gruen);color:#062B12}
+.punkt.dran{background:var(--akzent);color:#160C2B}
+.punkt.warn{background:var(--gelb);color:#3A2A00}
+.punkt.ring{background:none;border:2px solid var(--leise)}
+.leiste{display:flex;align-items:center;gap:12px}
+.leiste .bahn{flex:1;height:8px;background:var(--hover);border-radius:4px;overflow:hidden}
+.leiste .bahn i{display:block;height:100%;background:var(--gruen);transition:width .3s}
+.leiste b{font-size:.92rem;white-space:nowrap}
+.jetzt-karte{background:linear-gradient(130deg,#3B2A64,#1F1929);border-radius:18px;padding:18px}
+.jetzt-karte .marke{color:var(--leise);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.jetzt-karte h2{font-size:1.35rem;margin:6px 0 4px}
+.jetzt-karte p{color:#D9D2E8;margin:0 0 14px}
+.fertig-karte{background:#123321;border-radius:18px;padding:18px}
+.fertig-karte p{color:#B9E8C9;margin:4px 0 0}
