@@ -1093,7 +1093,8 @@ function meter(a,b){            // Abstand zweier Punkte in Metern (Haversine)
   var h=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLng/2)*Math.sin(dLng/2);
   return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));
 }
-function sollOeffnen(dist, acc, radius){ return dist<=radius && acc<=40; }
+function radiusMit(acc, radius){ return radius + Math.min(20, Math.max(0, (acc||0)-10)*0.5); }   // ungenaues GPS (z. B. iPad ohne Mobilfunk): Radius wächst mit, höchstens 20 m
+function sollOeffnen(dist, acc, radius){ return acc<=60 && dist<=radiusMit(acc, radius); }
 function waerme(dist, radius){
   if(dist<=radius+10) return 'heiß';
   if(dist<=radius+30) return 'warm';
@@ -1615,12 +1616,17 @@ function abstand(){
 function spruenge(d){ return Math.max(0, Math.round(d/0.6)); }   // Einhorn-Sprünge eines Dreijährigen
 var seekSeit=0;                         // wann die aktuelle Suche begann; das GPS öffnet erst nach einer Schonfrist
 function jetztMs(){ return Date.now(); }
-var imRadiusSeit=0, verlassen=false;    // Ankunft erst, wenn das GPS 2,5 s lang im Radius bleibt, das Signal frisch ist und man vorher außerhalb war
+var imRadiusSeit=0, verlassen=false, minD=Infinity;   // minD: kleinster Abstand dieser Suche, für die Vorbeigelaufen-Erkennung
+    // Ankunft erst, wenn das GPS 2,5 s lang im Radius bleibt, das Signal frisch ist und man vorher außerhalb war
 function pruefeAnkunft(){
   if(!unterwegs()) return;
   var d=abstand();
   if(d!==null && d>state.radius+15) verlassen=true;
   if(jetztMs()-seekSeit<10000){ imRadiusSeit=0; return; }
+  if(!indoor() && d!==null && fixFrisch() && fix.acc<=60 && state.phase==='seek'){   // vorbeigelaufen: erst nah dran, jetzt wieder 15 m weiter weg -> Station anbieten
+    if(d<minD) minD=d;
+    if(verlassen && minD<=radiusMit(fix.acc, state.radius)+25 && d>=minD+15){ minD=Infinity; ankommen('vorbei'); return; }
+  }
   if(!indoor() && d!==null && verlassen && fixFrisch() && sollOeffnen(d, fix.acc, state.radius)){
     if(!imRadiusSeit) imRadiusSeit=jetztMs();
     else if(jetztMs()-imRadiusSeit>=2500){ if(state.phase==='heim') heimAngekommen(); else ankommen('gps'); }
@@ -1797,7 +1803,7 @@ function renderProtokoll(){
     if(!r.eintraege.length){ h+='<p class="lead">Keine Station erreicht.</p>'; return; }
     h+='<table class="proto"><tr><th>Station</th><th>Weg</th><th>Sammeln</th><th>GPS</th><th>Geöffnet</th></tr>';
     r.eintraege.forEach(function(e){
-      h+='<tr><td>'+(e.i+1)+' · '+esc(STATIONS[e.i].name)+'</td><td class="z">'+mmss(e.dauer)+'</td><td class="z">'+(e.warte!=null?e.warte+' s':'–')+'</td><td class="z">'+(e.acc!=null?'±'+e.acc+' m':'–')+'</td><td>'+(e.modus==='gps'?'per GPS':'von Hand')+'</td></tr>';
+      h+='<tr><td>'+(e.i+1)+' · '+esc(STATIONS[e.i].name)+'</td><td class="z">'+mmss(e.dauer)+'</td><td class="z">'+(e.warte!=null?e.warte+' s':'–')+'</td><td class="z">'+(e.acc!=null?'±'+e.acc+' m':'–')+'</td><td>'+(e.modus==='gps'?'per GPS':e.modus==='vorbei'?'vorbeigelaufen':'von Hand')+'</td></tr>';
     });
     h+='</table>';
   });
@@ -1931,7 +1937,7 @@ function ankunftAbbrechen(){ if(ankunftT){ clearTimeout(ankunftT); ankunftT=null
 function weiter(){
   still();
   if(state.idx>=N-1){ state.phase='end'; state.step=0; klang(KLANG_ENDE); konfetti(160, .5, .3); setTimeout(function(){ konfetti(120, .2, .35); konfetti(120, .8, .35); }, 500); }
-  else { state.idx+=1; state.phase='seek'; state.step=0; naeheIst=0; naeheZiel=0; seekSeit=jetztMs(); verlassen=false; imRadiusSeit=0; }
+  else { state.idx+=1; state.phase='seek'; state.step=0; naeheIst=0; naeheZiel=0; seekSeit=jetztMs(); verlassen=false; minD=Infinity; imRadiusSeit=0; }
   save(); render(); pruefeAnkunft();
 }
 function verzaubern(){
@@ -1968,7 +1974,7 @@ function spurTipp(id){
 }
 function test(){ tonAn(); if(state.phase==='seek') ankommen('hand'); }
 function heimStart(){                   // nach dem Schatz: Sprünge bis zur Haustür zählen
-  tonAn(); still(); state.phase='heim'; state.step=0; seekSeit=jetztMs(); verlassen=false; imRadiusSeit=0; naeheIst=0; naeheZiel=0; heimMarke=Infinity;
+  tonAn(); still(); state.phase='heim'; state.step=0; seekSeit=jetztMs(); verlassen=false; minD=Infinity; imRadiusSeit=0; naeheIst=0; naeheZiel=0; heimMarke=Infinity;
   wachBleiben(); gpsStart(); save(); render(); pruefeAnkunft();
 }
 var heimMarke=Infinity;
@@ -1979,7 +1985,7 @@ function heimAngekommen(){
 function gehZu(n){                      // Sprung aus dem Ablauf-Faden zu einem beliebigen Schritt
   var t=TEXTE[n]; if(!t) return;
   tonAn(); still(); ankunftAbbrechen(); trackTaps={}; galN=0; trackMsg=''; naeheIst=0; naeheZiel=0; heimMarke=Infinity;
-  state.idx=t.i; state.phase=t.phase; state.step=t.step; seekSeit=jetztMs(); verlassen=false; imRadiusSeit=0;
+  state.idx=t.i; state.phase=t.phase; state.step=t.step; seekSeit=jetztMs(); verlassen=false; minD=Infinity; imRadiusSeit=0;
   if(t.phase!=='start'){ wachBleiben(); gpsStart(); }
   save(); zeige('tour'); render(); pruefeAnkunft();
 }

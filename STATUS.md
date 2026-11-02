@@ -44,6 +44,15 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 7. **Zweites Thema**, damit die Engine wirklich generisch ist: Bilder (`PIC`), Regenbogen-Fortschritt und Farben stecken noch in `spiel.html` und müssen ins Thema wandern.
 8. **Partnerlinks** in `tour.json` → `utensilien[].link` eintragen (Partner-ID von Felix nötig).
 
+## Erfahrung vom Geburtstag: GPS
+
+Punkte mit dem Handy gesetzt, gespielt mit dem iPad: Die Stationen öffneten oft nicht, die Gruppe lief vorbei. Ursachen: zwei Geräte mit unterschiedlichem Fehler, und ein iPad ohne Mobilfunk hat kein GPS (nur WLAN-Ortung). Seit PR #39:
+
+- Die Punkte kommen aus der Karte des Planers statt vom Handy.
+- Der Öffnungsradius wächst mit der Ungenauigkeit (15 m plus bis zu 20 m), Messungen bis ±60 m zählen.
+- Läuft die Gruppe vorbei (erst nah dran, dann wieder 15 m weiter weg), bietet der Spiegel die Station selbst an. Im Protokoll steht dann „vorbeigelaufen“.
+- Der Bereit-Check warnt bei mehr als ±50 m und empfiehlt Handy oder iPad mit Mobilfunk als Spiegel.
+
 ## Offene Fragen
 
 - Server: Cloudflare oder Supabase?

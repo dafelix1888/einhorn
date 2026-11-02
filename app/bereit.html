@@ -60,7 +60,7 @@
       stimmenKnopf ? '<button type="button" class="knopf klein mittel" id="laden"'+(details.laedt?' disabled':'')+'>'+(details.laedt?'Lädt …':'Laden')+'</button>' : '',
       stimmenKnopf ? '<div class="balken"><i id="stimm-balken" style="width:'+(details.anteil||0)+'%"></i></div>' : '');
     h+=zeile('offline','Ohne Netz spielbar', details.offlineText||'Wird geprüft …');
-    if(draussen) h+=zeile('gps','GPS', details.gpsText||'Misst die Genauigkeit …',
+    if(draussen) h+=zeile('gps','GPS', details.gpsText||'Misst die Genauigkeit … Mit dem Gerät prüfen, das den Spiegel spielt.',
       zustand.gps!==true && !details.gpsLaeuft ? '<button type="button" class="knopf klein leer mittel" id="gps">Nochmal</button>' : '');
     h+=zeile('akku','Akku', details.akkuText||'Mindestens halb voll für eine Stunde Spiel.',
       details.akkuAuto || zustand.akku===true ? '' : '<button type="button" class="knopf klein mittel" id="akku">Ist halb voll</button>');
@@ -156,7 +156,9 @@
     details.gpsLaeuft=true; details.gpsText='Misst die Genauigkeit …'; zeichnen(); var best=Infinity, n=0;
     var w=navigator.geolocation.watchPosition(function(p){
       best=Math.min(best, p.coords.accuracy); n++;
-      zustand.gps=best<=25; details.gpsText='Genauigkeit '+Math.round(best)+' m'+(best<=25?', passt.':'. Unter freiem Himmel nochmal messen, Bäume und Häuser stören.');
+      zustand.gps=best<=25;
+      details.gpsText='Genauigkeit '+Math.round(best)+' m'+(best<=25?'. Passt.':best<=50?'. Unter freiem Himmel nochmal messen, Bäume und Häuser stören. Der Spiegel rechnet die Ungenauigkeit mit ein.':
+        '. Das ist zu ungenau für die Stationen. Ein iPad ohne Mobilfunk hat kein GPS und schätzt den Ort nur über WLAN. Besser ein Handy oder ein iPad mit Mobilfunk als Spiegel nehmen. Sonst die Stationen von Hand öffnen.');
       if(n>=4 || best<=10){ navigator.geolocation.clearWatch(w); details.gpsLaeuft=false; }
       zeichnen();
     }, function(){ navigator.geolocation.clearWatch(w); details.gpsLaeuft=false; zustand.gps=false; details.gpsText='Standort nicht erlaubt. In den Einstellungen für Safari freigeben.'; zeichnen(); }, {enableHighAccuracy:true, maximumAge:0, timeout:20000});
