@@ -412,6 +412,9 @@ body.m-sammeln:not(.mehr) #scene-title, body.m-sammeln:not(.mehr) #scene-say{dis
 body.m-laufen:not(.mehr) #scene-title, body.m-laufen:not(.mehr) #scene-say, body.m-laufen:not(.mehr) .jetzt, body.m-laufen:not(.mehr) #btn-speak{display:none!important}
 body.m-da:not(.mehr) .story, body.m-da:not(.mehr) .foot, body.m-da:not(.mehr) #mirror-read{display:none!important}
 body.m-sammeln:not(.mehr) .jetzt .dann, body.m-laufen:not(.mehr) .jetzt .dann{display:none!important}
+#btn-hand.hinweis{display:inline-block!important;background:var(--magic);color:#fff;box-shadow:0 4px 0 var(--magic-deep);animation:hinweis-puls 1.6s ease-in-out infinite}
+@keyframes hinweis-puls{50%{transform:scale(1.05)}}
+@media (prefers-reduced-motion:reduce){ #btn-hand.hinweis{animation:none} }
 body.m-tour:not(.mehr) #btn-test, body.m-tour:not(.mehr) #gps-chip.on{display:none!important}
 body.m-szene:not(.mehr) #gps-chip, body.m-ende:not(.mehr) #gps-chip{display:none!important}
 .leiste{display:none;gap:10px;justify-content:center;flex-wrap:wrap}
@@ -1036,8 +1039,9 @@ function meter(a,b){            // Abstand zweier Punkte in Metern (Haversine)
   var h=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLng/2)*Math.sin(dLng/2);
   return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));
 }
-function radiusMit(acc, radius){ return radius + Math.min(20, Math.max(0, (acc||0)-10)*0.5); }   // ungenaues GPS (z. B. iPad ohne Mobilfunk): Radius wächst mit, höchstens 20 m
-function sollOeffnen(dist, acc, radius){ return acc<=60 && dist<=radiusMit(acc, radius); }
+var GENAU=25;                            // ab dieser Ungenauigkeit (m) öffnet nichts mehr von selbst, der Spiegel fragt stattdessen
+function sollOeffnen(dist, acc, radius){ return dist<=radius && acc<=GENAU; }
+function fastDa(dist, acc, radius){ return !sollOeffnen(dist, acc, radius) && dist<=radius+Math.min(acc, 35); }   // vielleicht da: nur nachfragen, nie selbst öffnen
 function waerme(dist, radius){
   if(dist<=radius+10) return 'heiß';
   if(dist<=radius+30) return 'warm';
@@ -1519,7 +1523,7 @@ function gpsStart(){
   gps='sucht'; live();
   try{
     watchId=navigator.geolocation.watchPosition(function(pos){
-      fix={lat:pos.coords.latitude, lng:pos.coords.longitude, acc:pos.coords.accuracy, t:jetztMs()};
+      fix=glaetten({lat:pos.coords.latitude, lng:pos.coords.longitude, acc:pos.coords.accuracy, t:jetztMs()});
       gps='an';
       if(!state.heim && state.startZeit && jetztMs()-state.startZeit<180000 && fix.acc<=40 && state.phase!=='start'){ state.heim={lat:fix.lat, lng:fix.lng}; save(); }   // die Haustür: erster guter Fix nach dem Aufwecken
       if(!kursVomKompass){               // ohne Kompass: Laufrichtung aus dem GPS
@@ -1537,6 +1541,17 @@ function gpsStart(){
     }, {enableHighAccuracy:true, maximumAge:1000, timeout:20000});
   }catch(e){ gps='keins'; watchId=null; live(); }
 }
+var roh=[], ausreisser=0;
+function glaetten(f){                    // GPS springt, besonders ohne Mobilfunk: Ausreißer verwerfen, die letzten 8 s nach Genauigkeit gewichtet mitteln
+  var letzte=roh.length ? roh[roh.length-1] : null;
+  if(letzte && fix){
+    var dt=Math.max(1, (f.t-letzte.t)/1000), v=meter(fix, f)/dt;
+    if(v>4 && meter(fix,f)>f.acc && ausreisser<3){ ausreisser++; return {lat:fix.lat, lng:fix.lng, acc:Math.max(fix.acc, f.acc), t:f.t}; }   // schneller als Kinder laufen: eher ein Sprung
+  }
+  ausreisser=0; roh.push(f); roh=roh.filter(function(r){ return f.t-r.t<=8000; });
+  var sw=0, la=0, ln=0; roh.forEach(function(r){ var w=1/Math.max(4, r.acc*r.acc); sw+=w; la+=r.lat*w; ln+=r.lng*w; });
+  return {lat:la/sw, lng:ln/sw, acc:f.acc, t:f.t};
+}
 function fixAlter(){ return fix ? jetztMs()-fix.t : Infinity; }   // ms seit der letzten GPS-Messung
 function fixFrisch(){ return fixAlter()<=15000; }
 function ziel(){ return state.phase==='heim' ? state.heim : state.points[state.idx]; }   // wohin es gerade geht
@@ -1549,20 +1564,23 @@ function abstand(){
 function spruenge(d){ return Math.max(0, Math.round(d/0.6)); }   // Einhorn-Sprünge eines Dreijährigen
 var seekSeit=0;                         // wann die aktuelle Suche begann; das GPS öffnet erst nach einer Schonfrist
 function jetztMs(){ return Date.now(); }
-var imRadiusSeit=0, verlassen=false, minD=Infinity;   // minD: kleinster Abstand dieser Suche, für die Vorbeigelaufen-Erkennung
+var imRadiusSeit=0, verlassen=false, minD=Infinity, hinweis=null, hinweisKlang=false;   // hinweis: 'fastda' oder 'vorbei', dann fragt der Spiegel statt zu öffnen   // minD: kleinster Abstand dieser Suche, für die Vorbeigelaufen-Erkennung
     // Ankunft erst, wenn das GPS 2,5 s lang im Radius bleibt, das Signal frisch ist und man vorher außerhalb war
 function pruefeAnkunft(){
   if(!unterwegs()) return;
   var d=abstand();
   if(d!==null && d>state.radius+15) verlassen=true;
   if(jetztMs()-seekSeit<10000){ imRadiusSeit=0; return; }
-  if(!indoor() && d!==null && fixFrisch() && fix.acc<=60 && state.phase==='seek'){   // vorbeigelaufen: erst nah dran, jetzt wieder 15 m weiter weg -> Station anbieten
+  var vorher=hinweis; hinweis=null;
+  if(!indoor() && d!==null && verlassen && fixFrisch() && state.phase==='seek'){
     if(d<minD) minD=d;
-    if(verlassen && minD<=radiusMit(fix.acc, state.radius)+25 && d>=minD+15){ minD=Infinity; ankommen('vorbei'); return; }
+    if(fastDa(d, fix.acc, state.radius)) hinweis='fastda';
+    else if(minD<=state.radius+Math.min(fix.acc,35) && d>=minD+20) hinweis='vorbei';   // erst nah dran, jetzt 20 m weiter weg
   }
+  if(hinweis && hinweis!==vorher && !hinweisKlang){ hinweisKlang=true; klang([660,880]); }
   if(!indoor() && d!==null && verlassen && fixFrisch() && sollOeffnen(d, fix.acc, state.radius)){
     if(!imRadiusSeit) imRadiusSeit=jetztMs();
-    else if(jetztMs()-imRadiusSeit>=2500){ if(state.phase==='heim') heimAngekommen(); else ankommen('gps'); }
+    else if(jetztMs()-imRadiusSeit>=4000){ if(state.phase==='heim') heimAngekommen(); else ankommen('gps'); }
   } else imRadiusSeit=0;
 }
 
@@ -1736,7 +1754,7 @@ function renderProtokoll(){
     if(!r.eintraege.length){ h+='<p class="lead">Keine Station erreicht.</p>'; return; }
     h+='<table class="proto"><tr><th>Station</th><th>Weg</th><th>Sammeln</th><th>GPS</th><th>Geöffnet</th></tr>';
     r.eintraege.forEach(function(e){
-      h+='<tr><td>'+(e.i+1)+' · '+esc(STATIONS[e.i].name)+'</td><td class="z">'+mmss(e.dauer)+'</td><td class="z">'+(e.warte!=null?e.warte+' s':'–')+'</td><td class="z">'+(e.acc!=null?'±'+e.acc+' m':'–')+'</td><td>'+(e.modus==='gps'?'per GPS':e.modus==='vorbei'?'vorbeigelaufen':'von Hand')+'</td></tr>';
+      h+='<tr><td>'+(e.i+1)+' · '+esc(STATIONS[e.i].name)+'</td><td class="z">'+mmss(e.dauer)+'</td><td class="z">'+(e.warte!=null?e.warte+' s':'–')+'</td><td class="z">'+(e.acc!=null?'±'+e.acc+' m':'–')+'</td><td>'+(e.modus==='gps'?'per GPS':e.modus==='vorbei'?'vorbeigelaufen, bestätigt':e.modus==='fastda'?'fast da, bestätigt':'von Hand')+'</td></tr>';
     });
     h+='</table>';
   });
@@ -1870,7 +1888,7 @@ function ankunftAbbrechen(){ if(ankunftT){ clearTimeout(ankunftT); ankunftT=null
 function weiter(){
   still();
   if(state.idx>=N-1){ state.phase='end'; state.step=0; klang(KLANG_ENDE); konfetti(160, .5, .3); setTimeout(function(){ konfetti(120, .2, .35); konfetti(120, .8, .35); }, 500); }
-  else { state.idx+=1; state.phase='seek'; state.step=0; naeheIst=0; naeheZiel=0; seekSeit=jetztMs(); verlassen=false; minD=Infinity; imRadiusSeit=0; }
+  else { state.idx+=1; state.phase='seek'; state.step=0; naeheIst=0; naeheZiel=0; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0; }
   save(); render(); pruefeAnkunft();
 }
 function verzaubern(){
@@ -1907,7 +1925,7 @@ function spurTipp(id){
 }
 function test(){ tonAn(); if(state.phase==='seek') ankommen('hand'); }
 function heimStart(){                   // nach dem Schatz: Sprünge bis zur Haustür zählen
-  tonAn(); still(); state.phase='heim'; state.step=0; seekSeit=jetztMs(); verlassen=false; minD=Infinity; imRadiusSeit=0; naeheIst=0; naeheZiel=0; heimMarke=Infinity;
+  tonAn(); still(); state.phase='heim'; state.step=0; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0; naeheIst=0; naeheZiel=0; heimMarke=Infinity;
   wachBleiben(); gpsStart(); save(); render(); pruefeAnkunft();
 }
 var heimMarke=Infinity;
@@ -1918,7 +1936,7 @@ function heimAngekommen(){
 function gehZu(n){                      // Sprung aus dem Ablauf-Faden zu einem beliebigen Schritt
   var t=TEXTE[n]; if(!t) return;
   tonAn(); still(); ankunftAbbrechen(); trackTaps={}; galN=0; trackMsg=''; naeheIst=0; naeheZiel=0; heimMarke=Infinity;
-  state.idx=t.i; state.phase=t.phase; state.step=t.step; seekSeit=jetztMs(); verlassen=false; minD=Infinity; imRadiusSeit=0;
+  state.idx=t.i; state.phase=t.phase; state.step=t.step; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0;
   if(t.phase!=='start'){ wachBleiben(); gpsStart(); }
   save(); zeige('tour'); render(); pruefeAnkunft();
 }
@@ -2245,7 +2263,9 @@ function live(){
   $('btn-linse').hidden=!linseAn();
   sprechKnopf();
   $('btn-test').hidden = !(state.showTest && state.phase==='seek' && !manuell() && !ankunft && !wartet);
-  $('btn-hand').hidden = $('btn-test').hidden;
+  $('btn-hand').hidden = $('btn-test').hidden && !(hinweis && state.phase==='seek' && !ankunft && !wartet);
+  $('btn-hand').textContent = hinweis==='fastda' ? 'Wir sind da' : hinweis==='vorbei' ? 'Station hier öffnen' : 'Station von Hand öffnen';
+  $('btn-hand').classList.toggle('hinweis', !!hinweis);
   var c=chipText();
   ['gps-chip','gps-chip-2'].forEach(function(id){ var el=$(id); el.className='chip '+c[0]; el.textContent=c[1]; });
   $('btn-gps').hidden = gps==='an' || gps==='sucht';
@@ -2270,7 +2290,8 @@ function live(){
       read.innerHTML = wartet ? '' : '<span class="big">Angekommen!</span>';
     } else if(d!==null){
       var alt=!fixFrisch();
-      read.innerHTML='<span class="big"'+(alt?' style="opacity:.45"':'')+'>'+Math.round(d)+' m</span><span class="lab">'+(alt?'altes Signal':waerme(d,state.radius))+'</span>';
+      var lab=alt?'altes Signal':hinweis==='fastda'?'Fast da! Seht ihr die Station?':hinweis==='vorbei'?'Vorbeigelaufen? Hier öffnen oder zurück':waerme(d,state.radius);
+      read.innerHTML='<span class="big"'+(alt?' style="opacity:.45"':'')+'>'+(hinweis==='fastda'?'≈ ':'')+Math.round(d)+' m</span><span class="lab">'+lab+'</span>';
       naeheZiel=naehe(d,state.radius); funkelZiel=0.12+0.88*naeheZiel;
     } else {
       read.innerHTML='<span class="lab">'+(!p ? 'Kein Punkt gesetzt' : gps==='keins' ? 'Ohne GPS unterwegs' : 'Suche die Spur …')+'</span>';
@@ -2410,7 +2431,7 @@ $('tab-setup').addEventListener('click', function(){ zeige('setup'); });
 $('btn-main').addEventListener('click', haupt);
 $('mirror').addEventListener('click', function(){ if(tonLaeuft){ still(); toast('Funkel ist still.'); return; } verzaubern(); });
 $('btn-pop').addEventListener('click', function(e){ e.stopPropagation(); });
-$('btn-hand').addEventListener('click', test);
+$('btn-hand').addEventListener('click', function(){ tonAn(); if(state.phase==='seek') ankommen(hinweis||'hand'); });
 $('btn-mehr').addEventListener('click', function(){ mehrAn=!mehrAn; modusZeigen(); if(!mehrAn) fokusSpiegel(); });
 $('btn-nochmal').addEventListener('click', function(){ if(sprichtGerade()){ still(); sprechKnopf(); return; } sagen(); });
 $('btn-speak').addEventListener('click', function(){ if(sprichtGerade()){ still(); sprechKnopf(); return; } sagen(); });

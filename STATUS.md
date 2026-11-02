@@ -9,7 +9,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 - Live: <https://dafelix1888.github.io/einhorn/app/> (GitHub Pages, Repo `dafelix1888/einhorn`, öffentlich)
 - Original vom Geburtstag: `/index.html`, verschlüsselt mit dem Zauberwort (GitHub-Secret `ZAUBERWORT`). Es bleibt unverändert.
 
-## Was fertig ist (PR #31 bis #36)
+## Was fertig ist (PR #31 bis #41)
 
 | Bereich | Dateien | Stand |
 |---|---|---|
@@ -46,12 +46,14 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 
 ## Erfahrung vom Geburtstag: GPS
 
-Punkte mit dem Handy gesetzt, gespielt mit dem iPad: Die Stationen öffneten oft nicht, die Gruppe lief vorbei. Ursachen: zwei Geräte mit unterschiedlichem Fehler, und ein iPad ohne Mobilfunk hat kein GPS (nur WLAN-Ortung). Seit PR #39:
+Punkte mit dem Handy gesetzt, gespielt mit dem iPad: Stationen öffneten mal zu früh, mal gar nicht (Gruppe lief vorbei). Ursachen: zwei Geräte mit unterschiedlichem Fehler, und ein iPad ohne Mobilfunk hat kein GPS (nur WLAN-Ortung, springt um 20 bis 60 m). Seit PR #41 gilt:
 
 - Die Punkte kommen aus der Karte des Planers statt vom Handy.
-- Der Öffnungsradius wächst mit der Ungenauigkeit (15 m plus bis zu 20 m), Messungen bis ±60 m zählen.
-- Läuft die Gruppe vorbei (erst nah dran, dann wieder 15 m weiter weg), bietet der Spiegel die Station selbst an. Im Protokoll steht dann „vorbeigelaufen“.
-- Der Bereit-Check warnt bei mehr als ±50 m und empfiehlt Handy oder iPad mit Mobilfunk als Spiegel.
+- Position geglättet: Mittel der letzten 8 s nach Genauigkeit gewichtet, Sprünge schneller als Gehtempo werden verworfen.
+- Von selbst öffnet eine Station nur bei sicherem Signal: höchstens 15 m entfernt, Genauigkeit höchstens ±25 m, 4 s lang.
+- Bei ungenauem Signal fragt der Spiegel: „Fast da! Seht ihr die Station?“, ein Erwachsener tippt „Wir sind da“. Bei Vorbeilaufen: „Station hier öffnen“. Beides mit leisem Klang, ohne Pop.
+- Simulation (Lauf auf eine Station zu, 1 m/s): Handy mit gutem GPS öffnet 4 bis 8 m vor dem Punkt; iPad mit WLAN-Ortung öffnet nie von selbst, „Fast da“ kommt 18 bis 38 m vorher.
+- Der Bereit-Check erklärt das und empfiehlt bei mehr als ±50 m ein Handy oder iPad mit Mobilfunk.
 
 ## Offene Fragen
 
