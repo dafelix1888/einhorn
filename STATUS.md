@@ -1,6 +1,6 @@
 # Zauberspiegel: Status und nächste Schritte
 
-Stand: 2. November 2026 (nach PR #39). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
+Stand: 2. November 2026 (nach PR #41). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
 
 ## Worum es geht
 
@@ -9,7 +9,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 - Live: <https://dafelix1888.github.io/einhorn/app/> (GitHub Pages, Repo `dafelix1888/einhorn`, öffentlich)
 - Original vom Geburtstag: `/index.html`, verschlüsselt mit dem Zauberwort (GitHub-Secret `ZAUBERWORT`). Es bleibt unverändert.
 
-## Was fertig ist (PR #31 bis #39)
+## Was fertig ist (PR #31 bis #41)
 
 | Bereich | Dateien | Stand |
 |---|---|---|
@@ -40,7 +40,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 3. **Server wählen** (Cloudflare KV/D1 + R2 oder Supabase). Daran hängen: Live-Haken des Vorausgehers, Party auf mehreren Geräten, Namens-Sätze speichern, später Konten und Käufe.
 4. **Etappe 2: Funkel kennt das Kind.** Namens-Sätze an den drei Stellen, Probehören, Aussprache-Feld, Grenze für Neuerzeugungen, später hinter einer Bezahlschranke.
 5. **Anpassen mit Leitplanken:** Prompt-Eingabe, KI schätzt Umfang und ändert Sätze, Eltern prüfen die Änderungen, dann Vertonung. Braucht Server und Bezahlung.
-6. ~~Planer und Spiel im dunklen Stil~~ erledigt in PR #39. Offen: echter Test auf iPad und Handy (dunkle OSM-Karte mit echten Kacheln, Ziehen per Touch).
+6. ~~Planer und Spiel im dunklen Stil~~ erledigt in PR #41. Offen: echter Test auf iPad und Handy (dunkle OSM-Karte mit echten Kacheln, Ziehen per Touch).
 7. **Zweites Thema**, damit die Engine wirklich generisch ist: Bilder (`PIC`), Regenbogen-Fortschritt und Farben stecken noch in `spiel.html` und müssen ins Thema wandern.
 8. **Partnerlinks** in `tour.json` → `utensilien[].link` eintragen (Partner-ID von Felix nötig).
 
