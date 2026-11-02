@@ -64,32 +64,116 @@
     try{ localStorage.setItem(PLAN_KEY, JSON.stringify(plan)); }catch(e){}
   }
 
-  function markerIcon(i, s){ return L.divIcon({className:'nr-marker'+(i===0?' start':s.gefunden?'':' ersatz'), html:String(i===0?'⌂':i+1), iconSize:[30,30]}); }
-  function ergebnisZeigen(){
-    $('ergebnis').hidden=false;
+  function markerIcon(i, s){ return L.divIcon({className:'nr-marker'+(i===0?' start':s.gefunden?'':' ersatz'), html:String(i===0?'⌂':i+1), iconSize:[38,38]}); }
+  var netz=null, marker=[], linie=null, rechenWunsch=null;
+
+  // ---------- Kennzahlen: Strecke, Dauer, Heimweg ----------
+  function kennzahlenZeigen(strecke, heim, luftlinie){
+    var d=PlanerKern.dauer(tour, strecke||0);
+    $('k-strecke').textContent=km(strecke||0)+(luftlinie?' (Luftlinie)':'');
+    $('k-dauer').textContent='ca. '+d.gesamt+' min';
+    $('k-dauer-teile').textContent=d.gehen+' min gehen + '+d.stationen+' min Stationen';
+    $('k-heim').textContent=heim!=null ? km(heim) : '–';
+    $('k-heim-min').textContent=heim!=null ? 'ca. '+Math.round(heim/((tour.dauer||{}).meterProMinute||35))+' min zurück' : '';
+  }
+  function luftlinie(){                          // Notbehelf, solange das Wegenetz noch lädt
+    var st=plan.stationen, m=0, nach=[0];
+    for(var i=1;i<st.length;i++){ m+=PlanerKern.meter(st[i-1], st[i]); nach.push(Math.round(m)); }
+    return {strecke:Math.round(m), nach:nach, heim:Math.round(PlanerKern.meter(st[st.length-1], st[0]))};
+  }
+  function neuRechnen(){                         // Route durch die aktuellen Stationen (auch die gerade gezogene)
+    var punkte=plan.stationen.map(function(s,i){ var m=marker[i]; if(m && m.dragging && m._ziehen){ var p=m.getLatLng(); return {lat:p.lat, lng:p.lng}; } return {lat:s.lat, lng:s.lng}; });
+    if(!netz){ var l=luftlinie(); return {strecke:l.strecke, nach:l.nach, heim:l.heim, luft:true}; }
+    var r=PlanerKern.routeDurch(netz, punkte); if(!r) return null;
+    r.heim=PlanerKern.wegLaenge(netz, punkte[punkte.length-1], punkte[0]);
+    return r;
+  }
+  function liveAktualisieren(){                  // beim Ziehen: höchstens einmal pro Bild neu rechnen
+    if(rechenWunsch) return;
+    rechenWunsch=requestAnimationFrame(function(){
+      rechenWunsch=null;
+      var r=neuRechnen(); if(!r) return;
+      if(r.route && linie) linie.setLatLngs(r.route);
+      kennzahlenZeigen(r.strecke, r.heim, r.luft);
+      marker.forEach(function(m,i){ if(m._ziehen) m.setTooltipContent((i+1)+' · nach '+km(r.nach[i])); });
+    });
+  }
+  function nachZiehen(i){                        // losgelassen: auf den Weg setzen, Namen, Strecke, Höhen übernehmen
+    var r=neuRechnen(), s=plan.stationen[i];
+    if(r && r.knoten){
+      var k=r.knoten[i], o=PlanerKern.ortAm(netz, k.id);
+      s.lat=k.lat; s.lng=k.lng;
+      s.name=(tour.stationen[i].name||'Station')+(o.strasse?' '+o.an:''); s.an=o.an; s.zu=o.zu;
+      plan.route=r.route; plan.strecke=r.strecke; plan.heimweg=r.heim;
+    } else {
+      var p=marker[i].getLatLng(); s.lat=+p.lat.toFixed(6); s.lng=+p.lng.toFixed(6);
+      if(r){ plan.strecke=r.strecke; plan.heimweg=r.heim; }
+    }
+    s.gefunden=true; s.hinweis='von Hand gesetzt'; s.verschoben=true;
+    if(r) plan.stationen.forEach(function(x,j){ x.nachMeter=r.nach[j]; });
+    speichern(); listeZeichnen(); kartenZeichnen(false);
+    toast('Station '+(i+1)+' gespeichert · '+km(plan.strecke)+' · ca. '+PlanerKern.dauer(tour, plan.strecke).gesamt+' min');
+    if(r && r.route) hoehenNeu();
+  }
+  function hoehenNeu(){                          // Höhenprofil zur neuen Route nachladen
+    var route=plan.route, m=[0];
+    for(var i=1;i<route.length;i++) m.push(m[i-1]+PlanerKern.meter({lat:route[i-1][0],lng:route[i-1][1]},{lat:route[i][0],lng:route[i][1]}));
+    var schritt=Math.max(15, m[m.length-1]/40), idx=[], weiter=0;
+    m.forEach(function(x,i){ if(x>=weiter || i===m.length-1){ idx.push(i); weiter=x+schritt; } });
+    var punkte=idx.map(function(i){ return {lat:route[i][0], lng:route[i][1]}; }), stand=plan.stand;
+    hoehen(punkte.concat(plan.stationen)).then(function(h){
+      if(plan.stand!==stand) return;
+      plan.hoehenProfil=idx.map(function(i,k){ return {m:Math.round(m[i]), h:h[k]}; });
+      plan.stationen.forEach(function(s,j){ s.hoehe=Math.round(h[idx.length+j]); });
+      speichern(); listeZeichnen();
+    })['catch'](function(){});
+  }
+
+  function listeZeichnen(){
     var st=plan.stationen, fehlt=st.filter(function(s){ return !s.gefunden; }).length;
-    $('zusammenfassung').textContent=km(plan.strecke)+' bis zum Ziel, '+st.length+' Stationen'+(fehlt?', '+fehlt+' davon mit Ersatzort':', alle Orte passen zur Geschichte')+'.';
+    $('zusammenfassung').textContent=st.length+' Stationen'+(fehlt?', '+fehlt+' davon mit Ersatzort':', alle Orte passen zur Geschichte')+'.';
     $('liste').innerHTML=st.map(function(s,i){
       var t=tour.stationen[i];
       return '<li><span class="nr">'+(i+1)+'</span><div><b>'+esc(s.name)+'</b> · '+esc(t.title||(t.steps&&t.steps[0].title)||'')+
-        '<div class="h">'+(i===0?'Start':(s.gefunden?'<span class="ok">✓ '+esc(s.hinweis)+'</span>':'<span class="warn">Ersatz: '+esc(s.hinweis)+'</span>')+' · nach '+km(s.nachMeter||0))+(s.hoehe!=null?' · '+s.hoehe+' m ü. NN':'')+(s.verschoben?' · von Hand verschoben':'')+'</div>'+
+        '<div class="h">'+(i===0?'Start':(s.gefunden?'<span class="ok">✓ '+esc(s.hinweis)+'</span>':'<span class="warn">Ersatz: '+esc(s.hinweis)+'</span>')+' · nach '+km(s.nachMeter||0))+(s.hoehe!=null?' · '+s.hoehe+' m ü. NN':'')+'</div>'+
         '<div class="h">Geschichte: '+esc(t.wo)+'</div></div></li>';
     }).join('');
     profilZeichnen();
+    kennzahlenZeigen(plan.strecke, plan.heimweg, false);
+  }
+  function kartenZeichnen(einpassen){
+    var st=plan.stationen;
     if(!karte){
-      karte=L.map('karte',{scrollWheelZoom:false});
+      karte=L.map('karte',{scrollWheelZoom:false, tap:false});
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(karte);
       ebenen=L.layerGroup().addTo(karte);
     }
-    ebenen.clearLayers();
-    if(plan.route) L.polyline(plan.route,{color:'#6B35C9', weight:5, opacity:.8}).addTo(ebenen);
-    var b=L.latLngBounds(st.map(function(s){ return [s.lat,s.lng]; }));
+    ebenen.clearLayers(); marker=[];
+    linie=L.polyline(plan.route||st.map(function(s){ return [s.lat,s.lng]; }),{color:'#6B35C9', weight:5, opacity:.8, dashArray:plan.route?null:'6 8'}).addTo(ebenen);
     st.forEach(function(s,i){
-      var m=L.marker([s.lat,s.lng],{icon:markerIcon(i,s), draggable:i>0, title:s.name}).addTo(ebenen);
+      var m=L.marker([s.lat,s.lng],{icon:markerIcon(i,s), draggable:i>0, autoPan:true, title:s.name}).addTo(ebenen);
       m.bindTooltip((i+1)+' · '+s.name);
-      m.on('dragend', function(){ var p=m.getLatLng(); s.lat=+p.lat.toFixed(6); s.lng=+p.lng.toFixed(6); s.verschoben=true; speichern(); ergebnisZeigen(); toast('Station '+(i+1)+' verschoben und gespeichert.'); });
+      m.on('dragstart', function(){ m._ziehen=true; m.openTooltip(); $('kennzahlen').classList.add('zieht'); });
+      m.on('drag', liveAktualisieren);
+      m.on('dragend', function(){ $('kennzahlen').classList.remove('zieht'); nachZiehen(i); m._ziehen=false; });
+      marker.push(m);
     });
-    setTimeout(function(){ karte.invalidateSize(); karte.fitBounds(b.pad(0.15)); }, 50);
+    if(einpassen) setTimeout(function(){ karte.invalidateSize(); karte.fitBounds(L.latLngBounds(st.map(function(s){ return [s.lat,s.lng]; })).pad(0.15)); }, 50);
+  }
+  function ergebnisZeigen(){
+    $('ergebnis').hidden=false;
+    if(plan.heimweg==null && netz){ var st=plan.stationen; plan.heimweg=PlanerKern.wegLaenge(netz, st[st.length-1], st[0]); }
+    listeZeichnen(); kartenZeichnen(true);
+  }
+  function netzNachladen(){                      // gespeicherte Tour: Wegenetz im Hintergrund holen, damit Verschieben live rechnet
+    if(netz || !plan || !plan.start) return;
+    var radius=Math.min(2500, (plan.distanz||wahl.distanz)*1.15+200);
+    overpass(PlanerKern.overpassAbfrage(plan.start.lat, plan.start.lng, radius)).then(function(osm){
+      osmCache={osm:osm, start:plan.start, distanz:plan.distanz||wahl.distanz}; wahl.start=plan.start;
+      netz=PlanerKern.netzBauen(osm);
+      if(plan.heimweg==null){ var st=plan.stationen; plan.heimweg=PlanerKern.wegLaenge(netz, st[st.length-1], st[0]); speichern(); }
+      kennzahlenZeigen(plan.strecke, plan.heimweg, false);
+    })['catch'](function(){});
   }
   function profilZeichnen(){
     var svg=$('profil'), p=plan.hoehenProfil;
@@ -116,7 +200,7 @@
       if(osmCache && osmCache.start===start && wahl.distanz<=osmCache.distanz) return rechnen();   // gleiche Gegend: Daten wiederverwenden
       status('Wege, Bänke, Zäune und Kreuzungen werden geladen …');
       var radius=Math.min(2500, wahl.distanz*1.15+200);
-      return overpass(PlanerKern.overpassAbfrage(start.lat, start.lng, radius)).then(function(osm){ osmCache={osm:osm, start:start, distanz:wahl.distanz}; return rechnen(); });
+      return overpass(PlanerKern.overpassAbfrage(start.lat, start.lng, radius)).then(function(osm){ osmCache={osm:osm, start:start, distanz:wahl.distanz}; netz=null; return rechnen(); });
     })['catch'](function(e){ status(String(e.message||e), true); })
     .then(function(){ $('planen').disabled=false; });
   }
@@ -124,8 +208,10 @@
     status('Höhen werden geladen und die Route wird geplant …');
     return PlanerKern.planen(osmCache.osm, {start:osmCache.start, richtung:wahl.richtung, distanz:wahl.distanz, stationen:tour.stationen, hoehen:hoehen, versuch:versuch})
       .then(function(r){
+        netz=r.netz;
         plan={format:1, thema:thema, adresse:wahl.adresse, start:osmCache.start, richtung:wahl.richtung, distanz:wahl.distanz,
-              strecke:r.strecke, stationen:r.stationen, route:r.route, hoehenProfil:r.hoehenProfil, varianten:r.varianten};
+              strecke:r.strecke, stationen:r.stationen, route:r.route, hoehenProfil:r.hoehenProfil, varianten:r.varianten,
+              heimweg:PlanerKern.wegLaenge(r.netz, r.stationen[r.stationen.length-1], r.stationen[0])};
         speichern(); ergebnisZeigen();
         status('Fertig'+(r.varianten>1?' · Route '+(r.versuch+1)+' von '+r.varianten:'')+'. Gespeichert auf diesem Gerät.');
         $('ergebnis').scrollIntoView({behavior:'smooth'});
@@ -169,6 +255,6 @@
       if(plan.start){ wahl.start=plan.start; wahl.adresse=plan.adresse||''; $('adresse').value=wahl.adresse; }
     }
     segZeichnen(); verbinden();
-    if(plan && plan.stationen && plan.stationen.length){ ergebnisZeigen(); status('Gespeicherte Tour von diesem Gerät.'); }
+    if(plan && plan.stationen && plan.stationen.length){ ergebnisZeigen(); status('Gespeicherte Tour von diesem Gerät.'); netzNachladen(); }
   })['catch'](function(e){ status('Thema „'+thema+'“ lässt sich nicht laden: '+e.message, true); });
 })();
