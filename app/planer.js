@@ -247,7 +247,7 @@
     });
     $('planen').addEventListener('click', planenKlick);
     $('anders').addEventListener('click', function(){ if(!osmCache){ toast('Bitte erst neu planen.'); return; } versuch++; rechnen(); });
-    $('speichern').addEventListener('click', function(){ speichern(); location.href='spiel.html?thema='+encodeURIComponent(thema); });
+    $('speichern').addEventListener('click', function(){ speichern(); location.href=(window.Party && Party.lesen(thema) ? 'party.html' : 'spiel.html')+'?thema='+encodeURIComponent(thema); });
     $('teilen').addEventListener('click', function(){
       speichern(); var link=spielLink(plan);
       if(navigator.share){ navigator.share({title:tour.titel, text:'Unsere Schnitzeljagd', url:link})['catch'](function(){}); return; }
@@ -267,7 +267,17 @@
       if(plan.richtung) wahl.richtung=plan.richtung;
       if(plan.start){ wahl.start=plan.start; wahl.adresse=plan.adresse||''; $('adresse').value=wahl.adresse; }
     }
+    var party=window.Party && Party.lesen(thema);
+    if(party){                                   // Party gibt Variante und Kinder vor, der Planer kümmert sich nur um die Route
+      wahl.variante=Party.variante(party); wahl.kinder=party.kinder;
+      $('sek-variante').hidden=true; $('sek-kinder').hidden=true;
+      $('zurueck-link').href='party.html?thema='+thema; $('zurueck-link').textContent='← Zur Party';
+      $('speichern').textContent='Speichern, zurück zur Party';
+      $('titel').textContent=(party.kind && party.kind.name ? party.kind.name+': ' : '')+'Route planen';
+      if(party.ort==='drinnen'){ $('draussen').hidden=true; }
+    }
     segZeichnen(); verbinden();
+    if(party){ $('sek-variante').hidden=true; $('sek-kinder').hidden=true; if(party.ort!=='drinnen'){ $('draussen').hidden=false; $('drinnen').hidden=true; } }
     if(plan && plan.stationen && plan.stationen.length){ ergebnisZeigen(); status('Gespeicherte Tour von diesem Gerät.'); netzNachladen(); }
   })['catch'](function(e){ status('Thema „'+thema+'“ lässt sich nicht laden: '+e.message, true); });
 })();

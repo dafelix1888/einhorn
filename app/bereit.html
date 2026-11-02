@@ -1,0 +1,140 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0F0B17">
+<title>Bereit-Check · Zauberspiegel</title>
+<link rel="stylesheet" href="dunkel.css">
+<style>
+.check{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start;background:var(--karte);border-radius:14px;padding:16px;margin-bottom:10px}
+.status{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--hover);color:var(--leise)}
+.status.ok{background:var(--gruen);color:#062B12}
+.status.warn{background:var(--gelb);color:#3A2A00}
+.check b{display:block;font-size:1.05rem}
+.check p{color:var(--leise);margin:4px 0 10px;font-size:.95rem}
+.balken{height:8px;border-radius:4px;background:var(--hover);overflow:hidden;margin:8px 0}
+.balken i{display:block;height:100%;background:var(--akzent);width:0;transition:width .3s}
+.gesamt{text-align:center;margin:24px 0}
+</style></head><body>
+<main class="seite">
+  <div class="oben"><a href="#" id="zurueck">← Zur Party</a><span class="leise">auf dem Spiel-Gerät öffnen</span></div>
+  <h1>Bereit-Check</h1>
+  <p class="leise">Einmal am Vortag und kurz vor dem Start durchgehen. Alles grün, dann kann nichts schiefgehen.</p>
+  <div id="liste" style="margin-top:18px"></div>
+  <div class="gesamt"><p id="fazit" class="leise"></p><a class="knopf" id="los" href="#">Spiel starten</a></div>
+</main>
+<script src="party.js"></script>
+<script>
+(function(){
+  'use strict';
+  var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
+  var tour=null, zustand={ton:null, stimmen:null, gps:null, akku:null, sperre:null, offline:null}, details={};
+  function $(id){ return document.getElementById(id); }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  $('zurueck').href='party.html?thema='+thema; $('los').href='spiel.html?thema='+thema;
+  var party=Party.lesen(thema), plan=Party.plan(thema);
+  var draussen=party ? party.ort!=='drinnen' : !(plan && plan.variante==='c');
+
+  function zeile(id, titel, text, inhalt){
+    var s=zustand[id], cls=s===true?'ok':s===false?'warn':'';
+    return '<div class="check"><span class="status '+cls+'" aria-label="'+(s===true?'erledigt':s===false?'offen':'noch nicht geprüft')+'">'+(s===true?'✓':s===false?'!':'?')+'</span><div><b>'+titel+'</b><p>'+text+'</p>'+(inhalt||'')+'</div></div>';
+  }
+  function zeichnen(){
+    var h='';
+    h+=zeile('ton','Ton','Stummschalter aus, Lautstärke hoch. Ist der Klang deutlich zu hören?',
+      '<div class="reihe"><button class="knopf klein leer" id="klang">Testklang abspielen</button><button class="knopf klein" id="gehoert"'+(details.klang?'':' disabled')+'>Gut zu hören</button></div>');
+    h+=zeile('stimmen','Stimmen auf dem Gerät', details.stimmenText||'Wird geprüft …',
+      zustand.stimmen===true?'':'<div class="balken"><i id="stimm-balken" style="width:'+(details.anteil||0)+'%"></i></div><button class="knopf klein" id="laden"'+(details.laedt?' disabled':'')+'>'+(details.laedt?'Lädt …':'Jetzt laden')+'</button>');
+    if(draussen) h+=zeile('gps','GPS', details.gpsText||'Draußen prüfen: Die Stationen öffnen sich ab etwa 15 m Abstand. Gut ist eine Genauigkeit unter 25 m.',
+      '<button class="knopf klein leer" id="gps">'+(details.gpsLaeuft?'Misst …':'GPS prüfen')+'</button>');
+    h+=zeile('akku','Akku', details.akkuText||'Für eine Stunde Spiel mit GPS und Bildschirm: mindestens halb voll.',
+      details.akkuAuto?'':'<button class="knopf klein leer" id="akku">Ist mindestens halb voll</button>');
+    h+=zeile('sperre','Automatische Sperre aus','iPad: Einstellungen → Anzeige & Helligkeit → Automatische Sperre → Nie. Sonst geht der Bildschirm mitten im Spiel aus.',
+      '<button class="knopf klein leer" id="sperre">Ist eingestellt</button>');
+    h+=zeile('offline','Ohne Netz spielbar', details.offlineText||'Wird geprüft …');
+    $('liste').innerHTML=h;
+    var offen=Object.keys(zustand).filter(function(k){ return (k!=='gps'||draussen) && zustand[k]!==true; }).length;
+    $('fazit').textContent=offen ? 'Noch '+offen+' Punkt'+(offen>1?'e':'')+' offen. Spielen geht trotzdem, aber besser alles grün.' : 'Alles bereit. Viel Spaß!';
+  }
+
+  // ---------- Stimmen: Pakete wie im Spiel in IndexedDB ----------
+  function benoetigt(){
+    var st=null; try{ st=JSON.parse(localStorage.getItem(tour.speicher+'.v1')||'null'); }catch(e){}
+    var f={}; f[(st&&st.erz)||'kakapups']=1; if(st && st.erzJe) Object.keys(st.erzJe).forEach(function(k){ f[st.erzJe[k]]=1; });
+    return ['basis'].concat(Object.keys(f));
+  }
+  function db(cb){ var rq=indexedDB.open(tour.speicher,1); rq.onupgradeneeded=function(){ rq.result.createObjectStore('clips'); }; rq.onsuccess=function(){ cb(rq.result); }; rq.onerror=function(){ cb(null); }; }
+  function vorhanden(cb){ db(function(d){ if(!d) return cb({}); var r=d.transaction('clips').objectStore('clips').getAllKeys(); r.onsuccess=function(){ var o={}; r.result.forEach(function(k){ o[k]=1; }); cb(o); }; r.onerror=function(){ cb({}); }; }); }
+  function stimmenPruefen(){
+    fetch(tour.stimmen.pakete.index).then(function(r){ return r.json(); }).then(function(ix){
+      vorhanden(function(da){
+        var pakete=benoetigt(), noetig=[]; pakete.forEach(function(p){ noetig=noetig.concat(Object.keys(ix[p]||{})); });
+        var fehlt=noetig.filter(function(k){ return !da[k]; });
+        details.fehlendePakete=pakete.filter(function(p){ return Object.keys(ix[p]||{}).some(function(k){ return !da[k]; }); });
+        zustand.stimmen=fehlt.length===0;
+        details.anteil=Math.round((noetig.length-fehlt.length)/Math.max(1,noetig.length)*100);
+        details.stimmenText=fehlt.length ? (noetig.length-fehlt.length)+' von '+noetig.length+' Sätzen sind auf dem Gerät. Im WLAN laden, das sind einige Megabyte.' : 'Alle '+noetig.length+' Sätze sind auf dem Gerät, auch ohne Netz.';
+        zeichnen();
+      });
+    })['catch'](function(){ details.stimmenText='Prüfung braucht einmal Netz.'; zustand.stimmen=false; zeichnen(); });
+  }
+  function b64zu(s){ var r=atob(s), a=new Uint8Array(r.length); for(var i=0;i<r.length;i++) a[i]=r.charCodeAt(i); return a.buffer; }
+  function stimmenLaden(){
+    details.laedt=true; zeichnen();
+    var pakete=details.fehlendePakete||benoetigt(), fertig=0;
+    db(function(d){
+      Promise.all(pakete.map(function(p){
+        var u=p==='basis' ? tour.stimmen.pakete.basis : tour.stimmen.pakete.erzaehler.replace('{figur}', p);
+        return fetch(u).then(function(r){ return r.json(); }).then(function(o){
+          var tx=d.transaction('clips','readwrite'), st=tx.objectStore('clips');
+          Object.keys(o.clips).forEach(function(k){ var c=o.clips[k], n={type:c.type||'audio/mpeg', buf:b64zu(c.b64)}; if(typeof c.rate==='number') n.rate=c.rate; if(c.h) n.h=c.h; if(c.rolle) n.rolle=c.rolle; st.put(n,k); });
+          return new Promise(function(ok){ tx.oncomplete=ok; tx.onerror=ok; });
+        }).then(function(){ fertig++; var b=$('stimm-balken'); if(b) b.style.width=Math.round(fertig/pakete.length*100)+'%'; });
+      })).then(function(){ details.laedt=false; stimmenPruefen(); }, function(){ details.laedt=false; details.stimmenText='Laden hat nicht geklappt. Netz prüfen und nochmal tippen.'; zeichnen(); });
+    });
+  }
+
+  function offlinePruefen(){
+    if(!('serviceWorker' in navigator) || !window.caches){ zustand.offline=false; details.offlineText='Dieser Browser kann die App nicht für unterwegs speichern. Safari oder Chrome nutzen.'; zeichnen(); return; }
+    if(location.protocol==='https:') try{ navigator.serviceWorker.register('sw.js'); }catch(e){}
+    caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return caches.open(k).then(function(c){ return c.match('spiel.html',{ignoreSearch:true}); }); })); }).then(function(l){
+      zustand.offline=l.some(Boolean);
+      details.offlineText=zustand.offline ? 'Spiel ist auf dem Gerät gespeichert und läuft auch ohne Empfang.' : 'Einmal das Spiel öffnen, solange Netz da ist, dann hier neu prüfen.';
+      zeichnen();
+    })['catch'](function(){ zustand.offline=false; zeichnen(); });
+  }
+  function akkuPruefen(){
+    if(!navigator.getBattery) return;
+    navigator.getBattery().then(function(b){ details.akkuAuto=true; zustand.akku=b.level>=0.5||b.charging; details.akkuText=Math.round(b.level*100)+' %'+(b.charging?', lädt':'')+(zustand.akku?'. Reicht.':'. Bitte vorher laden.'); zeichnen(); })['catch'](function(){});
+  }
+  var klangCtx=null;
+  function klang(){
+    try{ klangCtx=klangCtx||new (window.AudioContext||window.webkitAudioContext)(); klangCtx.resume();
+      [523,659,784,1047].forEach(function(f,i){ var o=klangCtx.createOscillator(), g=klangCtx.createGain(), t=klangCtx.currentTime+i*.18; o.frequency.value=f; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.4,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+.35); o.connect(g); g.connect(klangCtx.destination); o.start(t); o.stop(t+.4); });
+    }catch(e){}
+    details.klang=true; zeichnen();
+  }
+  function gps(){
+    if(!navigator.geolocation){ zustand.gps=false; details.gpsText='Dieses Gerät hat kein GPS.'; zeichnen(); return; }
+    details.gpsLaeuft=true; zeichnen(); var best=Infinity, n=0;
+    var w=navigator.geolocation.watchPosition(function(p){
+      best=Math.min(best, p.coords.accuracy); n++;
+      zustand.gps=best<=25; details.gpsText='Genauigkeit '+Math.round(best)+' m'+(best<=25?'. Passt.':'. Unter freiem Himmel nochmal messen, Bäume und Häuser stören.');
+      if(n>=4 || best<=10){ navigator.geolocation.clearWatch(w); details.gpsLaeuft=false; }
+      zeichnen();
+    }, function(){ details.gpsLaeuft=false; zustand.gps=false; details.gpsText='Standort nicht erlaubt. In den Einstellungen für Safari freigeben.'; zeichnen(); }, {enableHighAccuracy:true, maximumAge:0, timeout:20000});
+    setTimeout(function(){ navigator.geolocation.clearWatch(w); if(details.gpsLaeuft){ details.gpsLaeuft=false; zeichnen(); } }, 25000);
+  }
+  document.addEventListener('click', function(e){
+    var t=e.target;
+    if(t.closest('#klang')) klang();
+    else if(t.closest('#gehoert')){ zustand.ton=true; zeichnen(); }
+    else if(t.closest('#laden')) stimmenLaden();
+    else if(t.closest('#gps')) gps();
+    else if(t.closest('#akku')){ zustand.akku=true; zeichnen(); }
+    else if(t.closest('#sperre')){ zustand.sperre=true; zeichnen(); }
+  });
+  fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }).then(function(t){
+    tour=t; zeichnen(); stimmenPruefen(); offlinePruefen(); akkuPruefen();
+  })['catch'](function(){ $('liste').innerHTML='<p>Thema lässt sich nicht laden. Einmal mit Netz öffnen.</p>'; });
+})();
+</script>
+</body></html>

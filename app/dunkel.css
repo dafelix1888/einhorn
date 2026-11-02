@@ -1,0 +1,42 @@
+/* Dunkler Grundstil für Party, Druck-Vorschau und Bereit-Check, passend zur Startseite */
+:root{--bg:#0F0B17;--panel:#17121F;--karte:#1F1929;--hover:#2A2236;--linie:#2F2740;--text:#F5F2FA;--leise:#B3A9C4;--akzent:#A78BFA;--akzent-tief:#7C5BD6;--gruen:#4ADE80;--gelb:#FACC15;--rot:#F87171;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:"Avenir Next","Trebuchet MS","Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.45}
+[hidden]{display:none!important}
+a{color:var(--akzent)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--akzent);outline-offset:2px}
+.seite{max-width:44rem;margin:0 auto;padding:16px 18px 64px}
+.oben{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.oben a{color:var(--leise);text-decoration:none}
+h1{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.1;margin:8px 0}
+h2{font-size:1.3rem;margin:28px 0 12px}
+p{margin:0 0 8px}
+.leise{color:var(--leise)}
+.karte{background:var(--karte);border-radius:14px;padding:16px;margin-bottom:12px}
+label{display:block;font-weight:700;margin:14px 0 6px}
+input[type=text],input[type=date],input[type=time],input[type=number]{font:inherit;color:var(--text);background:var(--panel);border:2px solid var(--linie);border-radius:12px;padding:11px 13px;width:100%}
+input:focus{border-color:var(--akzent);outline:none}
+.reihe{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.zwei{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wahl{display:grid;gap:10px}
+.wahl button{display:flex;gap:12px;align-items:flex-start;text-align:left;background:var(--panel);border:2px solid var(--linie);border-radius:14px;padding:14px}
+.wahl button b{display:block}
+.wahl button span{color:var(--leise);font-size:.92rem}
+.wahl button[aria-pressed=true]{border-color:var(--akzent);background:color-mix(in srgb,var(--akzent) 14%,var(--panel))}
+.wahl .ico{font-size:1.6rem;line-height:1}
+.knopf{border:0;border-radius:999px;padding:12px 22px;font-weight:800;text-decoration:none;display:inline-block;background:var(--akzent);color:#160C2B}
+.knopf.leer{background:none;border:1.5px solid var(--leise);color:var(--text)}
+.knopf.klein{padding:8px 14px;font-size:.92rem}
+.knopf:disabled{opacity:.5}
+.zaehler{display:flex;align-items:center;gap:14px}
+.zaehler button{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--leise);background:none;font-size:1.3rem}
+.zaehler b{font-size:1.6rem;min-width:2.2rem;text-align:center}
+.schalter{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--linie)}
+.schalter input{width:24px;height:24px;accent-color:var(--akzent)}
+.fortschritt{display:flex;gap:6px;margin:6px 0 16px}
+.fortschritt i{flex:1;height:5px;border-radius:3px;background:var(--hover)}
+.fortschritt i.an{background:var(--akzent)}
+.hinweis{background:color-mix(in srgb,var(--akzent) 14%,var(--karte));border-radius:12px;padding:12px 14px;font-size:.95rem}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text);color:#111;padding:12px 18px;border-radius:12px;z-index:50;max-width:90vw}
