@@ -77,7 +77,8 @@
   }
 
   // Dijkstra mit kleinem Binär-Heap
-  function dijkstra(netz, start, ziel){
+  function kante(a,b){ return a<b ? a+'|'+b : b+'|'+a; }
+  function dijkstra(netz, start, ziel, meiden){                 // meiden: Kanten des Hinwegs, kosten sechsfach
     var dist={}, vor={}, heap=[[0,start]]; dist[start]=0;
     function hoch(i){ while(i>0){ var p=(i-1)>>1; if(heap[p][0]<=heap[i][0]) break; var t=heap[p]; heap[p]=heap[i]; heap[i]=t; i=p; } }
     function runter(i){ for(;;){ var l=2*i+1, r=l+1, m=i; if(l<heap.length && heap[l][0]<heap[m][0]) m=l; if(r<heap.length && heap[r][0]<heap[m][0]) m=r; if(m===i) break; var t=heap[m]; heap[m]=heap[i]; heap[i]=t; i=m; } }
@@ -85,7 +86,7 @@
       var top=heap[0], last=heap.pop(); if(heap.length){ heap[0]=last; runter(0); }
       var d=top[0], u=top[1]; if(d>dist[u]) continue;
       if(ziel!==undefined && u===ziel) break;
-      (netz.nachbarn[u]||[]).forEach(function(e){ var nd=d+e.d; if(dist[e.n]===undefined || nd<dist[e.n]){ dist[e.n]=nd; vor[e.n]=u; heap.push([nd,e.n]); hoch(heap.length-1); } });
+      (netz.nachbarn[u]||[]).forEach(function(e){ var nd=d+(meiden && meiden[kante(u,e.n)] ? e.d*6 : e.d); if(dist[e.n]===undefined || nd<dist[e.n]){ dist[e.n]=nd; vor[e.n]=u; heap.push([nd,e.n]); hoch(heap.length-1); } });
     }
     return {dist:dist, vor:vor};
   }
@@ -234,7 +235,8 @@
     if(!s) return Promise.reject(new Error('Rund um die Adresse gibt es in OpenStreetMap keine Wege.'));
     var dj=dijkstra(netz, s.id);
     var zielSpec=(opt.stationen[opt.stationen.length-1].ort)||{typ:'bank'};
-    var kand=zielKandidaten(netz, dj, opt.start, zielSpec, opt);
+    var zielOpt={distanz:opt.rundkurs ? opt.distanz*0.5 : opt.distanz, richtung:opt.richtung};   // Rundkurs: Regler gilt für die ganze Runde
+    var kand=zielKandidaten(netz, dj, opt.start, zielSpec, zielOpt);
     if(!kand.length) return Promise.reject(new Error('In dieser Richtung und Entfernung gibt es keine passenden Wege. Andere Richtung oder Strecke versuchen.'));
     // jede Kandidaten-Route bewerten: wie viele Stationen finden ihren Ort?
     var routen=kand.map(function(z){ var ids=pfad(dj, z.knoten); return {ziel:z, ids:ids, strecke:streckeAuf(netz, ids)}; })
@@ -253,6 +255,11 @@
         var treffer=r.st.filter(function(x){ return x.gefunden; }).length;
         var hoch=zielSpec.oben && H ? Math.max(0, r.hoehe(r.ids.length-1)-r.hoehe(0)) : 0;
         r.wert=treffer*10 + r.ziel.score*8 + Math.min(6, hoch/2);
+        r.rueck=rueckweg(netz, r.ids, opt.rundkurs);
+        if(opt.rundkurs && r.rueck){
+          var runde=r.strecke[r.strecke.length-1]+r.rueck.laenge;
+          r.wert+=(1-r.rueck.gleich)*15 - Math.min(10, Math.abs(runde-opt.distanz)/opt.distanz*10);
+        }
       });
       routen.sort(function(a,b){ return b.wert-a.wert; });
       var r=routen[(opt.versuch||0)%routen.length];
@@ -269,6 +276,7 @@
         route:r.ids.map(function(id){ var k=netz.knoten[id]; return [+k.lat.toFixed(6), +k.lng.toFixed(6)]; }),
         strecke:Math.round(r.strecke[r.strecke.length-1]),
         hoehenProfil:H ? r.hoehenProfil : null,
+        heimweg:r.rueck ? r.rueck.laenge : null, heimRoute:r.rueck ? r.rueck.route : null, heimGleich:r.rueck ? Math.round(r.rueck.gleich*100) : null,
         netz:netz,
         varianten:routen.length,
         versuch:(opt.versuch||0)%routen.length
@@ -277,6 +285,19 @@
   }
 
 
+
+  // ---------- Rückweg: kürzester Weg zurück, beim Rundkurs möglichst nicht auf dem Hinweg ----------
+  function rueckweg(netz, hinIds, rundkurs){
+    var von=hinIds[hinIds.length-1], zu=hinIds[0], meiden=null;
+    if(rundkurs){ meiden={}; for(var i=1;i<hinIds.length;i++) meiden[kante(hinIds[i-1],hinIds[i])]=1; }
+    var dj=dijkstra(netz, von, zu, meiden); if(dj.dist[zu]===undefined) return null;
+    var ids=pfad(dj, zu), l=streckeAuf(netz, ids), gleich=0;
+    var hin={}; for(var k=1;k<hinIds.length;k++) hin[kante(hinIds[k-1],hinIds[k])]=1;
+    for(var j=1;j<ids.length;j++) if(hin[kante(ids[j-1],ids[j])]) gleich+=l[j]-l[j-1];
+    var laenge=l[l.length-1];
+    return {ids:ids, laenge:Math.round(laenge), gleich:laenge?gleich/laenge:0,
+            route:ids.map(function(id){ var x=netz.knoten[id]; return [+x.lat.toFixed(6), +x.lng.toFixed(6)]; })};
+  }
   // ---------- Route durch feste Punkte (für das Verschieben von Hand) ----------
   // punkte: [{lat,lng}] in Reihenfolge. Jeder Punkt wird auf den nächsten Weg gezogen,
   // zwischen zwei Punkten nimmt die Route den kürzesten Fußweg.
@@ -292,7 +313,7 @@
       nach.push(nach[i-1]+l[l.length-1]);
       ids=ids.concat(teil.slice(1));
     }
-    return {route:ids.map(function(id){ var k=netz.knoten[id]; return [+k.lat.toFixed(6), +k.lng.toFixed(6)]; }),
+    return {ids:ids, route:ids.map(function(id){ var k=netz.knoten[id]; return [+k.lat.toFixed(6), +k.lng.toFixed(6)]; }),
             strecke:Math.round(nach[nach.length-1]), nach:nach.map(Math.round),
             knoten:snap.map(function(x){ var k=netz.knoten[x.id]; return {id:x.id, lat:+k.lat.toFixed(6), lng:+k.lng.toFixed(6), abstand:Math.round(x.d)}; })};
   }
@@ -309,6 +330,6 @@
     var gehen=Math.round(meter/v); return {gesamt:st+gehen, gehen:gehen, stationen:st};
   }
 
-  var api={routeDurch:routeDurch, wegLaenge:wegLaenge, ortAm:ortAm, dauer:dauer, planen:planen, overpassAbfrage:overpassAbfrage, netzBauen:netzBauen, praeposition:praeposition, meter:meter, peilung:peilung, RICHTUNG:RICHTUNG};
+  var api={rueckweg:rueckweg, routeDurch:routeDurch, wegLaenge:wegLaenge, ortAm:ortAm, dauer:dauer, planen:planen, overpassAbfrage:overpassAbfrage, netzBauen:netzBauen, praeposition:praeposition, meter:meter, peilung:peilung, RICHTUNG:RICHTUNG};
   if(typeof module!=='undefined' && module.exports) module.exports=api; else root.PlanerKern=api;
 })(this);

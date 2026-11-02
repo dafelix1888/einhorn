@@ -41,15 +41,18 @@
     <label for="adresse">Startadresse (Haustür)</label>
     <div class="row"><input id="adresse" type="text" autocomplete="street-address" placeholder="Straße Hausnummer, Ort"><button type="button" class="btn ghost small" id="hier">Mein Standort</button></div>
     <p class="hinweis" id="start-info"></p>
+    <span class="label" style="margin-top:12px">Form der Tour</span>
+    <div class="seg" id="form" role="group" aria-label="Form der Tour"></div>
+    <p class="hinweis" id="form-kurz"></p>
     <div class="zwei">
       <div>
         <span class="label">Grobe Richtung</span>
         <div class="richtung" id="richtung" role="group" aria-label="Himmelsrichtung"></div>
       </div>
       <div>
-        <label for="distanz">Strecke bis zum Ziel: <b id="distanz-wert"></b></label>
+        <label for="distanz"><span id="distanz-label">Strecke bis zum Ziel: </span><b id="distanz-wert"></b></label>
         <input type="range" id="distanz" step="50">
-        <p class="hinweis">Gehweg bis zur letzten Station. Kleine Kinder schaffen gut 500 m.</p>
+        <p class="hinweis" id="distanz-hinweis"></p>
       </div>
     </div>
   </section>
@@ -73,10 +76,10 @@
     <div class="kennzahlen" id="kennzahlen" aria-live="polite">
       <div><span>Bis zum Ziel</span><b id="k-strecke">–</b></div>
       <div><span>Tourdauer</span><b id="k-dauer">–</b><small id="k-dauer-teile"></small></div>
-      <div><span>Heimweg</span><b id="k-heim">–</b><small id="k-heim-min"></small></div>
+      <div><span id="k-heim-titel">Heimweg</span><b id="k-heim">–</b><small id="k-heim-min"></small></div>
     </div>
     <div id="karte"></div>
-    <p class="hinweis">Nummer mit dem Finger festhalten und ziehen: Route, Strecke und Dauer rechnen sich beim Ziehen neu. Beim Loslassen rutscht die Station auf den nächsten Weg. Kartendaten © OpenStreetMap-Mitwirkende, Höhen: Open-Meteo.</p>
+    <p class="hinweis">Lila: Hinweg, grün gepunktet: Heimweg. Nummer mit dem Finger festhalten und ziehen: Route, Strecke und Dauer rechnen sich beim Ziehen neu. Beim Loslassen rutscht die Station auf den nächsten Weg. Kartendaten © OpenStreetMap-Mitwirkende, Höhen: Open-Meteo.</p>
     <svg class="profil" id="profil" viewBox="0 0 600 120" preserveAspectRatio="none" aria-label="Höhenprofil"></svg>
     <ol class="stationen" id="liste"></ol>
     <div class="row">

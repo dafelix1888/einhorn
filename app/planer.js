@@ -11,7 +11,7 @@
   var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
   var PLAN_KEY='sj.plan.'+thema;
   var tour=null, plan=null, osmCache=null, versuch=0, karte=null, ebenen=null;
-  var wahl={variante:'a', richtung:'egal', distanz:500, kinder:10, start:null, adresse:''};
+  var wahl={variante:'a', rundkurs:false, richtung:'egal', distanz:500, kinder:10, start:null, adresse:''};
 
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
@@ -48,7 +48,12 @@
     $('variante').innerHTML=Object.keys(tour.varianten).map(function(k){ var v=tour.varianten[k]; return '<button type="button" data-v="'+k+'" aria-pressed="'+(wahl.variante===k)+'">'+esc(v.name)+'</button>'; }).join('');
     $('variante-kurz').textContent=(tour.varianten[wahl.variante]||{}).kurz||'';
     $('richtung').innerHTML=RICHTUNGEN.map(function(r){ return '<button type="button" data-r="'+r+'" aria-pressed="'+(wahl.richtung===r)+'" aria-label="'+(r==='egal'?'Richtung egal':'Richtung '+r)+'">'+PFEIL[r]+'</button>'; }).join('');
-    $('distanz-wert').textContent=km(wahl.distanz);
+    $('form').innerHTML=[[false,'Hin und zurück'],[true,'Rundkurs']].map(function(f){ return '<button type="button" data-f="'+f[0]+'" aria-pressed="'+(wahl.rundkurs===f[0])+'">'+f[1]+'</button>'; }).join('');
+    $('form-kurz').textContent=wahl.rundkurs ? 'Der Heimweg führt möglichst über andere Wege zurück.' : 'Nach dem Schatz geht es auf dem kürzesten Weg zurück, meist derselbe Weg.';
+    var d=$('distanz'), f=wahl.rundkurs?2:1; d.min=tour.strecke.min*f; d.max=tour.strecke.max*f;
+    $('distanz-label').textContent=wahl.rundkurs ? 'Ganze Runde: ' : 'Strecke bis zum Ziel: ';
+    $('distanz-hinweis').textContent=wahl.rundkurs ? 'Hinweg und Heimweg zusammen. Kleine Kinder schaffen gut 1 km.' : 'Gehweg bis zur letzten Station. Kleine Kinder schaffen gut 500 m.';
+    d.value=wahl.distanz; $('distanz-wert').textContent=km(wahl.distanz);
     $('kinder').textContent=wahl.kinder;
     $('draussen').hidden=!draussen(); $('drinnen').hidden=draussen();
     $('planen').textContent=draussen() ? 'Tour planen' : 'Speichern und spielen';
@@ -65,7 +70,7 @@
   }
 
   function markerIcon(i, s){ return L.divIcon({className:'nr-marker'+(i===0?' start':s.gefunden?'':' ersatz'), html:String(i===0?'⌂':i+1), iconSize:[38,38]}); }
-  var netz=null, marker=[], linie=null, rechenWunsch=null;
+  var netz=null, marker=[], linie=null, heimLinie=null, rechenWunsch=null;
 
   // ---------- Kennzahlen: Strecke, Dauer, Heimweg ----------
   function kennzahlenZeigen(strecke, heim, luftlinie){
@@ -73,8 +78,10 @@
     $('k-strecke').textContent=km(strecke||0)+(luftlinie?' (Luftlinie)':'');
     $('k-dauer').textContent='ca. '+d.gesamt+' min';
     $('k-dauer-teile').textContent=d.gehen+' min gehen + '+d.stationen+' min Stationen';
+    $('k-heim-titel').textContent=plan && plan.rundkurs ? 'Heimweg (Runde)' : 'Heimweg';
     $('k-heim').textContent=heim!=null ? km(heim) : '–';
-    $('k-heim-min').textContent=heim!=null ? 'ca. '+Math.round(heim/((tour.dauer||{}).meterProMinute||35))+' min zurück' : '';
+    var g=plan && plan.rundkurs && plan.heimGleich!=null && !luftlinie ? (plan.heimGleich<=10 ? ' · eigener Weg' : ' · '+plan.heimGleich+' % wie hin') : '';
+    $('k-heim-min').textContent=heim!=null ? 'ca. '+Math.round(heim/((tour.dauer||{}).meterProMinute||35))+' min'+g : '';
   }
   function luftlinie(){                          // Notbehelf, solange das Wegenetz noch lädt
     var st=plan.stationen, m=0, nach=[0];
@@ -85,7 +92,8 @@
     var punkte=plan.stationen.map(function(s,i){ var m=marker[i]; if(m && m.dragging && m._ziehen){ var p=m.getLatLng(); return {lat:p.lat, lng:p.lng}; } return {lat:s.lat, lng:s.lng}; });
     if(!netz){ var l=luftlinie(); return {strecke:l.strecke, nach:l.nach, heim:l.heim, luft:true}; }
     var r=PlanerKern.routeDurch(netz, punkte); if(!r) return null;
-    r.heim=PlanerKern.wegLaenge(netz, punkte[punkte.length-1], punkte[0]);
+    var rw=PlanerKern.rueckweg(netz, r.ids, plan.rundkurs);
+    r.heim=rw ? rw.laenge : null; r.heimRoute=rw ? rw.route : null; r.heimGleich=rw ? Math.round(rw.gleich*100) : null;
     return r;
   }
   function liveAktualisieren(){                  // beim Ziehen: höchstens einmal pro Bild neu rechnen
@@ -94,6 +102,7 @@
       rechenWunsch=null;
       var r=neuRechnen(); if(!r) return;
       if(r.route && linie) linie.setLatLngs(r.route);
+      if(heimLinie){ if(r.heimRoute) heimLinie.setLatLngs(r.heimRoute); plan.heimGleich=r.heimGleich; }
       kennzahlenZeigen(r.strecke, r.heim, r.luft);
       marker.forEach(function(m,i){ if(m._ziehen) m.setTooltipContent((i+1)+' · nach '+km(r.nach[i])); });
     });
@@ -104,7 +113,7 @@
       var k=r.knoten[i], o=PlanerKern.ortAm(netz, k.id);
       s.lat=k.lat; s.lng=k.lng;
       s.name=(tour.stationen[i].name||'Station')+(o.strasse?' '+o.an:''); s.an=o.an; s.zu=o.zu;
-      plan.route=r.route; plan.strecke=r.strecke; plan.heimweg=r.heim;
+      plan.route=r.route; plan.strecke=r.strecke; plan.heimweg=r.heim; plan.heimRoute=r.heimRoute; plan.heimGleich=r.heimGleich;
     } else {
       var p=marker[i].getLatLng(); s.lat=+p.lat.toFixed(6); s.lng=+p.lng.toFixed(6);
       if(r){ plan.strecke=r.strecke; plan.heimweg=r.heim; }
@@ -131,7 +140,7 @@
 
   function listeZeichnen(){
     var st=plan.stationen, fehlt=st.filter(function(s){ return !s.gefunden; }).length;
-    $('zusammenfassung').textContent=st.length+' Stationen'+(fehlt?', '+fehlt+' davon mit Ersatzort':', alle Orte passen zur Geschichte')+'.';
+    $('zusammenfassung').textContent=(plan.rundkurs && plan.heimweg!=null ? 'Rundkurs, '+km(plan.strecke+plan.heimweg)+' insgesamt. ' : '')+st.length+' Stationen'+(fehlt?', '+fehlt+' davon mit Ersatzort':', alle Orte passen zur Geschichte')+'.';
     $('liste').innerHTML=st.map(function(s,i){
       var t=tour.stationen[i];
       return '<li><span class="nr">'+(i+1)+'</span><div><b>'+esc(s.name)+'</b> · '+esc(t.title||(t.steps&&t.steps[0].title)||'')+
@@ -149,6 +158,7 @@
       ebenen=L.layerGroup().addTo(karte);
     }
     ebenen.clearLayers(); marker=[];
+    heimLinie=plan.heimRoute ? L.polyline(plan.heimRoute,{color:'#1F7A45', weight:4, opacity:.75, dashArray:'2 9', lineCap:'round'}).addTo(ebenen) : null;
     linie=L.polyline(plan.route||st.map(function(s){ return [s.lat,s.lng]; }),{color:'#6B35C9', weight:5, opacity:.8, dashArray:plan.route?null:'6 8'}).addTo(ebenen);
     st.forEach(function(s,i){
       var m=L.marker([s.lat,s.lng],{icon:markerIcon(i,s), draggable:i>0, autoPan:true, title:s.name}).addTo(ebenen);
@@ -160,18 +170,19 @@
     });
     if(einpassen) setTimeout(function(){ karte.invalidateSize(); karte.fitBounds(L.latLngBounds(st.map(function(s){ return [s.lat,s.lng]; })).pad(0.15)); }, 50);
   }
+  function heimNachrechnen(){ var r=neuRechnen(); if(r && !r.luft){ plan.heimweg=r.heim; plan.heimRoute=r.heimRoute; plan.heimGleich=r.heimGleich; } }
   function ergebnisZeigen(){
     $('ergebnis').hidden=false;
-    if(plan.heimweg==null && netz){ var st=plan.stationen; plan.heimweg=PlanerKern.wegLaenge(netz, st[st.length-1], st[0]); }
+    if(plan.heimweg==null && netz) heimNachrechnen();
     listeZeichnen(); kartenZeichnen(true);
   }
   function netzNachladen(){                      // gespeicherte Tour: Wegenetz im Hintergrund holen, damit Verschieben live rechnet
     if(netz || !plan || !plan.start) return;
-    var radius=Math.min(2500, (plan.distanz||wahl.distanz)*1.15+200);
+    var radius=Math.min(2500, (plan.distanz||wahl.distanz)*(plan.rundkurs?0.6:1.15)+200);
     overpass(PlanerKern.overpassAbfrage(plan.start.lat, plan.start.lng, radius)).then(function(osm){
       osmCache={osm:osm, start:plan.start, distanz:plan.distanz||wahl.distanz}; wahl.start=plan.start;
       netz=PlanerKern.netzBauen(osm);
-      if(plan.heimweg==null){ var st=plan.stationen; plan.heimweg=PlanerKern.wegLaenge(netz, st[st.length-1], st[0]); speichern(); }
+      if(plan.heimweg==null || (plan.rundkurs && !plan.heimRoute)){ heimNachrechnen(); speichern(); kartenZeichnen(false); }
       kennzahlenZeigen(plan.strecke, plan.heimweg, false);
     })['catch'](function(){});
   }
@@ -199,19 +210,19 @@
     startHolen.then(function(start){
       if(osmCache && osmCache.start===start && wahl.distanz<=osmCache.distanz) return rechnen();   // gleiche Gegend: Daten wiederverwenden
       status('Wege, Bänke, Zäune und Kreuzungen werden geladen …');
-      var radius=Math.min(2500, wahl.distanz*1.15+200);
+      var radius=Math.min(2500, wahl.distanz*(wahl.rundkurs?0.6:1.15)+200);
       return overpass(PlanerKern.overpassAbfrage(start.lat, start.lng, radius)).then(function(osm){ osmCache={osm:osm, start:start, distanz:wahl.distanz}; netz=null; return rechnen(); });
     })['catch'](function(e){ status(String(e.message||e), true); })
     .then(function(){ $('planen').disabled=false; });
   }
   function rechnen(){
     status('Höhen werden geladen und die Route wird geplant …');
-    return PlanerKern.planen(osmCache.osm, {start:osmCache.start, richtung:wahl.richtung, distanz:wahl.distanz, stationen:tour.stationen, hoehen:hoehen, versuch:versuch})
+    return PlanerKern.planen(osmCache.osm, {start:osmCache.start, richtung:wahl.richtung, distanz:wahl.distanz, rundkurs:wahl.rundkurs, stationen:tour.stationen, hoehen:hoehen, versuch:versuch})
       .then(function(r){
         netz=r.netz;
-        plan={format:1, thema:thema, adresse:wahl.adresse, start:osmCache.start, richtung:wahl.richtung, distanz:wahl.distanz,
+        plan={format:1, thema:thema, adresse:wahl.adresse, start:osmCache.start, richtung:wahl.richtung, distanz:wahl.distanz, rundkurs:wahl.rundkurs,
               strecke:r.strecke, stationen:r.stationen, route:r.route, hoehenProfil:r.hoehenProfil, varianten:r.varianten,
-              heimweg:PlanerKern.wegLaenge(r.netz, r.stationen[r.stationen.length-1], r.stationen[0])};
+              heimweg:r.heimweg, heimRoute:r.heimRoute, heimGleich:r.heimGleich};
         speichern(); ergebnisZeigen();
         status('Fertig'+(r.varianten>1?' · Route '+(r.versuch+1)+' von '+r.varianten:'')+'. Gespeichert auf diesem Gerät.');
         $('ergebnis').scrollIntoView({behavior:'smooth'});
@@ -220,6 +231,7 @@
 
   function verbinden(){
     $('variante').addEventListener('click', function(e){ var b=e.target.closest('button[data-v]'); if(!b) return; wahl.variante=b.getAttribute('data-v'); segZeichnen(); });
+    $('form').addEventListener('click', function(e){ var b=e.target.closest('button[data-f]'); if(!b) return; var neu=b.getAttribute('data-f')==='true'; if(neu!==wahl.rundkurs){ wahl.distanz=Math.round(wahl.distanz*(neu?2:0.5)/50)*50; } wahl.rundkurs=neu; segZeichnen(); });
     $('richtung').addEventListener('click', function(e){ var b=e.target.closest('button[data-r]'); if(!b) return; wahl.richtung=b.getAttribute('data-r'); segZeichnen(); });
     $('distanz').addEventListener('input', function(){ wahl.distanz=+this.value; $('distanz-wert').textContent=km(wahl.distanz); });
     $('k-minus').addEventListener('click', function(){ wahl.kinder=Math.max(tour.kinder.min, wahl.kinder-1); segZeichnen(); });
@@ -246,11 +258,12 @@
   fetch('themen/'+thema+'/tour.json').then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }).then(function(t){
     tour=t; document.title='Tour planen · '+t.titel;
     $('titel').textContent=t.titel+': Tour planen'; $('untertitel').textContent=t.untertitel+' · '+t.alter+' · '+t.dauer.text;
-    var d=$('distanz'); d.min=t.strecke.min; d.max=t.strecke.max; wahl.distanz=t.strecke.standard; wahl.kinder=t.kinder.standard; d.value=wahl.distanz;
+    var d=$('distanz'); wahl.distanz=t.strecke.standard; wahl.kinder=t.kinder.standard;
     try{ plan=JSON.parse(localStorage.getItem(PLAN_KEY)||'null'); }catch(e){ plan=null; }
     if(plan){
       wahl.variante=plan.variante||wahl.variante; wahl.kinder=plan.kinder||wahl.kinder;
-      if(plan.distanz){ wahl.distanz=plan.distanz; d.value=plan.distanz; }
+      if(plan.distanz) wahl.distanz=plan.distanz;
+      wahl.rundkurs=!!plan.rundkurs;
       if(plan.richtung) wahl.richtung=plan.richtung;
       if(plan.start){ wahl.start=plan.start; wahl.adresse=plan.adresse||''; $('adresse').value=wahl.adresse; }
     }
