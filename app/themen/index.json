@@ -2,13 +2,148 @@
  "themen": [
   {
    "id": "einhorn",
+   "status": "verfuegbar",
    "titel": "Funkels Regenbogen",
    "untertitel": "Eine Einhorn-Schnitzeljagd mit Zauberspiegel",
+   "held": "Funkel, das Einhorn",
    "kurz": "Über Nacht ist Funkels Regenbogen verschwunden, und alle Farben sind durcheinander. Die Kinder folgen Hufspuren, lösen Farbrätsel im Zauberspiegel, sammeln die Bögen ein und finden heraus, wer sie gemopst hat.",
    "alter": "3 bis 6 Jahre",
+   "altersgruppen": [
+    "3-6"
+   ],
+   "orte": [
+    "draussen",
+    "drinnen"
+   ],
    "dauer": "etwa 50 Minuten plus Heimweg",
+   "minuten": 50,
    "stationen": 7,
+   "cover": "themen/einhorn/cover.svg",
+   "farbe": "#7C5BD6",
+   "hoerprobe": "themen/einhorn/hoerprobe.mp3",
+   "preis": "Kostenlos",
    "tour": "themen/einhorn/tour.json"
+  },
+  {
+   "id": "piraten",
+   "status": "bald",
+   "titel": "Käpt’n Kringels Schatz",
+   "untertitel": "Eine Piraten-Schatzsuche mit Flaschenpost",
+   "held": "Käpt’n Kringel",
+   "kurz": "Die Schatzkarte ist in sieben Fetzen zerrissen. Wer alle findet, entdeckt die Kiste des vergesslichsten Piraten der sieben Meere.",
+   "alter": "5 bis 8 Jahre",
+   "altersgruppen": [
+    "3-6",
+    "6-10"
+   ],
+   "orte": [
+    "draussen",
+    "drinnen"
+   ],
+   "minuten": 60,
+   "stationen": 7,
+   "cover": "themen/bald/piraten.svg",
+   "farbe": "#0E7490"
+  },
+  {
+   "id": "dino",
+   "status": "bald",
+   "titel": "Das verlorene Dino-Ei",
+   "untertitel": "Eine Urzeit-Expedition",
+   "held": "Professorin Knochenfeld",
+   "kurz": "Ein Dino-Ei ist aus dem Museum verschwunden. Die Kinder folgen riesigen Fußspuren und bringen es zurück, bevor es schlüpft.",
+   "alter": "4 bis 7 Jahre",
+   "altersgruppen": [
+    "3-6",
+    "6-10"
+   ],
+   "orte": [
+    "draussen"
+   ],
+   "minuten": 50,
+   "stationen": 7,
+   "cover": "themen/bald/dino.svg",
+   "farbe": "#4D7C0F"
+  },
+  {
+   "id": "weltraum",
+   "status": "bald",
+   "titel": "Mission Mondkäse",
+   "untertitel": "Ein Weltraum-Abenteuer",
+   "held": "Robo Rakete",
+   "kurz": "Der Mond ist aus Käse, und jemand knabbert daran! Die Raumfahrer-Crew löst Rätsel auf fünf Planeten.",
+   "alter": "6 bis 10 Jahre",
+   "altersgruppen": [
+    "6-10"
+   ],
+   "orte": [
+    "drinnen",
+    "draussen"
+   ],
+   "minuten": 60,
+   "stationen": 6,
+   "cover": "themen/bald/weltraum.svg",
+   "farbe": "#3730A3"
+  },
+  {
+   "id": "detektiv",
+   "status": "bald",
+   "titel": "Die Spur der Keksdiebe",
+   "untertitel": "Ein Detektiv-Fall",
+   "held": "Kommissarin Krümel",
+   "kurz": "Aus der Keksdose fehlt alles. Mit Lupe, Fingerabdrücken und Geheimcodes überführen die Detektive die Täter.",
+   "alter": "6 bis 10 Jahre",
+   "altersgruppen": [
+    "6-10"
+   ],
+   "orte": [
+    "drinnen",
+    "draussen"
+   ],
+   "minuten": 55,
+   "stationen": 7,
+   "cover": "themen/bald/detektiv.svg",
+   "farbe": "#B45309"
+  },
+  {
+   "id": "feen",
+   "status": "bald",
+   "titel": "Im Feenwald",
+   "untertitel": "Eine leise Glitzer-Suche",
+   "held": "Fee Flimmer",
+   "kurz": "Fee Flimmer hat ihren Glitzerstaub verloren. Ohne ihn kann sie nicht fliegen. Die Kinder sammeln ihn Station für Station.",
+   "alter": "3 bis 5 Jahre",
+   "altersgruppen": [
+    "3-6"
+   ],
+   "orte": [
+    "draussen"
+   ],
+   "minuten": 40,
+   "stationen": 6,
+   "cover": "themen/bald/feen.svg",
+   "farbe": "#0F766E"
+  },
+  {
+   "id": "ritter",
+   "status": "bald",
+   "titel": "Der Drache ohne Feuer",
+   "untertitel": "Ein Ritter-Abenteuer",
+   "held": "Drache Dodo",
+   "kurz": "Drache Dodo kann kein Feuer mehr spucken. Die Ritter-Gruppe besteht Mutproben und braut ihm einen Zaubertrank.",
+   "alter": "5 bis 9 Jahre",
+   "altersgruppen": [
+    "3-6",
+    "6-10"
+   ],
+   "orte": [
+    "draussen",
+    "drinnen"
+   ],
+   "minuten": 55,
+   "stationen": 7,
+   "cover": "themen/bald/ritter.svg",
+   "farbe": "#9F1239"
   }
  ]
 }

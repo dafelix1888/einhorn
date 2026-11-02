@@ -1,63 +1,321 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Schnitzeljagden mit Zauberspiegel</title>
-<link rel="stylesheet" href="stil.css">
+<meta name="theme-color" content="#0F0B17">
+<title>Zauberspiegel · Schnitzeljagden</title>
 <style>
-.fakten{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:10px;margin:12px 0}
-.fakt{background:var(--tint);border-radius:14px;padding:10px 12px}
-.fakt b{display:block;font-size:1.25rem}
-.fakt span{color:var(--soft);font-size:.9rem}
-ol.st,ul.fig,ul.ut{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:6px}
-.klein{color:var(--soft);font-size:.92rem}
-.themen-wahl{display:flex;gap:8px;flex-wrap:wrap}
+:root{--bg:#0F0B17;--panel:#17121F;--karte:#1F1929;--hover:#2A2236;--linie:#2F2740;--text:#F5F2FA;--leise:#B3A9C4;--akzent:#A78BFA;--akzent-tief:#7C5BD6;--gruen:#4ADE80;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#000;color:var(--text);font-family:"Avenir Next","Trebuchet MS","Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.4;overflow:hidden}
+[hidden]{display:none!important}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--akzent);outline-offset:2px}
+/* Kopf */
+.kopf{height:64px;display:flex;align-items:center;gap:12px;padding:8px 16px}
+.marke{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;text-decoration:none;flex:0 0 auto}
+.marke .logo{width:34px;height:34px;border-radius:50%;background:conic-gradient(#E23A3F,#F2B90F,#3A9D4B,#2B6FE0,#9050C8,#E23A3F);display:grid;place-items:center}
+.marke .logo i{width:22px;height:22px;border-radius:50%;background:#0F0B17;display:block}
+.mitte{flex:1;display:flex;justify-content:center;gap:8px;min-width:0}
+.rund{width:48px;height:48px;border-radius:50%;border:0;background:var(--karte);display:grid;place-items:center;flex:0 0 auto}
+.rund:hover{background:var(--hover)}
+.suche{display:flex;align-items:center;gap:10px;background:var(--karte);border-radius:999px;padding:0 18px;height:48px;width:min(480px,100%);border:2px solid transparent}
+.suche:focus-within{border-color:var(--leise)}
+.suche input{flex:1;background:none;border:0;color:var(--text);font:inherit;font-size:1rem;outline:none;min-width:0}
+.suche svg,.rund svg{width:22px;height:22px;flex:0 0 auto}
+/* Raster */
+.raster{display:grid;grid-template-columns:300px 1fr 320px;gap:8px;padding:0 8px 8px;height:calc(100% - 64px)}
+.flaeche{background:var(--panel);border-radius:10px;overflow:auto;min-height:0}
+@media (max-width:1180px){ .raster{grid-template-columns:260px 1fr} .jetzt{display:none} }
+@media (max-width:820px){ .raster{grid-template-columns:1fr} .bib{display:none} body{overflow:auto} .raster{height:auto} .marke span{display:none} }
+/* Bibliothek */
+.bib{padding:16px 8px}
+.bib h2{font-size:1.05rem;margin:0 8px 12px;display:flex;justify-content:space-between;align-items:center}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 8px 14px}
+.chip{border:0;background:var(--karte);border-radius:999px;padding:7px 14px;font-size:.92rem}
+.chip:hover{background:var(--hover)}
+.chip[aria-pressed=true]{background:var(--text);color:#111}
+.zeile{display:flex;gap:12px;align-items:center;padding:8px;border-radius:8px;text-decoration:none;width:100%;border:0;background:none;text-align:left}
+.zeile:hover{background:var(--hover)}
+.zeile img{width:48px;height:48px;border-radius:6px;flex:0 0 auto}
+.zeile b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zeile span{display:block;color:var(--leise);font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zeile .txt{min-width:0}
+.leer{color:var(--leise);font-size:.92rem;margin:4px 8px 0;background:var(--karte);border-radius:10px;padding:14px}
+.leer b{color:var(--text);display:block;margin-bottom:4px}
+/* Start */
+.inhalt{padding:20px 24px 40px}
+.gruss{font-size:1.9rem;font-weight:800;margin:4px 0 14px}
+h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
+.kurzreihe{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.kurz{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);border-radius:6px;overflow:hidden;text-decoration:none;font-weight:700;height:64px}
+.kurz:hover{background:rgba(255,255,255,.14)}
+.kurz img{width:64px;height:64px}
+.kacheln{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:22px 18px}
+@media (max-width:520px){ .kacheln{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 12px} .inhalt{padding:16px} }
+.kachel{position:relative;text-decoration:none;display:block;padding:10px;margin:-10px;border-radius:10px;min-width:0}
+.kachel:hover{background:var(--karte)}
+.kachel .bild{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.kachel img{width:100%;height:100%;display:block}
+.kachel.bald img{filter:saturate(.55) brightness(.7)}
+.kachel h3{font-size:1.05rem;margin:12px 0 4px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kachel p{margin:0;color:var(--leise);font-size:.92rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.marke-oben{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);border-radius:999px;padding:4px 10px;font-size:.78rem;font-weight:700}
+.marke-oben.frei{background:var(--gruen);color:#062B12}
+.spielknopf{position:absolute;right:10px;bottom:10px;width:52px;height:52px;border-radius:50%;background:var(--akzent);color:#160C2B;border:0;display:grid;place-items:center;box-shadow:0 8px 16px rgba(0,0,0,.4);opacity:0;transform:translateY(8px);transition:all .2s}
+.kachel:hover .spielknopf,.kachel:focus-visible .spielknopf{opacity:1;transform:none}
+@media (hover:none){ .spielknopf{opacity:1;transform:none;width:44px;height:44px} }
+.spielknopf svg{width:22px;height:22px}
+/* Detail */
+.held{display:flex;gap:24px;align-items:flex-end;padding:72px 24px 24px;background:linear-gradient(180deg,var(--farbe) 0%,color-mix(in srgb,var(--farbe) 45%,var(--panel)) 100%)}
+.held img{width:232px;height:232px;border-radius:6px;box-shadow:0 8px 40px rgba(0,0,0,.55);flex:0 0 auto}
+.held .art{font-size:.9rem;font-weight:600}
+.held h1{font-size:clamp(2.2rem,6vw,4.8rem);line-height:1;margin:8px 0 12px;letter-spacing:-.02em}
+.held .wer{font-weight:700;font-size:1.05rem}
+.held .wer span{font-weight:400;opacity:.85}
+@media (max-width:700px){ .held{flex-direction:column;align-items:flex-start;padding-top:24px} .held img{width:180px;height:180px} }
+.aktion{display:flex;align-items:center;gap:18px;padding:20px 24px;background:linear-gradient(180deg,color-mix(in srgb,var(--farbe) 22%,var(--panel)),var(--panel) 160px)}
+.gross{width:58px;height:58px;border-radius:50%;background:var(--akzent);border:0;display:grid;place-items:center;color:#160C2B}
+.gross:hover{transform:scale(1.05);background:#BBA4FF}
+.gross svg{width:26px;height:26px}
+.pille{border:1.5px solid var(--leise);background:none;border-radius:999px;padding:8px 18px;font-weight:700;text-decoration:none;font-size:.95rem}
+.pille:hover{border-color:var(--text)}
+.pille.an{border-color:var(--akzent);color:var(--akzent)}
+.abschnitt-d{padding:6px 24px 10px}
+.abschnitt-d h2{font-size:1.5rem;margin:22px 0 12px}
+.info{color:var(--leise);max-width:60rem;font-size:1.05rem}
+.info.zu{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.mehr{background:none;border:0;font-weight:700;padding:6px 0;color:var(--text)}
+.fakten{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.fakt{background:var(--karte);border-radius:999px;padding:8px 14px;font-size:.92rem}
+.fakt b{font-weight:700}
+.probe{display:flex;align-items:center;gap:16px;background:var(--karte);border-radius:10px;padding:12px;margin-top:18px;max-width:60rem}
+.probe img{width:72px;height:72px;border-radius:6px}
+.probe b{display:block}
+.probe span{color:var(--leise);font-size:.9rem}
+.probe .klein{width:44px;height:44px;margin-left:auto}
+.folgen{list-style:none;margin:0;padding:0;max-width:60rem}
+.folgen li{display:grid;grid-template-columns:64px 1fr auto;gap:16px;align-items:center;padding:14px 8px;border-top:1px solid var(--linie);border-radius:6px}
+.folgen li:hover{background:var(--karte)}
+.folgen .nr{width:64px;height:64px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:1.5rem;color:#fff}
+.folgen b{display:block;font-size:1.05rem}
+.folgen span{color:var(--leise);font-size:.9rem}
+.folgen .zeit{color:var(--leise);font-size:.88rem;white-space:nowrap}
+.figuren{display:flex;gap:18px;overflow-x:auto;padding-bottom:8px}
+.figur{flex:0 0 150px;text-align:center}
+.figur .kreis{width:130px;height:130px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;font-size:3rem;font-weight:800;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.figur b{display:block;font-size:.98rem}
+.figur span{color:var(--leise);font-size:.85rem}
+.ausruestung{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;max-width:60rem}
+.ding{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--karte);border-radius:10px;padding:12px 14px}
+.ding b{display:block;font-size:.98rem}
+.ding span{color:var(--leise);font-size:.85rem}
+.ding a,.ding em{font-size:.85rem;white-space:nowrap}
+.ding em{color:var(--leise);font-style:normal}
+.paket{margin-top:12px;max-width:60rem;border-radius:12px;padding:18px;background:linear-gradient(120deg,#3B2A64,#1F1929);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.paket b{font-size:1.1rem}
+.paket span{color:var(--leise);display:block;font-size:.92rem}
+.hinweis-klein{color:var(--leise);font-size:.8rem;margin-top:8px;max-width:60rem}
+/* rechte Spalte */
+.jetzt{padding:16px}
+.jetzt h2{font-size:1.05rem;margin:0 0 14px}
+.jetzt .cover{width:100%;aspect-ratio:1;border-radius:8px;display:block}
+.jetzt h3{font-size:1.5rem;margin:14px 0 2px}
+.jetzt .unter{color:var(--leise);margin:0 0 14px}
+.box{background:var(--karte);border-radius:10px;padding:14px;margin-top:12px}
+.box h4{margin:0 0 10px;font-size:1rem}
+.werte{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.werte div span{display:block;color:var(--leise);font-size:.8rem}
+.werte div b{font-size:1.05rem}
+.balken{height:6px;background:var(--hover);border-radius:3px;overflow:hidden;margin:8px 0 4px}
+.balken i{display:block;height:100%;background:var(--gruen)}
+.knopfreihe{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.voll{background:var(--akzent);color:#160C2B;border:0;border-radius:999px;padding:10px 18px;font-weight:800;text-decoration:none;display:inline-block}
+.zurueck{position:sticky;top:0;z-index:5;display:flex;gap:8px;padding:12px 16px;background:linear-gradient(var(--panel),transparent)}
+.mobil-jetzt{display:none}
+@media (max-width:1180px){ .mobil-jetzt{display:block} }
 </style></head><body>
-<main class="seite">
-  <h1>Schnitzeljagden mit Zauberspiegel</h1>
-  <p class="lead">Eine Geschichte, ein Tablet als sprechender Spiegel, und die Tour plant sich für jeden Ort von selbst.</p>
-  <div class="themen-wahl" id="themen"></div>
-  <article class="karte-box" id="thema" aria-live="polite"><p class="lead">Lädt …</p></article>
-</main>
+<header class="kopf">
+  <a class="marke" href="#/"><span class="logo"><i></i></span><span>Zauberspiegel</span></a>
+  <div class="mitte">
+    <a class="rund" href="#/" aria-label="Start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></a>
+    <label class="suche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="suche" type="search" placeholder="Welches Abenteuer suchst du?" aria-label="Abenteuer suchen"></label>
+  </div>
+</header>
+<div class="raster">
+  <aside class="flaeche bib" aria-label="Meine Abenteuer">
+    <h2>Meine Abenteuer</h2>
+    <div class="chips" id="bib-chips"></div>
+    <div id="bib-liste"></div>
+  </aside>
+  <main class="flaeche" id="haupt" tabindex="-1"></main>
+  <aside class="flaeche jetzt" id="jetzt" aria-label="Deine nächste Tour"></aside>
+</div>
+<audio id="ton" preload="none"></audio>
 <script>
 (function(){
   'use strict';
+  var THEMEN=[], TOUR={}, filter='alle', bibFilter='alle', suche='';
+  var MERK='sj.merkliste';
+  var FIG_FARBEN=['#9050C8','#E23A3F','#2B6FE0','#F28C1B','#3A9D4B','#27A7A0','#C2410C','#DB2777','#4F46E5'];
+  var PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg>';
+  var PAUSE='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function j(u){ return fetch(u).then(function(r){ if(!r.ok) throw new Error(u+': HTTP '+r.status); return r.json(); }); }
-  function zeigen(t){
-    var plan=null; try{ plan=JSON.parse(localStorage.getItem('sj.plan.'+t.id)||'null'); }catch(e){}
-    var st=t.stationen.map(function(s,i){
-      var titel=s.title||(s.steps?s.steps.map(function(x){ return x.title; }).join(' → '):'');
-      return '<li><b>'+esc(titel)+'</b> <span class="klein">· '+esc((s.ort&&s.ort.typ==='start')?'an der Haustür':s.wo)+'</span></li>';
-    }).join('');
-    var fig=t.figuren.map(function(f){ return '<li><b>'+esc(f.name)+'</b> <span class="klein">· '+esc(f.rolle)+'</span><br><span class="klein">'+esc(f.text)+'</span></li>'; }).join('');
-    var ut=t.utensilien.map(function(u){ var n=u.link?'<a href="'+esc(u.link)+'" rel="sponsored noopener" target="_blank">'+esc(u.name)+'</a>':esc(u.name); return '<li>'+n+' <span class="klein">· '+esc(u.menge==='je Kind'||/Kind/.test(String(u.menge))?u.menge:u.menge+'×')+' · '+esc(u.wann)+'</span></li>'; }).join('');
-    var gaben=t.gaben.map(function(g){ return '<li><b>'+esc(g.was)+'</b> <span class="klein">· '+esc(g.art)+'</span></li>'; }).join('');
-    var vari=Object.keys(t.varianten).map(function(k){ var v=t.varianten[k]; return '<li><b>'+esc(v.name)+'</b> <span class="klein">· '+esc(v.kurz)+'</span></li>'; }).join('');
-    $('thema').innerHTML=
-      '<h2>'+esc(t.titel)+'</h2><p class="lead">'+esc(t.untertitel)+'</p><p style="margin-top:10px">'+esc(t.kurz)+'</p>'+
-      '<div class="fakten">'+
-        '<div class="fakt"><b>'+esc(t.dauer.minuten)+' min</b><span>'+esc(t.dauer.text)+'</span></div>'+
-        '<div class="fakt"><b>'+t.stationen.length+'</b><span>Stationen</span></div>'+
-        '<div class="fakt"><b>'+esc(t.alter)+'</b><span>Alter</span></div>'+
-        '<div class="fakt"><b>'+t.kinder.min+'–'+t.kinder.max+'</b><span>Kinder</span></div>'+
-        '<div class="fakt"><b>'+esc(t.strecke.text)+'</b><span>Strecke draußen</span></div>'+
-        '<div class="fakt"><b>'+t.figuren.length+'</b><span>Figuren</span></div>'+
-      '</div>'+
-      '<div class="row"><a class="btn primary" href="planer.html?thema='+encodeURIComponent(t.id)+'">'+(plan?'Tour ansehen oder neu planen':'Tour planen')+'</a>'+
-      (plan?'<a class="btn ghost" href="spiel.html?thema='+encodeURIComponent(t.id)+'">Spiel öffnen</a>':'')+'</div>'+
-      (plan&&plan.strecke?'<p class="hinweis">Gespeicherte Tour auf diesem Gerät: '+esc(plan.adresse||'')+', '+plan.strecke+' m.</p>':'')+
-      '<h3>Varianten</h3><ul class="fig">'+vari+'</ul>'+
-      '<h3>Stationen</h3><ol class="st">'+st+'</ol>'+
-      '<h3>Figuren</h3><ul class="fig">'+fig+'</ul>'+
-      '<h3>Was die Kinder bekommen</h3><ul class="fig">'+gaben+'</ul>'+
-      '<h3>Utensilien</h3><ul class="ut">'+ut+'</ul>';
+  function lies(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
+  function plan(id){ var p=lies('sj.plan.'+id); return p && p.thema===id ? p : null; }
+  function merkliste(){ return lies(MERK)||[]; }
+  function km(m){ return m>=1000 ? (m/1000).toFixed(1).replace('.',',')+' km' : Math.round(m)+' m'; }
+  function thema(id){ return THEMEN.filter(function(t){ return t.id===id; })[0]; }
+  function verfuegbar(t){ return t.status==='verfuegbar'; }
+  function dauerMin(t, p){ var d=(TOUR[t.id]||{}).dauer||{}; if(!p || !p.strecke) return t.minuten; return (d.stationenMinuten||35)+Math.round(p.strecke/(d.meterProMinute||35)); }
+  function zielLink(t){ return plan(t.id) ? 'spiel.html?thema='+t.id : 'planer.html?thema='+t.id; }
+  function ortText(t){ return t.orte.map(function(o){ return o==='draussen'?'draußen':'drinnen'; }).join(' & '); }
+
+  // ---------- Bibliothek links ----------
+  function bibZeichnen(){
+    var meine=THEMEN.filter(function(t){ return plan(t.id) || merkliste().indexOf(t.id)>=0; });
+    $('bib-chips').innerHTML=[['alle','Alle'],['geplant','Geplant'],['gemerkt','Gemerkt']].map(function(c){ return '<button class="chip" data-bf="'+c[0]+'" aria-pressed="'+(bibFilter===c[0])+'">'+c[1]+'</button>'; }).join('');
+    var l=meine.filter(function(t){ return bibFilter==='alle' || (bibFilter==='geplant' ? !!plan(t.id) : merkliste().indexOf(t.id)>=0); });
+    $('bib-liste').innerHTML=l.length ? l.map(function(t){
+      var p=plan(t.id);
+      var sub=p ? (p.strecke ? 'Geplant · '+km(p.strecke)+(p.rundkurs?' · Rundkurs':'') : 'Geplant · drinnen') : (verfuegbar(t)?'Gemerkt · noch nicht geplant':'Gemerkt · bald verfügbar');
+      return '<a class="zeile" href="#/abenteuer/'+t.id+'"><img src="'+t.cover+'" alt=""><div class="txt"><b>'+esc(t.titel)+'</b><span>'+esc(sub)+'</span></div></a>';
+    }).join('') : '<p class="leer"><b>Noch nichts hier</b>Plane eine Tour oder merke dir ein Abenteuer mit ＋, dann taucht es hier auf.</p>';
   }
+
+  // ---------- rechte Spalte: nächste Tour ----------
+  function vorbereitung(t, p){
+    var tour=TOUR[t.id]; if(!tour) return null;
+    var v=(p && p.variante) || 'a', kinder=(p && p.kinder) || tour.kinder.standard;
+    var g=tour.vorbereitung.gemeinsam, l=g.slice(0,1).concat(tour.vorbereitung.variante[v]||[], g.slice(1));
+    var haken=lies(tour.speicher+'.liste')||{}, n=0, fertig=0;
+    l.forEach(function(gr){ gr.items.forEach(function(it){ n++; if(haken[v+'|'+it.replace(/\{kinder\}/g,kinder)]) fertig++; }); });
+    return {n:n, fertig:fertig};
+  }
+  function jetztHtml(){
+    var t=THEMEN.filter(function(x){ return plan(x.id); })[0];
+    if(!t){
+      var e=THEMEN.filter(verfuegbar)[0];
+      return '<h2>Deine nächste Tour</h2><img class="cover" src="'+e.cover+'" alt=""><h3>'+esc(e.titel)+'</h3><p class="unter">Noch nicht geplant</p>'+
+        '<div class="box"><h4>So geht’s</h4><p class="unter" style="margin:0">Adresse eingeben, Richtung wählen, fertig. Die Stationen sucht der Planer passend zur Geschichte.</p><div class="knopfreihe"><a class="voll" href="planer.html?thema='+e.id+'">Tour planen</a></div></div>';
+    }
+    var p=plan(t.id), vb=vorbereitung(t,p), tour=TOUR[t.id]||{};
+    var variante=(tour.varianten && tour.varianten[p.variante||'a'] || {}).name||'';
+    return '<h2>Deine nächste Tour</h2><a href="#/abenteuer/'+t.id+'"><img class="cover" src="'+t.cover+'" alt=""></a><h3>'+esc(t.titel)+'</h3><p class="unter">'+esc(variante)+(p.adresse?' · ab '+esc(p.adresse):'')+'</p>'+
+      '<div class="box"><h4>Tour</h4><div class="werte">'+
+        (p.strecke?'<div><span>Bis zum Ziel</span><b>'+km(p.strecke)+'</b></div>':'<div><span>Ort</span><b>Drinnen</b></div>')+
+        '<div><span>Dauer</span><b>ca. '+dauerMin(t,p)+' min</b></div>'+
+        (p.heimweg!=null?'<div><span>'+(p.rundkurs?'Heimweg (Runde)':'Heimweg')+'</span><b>'+km(p.heimweg)+'</b></div>':'')+
+        '<div><span>Kinder</span><b>'+(p.kinder||tour.kinder&&tour.kinder.standard||'–')+'</b></div>'+
+      '</div></div>'+
+      (vb?'<div class="box"><h4>Vorbereitung</h4><div class="balken"><i style="width:'+Math.round(vb.fertig/Math.max(1,vb.n)*100)+'%"></i></div><p class="unter" style="margin:0">'+vb.fertig+' von '+vb.n+' Punkten erledigt</p><div class="knopfreihe"><a class="pille" href="spiel.html?thema='+t.id+'#einrichten">Checkliste</a></div></div>':'')+
+      '<div class="knopfreihe"><a class="voll" href="spiel.html?thema='+t.id+'">Spiel öffnen</a><a class="pille" href="planer.html?thema='+t.id+'">Route ändern</a></div>';
+  }
+
+  // ---------- Startseite ----------
+  function passt(t){
+    if(filter==='draussen' || filter==='drinnen'){ if(t.orte.indexOf(filter)<0) return false; }
+    else if(filter!=='alle'){ if(t.altersgruppen.indexOf(filter)<0) return false; }
+    if(suche){ var s=(t.titel+' '+t.untertitel+' '+t.kurz+' '+t.held).toLowerCase(); if(s.indexOf(suche)<0) return false; }
+    return true;
+  }
+  function kachel(t){
+    var frei=verfuegbar(t);
+    return '<a class="kachel'+(frei?'':' bald')+'" href="#/abenteuer/'+t.id+'"><div class="bild"><img src="'+t.cover+'" alt="" loading="lazy">'+
+      '<span class="marke-oben'+(frei&&t.preis==='Kostenlos'?' frei':'')+'">'+(frei?esc(t.preis||'Verfügbar'):'Bald')+'</span>'+
+      (frei?'<button class="spielknopf" data-los="'+t.id+'" aria-label="'+esc(t.titel)+' starten">'+PLAY+'</button>':'')+
+      '</div><h3>'+esc(t.titel)+'</h3><p>'+esc(t.alter)+' · '+esc(ortText(t))+'</p></a>';
+  }
+  function startZeigen(){
+    var h=new Date().getHours(), gruss=h<11?'Guten Morgen':h<18?'Hallo':'Guten Abend';
+    var geplant=THEMEN.filter(function(t){ return plan(t.id); });
+    var l=THEMEN.filter(passt), da=l.filter(verfuegbar), bald=l.filter(function(t){ return !verfuegbar(t); });
+    var chips=[['alle','Alle'],['draussen','Draußen'],['drinnen','Drinnen'],['3-6','3–6 Jahre'],['6-10','6–10 Jahre']];
+    $('haupt').innerHTML='<div class="inhalt">'+
+      '<p class="gruss">'+gruss+'</p>'+
+      '<div class="chips" style="margin:0 0 18px">'+chips.map(function(c){ return '<button class="chip" data-f="'+c[0]+'" aria-pressed="'+(filter===c[0])+'">'+c[1]+'</button>'; }).join('')+'</div>'+
+      (geplant.length && !suche ? '<div class="kurzreihe">'+geplant.map(function(t){ return '<a class="kurz" href="#/abenteuer/'+t.id+'"><img src="'+t.cover+'" alt="">'+esc(t.titel)+'</a>'; }).join('')+'</div>' : '')+
+      (l.length?'<h2 class="abschnitt">Alle Abenteuer</h2><div class="kacheln">'+da.concat(bald).map(kachel).join('')+'</div>':'')+
+      (!l.length?'<p class="leer" style="margin-top:20px"><b>Nichts gefunden</b>Andere Suche oder anderen Filter versuchen.</p>':'')+
+      '<div class="mobil-jetzt" style="margin-top:30px">'+jetztHtml()+'</div>'+
+    '</div>';
+  }
+
+  // ---------- Detailseite ----------
+  function detailZeigen(id){
+    var t=thema(id); if(!t){ location.hash='#/'; return; }
+    var tour=TOUR[id], p=plan(id), gemerkt=merkliste().indexOf(id)>=0;
+    var h='<div style="--farbe:'+t.farbe+'">'+
+      '<div class="held"><img src="'+t.cover+'" alt=""><div><div class="art">Schnitzeljagd'+(verfuegbar(t)?'':' · bald verfügbar')+'</div><h1>'+esc(t.titel)+'</h1>'+
+      '<div class="wer">'+esc(t.held)+' <span>· '+esc(t.alter)+' · '+t.stationen+' Stationen · ca. '+t.minuten+' min</span></div></div></div>'+
+      '<div class="aktion">'+
+        (verfuegbar(t)?'<a class="gross" href="'+zielLink(t)+'" aria-label="'+(p?'Spiel öffnen':'Tour planen')+'">'+PLAY+'</a><a class="pille" href="planer.html?thema='+id+'">'+(p?'Route ändern':'Tour planen')+'</a>':'<button class="pille" disabled>Kommt bald</button>')+
+        '<button class="pille'+(gemerkt?' an':'')+'" data-merken="'+id+'">'+(gemerkt?'✓ Gemerkt':'＋ Merken')+'</button>'+
+      '</div>';
+    h+='<section class="abschnitt-d"><h2>Informationen</h2><p class="info zu" id="info">'+esc(t.kurz)+(tour?' '+esc(tour.untertitel)+'. Das Tablet wird zum sprechenden Zauberspiegel: Er erzählt die Geschichte, stellt Rätsel und führt per GPS von Station zu Station. Draußen plant der Planer die Route an jedem Ort, drinnen öffnet ihr die Stationen per Knopf.':'')+'</p>'+
+      '<button class="mehr" id="mehr">… Mehr anzeigen</button>'+
+      '<div class="fakten"><span class="fakt"><b>'+esc(t.alter)+'</b></span><span class="fakt">'+t.stationen+' Stationen</span><span class="fakt">ca. '+t.minuten+' min</span><span class="fakt">'+esc(ortText(t))+'</span>'+
+      (tour?'<span class="fakt">'+tour.kinder.min+'–'+tour.kinder.max+' Kinder</span><span class="fakt">'+esc(tour.strecke.text)+'</span>':'')+'</div>'+
+      (t.hoerprobe?'<div class="probe"><img src="'+t.cover+'" alt=""><div><b>Hörprobe: '+esc(t.held)+' stellt sich vor</b><span>Der Anfang der Geschichte · 21 Sek.</span></div><button class="gross klein" id="probe" aria-label="Hörprobe abspielen">'+PLAY+'</button></div>':'')+
+      '</section>';
+    if(tour){
+      var plan0=tour.zeitplan.stationen;
+      h+='<section class="abschnitt-d"><h2>Stationen</h2><ol class="folgen">'+tour.stationen.map(function(s,i){
+        var titel=s.title||(s.steps?s.steps.map(function(x){ return x.title; }).join(' · '):'');
+        var ort=p && p.stationen && p.stationen[i] && p.stationen[i].name ? p.stationen[i].name : (i===0?'An der Haustür':s.wo);
+        return '<li><span class="nr" style="background:'+FIG_FARBEN[i%FIG_FARBEN.length]+'">'+(i+1)+'</span><div><b>'+esc(titel)+'</b><span>'+esc(ort)+'</span></div><span class="zeit">ab Min. '+plan0[i]+'</span></li>';
+      }).join('')+'</ol></section>';
+      h+='<section class="abschnitt-d"><h2>Figuren</h2><div class="figuren">'+tour.figuren.map(function(f,i){
+        var bild=f.id==='funkel'?'<img src="'+t.cover+'" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">':esc(f.name.replace(/^(Professor|Der|Die)\s+/,'').charAt(0));
+        return '<div class="figur"><div class="kreis" style="background:'+FIG_FARBEN[i%FIG_FARBEN.length]+';overflow:hidden">'+bild+'</div><b>'+esc(f.name)+'</b><span>'+esc(f.rolle)+'</span></div>';
+      }).join('')+'</div></section>';
+      h+='<section class="abschnitt-d"><h2>Was die Kinder bekommen</h2><div class="ausruestung">'+tour.gaben.map(function(g){
+        return '<div class="ding"><div><b>'+esc(g.was)+'</b><span>'+esc(g.art)+' · '+esc(g.i==='start'?'beim Ankommen':g.i==='ende'?'am Ende':'Station '+(g.i+1))+'</span></div></div>';
+      }).join('')+'</div></section>';
+      h+='<section class="abschnitt-d"><h2>Ausrüstung</h2><div class="ausruestung">'+tour.utensilien.map(function(u){
+        var menge=/Kind/.test(String(u.menge))?u.menge:u.menge+'×';
+        return '<div class="ding"><div><b>'+esc(u.name)+'</b><span>'+esc(menge)+' · '+esc(u.wann)+'</span></div>'+(u.link?'<a class="pille" href="'+esc(u.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'<em>Link folgt</em>')+'</div>';
+      }).join('')+'</div>'+
+      '<div class="paket"><div><b>Alles in einer Box</b><span>Haarreifen, Holz-Regenbogen, Glückssteine, Zaubertafeln und Sticker für '+tour.kinder.standard+' Kinder.</span></div><button class="pille" disabled>Bald im Shop</button></div>'+
+      '<p class="hinweis-klein">Links zu Händlern können Partnerlinks sein. Für euch ändert sich am Preis nichts.</p></section>';
+      h+='<section class="abschnitt-d"><h2>Varianten</h2><div class="ausruestung">'+Object.keys(tour.varianten).map(function(k){ var v=tour.varianten[k]; return '<div class="ding"><div><b>'+esc(v.name)+'</b><span>'+esc(v.kurz)+'</span></div></div>'; }).join('')+'</div></section>';
+    } else {
+      h+='<section class="abschnitt-d"><h2>Was dich erwartet</h2><p class="info">Wie bei Funkel: eine Geschichte mit eigenen Figuren und Stimmen, Rätsel im Zauberspiegel und eine Route, die sich an jeden Ort anpasst. Merke dir das Abenteuer, dann siehst du es in deiner Liste, sobald es da ist.</p></section>';
+    }
+    h+='<div class="mobil-jetzt abschnitt-d" style="padding-bottom:30px">'+jetztHtml()+'</div></div>';
+    $('haupt').innerHTML=h; $('haupt').scrollTop=0;
+  }
+
+  // ---------- Steuerung ----------
+  function zeigen(){
+    var m=location.hash.match(/^#\/abenteuer\/([a-z0-9-]+)/);
+    if(m) detailZeigen(m[1]); else startZeigen();
+    bibZeichnen(); $('jetzt').innerHTML=jetztHtml();
+  }
+  document.addEventListener('click', function(e){
+    var b=e.target.closest('[data-f]'); if(b){ filter=b.getAttribute('data-f'); startZeigen(); return; }
+    b=e.target.closest('[data-bf]'); if(b){ bibFilter=b.getAttribute('data-bf'); bibZeichnen(); return; }
+    b=e.target.closest('[data-los]'); if(b){ e.preventDefault(); location.href=zielLink(thema(b.getAttribute('data-los'))); return; }
+    b=e.target.closest('[data-merken]'); if(b){ var id=b.getAttribute('data-merken'), l=merkliste(), i=l.indexOf(id); if(i>=0) l.splice(i,1); else l.push(id); try{ localStorage.setItem(MERK, JSON.stringify(l)); }catch(x){} zeigen(); return; }
+    if(e.target.closest('#mehr')){ var inf=$('info'), zu=inf.classList.toggle('zu'); e.target.closest('#mehr').textContent=zu?'… Mehr anzeigen':'Weniger anzeigen'; return; }
+    b=e.target.closest('#probe'); if(b){ var a=$('ton'), t=thema((location.hash.match(/abenteuer\/([a-z0-9-]+)/)||[])[1]);
+      if(!a.paused){ a.pause(); return; }
+      if(a.getAttribute('data-id')!==t.id){ a.src=t.hoerprobe; a.setAttribute('data-id', t.id); }
+      a.play()['catch'](function(){}); return; }
+  });
+  $('ton').addEventListener('play', function(){ var b=$('probe'); if(b) b.innerHTML=PAUSE; });
+  $('ton').addEventListener('pause', function(){ var b=$('probe'); if(b) b.innerHTML=PLAY; });
+  $('ton').addEventListener('ended', function(){ var b=$('probe'); if(b) b.innerHTML=PLAY; });
+  $('suche').addEventListener('input', function(){ suche=this.value.trim().toLowerCase(); if(location.hash.indexOf('#/abenteuer/')===0) location.hash='#/'; else startZeigen(); });
+  window.addEventListener('hashchange', function(){ $('ton').pause(); zeigen(); });
+
+  try{ if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js'); }catch(e){}
   j('themen/index.json').then(function(ix){
-    var q=new URLSearchParams(location.search), id=q.get('thema')||ix.themen[0].id;
-    $('themen').innerHTML=ix.themen.length>1 ? ix.themen.map(function(t){ return '<a class="btn '+(t.id===id?'primary':'ghost')+' small" href="?thema='+encodeURIComponent(t.id)+'">'+esc(t.titel)+'</a>'; }).join('') : '';
-    var e=ix.themen.filter(function(t){ return t.id===id; })[0]||ix.themen[0];
-    return j(e.tour).then(zeigen);
-  })['catch'](function(e){ $('thema').innerHTML='<p class="fehler">Übersicht lässt sich nicht laden: '+esc(e.message)+'</p>'; });
+    THEMEN=ix.themen;
+    return Promise.all(THEMEN.filter(verfuegbar).map(function(t){ return j(t.tour).then(function(x){ TOUR[t.id]=x; }); }));
+  }).then(zeigen)['catch'](function(e){ $('haupt').innerHTML='<p class="leer" style="margin:24px">Katalog lässt sich nicht laden: '+esc(e.message)+'</p>'; });
 })();
 </script>
 </body></html>
