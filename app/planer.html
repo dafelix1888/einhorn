@@ -1,0 +1,83 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tour planen · Schnitzeljagd</title>
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="stil.css">
+<style>
+.richtung{display:grid;grid-template-columns:repeat(3,3.4rem);gap:6px}
+.richtung button{height:3.4rem;padding:0;border-radius:14px;font-size:1rem}
+#karte{height:min(62vh,520px);border-radius:18px;border:2px solid var(--line);margin-top:6px}
+.nr-marker{background:var(--magic);color:#fff;font-weight:800;border-radius:50%;width:30px!important;height:30px!important;margin:-15px 0 0 -15px!important;display:grid;place-items:center;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);font-size:15px}
+.nr-marker.ersatz{background:#9A5A08}
+.nr-marker.start{background:var(--ink)}
+.stationen{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.stationen li{display:grid;grid-template-columns:2.2rem 1fr;gap:10px;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:10px 12px}
+.stationen .nr{font-weight:800;font-size:1.2rem;color:var(--magic)}
+.stationen .h{font-size:.92rem;color:var(--soft)}
+.stationen .ok{color:var(--ok);font-weight:700}
+.stationen .warn{color:var(--warn);font-weight:700}
+.profil{width:100%;height:120px;display:block}
+.status{min-height:1.4em}
+.drinnen-hinweis{background:var(--tint);border-radius:14px;padding:12px 14px}
+</style></head><body>
+<main class="seite">
+  <p><a href="index.html">← Übersicht</a></p>
+  <h1 id="titel">Tour planen</h1>
+  <p class="lead" id="untertitel"></p>
+
+  <section class="karte-box">
+    <h2>1 · Wo wird gespielt?</h2>
+    <div class="seg" id="variante" role="group" aria-label="Variante"></div>
+    <p class="hinweis" id="variante-kurz"></p>
+  </section>
+
+  <section class="karte-box" id="draussen">
+    <h2>2 · Start und Richtung</h2>
+    <label for="adresse">Startadresse (Haustür)</label>
+    <div class="row"><input id="adresse" type="text" autocomplete="street-address" placeholder="Straße Hausnummer, Ort"><button type="button" class="btn ghost small" id="hier">Mein Standort</button></div>
+    <p class="hinweis" id="start-info"></p>
+    <div class="zwei">
+      <div>
+        <span class="label">Grobe Richtung</span>
+        <div class="richtung" id="richtung" role="group" aria-label="Himmelsrichtung"></div>
+      </div>
+      <div>
+        <label for="distanz">Strecke bis zum Ziel: <b id="distanz-wert"></b></label>
+        <input type="range" id="distanz" step="50">
+        <p class="hinweis">Gehweg bis zur letzten Station. Kleine Kinder schaffen gut 500 m.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="karte-box" id="drinnen" hidden>
+    <h2>2 · Drinnen</h2>
+    <p class="drinnen-hinweis">Drinnen gibt es kein GPS. Jede Station öffnet ihr mit „Station öffnen“ im Spiegel. Die Räume stehen in der Vorbereitungsliste.</p>
+  </section>
+
+  <section class="karte-box">
+    <h2>3 · Wie viele Kinder?</h2>
+    <div class="row"><button type="button" class="btn ghost small" id="k-minus" aria-label="Weniger">–</button><b id="kinder" class="zahl"></b><button type="button" class="btn ghost small" id="k-plus" aria-label="Mehr">+</button></div>
+  </section>
+
+  <div class="row"><button type="button" class="btn primary" id="planen">Tour planen</button></div>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <section id="ergebnis" hidden>
+    <h2>Deine Tour</h2>
+    <p class="lead" id="zusammenfassung"></p>
+    <div id="karte"></div>
+    <p class="hinweis">Stationen lassen sich auf der Karte verschieben. Kartendaten © OpenStreetMap-Mitwirkende, Höhen: Open-Meteo.</p>
+    <svg class="profil" id="profil" viewBox="0 0 600 120" preserveAspectRatio="none" aria-label="Höhenprofil"></svg>
+    <ol class="stationen" id="liste"></ol>
+    <div class="row">
+      <button type="button" class="btn ghost" id="anders">Andere Route</button>
+      <button type="button" class="btn primary" id="speichern">Speichern und spielen</button>
+      <button type="button" class="btn ghost" id="teilen">Link fürs Spiel-Gerät</button>
+    </div>
+  </section>
+  <div class="toast" id="toast" role="status" hidden></div>
+</main>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="planer-kern.js"></script>
+<script src="planer.js"></script>
+</body></html>

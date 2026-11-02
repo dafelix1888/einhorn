@@ -1,0 +1,29 @@
+// Schnitzeljagd: hält Spiel, Thema, Stimmen und Funkel in 3D für unterwegs ohne Empfang bereit.
+var CACHE='schnitzeljagd-v1';
+var DATEIEN=['./','./index.html','./spiel.html','./tour-laden.js','./config.json','./themen/index.json','./themen/einhorn/tour.json','./stil.css','./planer.html','./planer.js','./planer-kern.js','../funkel-stimme.json','../funkel3d.js','../three.module.min.js'];
+self.addEventListener('install', function(e){
+  e.waitUntil(caches.open(CACHE).then(function(c){
+    return Promise.all(DATEIEN.map(function(u){ return c.add(u)['catch'](function(){}); }));
+  }).then(function(){ return self.skipWaiting(); }));
+});
+self.addEventListener('activate', function(e){
+  e.waitUntil(caches.keys().then(function(ks){ return Promise.all(ks.filter(function(k){ return k.indexOf('schnitzeljagd-')===0 && k!==CACHE; }).map(function(k){ return caches['delete'](k); })); }).then(function(){ return self.clients.claim(); }));
+});
+self.addEventListener('fetch', function(e){
+  var url=new URL(e.request.url);
+  if(e.request.method!=='GET' || url.origin!==location.origin) return;     // Karten, OSM und Worker gehen immer direkt ins Netz
+  var frisch = /\.(html|json|js)$/.test(url.pathname) || url.pathname.endsWith('/');
+  if(frisch){                                  // erst Netz (neue Fassung), nach 4 s oder ohne Empfang Vorrat
+    e.respondWith(caches.open(CACHE).then(function(c){
+      var netz=fetch(e.request).then(function(r){ if(r.ok) c.put(e.request, r.clone()); return r; });
+      var vorrat=new Promise(function(ok){ setTimeout(ok, 4000); }).then(function(){ return c.match(e.request, {ignoreSearch:true}); });
+      return Promise.race([netz['catch'](function(){ return c.match(e.request, {ignoreSearch:true}); }), vorrat.then(function(h){ return h || netz; })])
+        .then(function(r){ return r || netz; });
+    }));
+  } else {
+    e.respondWith(caches.match(e.request).then(function(hit){
+      var netz=fetch(e.request).then(function(r){ if(r.ok){ var k=r.clone(); caches.open(CACHE).then(function(c){ c.put(e.request, k); }); } return r; })['catch'](function(){ return hit; });
+      return hit || netz;
+    }));
+  }
+});
