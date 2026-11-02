@@ -77,13 +77,14 @@
   }
 
   // Dijkstra mit kleinem Binär-Heap
-  function dijkstra(netz, start){
+  function dijkstra(netz, start, ziel){
     var dist={}, vor={}, heap=[[0,start]]; dist[start]=0;
     function hoch(i){ while(i>0){ var p=(i-1)>>1; if(heap[p][0]<=heap[i][0]) break; var t=heap[p]; heap[p]=heap[i]; heap[i]=t; i=p; } }
     function runter(i){ for(;;){ var l=2*i+1, r=l+1, m=i; if(l<heap.length && heap[l][0]<heap[m][0]) m=l; if(r<heap.length && heap[r][0]<heap[m][0]) m=r; if(m===i) break; var t=heap[m]; heap[m]=heap[i]; heap[i]=t; i=m; } }
     while(heap.length){
       var top=heap[0], last=heap.pop(); if(heap.length){ heap[0]=last; runter(0); }
       var d=top[0], u=top[1]; if(d>dist[u]) continue;
+      if(ziel!==undefined && u===ziel) break;
       (netz.nachbarn[u]||[]).forEach(function(e){ var nd=d+e.d; if(dist[e.n]===undefined || nd<dist[e.n]){ dist[e.n]=nd; vor[e.n]=u; heap.push([nd,e.n]); hoch(heap.length-1); } });
     }
     return {dist:dist, vor:vor};
@@ -268,12 +269,46 @@
         route:r.ids.map(function(id){ var k=netz.knoten[id]; return [+k.lat.toFixed(6), +k.lng.toFixed(6)]; }),
         strecke:Math.round(r.strecke[r.strecke.length-1]),
         hoehenProfil:H ? r.hoehenProfil : null,
+        netz:netz,
         varianten:routen.length,
         versuch:(opt.versuch||0)%routen.length
       };
     });
   }
 
-  var api={planen:planen, overpassAbfrage:overpassAbfrage, netzBauen:netzBauen, praeposition:praeposition, meter:meter, peilung:peilung, RICHTUNG:RICHTUNG};
+
+  // ---------- Route durch feste Punkte (für das Verschieben von Hand) ----------
+  // punkte: [{lat,lng}] in Reihenfolge. Jeder Punkt wird auf den nächsten Weg gezogen,
+  // zwischen zwei Punkten nimmt die Route den kürzesten Fußweg.
+  function routeDurch(netz, punkte){
+    var snap=punkte.map(function(p){ return naechsterKnoten(netz, p, 400); });
+    if(snap.some(function(x){ return !x; })) return null;
+    var ids=[snap[0].id], nach=[0];
+    for(var i=1;i<snap.length;i++){
+      if(snap[i].id===snap[i-1].id){ nach.push(nach[i-1]); continue; }
+      var dj=dijkstra(netz, snap[i-1].id, snap[i].id);
+      if(dj.dist[snap[i].id]===undefined) return null;
+      var teil=pfad(dj, snap[i].id), l=streckeAuf(netz, teil);
+      nach.push(nach[i-1]+l[l.length-1]);
+      ids=ids.concat(teil.slice(1));
+    }
+    return {route:ids.map(function(id){ var k=netz.knoten[id]; return [+k.lat.toFixed(6), +k.lng.toFixed(6)]; }),
+            strecke:Math.round(nach[nach.length-1]), nach:nach.map(Math.round),
+            knoten:snap.map(function(x){ var k=netz.knoten[x.id]; return {id:x.id, lat:+k.lat.toFixed(6), lng:+k.lng.toFixed(6), abstand:Math.round(x.d)}; })};
+  }
+  function wegLaenge(netz, a, b){             // kürzester Fußweg zwischen zwei Punkten in Metern (z. B. Heimweg)
+    var r=routeDurch(netz, [a,b]); return r ? r.strecke : null;
+  }
+  function ortAm(netz, id){                    // Straßenname und Sprechbausteine für einen Wegknoten
+    var name=wegName(netz, id), pr=praeposition(name);
+    return {strasse:name, an:pr&&pr.an, zu:pr&&pr.zu};
+  }
+  // Dauer: feste Zeit an den Stationen plus Gehzeit im Kindertempo
+  function dauer(tour, meter){
+    var d=tour.dauer||{}, st=d.stationenMinuten!=null?d.stationenMinuten:35, v=d.meterProMinute||35;
+    var gehen=Math.round(meter/v); return {gesamt:st+gehen, gehen:gehen, stationen:st};
+  }
+
+  var api={routeDurch:routeDurch, wegLaenge:wegLaenge, ortAm:ortAm, dauer:dauer, planen:planen, overpassAbfrage:overpassAbfrage, netzBauen:netzBauen, praeposition:praeposition, meter:meter, peilung:peilung, RICHTUNG:RICHTUNG};
   if(typeof module!=='undefined' && module.exports) module.exports=api; else root.PlanerKern=api;
 })(this);

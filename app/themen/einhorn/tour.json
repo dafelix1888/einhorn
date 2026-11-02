@@ -12,7 +12,9 @@
  },
  "dauer": {
   "minuten": 50,
-  "text": "etwa 50 Minuten plus Heimweg"
+  "text": "etwa 50 Minuten plus Heimweg",
+  "stationenMinuten": 35,
+  "meterProMinute": 35
  },
  "strecke": {
   "standard": 500,
