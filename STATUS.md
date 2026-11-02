@@ -9,7 +9,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 - Live: <https://dafelix1888.github.io/einhorn/app/> (GitHub Pages, Repo `dafelix1888/einhorn`, öffentlich)
 - Original vom Geburtstag: `/index.html`, verschlüsselt mit dem Zauberwort (GitHub-Secret `ZAUBERWORT`). Es bleibt unverändert.
 
-## Was fertig ist (PR #31 bis #41)
+## Was fertig ist (PR #31 bis #42)
 
 | Bereich | Dateien | Stand |
 |---|---|---|
@@ -46,7 +46,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 
 ## Erfahrung vom Geburtstag: GPS
 
-Punkte mit dem Handy gesetzt, gespielt mit dem iPad: Stationen öffneten mal zu früh, mal gar nicht (Gruppe lief vorbei). Ursachen: zwei Geräte mit unterschiedlichem Fehler, und ein iPad ohne Mobilfunk hat kein GPS (nur WLAN-Ortung, springt um 20 bis 60 m). Seit PR #41 gilt:
+Punkte mit dem Handy gesetzt, gespielt mit dem iPad: Stationen öffneten mal zu früh, mal gar nicht (Gruppe lief vorbei). Ursachen: zwei Geräte mit unterschiedlichem Fehler, und ein iPad ohne Mobilfunk hat kein GPS (nur WLAN-Ortung, springt um 20 bis 60 m). Seit PR #42 gilt:
 
 - Die Punkte kommen aus der Karte des Planers statt vom Handy.
 - Position geglättet: Mittel der letzten 8 s nach Genauigkeit gewichtet, Sprünge schneller als Gehtempo werden verworfen.
