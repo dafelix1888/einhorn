@@ -1,0 +1,1600 @@
+{
+ "format": 1,
+ "id": "einhorn",
+ "titel": "Funkels Regenbogen",
+ "untertitel": "Eine Einhorn-Schnitzeljagd mit Zauberspiegel",
+ "kurz": "Über Nacht ist Funkels Regenbogen verschwunden, und alle Farben sind durcheinander. Die Kinder folgen Hufspuren, lösen Farbrätsel im Zauberspiegel, sammeln die Bögen ein und finden heraus, wer sie gemopst hat.",
+ "alter": "3 bis 6 Jahre",
+ "kinder": {
+  "min": 3,
+  "max": 12,
+  "standard": 10
+ },
+ "dauer": {
+  "minuten": 50,
+  "text": "etwa 50 Minuten plus Heimweg"
+ },
+ "strecke": {
+  "standard": 500,
+  "min": 250,
+  "max": 1500,
+  "text": "250 m bis 1,5 km"
+ },
+ "stationenAnzahl": 7,
+ "appName": "Funkels Zauberspiegel",
+ "speicher": "sj.einhorn",
+ "stimmen": {
+  "datei": "../funkel-stimme.json",
+  "rollen": "stimmen/rollen.json",
+  "live": {
+   "rolle": "spiegel"
+  }
+ },
+ "figuren": [
+  {
+   "id": "funkel",
+   "name": "Funkel",
+   "rolle": "Hauptfigur",
+   "text": "Das Einhorn, dessen Regenbogen verschwunden ist. Spricht aus dem Zauberspiegel."
+  },
+  {
+   "id": "fridolin",
+   "name": "Fridolin",
+   "rolle": "Der „Dieb“",
+   "text": "Ein kleiner Fuchs, der so bunt sein wollte wie ein Einhorn. Am Ende ein Freund."
+  },
+  {
+   "id": "spiegel",
+   "name": "Der Zauberspiegel",
+   "rolle": "Erzähler",
+   "text": "Führt die Kinder von Station zu Station."
+  },
+  {
+   "id": "kakapups",
+   "name": "Professor Kakapups",
+   "rolle": "Aufgaben-Vorleser (wählbar)",
+   "text": "pupst und legt ein Häufchen"
+  },
+  {
+   "id": "rudi",
+   "name": "Rudi, die ratlose Ratte",
+   "rolle": "Aufgaben-Vorleser (wählbar)",
+   "text": "total verplant, sucht ständig seinen Zettel"
+  },
+  {
+   "id": "alfonso",
+   "name": "Alfonso, die alberne Ameise",
+   "rolle": "Aufgaben-Vorleser (wählbar)",
+   "text": "kichert und albert herum"
+  },
+  {
+   "id": "bruno",
+   "name": "Bruno, der brummige Bär",
+   "rolle": "Aufgaben-Vorleser (wählbar)",
+   "text": "brummt, ist aber eigentlich lieb"
+  },
+  {
+   "id": "charly",
+   "name": "Charly, der coole Clown",
+   "rolle": "Aufgaben-Vorleser (wählbar)",
+   "text": "supercool, hupt mit seiner Tröte"
+  },
+  {
+   "id": "dagobert",
+   "name": "Dagobert, der dusslige Dachs",
+   "rolle": "Aufgaben-Vorleser (wählbar)",
+   "text": "stolpert und bringt alles durcheinander"
+  }
+ ],
+ "varianten": {
+  "a": {
+   "name": "Outdoor, voll",
+   "kurz": "Draußen mit allen Ausdrucken",
+   "draussen": true
+  },
+  "b": {
+   "name": "Outdoor ohne Ausdrucke",
+   "kurz": "Draußen, Bilder nur im Spiegel",
+   "st": {
+    "1": {
+     "wo": "Am Ende der Kreidespur, roter Kreidekreis",
+     "dann": "Die roten Bögen suchen, davor ist ein roter Kreidekreis. Sind sie gefunden, „Bögen gefunden, weiter“ tippen."
+    },
+    "3": {
+     "wo": "Bei der ersten Schleife am Zaun",
+     "frage": "Von Schleife zu Schleife laufen (blau, pink, grün, rot-weiß). Bei jeder rufen die Kinder, was im Spiegel falsch ist und welche Farbe das Ding in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
+     "dann": "Hinter der grünen Schleife den gelben und den orangen Bogen holen. Hat jedes Kind seinen Glücksstein, „Bögen gefunden, weiter“ tippen."
+    },
+    "5": {
+     "wo": "Unten am Hügel, beim Bettlaken",
+     "dann": "Leise zum Laken schleichen und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen."
+    },
+    "6": {
+     "vorOrt": "Sticker-Stücke bereithalten. Der Vorausgeher hat die Schatzkiste in der Tasche."
+    }
+   },
+   "draussen": true
+  },
+  "c": {
+   "name": "Indoor",
+   "kurz": "Im Haus, Vorausgeher legt nach",
+   "st": {
+    "1": {
+     "wo": "Küche",
+     "dann": "Die roten Bögen hinter der Küchentür suchen. Sind sie gefunden, „Bögen gefunden, weiter“ tippen."
+    },
+    "2": {
+     "wo": "Flur",
+     "vorOrt": "Der Vorausgeher legt das blaue Handtuch als Fluss.",
+     "task": "Alle Hände ans Seil, über den Handtuch-Fluss. Drüben „Alle sind drüben“ tippen."
+    },
+    "3": {
+     "wo": "Treppe oder Flur, vier Bänder am Geländer",
+     "frage": "Vier Bänder am Geländer (blau, pink, grün, rot-weiß). Bei jedem zeigt der Spiegel ein Bild, die Kinder rufen, was falsch ist. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
+     "dann": "Beim grünen Band steht die Schüssel: gelber und oranger Bogen, Glückssteine. Dann „Bögen gefunden, weiter“ tippen."
+    },
+    "4": {
+     "wo": "Flur mit drei Türen",
+     "frage": "Vor drei Türen liegt je eine Spurenkarte. Ein Kind tippt im Spiegel auf die Spur, die zu den kleinen Pfoten passt.",
+     "dann": "Hinter der Fuchs-Tür liegt die Zaubertafel. Reihum malt jedes Kind ein Stück der Pfote, danach kommt die Tafel weg. Dann „Der Fuchsspur folgen“ tippen."
+    },
+    "5": {
+     "wo": "Kissenberg im Toberaum",
+     "vorOrt": "Vorausgeher: Kissenberg mit Wolke und grünen Bögen aufbauen, Toberaum-Tür kurz zu.",
+     "dann": "Leise über den Kissenberg klettern und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen."
+    },
+    "6": {
+     "wo": "Toberaum, hinter dem Sofa",
+     "vorOrt": "Fridolins Karton steht hinter dem Sofa, buntes Band daran. Sticker-Stücke bereithalten."
+    }
+   },
+   "draussen": false
+  }
+ },
+ "stationen": [
+  {
+   "name": "Haustür",
+   "wo": "Start, braucht keinen Punkt",
+   "kind": "plain",
+   "arc": "lila",
+   "pic": "horn",
+   "title": "Funkels Botschaft",
+   "say": "Hallo, ihr Einhorn-Helfer! Ihr tragt ja schon mein Zeichen. Ich bin Funkel und wohne im Wald hinter euren Häusern. Jeden Morgen male ich mit meinem Regenbogen die Farben in die Welt.",
+   "say2": "Aber heute Nacht hat ihn jemand gemopst! Jetzt sind alle Farben durcheinander. Nur die zwei kleinsten Bögen habe ich noch. Setzt eure Hörner auf und folgt meinen Hufspuren!",
+   "task": "Einhorn-Prüfung machen: wiehern, mit dem Huf scharren, mit dem Horn wackeln. Wer besteht, bekommt seinen Haarreif mit Horn. Danach „Prüfung bestanden, los!“ tippen.",
+   "go": "Prüfung bestanden, los!",
+   "ort": {
+    "typ": "start"
+   }
+  },
+  {
+   "name": "Ecke am Ende der Kreidespur",
+   "wo": "Am Ende der Kreidespur",
+   "kind": "recolor",
+   "arc": "rot",
+   "pic": "erdbeere",
+   "falsch": "--blau",
+   "richtig": "--rot",
+   "linse": {
+    "von": "blau",
+    "zu": "rot"
+   },
+   "seek": "Hier bin ich heute Nacht entlanggelaufen und habe meinen Regenbogen gesucht. Folgt meinen Hufspuren! Nanu, wem gehören denn die kleinen Pfoten daneben?",
+   "title": "Die blaue Erdbeere",
+   "say": "Oh nein, schaut in den Spiegel! So sehen die Erdbeeren aus, seit mein Regenbogen weg ist. Was stimmt hier nicht?",
+   "after": "Richtig, Erdbeeren sind rot! Sucht etwas Rotes. Dort liegen meine roten Bögen. Die hat der Dieb wohl beim Wegrennen verloren.",
+   "dann": "Die roten Bögen suchen. Sind sie gefunden, „Bögen gefunden, weiter“ tippen.",
+   "ort": {
+    "typ": "weg",
+    "anteil": 0.18
+   },
+   "ansage": "Die Hufspuren führen {zu}."
+  },
+  {
+   "name": "Straßenübergang",
+   "wo": "Vor der Straße",
+   "kind": "plain",
+   "arc": null,
+   "pic": "hufe",
+   "vorOrt": "Seil auspacken. Ein Erwachsener geht vorn, einer hinten.",
+   "seek": "Weiter bis zur Straße. Dort wartet die Regenbogenbrücke.",
+   "title": "Die Regenbogenbrücke",
+   "say": "Über die Regenbogenbrücke gehen Einhörner nur zusammen. Auf der anderen Seite beginnt mein Wald. Alle ans Seil! Beim Gehen rufen wir: klipp, klopp!",
+   "task": "iPad einstecken, alle Hände ans Seil. Drüben angekommen „Alle sind drüben“ tippen.",
+   "go": "Alle sind drüben",
+   "ort": {
+    "typ": "strassenquerung",
+    "anteil": 0.32
+   },
+   "ansage": "Die Regenbogenbrücke wartet {an}."
+  },
+  {
+   "name": "Am Zaun",
+   "wo": "Am Anfang des Zauns",
+   "kind": "wahl",
+   "arc": "gelb",
+   "pic": "galerie",
+   "namenOffen": true,
+   "seek": "Hinter der Brücke beginnt der Zaun. Dort zeigt euch mein Spiegel Bilder mit falschen Farben!",
+   "ohne": {
+    "seek": "Hinter der Brücke hat der Dieb vier bunte Bänder verloren. Lauft von Band zu Band und schaut dort in meinen Spiegel!",
+    "say": "Schaut in meinen Spiegel! Vier Bilder mit falschen Farben. Bei einem davon liegen mein gelber und mein oranger Bogen. Es ist das Ding, das in echt gelb ist. Findet es heraus!",
+    "after": "Richtig, die Sonne ist gelb! Sucht beim grünen Band. Dort liegen mein gelber und mein oranger Bogen, und für jeden ein Glücksstein. Der macht mutig für den Wald."
+   },
+   "title": "Die Quatschbilder",
+   "say": "Schaut nur, was ohne meinen Regenbogen passiert ist! Mein Spiegel zeigt euch vier Bilder mit falschen Farben, eins nach dem anderen. Lauft dabei am Zaun entlang. Eins davon ist in echt gelb. Findet es heraus!",
+   "frage": "Alle vier Bilder gesehen. Jetzt tippt ein Kind auf das Ding, das in echt gelb ist.",
+   "optionen": [
+    {
+     "id": "moehre",
+     "name": "Möhre",
+     "farbe": "var(--blau)",
+     "nein": "Eine Möhre ist in echt orange. Nicht gelb!"
+    },
+    {
+     "id": "elefant",
+     "name": "Elefant",
+     "farbe": "#EE5FA7",
+     "nein": "Elefanten sind in echt grau. Törööö!"
+    },
+    {
+     "id": "sonne",
+     "name": "Sonne",
+     "farbe": "var(--gruen)",
+     "richtig": "var(--gelb)",
+     "ja": true
+    },
+    {
+     "id": "kuh",
+     "name": "Kuh",
+     "farbe": "",
+     "nein": "Kühe sind in echt schwarz und weiß. Muh!"
+    }
+   ],
+   "after": "Richtig, die Sonne ist gelb! Mein gelber und mein oranger Bogen sind ganz in der Nähe. Schaut euch gut um. Fällt euch hier etwas auf? Für jeden ist auch ein Glücksstein dabei. Der macht mutig für den Wald.",
+   "go": "Bögen gefunden, weiter",
+   "dann": "Die Kinder schauen sich um und finden den gelben und den orangen Bogen und für jeden einen Glücksstein. Dann „Bögen gefunden, weiter“ tippen.",
+   "ort": {
+    "typ": "zaun",
+    "anteil": 0.48
+   },
+   "ansage": "Der Zaun beginnt {an}."
+  },
+  {
+   "name": "Wegkreuzung",
+   "wo": "Mitten auf der Kreuzung",
+   "kind": "wahl",
+   "arc": null,
+   "pic": "pfote",
+   "seek": "Der Dieb ist weitergerannt. Geht bis zur Kreuzung. Dort wartet ein neues Rätsel auf euch!",
+   "title": "Wer war das?",
+   "say": "Schaut in meinen Spiegel! Drei Spuren. Wem gehören die kleinen Pfoten?",
+   "frage": "Der Spiegel zeigt drei Spuren. Die Kinder schauen sie genau an, dann tippt ein Kind auf die Spur, die zu den kleinen Pfoten passt.",
+   "optionen": [
+    {
+     "id": "hase",
+     "name": "Hase",
+     "nein": "Hoppel, hoppel! Das war der Hase. Hat ein Hase so kleine Pfoten?"
+    },
+    {
+     "id": "ente",
+     "name": "Ente",
+     "nein": "Quak, quak! Das war die Ente. Macht ein Fuchs Quak?"
+    },
+    {
+     "id": "fuchs",
+     "name": "Fuchs",
+     "ja": true
+    }
+   ],
+   "after": "Ein Fuchs! Was will denn ein Fuchs mit meinem Regenbogen? Der Fuchs hat hier eine Zaubertafel verloren. Schaut euch gut um! Malt die Pfote gemeinsam darauf ab, dann erkennt ihr die Spur überall wieder!",
+   "go": "Der Fuchsspur folgen",
+   "dann": "Die Kinder schauen sich um und finden die Zaubertafel. Reihum malt jedes Kind ein Stück der Pfote, danach kommt die Tafel in die Tasche. Dann „Der Fuchsspur folgen“ tippen.",
+   "ort": {
+    "typ": "kreuzung",
+    "anteil": 0.64
+   },
+   "ansage": "Die Kreuzung ist {an}."
+  },
+  {
+   "name": "Wolkenberg",
+   "wo": "Unten am Hügel",
+   "kind": "recolor",
+   "arc": "gruen",
+   "pic": "frosch",
+   "falsch": "--lila",
+   "richtig": "--gruen",
+   "linse": {
+    "von": "lila",
+    "zu": "gruen"
+   },
+   "seek": "Der Fuchs ist zum Berg gelaufen. Kommt mit! Psst, auf dem Berg schläft eine Regenwolke.",
+   "title": "Der lila Frosch",
+   "say": "Psst, die Wolke schläft. Schaut leise in den Spiegel. Was stimmt hier nicht?",
+   "after": "Richtig, Frösche sind grün! Schleicht zur Wolke und sucht etwas Grünes. Aber weckt sie nicht!",
+   "dann": "Leise zur Wolke schleichen und die zwei grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen.",
+   "ort": {
+    "typ": "huegel_unten",
+    "anteil": 0.8
+   },
+   "ansage": "Der Wolkenberg ist {an}."
+  },
+  {
+   "name": "Parkbank",
+   "wo": "Oben am Berg, bei der Parkbank",
+   "kind": "finale",
+   "arc": "blau",
+   "vorOrt": "Sticker-Stücke bereithalten. Der Vorausgeher hat die Schatzkiste in der Tasche.",
+   "seek": "Jetzt den Berg hinauf, zur Parkbank bei den Bäumen. Dort legen wir den Regenbogen.",
+   "steps": [
+    {
+     "title": "Eine Farbe fehlt",
+     "say": "Legt alle Bögen der Reihe nach hin. Welche Farbe fehlt?",
+     "go": "Blau fehlt!",
+     "pic": "bogen",
+     "dann": "Alle Bögen der Reihe nach hinlegen. Rufen die Kinder „Blau!“, dann „Blau fehlt!“ tippen."
+    },
+    {
+     "title": "Wo ist Blau?",
+     "say": "Blau fehlt! Die kleinen Pfoten führen zu einem grauen Bau. Sucht das bunte Band, dort ist er!",
+     "go": "Wir haben jemanden gefunden",
+     "pic": "pfote",
+     "dann": "Das bunte Band suchen. Darunter steht ein grauer Karton, das ist der Bau. Schaut jemand heraus, „Wir haben jemanden gefunden“ tippen."
+    },
+    {
+     "title": "Fridolin!",
+     "say": "Das ist Fridolin, der Fuchs. In seinem Bau ist alles grau, und er wollte auch so bunt sein wie ein Einhorn. Beim Wegrennen sind ihm die Bögen heruntergefallen. Legt die zwei blauen Bögen zu den anderen!",
+     "go": "Der Regenbogen ist ganz",
+     "pic": "fuchs",
+     "dann": "Die zwei blauen Bögen zu den anderen legen. Dann „Der Regenbogen ist ganz“ tippen."
+    }
+   ],
+   "ort": {
+    "typ": "bank",
+    "anteil": 1,
+    "ende": true,
+    "oben": true
+   },
+   "ansage": "Die Parkbank steht {an}."
+  }
+ ],
+ "vorbereitung": {
+  "gemeinsam": [
+   {
+    "t": "Besorgen und basteln",
+    "items": [
+     "Schatzkiste: ein beklebter Schuhkarton",
+     "Fridolins Bau: Karton grau anmalen, dazu eine Plastiktüte als Unterlage",
+     "Buntes Band oder Tuch als Markierung für Fridolins Versteck",
+     "Sticker in {kinder} Stücke schneiden",
+     "Fridolin (Kuscheltier) mit Haarreif aus der Reserve",
+     "Schatzkiste füllen: {kinder} Kratzbilder, {kinder} Zaubertafeln, {kinder} Zeichenschablonen",
+     "Eine Zaubertafel extra für Station 5 (zum gemeinsamen Abmalen)",
+     "{kinder} Glückssteine in eine kleine Tüte, getrennt von den Geschenken"
+    ]
+   },
+   {
+    "t": "Spiegel",
+    "items": [
+     "funkel-stimme.json liegt neben der Seite, iPad spielt alle Sätze dieser Variante",
+     "iPad: Einstellungen → Anzeige → Automatische Sperre auf „Nie“",
+     "Am Morgen: iPad voll geladen, Stummschalter auf laut"
+    ]
+   },
+   {
+    "t": "Packen: bei der Gruppe",
+    "items": [
+     "{kinder} Tattoos und ein feuchter Lappen (für das Ankommen)",
+     "{kinder} Haarreifen, die zwei kleinsten Bögen (Station 1)",
+     "Seil (Station 3)",
+     "Sticker-Stücke (Station 7)",
+     "iPad"
+    ]
+   },
+   {
+    "t": "Packen: Bollerwagen oder Küche",
+    "items": [
+     "Regenbogen-Snack in großer Dose: Tomaten, Mandarinen, gelbe Paprika, Gurke, Blaubeeren",
+     "Wasser, Becher",
+     "Picknickdecke, feuchte Tücher"
+    ]
+   }
+  ],
+  "variante": {
+   "a": [
+    {
+     "t": "Drucken",
+     "items": [
+      "A3: schlafende Wolke",
+      "Bei Regenwetter: in eine Klarsichthülle"
+     ]
+    },
+    {
+     "t": "GPS",
+     "items": [
+      "Tour im Planer erstellt und einmal abgelaufen, Punkte bei Bedarf im Planer verschoben"
+     ]
+    },
+    {
+     "t": "Packen: Vorausgeher-Tasche",
+     "items": [
+      "Bögen Rot und Rotorange (Station 2)",
+      "Bögen Orange und Gelb und die Tüte mit {kinder} Glückssteinen, irgendwo am Zaun verstecken (Station 4)",
+      "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
+      "Wolken-Ausdruck, Bögen Hellgrün und Grün (Station 6)",
+      "Grauer Karton mit Fridolin, Bögen Türkis und Blau, Plastiktüte, buntes Band (Station 7)",
+      "Schatzkiste (Station 7)"
+     ]
+    },
+    {
+     "t": "Am Tag, vor dem Start",
+     "items": [
+      "Kreidespur von der Haustür bis Station 2: Hufe als U, ab der Hälfte Pfoten als Punkte, dazwischen Spirale, Zickzack, Wolke, Pfütze",
+      "Vorausgeher startet rund 20 Minuten vor der Gruppe mit der Tasche und baut die Stationen 2 bis 7 auf"
+     ]
+    }
+   ],
+   "b": [
+    {
+     "t": "GPS",
+     "items": [
+      "Tour im Planer erstellt und einmal abgelaufen, Punkte bei Bedarf im Planer verschoben"
+     ]
+    },
+    {
+     "t": "Packen: Vorausgeher-Tasche",
+     "items": [
+      "Bögen Rot und Rotorange, rote Kreide für den Kreidekreis (Station 2)",
+      "Vier Schleifen aus Krepp- oder Geschenkband (Blau, Pink, Grün, Rot-Weiß), Bögen Orange und Gelb, Tüte mit {kinder} Glückssteinen (Station 4)",
+      "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
+      "Weißes Bettlaken oder weißer Schirm als Wolke, Bögen Hellgrün und Grün (Station 6)",
+      "Grauer Karton mit Fridolin, Bögen Türkis und Blau, Plastiktüte, buntes Band (Station 7)",
+      "Schatzkiste (Station 7)"
+     ]
+    },
+    {
+     "t": "Am Tag, vor dem Start",
+     "items": [
+      "Kreidespur von der Haustür bis Station 2: Hufe als U, ab der Hälfte Pfoten als Punkte, dazwischen Spirale, Zickzack, Wolke, Pfütze",
+      "Vorausgeher startet rund 20 Minuten vor der Gruppe mit der Tasche"
+     ]
+    }
+   ],
+   "c": [
+    {
+     "t": "Spiegel",
+     "items": [
+      "Tour einmal zu Hause mit „Station öffnen“ durchgespielt"
+     ]
+    },
+    {
+     "t": "Packen: Vorausgeher-Tasche",
+     "items": [
+      "Bögen Rot und Rotorange (Küche)",
+      "Blaues Handtuch als Fluss (Flur)",
+      "Vier Bänder (Blau, Pink, Grün, Rot-Weiß), Schüssel mit Bögen Orange und Gelb und {kinder} Glückssteinen (Treppe)",
+      "Drei Zettel mit gemalten Spuren (Hase, Ente, Fuchs), die eine Zaubertafel (Türen)",
+      "Weißes Kissen oder Laken als Wolke, Bögen Hellgrün und Grün (Kissenberg)",
+      "Grauer Karton mit Fridolin, Bögen Türkis und Blau, buntes Band (Sofa)",
+      "Schatzkiste"
+     ]
+    },
+    {
+     "t": "Am Tag",
+     "items": [
+      "Nichts vorab aufbauen. Kissen für den Wolkenberg liegen im Toberaum. Toberaum-Tür zu, wenn der Vorausgeher Station 6 und 7 legt"
+     ]
+    }
+   ]
+  }
+ },
+ "gaben": [
+  {
+   "i": "start",
+   "was": "Kindertattoo",
+   "wie": "Funkels Zeichen zum Ankommen. Zu Hause wieder abwischen.",
+   "art": "Verkleidung"
+  },
+  {
+   "i": 0,
+   "was": "Haarreif mit Horn",
+   "wie": "Nach der Einhorn-Prüfung, den tragen sie die ganze Tour.",
+   "art": "Verkleidung"
+  },
+  {
+   "i": 3,
+   "was": "Glücksstein",
+   "wie": "Einer pro Kind, liegt bei den gelben Bögen. Das einzige Geschenk unterwegs, am besten in einer eigenen kleinen Tüte.",
+   "art": "Unterwegs"
+  },
+  {
+   "i": 4,
+   "was": "Eine Zaubertafel für alle",
+   "wie": "Reihum malen sie die Fuchspfote ab, danach kommt die Tafel weg.",
+   "art": "Nur ausleihen"
+  },
+  {
+   "i": 6,
+   "was": "Sticker-Stück",
+   "wie": "Kleben sie auf Fridolins grauen Bau, dann erscheint der Schatz.",
+   "art": "Bleibt dort"
+  },
+  {
+   "i": "ende",
+   "was": "Schatzkiste",
+   "wie": "Je Kind ein Kratzbild, eine Zaubertafel und eine Zeichenschablone. Verteilt wird nach dem Essen.",
+   "art": "Schatz"
+  }
+ ],
+ "utensilien": [
+  {
+   "name": "Haarreif mit Einhorn-Horn",
+   "menge": "je Kind",
+   "wann": "Station 1",
+   "link": null
+  },
+  {
+   "name": "Kindertattoos (Einhorn)",
+   "menge": "je Kind",
+   "wann": "Ankommen",
+   "link": null
+  },
+  {
+   "name": "Holz-Regenbogen mit 10 Bögen (Stapelspielzeug)",
+   "menge": 1,
+   "wann": "Stationen 1 bis 7",
+   "link": null
+  },
+  {
+   "name": "Glückssteine (Halbedelsteine)",
+   "menge": "je Kind",
+   "wann": "Station 4",
+   "link": null
+  },
+  {
+   "name": "Zaubertafel (Magnet-Maltafel)",
+   "menge": "je Kind + 1",
+   "wann": "Station 5 und Schatz",
+   "link": null
+  },
+  {
+   "name": "Kratzbilder",
+   "menge": "je Kind",
+   "wann": "Schatz",
+   "link": null
+  },
+  {
+   "name": "Zeichenschablonen",
+   "menge": "je Kind",
+   "wann": "Schatz",
+   "link": null
+  },
+  {
+   "name": "Sticker-Bogen",
+   "menge": 1,
+   "wann": "Station 7",
+   "link": null
+  },
+  {
+   "name": "Fuchs-Kuscheltier",
+   "menge": 1,
+   "wann": "Station 7",
+   "link": null
+  },
+  {
+   "name": "Seil",
+   "menge": 1,
+   "wann": "Station 3",
+   "link": null
+  },
+  {
+   "name": "Straßenkreide",
+   "menge": 1,
+   "wann": "Kreidespur",
+   "link": null
+  },
+  {
+   "name": "Schuhkarton als Schatzkiste, grauer Karton als Fuchsbau",
+   "menge": 2,
+   "wann": "Station 7",
+   "link": null
+  }
+ ],
+ "zeitplan": {
+  "stationen": [
+   0,
+   8,
+   14,
+   20,
+   30,
+   38,
+   45
+  ],
+  "ende": 50
+ },
+ "texte": {
+  "start": "Tippt auf den Knopf. Dann wacht mein Zauberspiegel auf und führt euch durch sieben Stationen.",
+  "ende": "Mein Regenbogen ist wieder ganz! Morgen früh male ich alle Farben wieder richtig, und Fridolin darf mir dabei helfen. Danke, ihr Einhorn-Helfer.",
+  "ende2": "Jetzt machen wir Fridolins grauen Bau bunt. Klebt eure Sticker darauf, dann erscheint der Schatz!",
+  "heim": "Jetzt geht es nach Hause. Hüpft wie kleine Einhörner! Ich zähle eure Sprünge bis zur Haustür.",
+  "heim2": "Ihr seid zu Hause! Danke, ihr Einhorn-Helfer. Bis zum nächsten Abenteuer!",
+  "foto": "Funkels Einhorn-Helfer"
+ },
+ "erzaehler": {
+  "kaka": {
+   "0": {
+    "0": {
+     "a": "Oh, Verzeihung! Professor Kakapups, Einhorn-Forscher. Bevor ihr Funkel helfen dürft, kommt die Einhorn-Prüfung! Erstens: Wiehert wie ein Einhorn! Zweitens: Scharrt mit dem Huf! Drittens: Wackelt mit dem Horn! Wer das schafft, bekommt seinen Einhorn-Haarreif. Also nochmal: Wiehern, scharren, wackeln!"
+    }
+   },
+   "1": {
+    "0": {
+     "a": "Hoppla, das war ich nicht! Ähem. Eine blaue Erdbeere, hochinteressant! Ruft ganz laut, welche Farbe eine Erdbeere in echt hat. Dann darf ein Kind auf das Bild tippen, und der Spiegel zaubert. Also nochmal: Ruft, welche Farbe Erdbeeren haben!"
+    },
+    "1": {
+     "a": "Pardon! Wissenschaftlich bewiesen: Rote Bögen liegen bei roten Dingen. Sucht etwas Rotes! Wer die roten Bögen findet, ruft ganz laut: Gefunden! Also nochmal: Rote Bögen suchen!",
+     "b": "Pardon! Wissenschaftlich bewiesen: Rote Bögen liegen bei roten Dingen. Sucht den roten Kreidekreis! Wer die roten Bögen findet, ruft ganz laut: Gefunden! Also nochmal: Zum roten Kreidekreis, rote Bögen holen!",
+     "c": "Pardon! Wissenschaftlich bewiesen: Rote Bögen liegen bei roten Dingen. Schaut mal hinter der Küchentür nach! Wer die roten Bögen findet, ruft ganz laut: Gefunden! Also nochmal: Hinter der Küchentür suchen!"
+    }
+   },
+   "2": {
+    "0": {
+     "a": "Huch, schon wieder! Achtung, Achtung! Über die Regenbogenbrücke geht es nur gemeinsam. Alle Hände ans Seil, und ja nicht loslassen! Und immer schön rufen: klipp, klopp! Also nochmal: Alle ans Seil, klipp, klopp!",
+     "c": "Huch, schon wieder! Achtung, Achtung! Über den Handtuch-Fluss geht es nur gemeinsam. Alle Hände ans Seil, und bloß keine nassen Füße! Und immer schön rufen: klipp, klopp! Also nochmal: Alle ans Seil, über den Fluss!"
+    }
+   },
+   "3": {
+    "0": {
+     "a": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Lauft am Zaun entlang und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Bild für Bild am Zaun entlang, dann das Gelbe antippen!",
+     "b": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Lauft von Schleife zu Schleife und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Von Schleife zu Schleife, dann das Gelbe antippen!",
+     "c": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Geht von Band zu Band am Geländer und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Von Band zu Band, dann das Gelbe antippen!"
+    },
+    "1": {
+     "a": "Oh, pardon! Der gelbe und der orange Bogen sind ganz in der Nähe. Schaut euch gut um. Fällt euch hier etwas auf? Und jeder nimmt sich einen Glücksstein. Aber nur einen, ich zähle mit! Also nochmal: Gut umschauen, Bögen finden, jeder einen Glücksstein!",
+     "b": "Oh, pardon! Holt den gelben und den orangen Bogen bei der grünen Schleife. Und jeder nimmt sich einen Glücksstein. Aber nur einen, ich zähle mit! Also nochmal: Bögen bei der grünen Schleife holen, jeder einen Glücksstein!",
+     "c": "Oh, pardon! Beim grünen Band steht eine Schüssel. Holt den gelben und den orangen Bogen. Und jeder nimmt sich einen Glücksstein. Aber nur einen, ich zähle mit! Also nochmal: Bögen aus der Schüssel holen, jeder einen Glücksstein!"
+    }
+   },
+   "4": {
+    "0": {
+     "a": "Ups! Das war ein Forschungspups. Spurenkunde! Schaut euch die drei Spuren im Spiegel ganz genau an. Welche passt zu den kleinen Pfoten? Ein Kind tippt auf die richtige Spur. Also nochmal: Die richtige Spur antippen!",
+     "c": "Ups! Das war ein Forschungspups. Spurenkunde! Vor den drei Türen liegen Spurenkarten. Welche passt zu den kleinen Pfoten? Ein Kind tippt im Spiegel auf die richtige Spur. Also nochmal: Die richtige Spur antippen!"
+    },
+    "1": {
+     "a": "Verzeihung! Der Fuchs hat hier eine Zaubertafel verloren. Schaut euch gut um! Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen. Schön ordentlich, wie ein echter Forscher! Also nochmal: Zaubertafel finden, Pfote gemeinsam abmalen!",
+     "c": "Verzeihung! Hinter der Fuchs-Tür liegt eine Zaubertafel. Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen. Schön ordentlich, wie ein echter Forscher! Also nochmal: Hinter die Fuchs-Tür, Pfote gemeinsam abmalen!"
+    }
+   },
+   "5": {
+    "0": {
+     "a": "Psst! Ganz leiser Pups. Flüstert, welche Farbe ein Frosch in echt hat. Dann tippt ein Kind auf das Bild. Aber ganz leise, die Wolke schläft! Also nochmal: Leise die Farbe flüstern!"
+    },
+    "1": {
+     "a": "Psst, Schleichmission! Schleicht ganz leise zur Wolke und holt die grünen Bögen. Und bloß nicht pupsen! Oh. Zu spät. Also nochmal: Leise zur Wolke, grüne Bögen holen!",
+     "b": "Psst, Schleichmission! Schleicht ganz leise zum Bettlaken und holt die grünen Bögen. Und bloß nicht pupsen! Oh. Zu spät. Also nochmal: Leise zum Bettlaken, grüne Bögen holen!",
+     "c": "Psst, Schleichmission! Klettert ganz leise über den Kissenberg und holt die grünen Bögen. Und bloß nicht pupsen! Oh. Zu spät. Also nochmal: Leise über den Kissenberg, grüne Bögen holen!"
+    }
+   },
+   "6": {
+    "0": {
+     "a": "Hoppla! Legt alle Bögen neben den Regenbogen, schön der Reihe nach. Und dann ruft ganz laut: Welche Farbe fehlt? Also nochmal: Bögen hinlegen und rufen, welche Farbe fehlt!"
+    },
+    "1": {
+     "a": "Pardon! Sucht das bunte Band! Darunter steht ein grauer Bau. Klopft mal an, vielleicht ist jemand zu Hause. Also nochmal: Das bunte Band suchen!",
+     "c": "Pardon! Schaut mal hinter dem Sofa nach! Dort steht ein grauer Bau mit einem bunten Band. Klopft mal an, vielleicht ist jemand zu Hause. Also nochmal: Hinter dem Sofa nachschauen!"
+    },
+    "2": {
+     "a": "Ähem, Entschuldigung. Na los, legt die zwei blauen Bögen zu den anderen. Ich glaube, gleich passiert etwas Magisches! Also nochmal: Blaue Bögen dazulegen!"
+    }
+   }
+  },
+  "kakaNein": {
+   "moehre": "Falsch! Eine Möhre ist in echt orange. Nicht gelb!",
+   "elefant": "Falsch! Elefanten sind in echt grau. Törööö!",
+   "kuh": "Falsch! Kühe sind in echt schwarz und weiß. Muh!",
+   "hase": "Hoppel, hoppel! Das war der Hase. Hat ein Hase so kleine Pfoten?",
+   "ente": "Quak, quak! Das war die Ente. Macht ein Fuchs Quak?"
+  },
+  "figuren": {
+   "kakapups": {
+    "name": "Professor Kakapups",
+    "kurz": "Kakapups",
+    "was": "pupst und legt ein Häufchen"
+   },
+   "rudi": {
+    "name": "Rudi, die ratlose Ratte",
+    "kurz": "Rudi",
+    "was": "total verplant, sucht ständig seinen Zettel",
+    "also": "Äh, wo war ich? Ach ja, also nochmal:",
+    "nein": "Fiep! Äh, ich glaube, das war falsch."
+   },
+   "alfonso": {
+    "name": "Alfonso, die alberne Ameise",
+    "kurz": "Alfonso",
+    "was": "kichert und albert herum",
+    "also": "Hihi! Also nochmal:",
+    "nein": "Hihi, knapp daneben!"
+   },
+   "bruno": {
+    "name": "Bruno, der brummige Bär",
+    "kurz": "Bruno",
+    "was": "brummt, ist aber eigentlich lieb",
+    "also": "Brumm. Also nochmal:",
+    "nein": "Brumm. Nein, nein."
+   },
+   "charly": {
+    "name": "Charly, der coole Clown",
+    "kurz": "Charly",
+    "was": "supercool, hupt mit seiner Tröte",
+    "also": "Easy, Leute. Also nochmal:",
+    "nein": "Uuh, knapp daneben, Leute."
+   },
+   "dagobert": {
+    "name": "Dagobert, der dusslige Dachs",
+    "kurz": "Dagobert",
+    "was": "stolpert und bringt alles durcheinander",
+    "also": "Moment, das wiederhol ich lieber. Also nochmal:",
+    "nein": "Oh, das hätte ich auch getippt. Aber:"
+   }
+  },
+  "reihe": [
+   "kakapups",
+   "rudi",
+   "alfonso",
+   "bruno",
+   "charly",
+   "dagobert"
+  ],
+  "kern": {
+   "0": {
+    "0": {
+     "a": "Bevor ihr Funkel helfen dürft, kommt die Einhorn-Prüfung! Erstens: Wiehert wie ein Einhorn! Zweitens: Scharrt mit dem Huf! Drittens: Wackelt mit dem Horn! Wer das schafft, bekommt seinen Einhorn-Haarreif."
+    }
+   },
+   "1": {
+    "0": {
+     "a": "Ruft ganz laut, welche Farbe eine Erdbeere in echt hat. Dann darf ein Kind auf das Bild tippen, und der Spiegel zaubert."
+    },
+    "1": {
+     "a": "Rote Bögen liegen bei roten Dingen. Sucht etwas Rotes! Wer die roten Bögen findet, ruft ganz laut: Gefunden!",
+     "b": "Rote Bögen liegen bei roten Dingen. Sucht den roten Kreidekreis! Wer die roten Bögen findet, ruft ganz laut: Gefunden!",
+     "c": "Rote Bögen liegen bei roten Dingen. Schaut mal hinter der Küchentür nach! Wer die roten Bögen findet, ruft ganz laut: Gefunden!"
+    }
+   },
+   "2": {
+    "0": {
+     "a": "Über die Regenbogenbrücke geht es nur gemeinsam. Alle Hände ans Seil, und ja nicht loslassen! Und immer schön rufen: klipp, klopp!",
+     "c": "Über den Handtuch-Fluss geht es nur gemeinsam. Alle Hände ans Seil, und bloß keine nassen Füße! Und immer schön rufen: klipp, klopp!"
+    }
+   },
+   "3": {
+    "0": {
+     "a": "Lauft am Zaun entlang und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
+     "b": "Lauft von Schleife zu Schleife und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
+     "c": "Geht von Band zu Band am Geländer und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist."
+    },
+    "1": {
+     "a": "Der gelbe und der orange Bogen sind ganz in der Nähe. Schaut euch gut um. Fällt euch hier etwas auf? Und jeder nimmt sich einen Glücksstein. Aber nur einen!",
+     "b": "Holt den gelben und den orangen Bogen bei der grünen Schleife. Und jeder nimmt sich einen Glücksstein. Aber nur einen!",
+     "c": "Beim grünen Band steht eine Schüssel. Holt den gelben und den orangen Bogen. Und jeder nimmt sich einen Glücksstein. Aber nur einen!"
+    }
+   },
+   "4": {
+    "0": {
+     "a": "Schaut euch die drei Spuren im Spiegel ganz genau an. Welche passt zu den kleinen Pfoten? Ein Kind tippt auf die richtige Spur.",
+     "c": "Vor den drei Türen liegen Spurenkarten. Welche passt zu den kleinen Pfoten? Ein Kind tippt im Spiegel auf die richtige Spur."
+    },
+    "1": {
+     "a": "Der Fuchs hat hier eine Zaubertafel verloren. Schaut euch gut um! Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen.",
+     "c": "Hinter der Fuchs-Tür liegt eine Zaubertafel. Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen."
+    }
+   },
+   "5": {
+    "0": {
+     "a": "Flüstert, welche Farbe ein Frosch in echt hat. Dann tippt ein Kind auf das Bild. Aber ganz leise, die Wolke schläft!"
+    },
+    "1": {
+     "a": "Schleicht ganz leise zur Wolke und holt die grünen Bögen.",
+     "b": "Schleicht ganz leise zum Bettlaken und holt die grünen Bögen.",
+     "c": "Klettert ganz leise über den Kissenberg und holt die grünen Bögen."
+    }
+   },
+   "6": {
+    "0": {
+     "a": "Legt alle Bögen neben den Regenbogen, schön der Reihe nach. Und dann ruft ganz laut: Welche Farbe fehlt?"
+    },
+    "1": {
+     "a": "Sucht das bunte Band! Darunter steht ein grauer Bau. Klopft mal an, vielleicht ist jemand zu Hause.",
+     "c": "Schaut mal hinter dem Sofa nach! Dort steht ein grauer Bau mit einem bunten Band. Klopft mal an, vielleicht ist jemand zu Hause."
+    },
+    "2": {
+     "a": "Na los, legt die zwei blauen Bögen zu den anderen. Ich glaube, gleich passiert etwas Magisches!"
+    }
+   }
+  },
+  "also": {
+   "0.0": {
+    "a": "Wiehern, scharren, wackeln!"
+   },
+   "1.0": {
+    "a": "Ruft, welche Farbe Erdbeeren haben!"
+   },
+   "1.1": {
+    "a": "Rote Bögen suchen!",
+    "b": "Zum roten Kreidekreis, rote Bögen holen!",
+    "c": "Hinter der Küchentür suchen!"
+   },
+   "2.0": {
+    "a": "Alle ans Seil, klipp, klopp!",
+    "c": "Alle ans Seil, über den Fluss!"
+   },
+   "3.0": {
+    "a": "Bild für Bild am Zaun entlang, dann das Gelbe antippen!",
+    "b": "Von Schleife zu Schleife, dann das Gelbe antippen!",
+    "c": "Von Band zu Band, dann das Gelbe antippen!"
+   },
+   "3.1": {
+    "a": "Gut umschauen, Bögen finden, jeder einen Glücksstein!",
+    "b": "Bögen bei der grünen Schleife holen, jeder einen Glücksstein!",
+    "c": "Bögen aus der Schüssel holen, jeder einen Glücksstein!"
+   },
+   "4.0": {
+    "a": "Die richtige Spur antippen!"
+   },
+   "4.1": {
+    "a": "Zaubertafel finden, Pfote gemeinsam abmalen!",
+    "c": "Hinter die Fuchs-Tür, Pfote gemeinsam abmalen!"
+   },
+   "5.0": {
+    "a": "Leise die Farbe flüstern!"
+   },
+   "5.1": {
+    "a": "Leise zur Wolke, grüne Bögen holen!",
+    "b": "Leise zum Bettlaken, grüne Bögen holen!",
+    "c": "Leise über den Kissenberg, grüne Bögen holen!"
+   },
+   "6.0": {
+    "a": "Bögen hinlegen und rufen, welche Farbe fehlt!"
+   },
+   "6.1": {
+    "a": "Das bunte Band suchen!",
+    "c": "Hinter dem Sofa nachschauen!"
+   },
+   "6.2": {
+    "a": "Blaue Bögen dazulegen!"
+   }
+  },
+  "gag": {
+   "rudi": {
+    "0.0": "Fiep! Hallo, ich bin Rudi, die Ratte. Ich hab hier irgendwo einen Zettel. Äh. Ah, da!",
+    "1.0": "Äh, Moment, was war nochmal. Ach ja, hier steht es!",
+    "1.1": "Oh, jetzt hab ich vergessen, wo ich war. Ach, egal!",
+    "2.0": "Fiep! Wo bin ich? Ach, an einer Brücke!",
+    "3.0": "Huch, mein Zettel ist falsch rum. So, jetzt!",
+    "3.1": "Äh, war ich schon dran? Egal, ich sag es einfach!",
+    "4.0": "Spuren? Welche Spuren? Ach, die da!",
+    "4.1": "Fiep, fiep! Ich hab meinen Stift verloren. Aber ihr nicht, oder?",
+    "5.0": "Psst! Äh, warum flüstern wir nochmal? Ach ja!",
+    "5.1": "Moment, Moment, ich weiß es gleich wieder!",
+    "6.0": "Oh, schon so weit? Ich hab gar nicht aufgepasst!",
+    "6.1": "Äh, wo ist das Band? Ich such mit, versprochen!",
+    "6.2": "Fiep! Jetzt weiß ich es ganz sicher!"
+   },
+   "alfonso": {
+    "0.0": "Hihi! Ich bin Alfonso, die alberne Ameise. Ich bin so klein, ich steh auf eurem Schuh!",
+    "1.0": "Hihi, eine blaue Erdbeere! Die ess ich nicht!",
+    "1.1": "Ich hab schon hundert Bögen getragen. Na gut, keinen. Hihi!",
+    "2.0": "Juhu, eine Brücke! Für mich ist das ein Riesenberg!",
+    "3.0": "Hihi, die Bilder sind ja ganz verdreht. Wie meine Fühler!",
+    "3.1": "Ich trag den Glücksstein! Uff, zu schwer. Hihi!",
+    "4.0": "Ameisen haben sechs Beine. Aber das hier sind keine Ameisenspuren!",
+    "4.1": "Ich male meine Fühler ab. Hihi! Ihr malt die Pfote.",
+    "5.0": "Hihi, psst! Ich kann gaaanz leise kichern.",
+    "5.1": "Ich bin schon da! Ich bin nämlich ganz klein. Hihi!",
+    "6.0": "Hihi, so viele Farben! Mir wird ganz schwindelig.",
+    "6.1": "Ich hab das Band gesehen! Oder war das ein Grashalm? Hihi!",
+    "6.2": "Hihi, gleich wird es bunt!"
+   },
+   "bruno": {
+    "0.0": "Brumm. Ich bin Bruno, der Bär. Ich wollte eigentlich Winterschlaf machen. Na gut.",
+    "1.0": "Brumm. Erdbeeren sind mein Lieblingsessen. Aber blaue? Pfui.",
+    "1.1": "Hmpf. Rote Bögen suchen. Na gut, weil ihr es seid.",
+    "2.0": "Brumm. Bären gehen nicht gern über Brücken. Aber zusammen geht es.",
+    "3.0": "Hmpf. So ein Durcheinander. Das muss weg.",
+    "3.1": "Brumm. Glückssteine. Ich hätte lieber Honig.",
+    "4.0": "Hmm. Ich kenne alle Spuren im Wald. Fast alle.",
+    "4.1": "Brumm. Malen ist nicht so meins. Aber ihr könnt das.",
+    "5.0": "Psst. Ich bin auch müde. Leise jetzt.",
+    "5.1": "Brumm. Schleichen kann ich gut. Bären sind Meister im Schleichen.",
+    "6.0": "Hmpf. Fast geschafft. Ich bin beeindruckt. Ein bisschen.",
+    "6.1": "Brumm. Ein grauer Bau? Hoffentlich wohnt da kein Bär.",
+    "6.2": "Brumm. Jetzt wird es gemütlich."
+   },
+   "charly": {
+    "0.0": "Yo, Leute! Charly hier, der coolste Clown der Stadt. Tröt!",
+    "1.0": "Easy! Eine blaue Erdbeere? Voll uncool.",
+    "1.1": "Chillt mal kurz und hört zu, Leute.",
+    "2.0": "Läuft bei euch! Jetzt kommt die Brücke.",
+    "3.0": "Yo, der Spiegel ist voll verrückt geworden. Kein Stress.",
+    "3.1": "Respekt, Leute! Jetzt kommt die Belohnung.",
+    "4.0": "Detektiv-Modus an, Sonnenbrille auf!",
+    "4.1": "Krass gemacht! Jetzt wird gemalt.",
+    "5.0": "Psst, ganz cool bleiben, Leute.",
+    "5.1": "Ninja-Modus, Leute. Ganz lässig schleichen.",
+    "6.0": "Yo, das Finale! Jetzt wird es richtig cool.",
+    "6.1": "Wo ist denn das Ding? Easy, wir finden das.",
+    "6.2": "Läuft! Gleich gibt es die große Show."
+   },
+   "dagobert": {
+    "0.0": "Hallöchen! Ich bin Dagobert, der Dachs. Ich bin eben gegen einen Baum gelaufen. Aua.",
+    "1.0": "Oh, eine blaue Erdbeere. Ich dachte, die sind immer blau. Nicht?",
+    "1.1": "Ich hab die roten Bögen gesucht. In meinem Ohr. Da waren sie nicht.",
+    "2.0": "Eine Brücke! Ich bin mal von einer runtergefallen. Also gut festhalten!",
+    "3.0": "Ich hab mir die Bilder angeguckt. Ich fand alles richtig. Hm.",
+    "3.1": "Glückssteine! Ich hab mal einen gegessen. War nicht so lecker.",
+    "4.0": "Spuren! Ich bin mal meinen eigenen Spuren gefolgt. Im Kreis. Drei Stunden lang.",
+    "4.1": "Ich hab meine Pfote abgemalt. Auf meinen Bauch. Hihi.",
+    "5.0": "Psst! Oder heißt es pssst? Egal, leise!",
+    "5.1": "Ich schleiche auch mit! Huch, ich bin gestolpert.",
+    "6.0": "Oh, viele Farben! Ich kann bis drei zählen. Eins, zwei, viele!",
+    "6.1": "Ein grauer Bau? Ist das meiner? Nein, meiner ist braun.",
+    "6.2": "Ich glaub, jetzt kommt was Tolles. Oder Mittagessen."
+   }
+  },
+  "neinKern": {
+   "moehre": "Eine Möhre ist in echt orange. Nicht gelb!",
+   "elefant": "Elefanten sind in echt grau. Törööö!",
+   "kuh": "Kühe sind in echt schwarz und weiß. Muh!",
+   "hase": "Das war der Hase. Hat ein Hase so kleine Pfoten?",
+   "ente": "Das war die Ente. Macht ein Fuchs Quak?"
+  }
+ },
+ "info": {
+  "start": {
+   "a": [
+    [
+     "Tun",
+     "Alle Kinder an der Haustür sammeln"
+    ],
+    [
+     "Weiter",
+     "„Spiegel aufwecken“ tippen"
+    ]
+   ]
+  },
+  "0.0": {
+   "a": [
+    [
+     "Tun",
+     "Wiehern wie ein Einhorn"
+    ],
+    [
+     "Tun",
+     "Mit dem Huf scharren"
+    ],
+    [
+     "Tun",
+     "Mit dem Horn wackeln"
+    ],
+    [
+     "Bekommen",
+     "Jedes Kind seinen Haarreif mit Horn"
+    ],
+    [
+     "Weiter",
+     "„Prüfung bestanden, los!“"
+    ]
+   ]
+  },
+  "w1": {
+   "a": [
+    [
+     "Tun",
+     "Funkels Hufspuren (Kreidespur) folgen"
+    ],
+    [
+     "Entdecken",
+     "Kleine Pfoten neben den Hufspuren"
+    ]
+   ],
+   "c": [
+    [
+     "Tun",
+     "Gemeinsam in die Küche gehen"
+    ],
+    [
+     "Entdecken",
+     "Kleine Pfoten neben den Hufspuren"
+    ]
+   ]
+  },
+  "1.0": {
+   "a": [
+    [
+     "Finden",
+     "Was am Bild falsch ist: die Erdbeere ist blau"
+    ],
+    [
+     "Tun",
+     "Laut rufen, welche Farbe Erdbeeren haben"
+    ],
+    [
+     "Lösung",
+     "Rot"
+    ],
+    [
+     "Weiter",
+     "Aufs Bild oder „Bild verzaubern“ tippen"
+    ]
+   ]
+  },
+  "1.1": {
+   "a": [
+    [
+     "Finden",
+     "Die zwei roten Bögen, bei etwas Rotem"
+    ],
+    [
+     "Tun",
+     "Wer sie findet, ruft „Gefunden!“"
+    ],
+    [
+     "Weiter",
+     "„Bögen gefunden, weiter“"
+    ]
+   ],
+   "b": [
+    [
+     "Finden",
+     "Die zwei roten Bögen am roten Kreidekreis"
+    ],
+    [
+     "Tun",
+     "Wer sie findet, ruft „Gefunden!“"
+    ],
+    [
+     "Weiter",
+     "„Bögen gefunden, weiter“"
+    ]
+   ],
+   "c": [
+    [
+     "Finden",
+     "Die zwei roten Bögen hinter der Küchentür"
+    ],
+    [
+     "Tun",
+     "Wer sie findet, ruft „Gefunden!“"
+    ],
+    [
+     "Weiter",
+     "„Bögen gefunden, weiter“"
+    ]
+   ]
+  },
+  "w2": {
+   "a": [
+    [
+     "Tun",
+     "Weiter bis zur Straße gehen"
+    ],
+    [
+     "Dort",
+     "Die Regenbogenbrücke (Seil)"
+    ]
+   ],
+   "c": [
+    [
+     "Tun",
+     "In den Flur gehen"
+    ],
+    [
+     "Dort",
+     "Der Handtuch-Fluss (Seil)"
+    ]
+   ]
+  },
+  "2.0": {
+   "a": [
+    [
+     "Tun",
+     "iPad einstecken, alle Hände ans Seil"
+    ],
+    [
+     "Tun",
+     "Zusammen über die Straße"
+    ],
+    [
+     "Rufen",
+     "„Klipp, klopp!“"
+    ],
+    [
+     "Weiter",
+     "Drüben „Alle sind drüben“"
+    ]
+   ],
+   "c": [
+    [
+     "Tun",
+     "Alle Hände ans Seil"
+    ],
+    [
+     "Tun",
+     "Zusammen über den Handtuch-Fluss"
+    ],
+    [
+     "Rufen",
+     "„Klipp, klopp!“"
+    ],
+    [
+     "Weiter",
+     "Drüben „Alle sind drüben“"
+    ]
+   ]
+  },
+  "w3": {
+   "a": [
+    [
+     "Tun",
+     "Hinter der Brücke zum Zaun gehen"
+    ],
+    [
+     "Dort",
+     "Vier Bilder mit falschen Farben, nur im Spiegel"
+    ]
+   ],
+   "b": [
+    [
+     "Tun",
+     "Hinter der Brücke zum Zaun gehen"
+    ],
+    [
+     "Dort",
+     "Vier bunte Schleifen am Zaun"
+    ]
+   ],
+   "c": [
+    [
+     "Tun",
+     "Zur Treppe oder in den Flur gehen"
+    ],
+    [
+     "Dort",
+     "Vier Bänder am Geländer"
+    ]
+   ]
+  },
+  "3.0": {
+   "a": [
+    [
+     "Tun",
+     "Im Spiegel kommen vier Bilder nacheinander"
+    ],
+    [
+     "Tun",
+     "Bei jedem ein paar Schritte am Zaun weiter"
+    ],
+    [
+     "Rufen",
+     "Was falsch ist, welche Farbe in echt"
+    ],
+    [
+     "Finden",
+     "Das Ding, das in echt gelb ist"
+    ],
+    [
+     "Lösung",
+     "Die Sonne"
+    ],
+    [
+     "Weiter",
+     "„Nächstes Bild“, am Ende tippt ein Kind die Sonne an"
+    ]
+   ],
+   "b": [
+    [
+     "Tun",
+     "Von Schleife zu Schleife laufen (blau, pink, grün, rot-weiß)"
+    ],
+    [
+     "Tun",
+     "Bei jeder in den Spiegel schauen und rufen, was falsch ist"
+    ],
+    [
+     "Finden",
+     "Das Ding, das in echt gelb ist"
+    ],
+    [
+     "Lösung",
+     "Die Sonne"
+    ],
+    [
+     "Weiter",
+     "Ein Kind tippt die Sonne an"
+    ]
+   ],
+   "c": [
+    [
+     "Tun",
+     "Von Band zu Band am Geländer (blau, pink, grün, rot-weiß)"
+    ],
+    [
+     "Tun",
+     "Bei jedem in den Spiegel schauen und rufen, was falsch ist"
+    ],
+    [
+     "Finden",
+     "Das Ding, das in echt gelb ist"
+    ],
+    [
+     "Lösung",
+     "Die Sonne"
+    ],
+    [
+     "Weiter",
+     "Ein Kind tippt die Sonne an"
+    ]
+   ]
+  },
+  "3.1": {
+   "a": [
+    [
+     "Finden",
+     "Gelben und orangen Bogen, irgendwo hier in der Nähe"
+    ],
+    [
+     "Finden",
+     "Je Kind einen Glücksstein"
+    ],
+    [
+     "Weiter",
+     "„Bögen gefunden, weiter“"
+    ]
+   ],
+   "b": [
+    [
+     "Finden",
+     "Gelben und orangen Bogen bei der grünen Schleife"
+    ],
+    [
+     "Finden",
+     "Je Kind einen Glücksstein"
+    ],
+    [
+     "Weiter",
+     "„Bögen gefunden, weiter“"
+    ]
+   ],
+   "c": [
+    [
+     "Finden",
+     "Schüssel beim grünen Band: gelber und oranger Bogen"
+    ],
+    [
+     "Finden",
+     "Je Kind einen Glücksstein aus der Schüssel"
+    ],
+    [
+     "Weiter",
+     "„Bögen gefunden, weiter“"
+    ]
+   ]
+  },
+  "w4": {
+   "a": [
+    [
+     "Tun",
+     "Bis zur Kreuzung gehen (Erdweg, keine Spuren am Boden)"
+    ],
+    [
+     "Ziel",
+     "Mitten auf die Kreuzung"
+    ]
+   ],
+   "c": [
+    [
+     "Tun",
+     "In den Flur gehen"
+    ],
+    [
+     "Ziel",
+     "Flur mit drei Türen"
+    ]
+   ]
+  },
+  "4.0": {
+   "a": [
+    [
+     "Tun",
+     "Die drei Spuren im Spiegel genau anschauen"
+    ],
+    [
+     "Finden",
+     "Die Spur, die zu den kleinen Pfoten passt"
+    ],
+    [
+     "Lösung",
+     "Der Fuchs"
+    ],
+    [
+     "Weiter",
+     "Ein Kind tippt im Spiegel die Fuchsspur an"
+    ]
+   ],
+   "c": [
+    [
+     "Tun",
+     "Die Spurenkarten vor den drei Türen anschauen"
+    ],
+    [
+     "Finden",
+     "Die Spur, die zu den kleinen Pfoten passt"
+    ],
+    [
+     "Lösung",
+     "Der Fuchs"
+    ],
+    [
+     "Weiter",
+     "Ein Kind tippt im Spiegel die Fuchsspur an"
+    ]
+   ]
+  },
+  "4.1": {
+   "a": [
+    [
+     "Finden",
+     "Eine Zaubertafel, irgendwo hier versteckt"
+    ],
+    [
+     "Tun",
+     "Reihum malt jedes Kind ein Stück der Fuchspfote"
+    ],
+    [
+     "Danach",
+     "Tafel in die Tasche, die eigenen gibt es im Schatz"
+    ],
+    [
+     "Weiter",
+     "„Der Fuchsspur folgen“"
+    ]
+   ],
+   "c": [
+    [
+     "Finden",
+     "Eine Zaubertafel hinter der Fuchs-Tür"
+    ],
+    [
+     "Tun",
+     "Reihum malt jedes Kind ein Stück der Fuchspfote"
+    ],
+    [
+     "Danach",
+     "Tafel weglegen, die eigenen gibt es im Schatz"
+    ],
+    [
+     "Weiter",
+     "„Der Fuchsspur folgen“"
+    ]
+   ]
+  },
+  "w5": {
+   "a": [
+    [
+     "Tun",
+     "Zum Berg gehen (Erdweg, keine Spuren am Boden)"
+    ],
+    [
+     "Leise",
+     "Auf dem Berg schläft eine Regenwolke"
+    ]
+   ],
+   "c": [
+    [
+     "Tun",
+     "Leise in den Toberaum"
+    ],
+    [
+     "Leise",
+     "Auf dem Kissenberg schläft eine Regenwolke"
+    ]
+   ]
+  },
+  "5.0": {
+   "a": [
+    [
+     "Finden",
+     "Was am Bild falsch ist: der Frosch ist lila"
+    ],
+    [
+     "Tun",
+     "Leise flüstern, welche Farbe Frösche haben"
+    ],
+    [
+     "Lösung",
+     "Grün"
+    ],
+    [
+     "Weiter",
+     "Aufs Bild oder „Bild verzaubern“ tippen"
+    ]
+   ]
+  },
+  "5.1": {
+   "a": [
+    [
+     "Tun",
+     "Ganz leise zur Wolke schleichen"
+    ],
+    [
+     "Finden",
+     "Die zwei grünen Bögen"
+    ],
+    [
+     "Weiter",
+     "„Bögen gefunden, weiter“"
+    ]
+   ],
+   "b": [
+    [
+     "Tun",
+     "Ganz leise zum Bettlaken schleichen"
+    ],
+    [
+     "Finden",
+     "Die zwei grünen Bögen"
+    ],
+    [
+     "Weiter",
+     "„Bögen gefunden, weiter“"
+    ]
+   ],
+   "c": [
+    [
+     "Tun",
+     "Ganz leise über den Kissenberg klettern"
+    ],
+    [
+     "Finden",
+     "Die zwei grünen Bögen"
+    ],
+    [
+     "Weiter",
+     "„Bögen gefunden, weiter“"
+    ]
+   ]
+  },
+  "w6": {
+   "a": [
+    [
+     "Tun",
+     "Den Berg hinauf zur Parkbank bei den Bäumen"
+    ],
+    [
+     "Dort",
+     "Den Regenbogen zusammenlegen"
+    ]
+   ],
+   "c": [
+    [
+     "Tun",
+     "Im Toberaum zusammenkommen"
+    ],
+    [
+     "Dort",
+     "Den Regenbogen zusammenlegen"
+    ]
+   ]
+  },
+  "6.0": {
+   "a": [
+    [
+     "Tun",
+     "Alle Bögen der Reihe nach hinlegen"
+    ],
+    [
+     "Finden",
+     "Welche Farbe fehlt"
+    ],
+    [
+     "Lösung",
+     "Blau"
+    ],
+    [
+     "Weiter",
+     "Rufen die Kinder „Blau!“, „Blau fehlt!“ tippen"
+    ]
+   ]
+  },
+  "6.1": {
+   "a": [
+    [
+     "Finden",
+     "Das bunte Band"
+    ],
+    [
+     "Finden",
+     "Darunter der graue Karton: Fridolins Bau"
+    ],
+    [
+     "Tun",
+     "Anklopfen, wer schaut heraus?"
+    ],
+    [
+     "Weiter",
+     "„Wir haben jemanden gefunden“"
+    ]
+   ],
+   "c": [
+    [
+     "Finden",
+     "Den grauen Karton hinter dem Sofa (buntes Band dran)"
+    ],
+    [
+     "Tun",
+     "Anklopfen, wer schaut heraus?"
+    ],
+    [
+     "Weiter",
+     "„Wir haben jemanden gefunden“"
+    ]
+   ]
+  },
+  "6.2": {
+   "a": [
+    [
+     "Tun",
+     "Die zwei blauen Bögen zu den anderen legen"
+    ],
+    [
+     "Weiter",
+     "„Der Regenbogen ist ganz“"
+    ]
+   ]
+  },
+  "ende": {
+   "a": [
+    [
+     "Tun",
+     "Fridolins grauen Bau mit Stickern bekleben"
+    ],
+    [
+     "Erwachsener",
+     "Währenddessen die Schatzkiste hinstellen"
+    ],
+    [
+     "Finden",
+     "Schatzkiste mit Kratzbildern, Zaubertafeln und Zeichenschablonen"
+    ],
+    [
+     "Weiter",
+     "Nach Schatz und Snack „Heimweg starten“"
+    ]
+   ]
+  },
+  "heim": {
+   "a": [
+    [
+     "Tun",
+     "Wie kleine Einhörner nach Hause hüpfen"
+    ],
+    [
+     "Spiegel",
+     "Zählt die Sprünge bis zur Haustür"
+    ]
+   ]
+  },
+  "heim.ende": {
+   "a": [
+    [
+     "Tun",
+     "Tattoos abwischen"
+    ],
+    [
+     "Danach",
+     "Schatz verteilen nach dem Essen"
+    ]
+   ]
+  }
+ }
+}

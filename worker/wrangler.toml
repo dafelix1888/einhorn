@@ -1,0 +1,11 @@
+# Live-Stimmen für die Schnitzeljagd: nimmt Ortsansagen entgegen und holt sie bei ElevenLabs.
+# Einrichten:  npx wrangler login
+#              npx wrangler secret put ELEVENLABS_API_KEY
+#              npx wrangler deploy
+# Danach die Worker-Adresse in app/config.json bei "liveUrl" eintragen.
+name = "schnitzeljagd-stimmen"
+main = "stimmen.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+ERLAUBTE_URSPRUENGE = "https://dafelix1888.github.io,http://localhost:8765"

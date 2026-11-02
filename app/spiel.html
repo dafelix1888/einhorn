@@ -1,0 +1,2520 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Zauberspiegel"><title>Funkels Zauberspiegel</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Baloo+2:wght@600;800&display=swap"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
+<style>
+/* Layout: ein runder Spiegel in der Mitte, darüber der Regenbogen als Fortschritt,
+   darunter großer Vorlesetext und ein Hauptknopf. Ein festes helles Design,
+   weil das iPad draußen bei Tageslicht gelesen wird. */
+:root{
+  --ground:#F1EEF8; --surface:#FFFFFF; --ink:#241A3D; --ink-soft:#5A5073; --line:#D8D2E6;
+  --magic:#6B35C9; --magic-deep:#4E22A0; --magic-ink:#FFFFFF; --tint:#E6DEF7;
+  --gold-a:#EBCB78; --gold-b:#B8862B;
+  --rot:#E23A3F; --gelb:#F2B90F; --gruen:#3A9D4B; --blau:#2B6FE0; --lila:#9050C8; --fehlt:#CFC9DD;
+  --rotorange:#EC5B2B; --orange:#F28C1B; --hellgruen:#9BCB3C; --tuerkis:#27A7A0; --indigo:#2F2C73; --kern:#7B3F2B;
+  --ok:#1F7A45; --warn:#9A5A08; --danger:#B3262E;
+  --font-display:"Baloo 2","Trebuchet MS","Avenir Next",sans-serif;
+  --font-body:"Atkinson Hyperlegible","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+[hidden]{display:none!important}
+body{background:var(--ground);color:var(--ink);font-family:var(--font-body);font-size:18px;line-height:1.45;
+  -webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+.app{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:16px 28px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--font-display);margin:0;line-height:1.1;text-wrap:balance}
+h1{font-size:1.45rem;font-weight:800}
+h2{font-size:1.6rem;font-weight:800}
+h3{font-size:1.2rem;font-weight:800}
+p{margin:0}
+button{font:inherit;color:inherit;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--magic);outline-offset:3px}
+
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.tabs{display:flex;gap:4px;background:var(--tint);border-radius:999px;padding:4px}
+.tab{border:0;background:transparent;border-radius:999px;padding:8px 18px;font-family:var(--font-display);font-weight:600;font-size:1.05rem;cursor:pointer;color:var(--ink-soft)}
+.tab[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(36,26,61,.18)}
+
+/* Tour */
+.tour{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.bogen{width:min(100%,340px);height:auto;display:block}
+.arc{fill:none;stroke-width:11;stroke-linecap:round;stroke:var(--fehlt);transition:stroke .9s}
+.arc.kern{stroke-width:28;stroke-linecap:butt}
+.arc.da{stroke:var(--c)}
+.arc.such{stroke:var(--c);stroke-dasharray:4 15;animation:such 1.1s ease-in-out infinite}
+@keyframes such{50%{opacity:.25}}
+.count{font-size:.85rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+
+.stage{display:flex;justify-content:center;align-items:center;gap:14px;width:100%}
+.mirror{position:relative;flex:0 1 460px;min-width:0;aspect-ratio:1;max-width:100%;border-radius:50%;
+  border:14px solid transparent;
+  background:radial-gradient(circle at 34% 28%,#FFFFFF 0,#F7F4FF 42%,#E3DBF6 100%) padding-box,
+             linear-gradient(140deg,var(--gold-a),var(--gold-b) 45%,var(--gold-a) 70%,var(--gold-b)) border-box;
+  box-shadow:0 10px 26px rgba(36,26,61,.2), inset 0 0 0 2px rgba(255,255,255,.7);
+  overflow:hidden;display:grid;place-items:center}
+.mirror>*{grid-area:1/1}
+.spiegel-ecke{position:relative;flex:0 1 460px;min-width:0;max-width:100%;display:flex}
+.spiegel-ecke>.mirror{flex:1 1 auto;width:100%}
+.funkel3d{position:absolute;inset:0;pointer-events:none;z-index:4;transform-origin:100% 100%;
+  transform:translate(3%,4%) scale(.46);transition:transform .7s cubic-bezier(.3,1.35,.45,1);will-change:transform;
+  -webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent 90%);mask-image:linear-gradient(to bottom,#000 62%,transparent 90%)}
+.funkel3d canvas{width:100%;height:100%;display:block}
+.spiegel-ecke.funkel-gross .funkel3d{transform:translate(4%,6%) scale(1.02);transition-duration:.55s}   /* spricht: groß über dem Spiegel */
+.mirror-pic,.kompass{transition:opacity .45s ease}
+.spiegel-ecke.funkel-gross .mirror-pic,.spiegel-ecke.funkel-gross .kompass{opacity:.12}
+@media (max-width:599px){ .funkel3d{transform:translate(2%,4%) scale(.42)} }
+@media (prefers-reduced-motion:reduce){ .funkel3d{transition:none} }
+.kaka{position:absolute;left:-6%;bottom:-5%;width:56%;aspect-ratio:240/300;pointer-events:none;z-index:5;
+  transform-origin:30% 100%;opacity:0;transform:translateY(18%) scale(.4);transition:opacity .25s ease,transform .5s cubic-bezier(.3,1.6,.45,1);
+  -webkit-mask-image:linear-gradient(to bottom,#000 93%,transparent 100%);mask-image:linear-gradient(to bottom,#000 93%,transparent 100%)}
+.kaka svg{width:100%;height:100%;display:block;overflow:visible}
+.kaka.da{opacity:1;transform:none}
+.kaka .kk-kopf{transform-origin:120px 230px;transform-box:view-box}
+.kaka .kk-wolke{opacity:0;transform-origin:40px 250px;transform-box:view-box}
+.kaka.pupst .kk-wolke{animation:kkWolke 1.3s ease-out forwards}
+.kaka.pupst .kk-kopf,.kaka.pupst .kk-koerper{animation:kkRuck .5s ease-in-out}
+.kaka .kk-mini{opacity:0;transform-origin:206px 286px;transform-box:view-box}
+.kaka.haufen .kk-mini{animation:kkPlumps .6s cubic-bezier(.3,1.6,.45,1) forwards}
+.kaka.haufen .kk-glitzer{animation:kkGlitzer 1.2s ease-in-out infinite}
+@keyframes kkWolke{0%{opacity:0;transform:scale(.3)}25%{opacity:1;transform:scale(1.05)}100%{opacity:0;transform:translate(-10px,-30px) scale(1.5)}}
+@keyframes kkRuck{0%,100%{transform:none}20%{transform:translateY(-10px) rotate(-4deg)}45%{transform:translateY(2px) rotate(3deg)}70%{transform:translateY(-4px) rotate(-1deg)}}
+@keyframes kkPlumps{0%{opacity:0;transform:translateY(-70px) scale(.5)}60%{opacity:1;transform:translateY(0) scale(1.1,.85)}100%{opacity:1;transform:none}}
+@keyframes kkGlitzer{50%{opacity:.25}}
+.kk[hidden]{display:none}
+.kaka .kk-extra{opacity:0;transform-origin:120px 80px;transform-box:view-box}
+.kaka.pupst .kk-extra{animation:kkExtra 1.6s ease-out forwards}
+@keyframes kkExtra{0%{opacity:0;transform:translateY(16px) scale(.5)}25%{opacity:1;transform:translateY(0) scale(1.1)}75%{opacity:1;transform:rotate(-4deg)}100%{opacity:0;transform:translateY(-12px)}}
+.kaka .kk-fl,.kaka .kk-fr{transform-box:fill-box}
+.kaka .kk-fl{transform-origin:100% 100%} .kaka .kk-fr{transform-origin:0 100%}
+.kaka.da .kk-fl,.kaka.da .kk-fr{animation:kkFuehler 1.1s ease-in-out infinite alternate}
+@keyframes kkFuehler{to{transform:rotate(9deg)}}
+.erz-wahl{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:6px 0 4px}
+.erz-k{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid var(--line);border-radius:16px;background:var(--surface);padding:8px 8px 10px;font:inherit;color:var(--ink);cursor:pointer;text-align:center;line-height:1.2}
+.erz-k[aria-pressed="true"]{border-color:var(--magic);box-shadow:0 0 0 3px rgba(107,53,201,.18)}
+.erz-k .ava{width:70px;height:88px;pointer-events:none}.erz-k .ava svg{width:100%;height:100%;display:block}
+.erz-k .kk-wolke,.erz-k .kk-mini,.erz-k .kk-extra{display:none}
+.erz-k b{font-size:.95rem}.erz-k small{color:var(--ink-soft);font-size:.78rem}
+.erz-hoer{margin-top:6px;border:0;background:var(--tint);color:var(--magic-deep);border-radius:999px;padding:5px 12px;font:inherit;font-weight:700;font-size:.85rem;cursor:pointer}
+.erz-zeile{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.erz-zeile span{flex:1 1 auto;min-width:0}.erz-zeile select{flex:none;max-width:48%}
+@media (max-width:599px){ .kaka{left:-3%;width:52%} }
+@media (prefers-reduced-motion:reduce){ .kaka,.kaka.pupst .kk-kopf,.kaka.pupst .kk-koerper{transition:none;animation:none} }
+.mirror canvas{width:100%;height:100%;display:block}
+.mirror-pic{width:76%;height:76%;display:grid;place-items:center}
+.mirror-pic svg{width:100%;height:100%;display:block}
+.mirror-pic.tap{cursor:pointer}
+.mirror-read{display:flex;align-items:baseline;justify-content:center;gap:12px;pointer-events:none}
+.mirror-read .big{font-family:var(--font-display);font-weight:800;font-size:2.3rem;line-height:1;font-variant-numeric:tabular-nums}
+.mirror-read .lab{font-family:var(--font-display);font-weight:600;font-size:1.3rem;color:var(--ink-soft)}
+
+.mirror video,.mirror .linse{width:100%;height:100%;object-fit:cover;display:block}
+.kompass{width:76%;height:76%;display:grid;place-items:center;pointer-events:none}
+.kompass svg{width:100%;height:100%;display:block;will-change:transform;transform:scale(.4)}
+.skala{flex:none;width:60px}
+.skala svg{width:100%;height:auto;display:block}
+.stage.da .mirror{animation:glueh .34s ease-in-out infinite}
+.stage.da .kompass,.stage.da .skala{animation:blink .34s steps(1) infinite}
+@keyframes glueh{50%{box-shadow:0 10px 26px rgba(36,26,61,.2), inset 0 0 0 2px rgba(255,255,255,.7), 0 0 0 12px rgba(242,185,15,.8), 0 0 70px 26px rgba(144,80,200,.6)}}
+@keyframes blink{50%{opacity:.2}}
+@media (min-width:600px){ .stage.mit-skala::before{content:"";flex:none;width:60px} }
+.pop-karte{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--surface);border-radius:26px;padding:22px 28px;box-shadow:0 12px 36px rgba(36,26,61,.28);animation:pop .55s cubic-bezier(.2,1.4,.4,1);text-align:center}
+.pop-karte{width:74%;padding:28px 20px}
+.pop-karte b{font-family:var(--font-display);font-weight:800;font-size:2rem;color:var(--magic-deep)}
+.pop-karte .seit{font-size:.95rem;color:var(--ink-soft)}
+.pop-karte .btn{font-size:1.5rem;padding:18px 44px}
+.pic .main{transition:fill 1.4s ease}
+.inkfill{fill:var(--ink)} .inkline{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+.pop{animation:pop .7s ease}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.12) rotate(-3deg)}100%{transform:scale(1)}}
+.wackel{animation:wackel .45s ease}
+@keyframes wackel{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+
+.story{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:34rem;width:100%}
+.say{font-size:1.1rem;line-height:1.4;color:var(--ink)}
+.task{font-size:1.05rem;color:var(--ink-soft)}
+.choices{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;width:100%}
+.choice{flex:1 1 150px;max-width:230px;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:10px 10px 8px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--font-display);font-weight:600;font-size:1.1rem}
+.choice svg{width:110px;height:110px;fill:var(--ink)}
+.choice.falsch{border-color:var(--fehlt);color:var(--ink-soft);opacity:.6} .choice.falsch svg{fill:var(--fehlt)}
+.choice.richtig{border-color:var(--ok);color:var(--ok)} .choice.richtig svg{fill:var(--ok)}
+.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:6px}
+.btn{border:0;border-radius:999px;padding:14px 26px;font-family:var(--font-display);font-weight:800;font-size:1.25rem;line-height:1.1;cursor:pointer}
+.btn.primary{background:var(--magic);color:var(--magic-ink);box-shadow:0 4px 0 var(--magic-deep)}
+.btn.primary:active{transform:translateY(3px);box-shadow:0 1px 0 var(--magic-deep)}
+.btn.ghost{background:var(--tint);color:var(--magic-deep)}
+.btn.quiet{background:transparent;border:2px dashed var(--line);color:var(--ink-soft);font-weight:600;font-size:1rem;padding:10px 18px}
+.btn.small{font-size:1rem;padding:10px 18px;font-weight:600}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.foot{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:6px;width:100%}
+.chip{font-size:.92rem;color:var(--ink-soft);display:inline-flex;align-items:center;gap:8px;text-align:left}
+.chip::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--fehlt);flex:none}
+.chip.on::before{background:var(--ok)} .chip.wait::before{background:var(--gelb)} .chip.off::before{background:var(--danger)}
+
+/* Einrichten */
+.setup{display:flex;flex-direction:column;gap:14px}
+.setup .lead{max-width:38rem}
+details.karte{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:0 2px 10px rgba(36,26,61,.06)}
+details.karte>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:16px 18px}
+details.karte>summary::-webkit-details-marker{display:none}
+details.karte>summary .ico{flex:none;width:40px;height:40px;border-radius:12px;background:var(--tint);display:grid;place-items:center;color:var(--magic-deep)}
+details.karte>summary .ico svg{width:22px;height:22px}
+details.karte>summary .tt{flex:1;min-width:0}
+details.karte>summary .tt b{display:block;font-family:var(--font-display);font-weight:800;font-size:1.15rem;line-height:1.2}
+details.karte>summary .tt span{display:block;color:var(--ink-soft);font-size:.95rem;line-height:1.3}
+details.karte>summary .pf{flex:none;width:12px;height:12px;border-right:3px solid var(--line);border-bottom:3px solid var(--line);transform:rotate(-45deg);transition:transform .2s;margin-right:4px}
+details.karte[open]>summary .pf{transform:rotate(45deg)}
+details.karte .inhalt{display:flex;flex-direction:column;gap:12px;padding:2px 18px 18px;border-top:1px solid var(--line);padding-top:14px}
+details.karte h3{font-size:1.02rem;margin-top:6px}
+details.karte.achtung{border-color:#F0C6C9}
+.schalter{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0;cursor:pointer;border-bottom:1px solid var(--line)}
+.schalter:last-child{border-bottom:0}
+.schalter .st{flex:1;min-width:0}
+.schalter .st b{display:block;font-weight:700}
+.schalter .st span{display:block;color:var(--ink-soft);font-size:.92rem;line-height:1.3}
+.schalter input{position:absolute;opacity:0;width:1px;height:1px}
+.schalter .knopf{flex:none;width:54px;height:32px;border-radius:999px;background:var(--line);position:relative;transition:background .2s}
+.schalter .knopf::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s}
+.schalter input:checked+.knopf{background:var(--magic)}
+.schalter input:checked+.knopf::after{left:25px}
+.schalter input:focus-visible+.knopf{outline:3px solid var(--magic);outline-offset:3px}
+.setup section{display:flex;flex-direction:column;gap:10px}
+.gaben .nr{font-size:1rem;width:auto;min-width:1.6rem}
+.gaben .art{display:inline-block;vertical-align:2px;margin-left:6px;font-size:.75rem;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:3px 10px;background:var(--tint);color:var(--magic-deep)}
+.gaben .art.schatz{background:var(--magic);color:#fff}
+.liste{display:flex;flex-direction:column;gap:4px}
+.liste h3{margin:14px 0 4px;display:flex;align-items:baseline;gap:10px}
+.liste h3 small{font-family:var(--font-body);font-weight:400;font-size:.9rem;color:var(--ink-soft)}
+.liste h3.weg{color:var(--ink-soft);font-size:.95rem}
+.haken{display:flex;align-items:flex-start;gap:12px;padding:7px 0;cursor:pointer;line-height:1.35}
+.haken input{appearance:none;-webkit-appearance:none;flex:none;width:26px;height:26px;border:2px solid var(--line);border-radius:8px;background:var(--surface);display:grid;place-items:center;margin-top:1px}
+.haken input:checked{background:var(--magic);border-color:var(--magic)}
+.haken input:checked::after{content:"";width:7px;height:13px;border-right:3px solid #fff;border-bottom:3px solid #fff;transform:rotate(45deg) translate(-1px,-2px)}
+.haken input:checked+span{color:var(--ink-soft);text-decoration:line-through}
+.liste .zwischen{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
+.lead{color:var(--ink-soft);max-width:38rem}
+.points{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.points li{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.points .nr{font-family:var(--font-display);font-weight:800;font-size:1.3rem;width:1.6rem;flex:none;color:var(--magic-deep)}
+.points .txt{flex:1 1 220px;min-width:0}
+.points .nm{font-weight:700}
+.points .wo{color:var(--ink-soft);font-size:.95rem}
+.points .st{font-size:.92rem;font-variant-numeric:tabular-nums}
+.st.ok{color:var(--ok);font-weight:700} .st.offen{color:var(--warn);font-weight:700}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.seg{display:inline-flex;align-self:flex-start;background:var(--tint);border-radius:999px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(36,26,61,.18)}
+label.check{display:flex;align-items:center;gap:10px;cursor:pointer}
+label.check input{width:22px;height:22px;accent-color:var(--magic)}
+select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:8px 10px}
+#gh-token{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:8px 10px;width:100%;margin:6px 0}
+.gh-zugang{margin:6px 0 4px}.gh-zugang summary{cursor:pointer;font-weight:700;color:var(--ink-soft);padding:4px 0}
+textarea{width:100%;min-height:74px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;resize:vertical}
+.hold{position:relative;overflow:hidden;background:var(--surface);border:2px solid var(--danger);color:var(--danger);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none}
+.hold .fill{position:absolute;inset:0;background:var(--danger);transform:scaleX(0);transform-origin:left;opacity:.22}
+.hold.pressing .fill{transform:scaleX(1);transition:transform 3s linear}
+.hold span{position:relative}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+.btn.rec{background:var(--danger);color:var(--surface)}
+.clips .wo{font-size:.95rem}
+details.box{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+details.box summary{cursor:pointer;padding:12px 0;font-family:var(--font-display);font-weight:800;font-size:1.1rem;color:var(--magic-deep)}
+details.box .points{border-top:1px solid var(--line)}
+details.box .points li:last-child{border-bottom:0}
+.sub{font-weight:700;margin-top:8px}
+.top-left{display:flex;align-items:center;gap:12px;min-width:0}
+.ablauf-btn{border:0;background:var(--tint);color:var(--magic-deep);border-radius:999px;padding:8px 16px 8px 12px;font-family:var(--font-display);font-weight:800;font-size:1.05rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px;flex:none}
+.ablauf-btn svg{width:20px;height:20px;flex:none}
+.jetzt{background:var(--tint);border-radius:18px;padding:12px 18px;display:flex;flex-direction:column;gap:2px;width:100%;text-align:left}
+.jetzt .lab{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--magic-deep)}
+.jetzt .was{font-size:1rem;line-height:1.4}
+.jetzt .dann{font-size:.85rem;color:var(--ink-soft);margin-top:6px;padding-top:6px;border-top:1px solid rgba(78,34,160,.15)}
+.jetzt .dann:empty{display:none}
+.aufg-hoer{margin-left:auto;display:inline-flex;align-items:center;gap:5px;border:0;background:var(--tint);color:var(--magic-deep);border-radius:999px;padding:5px 12px 5px 9px;font:inherit;font-family:var(--font-body,inherit);font-weight:700;font-size:.82rem;cursor:pointer;line-height:1.2}
+.aufg-hoer svg{width:14px;height:14px;flex:none}
+.aufg-hoer:active{transform:scale(.96)}
+.lab-knoepfe{margin-left:auto;display:inline-flex;align-items:center;gap:6px}
+.lab-knoepfe .aufg-hoer{margin-left:0}
+.info-knopf{flex:none;width:30px;height:30px;border-radius:50%;border:0;padding:0;background:var(--tint);color:var(--magic-deep);display:grid;place-items:center;cursor:pointer;box-shadow:none}
+.info-knopf svg{width:16px;height:16px}
+.info-knopf[aria-expanded="true"]{background:var(--magic);color:#fff}
+.info-knopf:active{transform:scale(.94)}
+.jetzt-info{list-style:none;margin:8px 0 2px;padding:10px 12px;background:var(--tint);border-radius:12px;display:flex;flex-direction:column;gap:5px;font-size:.95rem;line-height:1.35}
+.jetzt-info li{position:relative;padding-left:16px}
+.jetzt-info li::before{content:"";position:absolute;left:2px;top:.5em;width:6px;height:6px;border-radius:50%;background:var(--magic)}
+.jetzt-info b{color:var(--magic-deep)}
+.erz-probe{flex:none;width:36px;height:36px;border-radius:50%;border:0;background:var(--tint);color:var(--magic-deep);display:grid;place-items:center;cursor:pointer}
+.erz-probe svg{width:14px;height:14px}
+.mirror.spricht{cursor:pointer}
+.eyebrow{font-size:.85rem;letter-spacing:.09em;text-transform:uppercase;color:var(--magic-deep);font-weight:700;border-top:2px solid var(--line);padding-top:14px}
+.setup .eyebrow:first-child{border-top:0;padding-top:0}
+.backdrop{position:fixed;inset:0;background:rgba(36,26,61,.38);z-index:8}
+.faden{position:fixed;left:0;top:0;bottom:0;width:min(350px,88vw);background:var(--surface);z-index:9;display:flex;flex-direction:column;
+  box-shadow:6px 0 24px rgba(36,26,61,.22);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);animation:rein .2s ease}
+@keyframes rein{from{transform:translateX(-36px);opacity:0}}
+.faden-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 14px 8px 20px}
+.faden-kopf h2{font-size:1.5rem}
+.faden-hinweis{padding:0 20px 10px;font-size:.9rem;color:var(--ink-soft);border-bottom:1px solid var(--line)}
+.faden-scroll{position:relative;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 10px 28px;flex:1}
+.faden ol{list-style:none;margin:0;padding:0}
+.faden li{position:relative}
+.faden li::before{content:"";position:absolute;left:22px;top:0;bottom:0;width:3px;background:var(--line)}
+.faden li:first-child::before{top:21px}
+.faden li:last-child::before{bottom:calc(100% - 21px)}
+.faden li.war::before{background:var(--magic)}
+.faden li.hier::before{background:linear-gradient(var(--magic) 0 20px,var(--line) 20px)}
+.faden li:first-child.hier::before{background:var(--line)}
+.fs{position:relative;display:flex;flex-direction:column;gap:1px;width:100%;text-align:left;border:0;background:transparent;border-radius:14px;padding:8px 10px 8px 46px;cursor:pointer;color:var(--ink);font:inherit}
+.fs .dot{position:absolute;left:15px;top:11px;width:17px;height:17px;border-radius:50%;border:3px solid var(--line);background:var(--surface)}
+.faden li.war .fs .dot{background:var(--magic);border-color:var(--magic)}
+.faden li.war .fs .dot::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;border-right:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(45deg)}
+.faden li.gross.war .fs .dot::after{left:8px;top:4px;width:6px;height:12px}
+.faden li.hier .fs{background:var(--tint)}
+.faden li.hier .fs .dot{background:var(--magic);border-color:var(--magic);box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--magic)}
+.faden li.gross .fs .dot{left:10px;top:8px;width:27px;height:27px;background:var(--c,var(--gold-b));border-color:var(--c,var(--gold-b))}
+.faden li.kopf .fs{margin-top:8px}
+.fs .t{font-weight:700;font-size:1rem;line-height:1.25}
+.faden li.gross .fs .t{font-family:var(--font-display);font-weight:800;font-size:1.15rem}
+.fs .v{font-size:.85rem;line-height:1.3;color:var(--ink-soft);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (min-width:1080px){
+  .backdrop{display:none!important}
+  .faden{box-shadow:1px 0 0 var(--line)}
+  body.faden-offen .app{margin-left:max(370px,calc(50% - 360px))}
+}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  background:var(--ink);color:var(--surface);padding:12px 20px;border-radius:999px;font-weight:700;max-width:calc(100% - 32px);text-align:center;z-index:12}
+@media (min-width:700px){
+  body{font-size:17px}
+  .tour{gap:12px}
+  .bogen{width:min(100%,400px)}
+  .mirror,.spiegel-ecke{flex-basis:560px} .skala{width:84px} .stage.mit-skala::before{width:84px}
+  .mirror-read .big{font-size:2.8rem} .mirror-read .lab{font-size:1.5rem}
+  h2{font-size:1.8rem}
+  .say{font-size:1.15rem}
+  .story{max-width:none;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-areas:"t j" "s j" "s a" "c c";column-gap:28px;row-gap:10px;align-items:start;text-align:left;margin-top:4px}
+  .story h2{grid-area:t;text-wrap:pretty}
+  .story .say{grid-area:s}
+  .story .jetzt{grid-area:j;height:auto}
+  .story .actions{grid-area:a;justify-content:flex-start;margin-top:0}
+  .story .choices{grid-area:c;justify-content:center}
+  .foot{flex-direction:row;justify-content:space-between;flex-wrap:wrap}
+}
+@media (min-width:1000px) and (orientation:portrait){ .mirror,.spiegel-ecke{flex-basis:640px} .bogen{width:min(100%,440px)} }
+@media (min-width:700px) and (orientation:landscape) and (max-height:900px){ .bogen{width:min(100%,300px)} .tour{gap:8px} }
+@media (prefers-reduced-motion:reduce){ .stage.da .mirror{animation:none;box-shadow:0 10px 26px rgba(36,26,61,.2), 0 0 0 12px rgba(242,185,15,.8)} .stage.da .kompass,.stage.da .skala{animation:none} .arc.such,.pop,.wackel,.faden{animation:none} .pic .main,.arc{transition:none} }
+
+/* ---------- Designpass: Morgenhimmel, Spiegel als Held, weiche Bewegung ---------- */
+@property --winkel{syntax:"<angle>";inherits:false;initial-value:0deg}
+:root{--himmel-a:#EEF4FF;--himmel-b:#F6EEFF;--morgen:#FFE8D4;--gold-c:#FFF2C2;--magic-hell:#8D5DF2}
+body{background:#F4F0FB}
+.himmel{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;
+  background:
+    radial-gradient(70% 55% at 8% -8%, var(--morgen) 0%, rgba(255,232,212,0) 65%),
+    radial-gradient(60% 50% at 100% -5%, #DCEBFF 0%, rgba(220,235,255,0) 65%),
+    radial-gradient(60% 45% at 50% 108%, #E8D6FF 0%, rgba(232,214,255,0) 65%),
+    linear-gradient(180deg,#F7F3FD 0%,#F3EEFA 100%)}
+.himmel .st{position:absolute;width:18px;height:18px;opacity:.55}
+.himmel .st svg{width:100%;height:100%;display:block}
+.himmel .st:nth-child(1){left:6%;top:14%;width:14px;height:14px}
+.himmel .st:nth-child(2){left:92%;top:9%;width:22px;height:22px}
+.himmel .st:nth-child(3){left:14%;top:62%}
+.himmel .st:nth-child(4){left:88%;top:48%;width:12px;height:12px}
+.himmel .st:nth-child(5){left:4%;top:88%;width:24px;height:24px}
+.himmel .st:nth-child(6){left:72%;top:84%}
+.himmel .st:nth-child(7){left:48%;top:4%;width:10px;height:10px}
+.himmel .st:nth-child(8){left:96%;top:72%}
+.top{padding-bottom:4px}
+h1{letter-spacing:-.01em}
+.tabs{background:rgba(255,255,255,.7);box-shadow:0 1px 4px rgba(36,26,61,.08)}
+.tab[aria-pressed="true"]{background:var(--magic);color:#fff;box-shadow:0 3px 10px rgba(107,53,201,.35)}
+.ablauf-btn{background:rgba(255,255,255,.75);box-shadow:0 1px 4px rgba(36,26,61,.08)}
+.count{font-size:.9rem;letter-spacing:0;text-transform:none;font-weight:600;color:var(--magic-deep);background:rgba(255,255,255,.7);border-radius:999px;padding:4px 14px;box-shadow:0 1px 3px rgba(36,26,61,.08)}
+.arc{transition:stroke .9s, stroke-width .4s}
+.arc.neu{animation:bogenPuls .9s cubic-bezier(.2,1.4,.4,1)}
+@keyframes bogenPuls{40%{stroke-width:17}100%{stroke-width:11}}
+.arc.kern.neu{animation:kernPuls .9s cubic-bezier(.2,1.4,.4,1)}
+@keyframes kernPuls{40%{stroke-width:36}100%{stroke-width:28}}
+
+.mirror{border-width:16px;
+  background:
+    radial-gradient(circle at 34% 28%,#FFFFFF 0,#FAF7FF 40%,#E9E1F8 100%) padding-box,
+    conic-gradient(from var(--winkel), var(--gold-b) 0deg, var(--gold-a) 55deg, var(--gold-c) 85deg, var(--gold-a) 115deg, var(--gold-b) 180deg, var(--gold-a) 240deg, var(--gold-c) 270deg, var(--gold-a) 300deg, var(--gold-b) 360deg) border-box;
+  box-shadow:0 18px 40px rgba(78,34,160,.18), 0 2px 0 rgba(255,255,255,.9), inset 0 0 0 2px rgba(255,255,255,.75), inset 0 0 40px rgba(141,93,242,.08);
+  animation:glanz 16s steps(160) infinite}   /* in Stufen, damit der Rahmen nicht 60-mal pro Sekunde neu gemalt wird */
+@keyframes glanz{to{--winkel:360deg}}
+.mirror.spricht{box-shadow:0 18px 40px rgba(78,34,160,.18), 0 0 0 6px rgba(141,93,242,.25), inset 0 0 0 2px rgba(255,255,255,.75)}
+.lichter{width:100%;height:100%;pointer-events:none;animation:lichter 60s linear infinite}
+.lichter circle{fill:none;stroke:var(--gold-b);stroke-width:1.6;stroke-dasharray:0 9.4;stroke-linecap:round;opacity:.55}
+@keyframes lichter{to{transform:rotate(360deg)}}
+.stage.atmet .mirror{animation:glanz 16s steps(160) infinite, atmen 4.5s ease-in-out infinite}
+@keyframes atmen{50%{transform:scale(1.012)}}
+.mirror-pic.neu svg{animation:popIn .7s cubic-bezier(.2,1.5,.4,1)}
+@keyframes popIn{0%{transform:scale(.6) rotate(-6deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
+.mirror-read .big{color:var(--magic-deep);text-shadow:0 2px 0 #fff}
+
+.story.neu>h2,.story.neu>.say{animation:rein2 .5s cubic-bezier(.2,1,.3,1) both}
+.story.neu>.jetzt,.story.neu>.actions{animation:rein2 .5s cubic-bezier(.2,1,.3,1) .08s both}
+@keyframes rein2{from{opacity:0;transform:translateY(10px)}}
+h2{color:var(--magic-deep)}
+.jetzt{background:rgba(255,255,255,.85);border:1.5px solid #E3D9F7;box-shadow:0 6px 18px rgba(78,34,160,.08);border-radius:20px;padding:14px 18px 14px 20px;position:relative;overflow:hidden}
+.jetzt::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(180deg,var(--rot),var(--gelb),var(--gruen),var(--blau),var(--lila))}
+.jetzt .lab{font-size:.95rem;letter-spacing:0;text-transform:none;font-family:var(--font-display);font-weight:800;color:var(--magic-deep);display:flex;align-items:center;gap:6px}
+.jetzt .lab::before{content:"";width:14px;height:14px;background:var(--magic);-webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z"/></svg>') center/contain no-repeat;mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z"/></svg>') center/contain no-repeat}
+
+.btn{transition:transform .14s cubic-bezier(.2,1.4,.4,1), box-shadow .14s}
+.btn.primary{background:linear-gradient(180deg,var(--magic-hell) 0%,var(--magic) 100%);box-shadow:0 5px 0 var(--magic-deep), 0 12px 24px rgba(107,53,201,.32), inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn.primary:active{transform:translateY(4px) scale(.99);box-shadow:0 1px 0 var(--magic-deep), 0 4px 10px rgba(107,53,201,.25), inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.ghost{background:rgba(255,255,255,.85);color:var(--magic-deep);box-shadow:0 2px 0 #E3D9F7, 0 6px 14px rgba(78,34,160,.08)}
+.btn.ghost:active{transform:translateY(2px);box-shadow:0 0 0 #E3D9F7}
+.btn.quiet{border-color:#DCD3EE;background:rgba(255,255,255,.4)}
+.choice{border-radius:26px;border-color:#E6DEF7;box-shadow:0 6px 16px rgba(78,34,160,.08);transition:transform .16s cubic-bezier(.2,1.4,.4,1), box-shadow .16s}
+.choice:active{transform:scale(.96)}
+.choice.richtig{box-shadow:0 0 0 4px rgba(31,122,69,.18), 0 8px 20px rgba(31,122,69,.18)}
+.pop-karte{background:linear-gradient(180deg,#fff,#F7F2FF);border:2px solid #EFE6FF;box-shadow:0 20px 50px rgba(78,34,160,.35), 0 0 0 10px rgba(255,255,255,.5)}
+.pop-karte b{background:linear-gradient(90deg,var(--magic),var(--blau));-webkit-background-clip:text;background-clip:text;color:transparent}
+/* Angekommen: runde Plakette im Spiegel, alles skaliert mit ihrer Breite, damit nichts über den Rand ragt */
+.pop-karte{width:72%;aspect-ratio:1;border-radius:50%;padding:0 8%;gap:0;justify-content:center;top:-3%;container-type:inline-size;
+  background:radial-gradient(circle at 50% 35%,#fff 0,#FBF8FF 55%,#F1E9FF 100%);border:2px solid rgba(214,170,74,.55);
+  box-shadow:0 14px 36px rgba(78,34,160,.28), inset 0 0 0 6px rgba(255,255,255,.9), inset 0 0 0 7px rgba(214,170,74,.3)}
+.pop-karte b{font-size:min(2rem,8.5vw);font-size:15cqi;line-height:1.05;white-space:nowrap}
+.pop-karte .btn{font-size:min(1.3rem,5.5vw);font-size:10cqi;padding:.55em 1.4em;margin-top:7cqi;max-width:100%}
+.pop-karte .seit{font-size:min(.9rem,3.6vw);font-size:6cqi;margin-top:4cqi;min-height:1.3em;line-height:1.3}
+.skala.voll svg{animation:skalaGlanz 1.2s ease-in-out infinite}
+@keyframes skalaGlanz{50%{filter:brightness(1.18)}}
+#konfetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:11}
+.chip{background:rgba(255,255,255,.55);border-radius:999px;padding:4px 12px 4px 10px}
+details.karte{border-color:#E6DEF7;box-shadow:0 8px 24px rgba(78,34,160,.07)}
+details.karte>summary .ico{background:linear-gradient(135deg,#EFE7FF,#DDEBFF);color:var(--magic)}
+.faden li.war::before{background:linear-gradient(180deg,var(--magic),var(--blau))}
+.faden li.hier .fs{background:linear-gradient(90deg,#EFE7FF,#F6F1FF)}
+.faden li.hier .fs .dot{box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--magic),0 0 18px rgba(107,53,201,.5)}
+.toast{background:var(--ink);color:#fff;box-shadow:0 10px 30px rgba(36,26,61,.35);border-radius:16px}
+@media (prefers-reduced-motion:no-preference){
+  .himmel .st{animation:schweben 11s ease-in-out infinite alternate}
+  .himmel .st:nth-child(2n){animation-duration:14s;animation-delay:-4s}
+  .himmel .st:nth-child(3n){animation-duration:9s;animation-delay:-2s}
+  @keyframes schweben{from{transform:translateY(0) rotate(0deg)}to{transform:translateY(-18px) rotate(25deg)}}
+  .bogen-wrap-float{animation:treiben 6s ease-in-out infinite}
+  @keyframes treiben{50%{transform:translateY(-4px)}}
+}
+@media (prefers-reduced-motion:reduce){ .mirror,.stage.atmet .mirror,.lichter,.arc.neu,.mirror-pic.neu svg,.story.neu>*,.skala.voll svg{animation:none} }
+
+/* ---------- Uhr, Protokoll, Foto ---------- */
+.pillen{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+/* Ruhige Ansicht: je nach Moment nur das, was der Erwachsene gerade braucht.
+   sammeln = unterwegs, Funkel hat noch nicht gesprochen · laufen = unterwegs, Kompass und Skala reichen
+   da = angekommen, nur die Plakette · szene = Aufgabe an der Station. „Mehr“ zeigt wieder alles. */
+body.m-tour:not(.mehr) .top h1{display:none}
+body.m-laufen:not(.mehr) .top, body.m-da:not(.mehr) .top{display:none!important}
+body.m-laufen:not(.mehr) .pillen, body.m-da:not(.mehr) .pillen{display:none!important}
+body.m-sammeln:not(.mehr) #scene-title, body.m-sammeln:not(.mehr) #scene-say{display:none!important}
+body.m-laufen:not(.mehr) #scene-title, body.m-laufen:not(.mehr) #scene-say, body.m-laufen:not(.mehr) .jetzt, body.m-laufen:not(.mehr) #btn-speak{display:none!important}
+body.m-da:not(.mehr) .story, body.m-da:not(.mehr) .foot, body.m-da:not(.mehr) #mirror-read{display:none!important}
+body.m-sammeln:not(.mehr) .jetzt .dann, body.m-laufen:not(.mehr) .jetzt .dann{display:none!important}
+body.m-tour:not(.mehr) #btn-test, body.m-tour:not(.mehr) #gps-chip.on{display:none!important}
+body.m-szene:not(.mehr) #gps-chip, body.m-ende:not(.mehr) #gps-chip{display:none!important}
+.leiste{display:none;gap:10px;justify-content:center;flex-wrap:wrap}
+body.m-laufen .leiste, body.m-sammeln .leiste, body.m-da.mehr .leiste{display:flex}
+.leiste .btn{font-size:1rem;padding:10px 18px}
+.leiste .hand{flex-basis:100%;max-width:max-content;margin:0 auto;font-size:.85rem;padding:6px 14px;opacity:.75}
+body.m-sammeln .leiste #btn-nochmal{display:none}
+body.m-sammeln:not(.mehr) #btn-aufgabe, body.m-laufen:not(.mehr) #btn-aufgabe{display:none!important}
+body.m-laufen:not(.mehr) .tour{gap:18px}
+/* Regenbogen: nur im Finale und am Schluss fest im Bild; kommt ein Bogen dazu, schwebt er kurz oben ein */
+body.m-tour:not(.bogen-inline):not(.mehr) #bogen-wrap:not(.schwebt), body.m-start #bogen-wrap:not(.schwebt){display:none!important}
+#bogen-wrap.schwebt{position:fixed;left:0;right:0;margin:0 auto;top:calc(10px + env(safe-area-inset-top,0px));width:min(78vw,340px);z-index:7;
+  background:rgba(255,255,255,.92);border-radius:26px;padding:14px 16px 10px;box-shadow:0 14px 36px rgba(78,34,160,.25);pointer-events:none;
+  animation:schwebRein .5s cubic-bezier(.2,1.3,.4,1) both}
+#bogen-wrap.schwebt.raus{animation:schwebRaus .5s ease both}
+#bogen-wrap.schwebt .bogen{width:100%}
+@keyframes schwebRein{from{opacity:0;transform:translateY(-30px) scale(.9)}}
+@keyframes schwebRaus{to{opacity:0;transform:translateY(-30px) scale(.9)}}
+@media (prefers-reduced-motion:reduce){ #bogen-wrap.schwebt,#bogen-wrap.schwebt.raus{animation:none} }
+/* Start: kein Regenbogen, Funkel groß im Spiegel */
+body.m-start .pillen{display:none!important}
+body.m-start #mirror-pic{opacity:0}
+body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
+.count.spaet{color:var(--danger)} .count.frueh{color:var(--ok)}
+.proto{width:100%;border-collapse:collapse;font-size:.92rem}
+.proto th,.proto td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.proto th{font-weight:700;color:var(--ink-soft);font-size:.85rem}
+.proto td.z{font-variant-numeric:tabular-nums;white-space:nowrap}
+.foto{position:fixed;inset:0;z-index:20;background:#000;display:flex;flex-direction:column;color:#fff}
+.foto .buehne{position:relative;flex:1;min-height:0;overflow:hidden;background:#111}
+.foto video,.foto img.vorschau{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.foto video.spiegeln{transform:scaleX(-1)}
+.foto .rahmen-vorschau{position:absolute;inset:0;pointer-events:none}
+.foto .rahmen-vorschau>svg{width:100%;height:100%;display:block}
+.foto .leiste{display:flex;align-items:center;justify-content:space-around;gap:10px;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));background:#000}
+.foto .leiste .btn{font-size:1rem}
+.foto .btn.ghost{background:rgba(255,255,255,.14);color:#fff;box-shadow:none}
+.foto .ausloeser{width:78px;height:78px;border-radius:50%;border:5px solid #fff;background:var(--magic);box-shadow:0 0 0 4px #000, 0 0 0 7px rgba(255,255,255,.4);cursor:pointer;padding:0}
+.foto .ausloeser:active{transform:scale(.92)}
+.foto .hinweis{position:absolute;left:0;right:0;top:calc(12px + env(safe-area-inset-top,0px));text-align:center;font-size:.95rem;text-shadow:0 1px 3px rgba(0,0,0,.6);padding:0 16px}
+</style>
+
+<div class="himmel" aria-hidden="true"><span class="st"><svg viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z" fill="#9050C8"/></svg></span><span class="st"><svg viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z" fill="#2B6FE0"/></svg></span><span class="st"><svg viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z" fill="#F2B90F"/></svg></span><span class="st"><svg viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z" fill="#E23A3F"/></svg></span><span class="st"><svg viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z" fill="#3A9D4B"/></svg></span><span class="st"><svg viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z" fill="#9050C8"/></svg></span><span class="st"><svg viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z" fill="#F2B90F"/></svg></span><span class="st"><svg viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z" fill="#2B6FE0"/></svg></span></div>
+<canvas id="konfetti" aria-hidden="true" hidden></canvas>
+<div class="app">
+  <header class="top">
+    <div class="top-left">
+      <button type="button" class="ablauf-btn" id="btn-ablauf" aria-expanded="false" aria-controls="faden">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4v12" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="5" cy="4" r="3" fill="currentColor"/><circle cx="5" cy="10" r="3" fill="currentColor"/><circle cx="5" cy="16" r="3" fill="currentColor"/><path d="M11 4h7M11 10h7M11 16h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Ablauf
+      </button>
+      <h1>Funkels Zauberspiegel</h1>
+    </div>
+    <nav class="tabs" aria-label="Ansicht">
+      <button type="button" class="tab" id="tab-tour" aria-pressed="true">Tour</button>
+      <button type="button" class="tab" id="tab-setup" aria-pressed="false">Einrichten</button>
+    </nav>
+  </header>
+
+  <div class="tour" id="view-tour">
+    <div id="bogen-wrap" class="bogen-wrap-float"></div>
+    <div class="pillen"><p class="count" id="count"></p><p class="count" id="uhr" hidden></p></div>
+    <div class="stage" id="stage">
+      <div class="spiegel-ecke" id="spiegel-ecke">
+      <div class="mirror" id="mirror">
+        <video id="kamera" playsinline muted autoplay aria-hidden="true" hidden></video>
+        <canvas class="linse" id="linse" width="360" height="360" aria-hidden="true" hidden></canvas>
+        <svg class="lichter" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="96"/></svg>
+        <canvas id="funkeln" aria-hidden="true"></canvas>
+        <div class="mirror-pic" id="mirror-pic"></div>
+        <div class="kompass" id="kompass" hidden></div>
+        <div class="pop-karte" id="pop" hidden><b>Angekommen!</b><button type="button" class="btn primary" id="btn-pop">Weiter</button><span class="seit" id="pop-seit"></span></div>
+      </div>
+      <div class="funkel3d" id="funkel3d" aria-hidden="true"></div>
+      <div class="kaka" id="kaka" aria-hidden="true" hidden>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="kakapups">
+          <defs>
+            <radialGradient id="kk-braun" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#C07A3E"/><stop offset=".55" stop-color="#9A5B2C"/><stop offset="1" stop-color="#7A4420"/></radialGradient>
+            <linearGradient id="kk-kittel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E6E1F0"/></linearGradient>
+            <radialGradient id="kk-wolke" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#C9E36B" stop-opacity=".95"/><stop offset="1" stop-color="#9BC23A" stop-opacity=".55"/></radialGradient>
+          </defs>
+          <g class="kk-wolke" fill="url(#kk-wolke)">
+            <circle cx="40" cy="262" r="26"/><circle cx="20" cy="236" r="18"/><circle cx="62" cy="240" r="20"/><circle cx="14" cy="270" r="15"/>
+            <path d="M10 214 q6 -10 0 -20 M30 206 q6 -10 0 -20 M50 212 q6 -10 0 -20" fill="none" stroke="#7FA22B" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <g class="kk-koerper">
+            <path d="M48 300 C50 252 70 222 120 218 C170 222 190 252 192 300 Z" fill="url(#kk-kittel)" stroke="#4E22A0" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M96 222 L120 268 L144 222" fill="none" stroke="#4E22A0" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M108 226 L120 250 L132 226 Z" fill="#7C5CC4"/>
+            <circle cx="120" cy="278" r="4" fill="#4E22A0"/><circle cx="120" cy="294" r="4" fill="#4E22A0"/>
+            <rect x="146" y="258" width="26" height="22" rx="4" fill="#fff" stroke="#4E22A0" stroke-width="3"/>
+            <rect x="151" y="244" width="5" height="20" rx="2" fill="#3B82F6"/><rect x="160" y="248" width="5" height="16" rx="2" fill="#E5484D"/>
+          </g>
+          <g class="kk-kopf">
+            <g class="kk-haare" fill="#D5D8DE" stroke="#8A8F98" stroke-width="3" stroke-linejoin="round">
+              <path d="M62 150 l-26 -18 l18 -2 l-22 -22 l24 6 l-10 -24 l26 20 Z"/>
+              <path d="M178 150 l26 -18 l-18 -2 l22 -22 l-24 6 l10 -24 l-26 20 Z"/>
+              <path d="M84 112 l-14 -26 l16 8 l-2 -24 l16 22 Z"/>
+              <path d="M156 112 l14 -26 l-16 8 l2 -24 l-16 22 Z"/>
+            </g>
+            <g class="kk-haufen-kopf" stroke="#5A3215" stroke-width="4" stroke-linejoin="round">
+              <path d="M120 66 C128 70 140 74 138 88 C150 92 162 100 160 116 L80 116 C78 100 92 92 104 90 C102 78 110 70 120 66 Z" fill="url(#kk-braun)"/>
+              <path d="M74 114 C64 120 58 134 62 148 L178 148 C182 134 176 120 166 114 C150 108 90 108 74 114 Z" fill="url(#kk-braun)"/>
+              <path d="M58 146 C40 152 34 172 42 190 C52 214 90 222 120 222 C150 222 188 214 198 190 C206 172 200 152 182 146 C160 140 80 140 58 146 Z" fill="url(#kk-braun)"/>
+              <path d="M92 84 q10 -8 22 -4 M86 124 q16 -8 34 -6 M70 160 q20 -8 40 -6" fill="none" stroke="#D99A5E" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+            </g>
+            <g class="kk-brauen" fill="#E2E4E8" stroke="#8A8F98" stroke-width="2.5">
+              <path class="kk-braue-l" d="M74 124 q12 -14 34 -6 q-4 8 -12 6 q-10 -4 -22 0 Z"/>
+              <path class="kk-braue-r" d="M166 124 q-12 -14 -34 -6 q4 8 12 6 q10 -4 22 0 Z"/>
+            </g>
+            <g class="kk-augen">
+              <g class="kk-auge" data-x="96" data-y="152" transform="translate(96 152)"><ellipse rx="17" ry="20" fill="#fff" stroke="#2A1B4D" stroke-width="3"/><ellipse class="kk-pupille" cx="3" cy="3" rx="8" ry="10" fill="#2A1B4D"/><circle cx="0" cy="-2" r="3.2" fill="#fff"/></g>
+              <g class="kk-auge" data-x="144" data-y="152" transform="translate(144 152)"><ellipse rx="17" ry="20" fill="#fff" stroke="#2A1B4D" stroke-width="3"/><ellipse class="kk-pupille" cx="-3" cy="3" rx="8" ry="10" fill="#2A1B4D"/><circle cx="-6" cy="-2" r="3.2" fill="#fff"/></g>
+            </g>
+            <g class="kk-brille" fill="none" stroke="#6B7280" stroke-width="3.5">
+              <circle cx="96" cy="152" r="24"/><circle cx="144" cy="152" r="24"/><path d="M120 150 q0 -6 0 0"/><path d="M118 148 q2 -5 4 0" stroke-width="4"/>
+              <path d="M72 148 l-12 -4 M168 148 l12 -4"/>
+              <path d="M84 138 q6 -6 12 -6" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+            </g>
+            <g class="kk-bart" fill="#E9EBEF" stroke="#8A8F98" stroke-width="3" stroke-linejoin="round">
+              <path d="M70 196 C66 218 80 232 92 234 C94 248 108 256 120 252 C132 256 146 248 148 234 C160 232 174 218 170 196 C150 210 90 210 70 196 Z"/>
+            </g>
+            <g class="kk-mund" transform="translate(120 198)">
+              <ellipse class="kk-mund-innen" rx="17" ry="4" fill="#3B1A0A" stroke="#5A3215" stroke-width="2.5"/>
+              <ellipse class="kk-zunge" cx="0" cy="3" rx="9" ry="3" fill="#FF7AA8"/>
+            </g>
+            <g class="kk-schnurrbart" fill="#E9EBEF" stroke="#8A8F98" stroke-width="3" stroke-linejoin="round">
+              <path d="M120 186 C110 178 92 178 84 188 C80 194 86 200 92 196 C100 190 110 192 120 194 C130 192 140 190 148 196 C154 200 160 194 156 188 C148 178 130 178 120 186 Z"/>
+            </g>
+          </g>
+          <g class="kk-mini">
+            <path d="M206 286 c-14 0 -18 -8 -12 -14 c-6 -6 0 -14 8 -14 c0 -8 8 -12 12 -18 c6 6 10 12 8 18 c8 0 12 8 6 14 c6 6 2 14 -12 14 Z" fill="url(#kk-braun)" stroke="#5A3215" stroke-width="3" stroke-linejoin="round"/>
+            <circle cx="206" cy="268" r="2.5" fill="#fff"/><circle cx="216" cy="268" r="2.5" fill="#fff"/>
+            <path class="kk-glitzer" d="M190 236 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z M228 248 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill="#F2C94C"/>
+          </g>
+        </svg>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="rudi" hidden>
+          <g class="kk-koerper">
+            <path d="M196 290 C226 280 232 250 214 236" fill="none" stroke="#F4A6B8" stroke-width="7" stroke-linecap="round"/>
+            <path d="M62 300 C64 256 86 230 120 228 C154 230 176 256 178 300 Z" fill="#9CA3AF" stroke="#4B5563" stroke-width="4"/>
+            <path d="M92 300 C94 270 104 252 120 250 C136 252 146 270 148 300 Z" fill="#D1D5DB"/>
+            <g transform="translate(150 252) rotate(-12)"><rect width="34" height="40" rx="3" fill="#FFFBEA" stroke="#4B5563" stroke-width="3"/><path d="M6 10h20M6 18h22M6 26h14" stroke="#9CA3AF" stroke-width="2.5"/></g>
+          </g>
+          <g class="kk-kopf">
+            <g fill="#9CA3AF" stroke="#4B5563" stroke-width="4"><circle cx="66" cy="104" r="34"/><circle cx="174" cy="104" r="34"/></g>
+            <circle cx="66" cy="104" r="20" fill="#F9C5D1"/><circle cx="174" cy="104" r="20" fill="#F9C5D1"/>
+            <path d="M120 96 C162 96 184 128 180 160 C176 196 146 222 120 222 C94 222 64 196 60 160 C56 128 78 96 120 96 Z" fill="#B4BAC4" stroke="#4B5563" stroke-width="4"/>
+            <path d="M120 150 C142 150 156 170 156 186 C156 206 138 216 120 216 C102 216 84 206 84 186 C84 170 98 150 120 150 Z" fill="#D1D5DB"/>
+            <g class="kk-brauen" fill="none" stroke="#4B5563" stroke-width="4" stroke-linecap="round"><path d="M82 126 q14 -10 28 2"/><path d="M158 126 q-14 -10 -28 2"/></g>
+            <g class="kk-auge" data-x="98" data-y="146" transform="translate(98 146)"><ellipse rx="14" ry="16" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="2" cy="2" r="7" fill="#1F2937"/><circle cx="-1" cy="-2" r="2.5" fill="#fff"/></g>
+            <g class="kk-auge" data-x="142" data-y="146" transform="translate(142 146)"><ellipse rx="14" ry="16" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="-2" cy="2" r="7" fill="#1F2937"/><circle cx="-5" cy="-2" r="2.5" fill="#fff"/></g>
+            <g stroke="#4B5563" stroke-width="2.5" stroke-linecap="round"><path d="M96 176 l-34 -6 M96 182 l-36 4 M144 176 l34 -6 M144 182 l36 4"/></g>
+            <ellipse cx="120" cy="172" rx="11" ry="8" fill="#F472B6" stroke="#9D174D" stroke-width="2.5"/>
+            <g class="kk-mund" transform="translate(120 196)"><ellipse class="kk-mund-innen" rx="14" ry="4" fill="#4A1D2A" stroke="#4B5563" stroke-width="2.5"/><ellipse class="kk-zunge" cx="0" cy="3" rx="7" ry="3" fill="#FB7185"/></g>
+            <g fill="#fff" stroke="#4B5563" stroke-width="2"><rect x="112" y="188" width="8" height="10" rx="2"/><rect x="120" y="188" width="8" height="10" rx="2"/></g>
+          </g>
+          <g class="kk-extra" font-family="var(--font-display),sans-serif" font-weight="800" fill="#7C3AED" stroke="#fff" stroke-width="2" paint-order="stroke">
+            <text x="44" y="64" font-size="34">?</text><text x="112" y="44" font-size="44">?</text><text x="182" y="62" font-size="30">?</text>
+          </g>
+        </svg>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="alfonso" hidden>
+          <g class="kk-koerper">
+            <ellipse cx="120" cy="272" rx="44" ry="34" fill="#C2410C" stroke="#7C2D12" stroke-width="4"/>
+            <g stroke="#7C2D12" stroke-width="6" stroke-linecap="round" fill="none"><path d="M80 262 q-26 -6 -34 -26"/><path d="M160 262 q26 -6 34 -26"/><path d="M82 286 q-24 6 -36 0"/><path d="M158 286 q24 6 36 0"/></g>
+            <ellipse cx="120" cy="268" rx="20" ry="14" fill="#FB923C" opacity=".6"/>
+          </g>
+          <g class="kk-kopf">
+            <g class="kk-fuehler kk-extra-dauer" fill="none" stroke="#7C2D12" stroke-width="5" stroke-linecap="round">
+              <path class="kk-fl" d="M100 104 C92 72 70 62 60 44"/><path class="kk-fr" d="M140 104 C148 72 170 62 180 44"/>
+            </g>
+            <circle cx="60" cy="44" r="10" fill="#F43F5E" stroke="#7C2D12" stroke-width="3"/><circle cx="180" cy="44" r="10" fill="#F43F5E" stroke="#7C2D12" stroke-width="3"/>
+            <circle cx="120" cy="164" r="70" fill="#EA580C" stroke="#7C2D12" stroke-width="4"/>
+            <ellipse cx="96" cy="130" rx="22" ry="12" fill="#FDBA74" opacity=".55"/>
+            <g class="kk-brauen" fill="none" stroke="#7C2D12" stroke-width="4" stroke-linecap="round"><path d="M76 118 q14 -14 30 -4"/><path d="M164 118 q-14 -14 -30 -4"/></g>
+            <g class="kk-auge" data-x="96" data-y="148" transform="translate(96 148)"><ellipse rx="20" ry="23" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="5" cy="4" r="10" fill="#1F2937"/><circle cx="1" cy="-1" r="3.5" fill="#fff"/></g>
+            <g class="kk-auge" data-x="144" data-y="148" transform="translate(144 148)"><ellipse rx="20" ry="23" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="-7" cy="6" r="10" fill="#1F2937"/><circle cx="-11" cy="1" r="3.5" fill="#fff"/></g>
+            <circle cx="76" cy="186" r="11" fill="#FB7185" opacity=".6"/><circle cx="164" cy="186" r="11" fill="#FB7185" opacity=".6"/>
+            <g class="kk-mund" transform="translate(120 196)"><ellipse class="kk-mund-innen" rx="26" ry="5" fill="#4A1D2A" stroke="#7C2D12" stroke-width="3"/><ellipse class="kk-zunge" cx="0" cy="3" rx="12" ry="3" fill="#FB7185"/></g>
+            <path d="M92 190 q28 18 56 0" fill="none" stroke="#7C2D12" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <g class="kk-extra" fill="none" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"><path d="M30 120 l-14 -8 M26 140 h-16 M30 160 l-14 8"/><path d="M210 120 l14 -8 M214 140 h16 M210 160 l14 8"/></g>
+        </svg>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="bruno" hidden>
+          <g class="kk-koerper">
+            <path d="M44 300 C46 246 76 220 120 218 C164 220 194 246 196 300 Z" fill="#8B5E3C" stroke="#4A2E1A" stroke-width="4"/>
+            <ellipse cx="120" cy="282" rx="44" ry="34" fill="#C89B6D"/>
+          </g>
+          <g class="kk-kopf">
+            <g fill="#8B5E3C" stroke="#4A2E1A" stroke-width="4"><circle cx="58" cy="92" r="28"/><circle cx="182" cy="92" r="28"/></g>
+            <circle cx="58" cy="92" r="14" fill="#C89B6D"/><circle cx="182" cy="92" r="14" fill="#C89B6D"/>
+            <ellipse cx="120" cy="150" rx="82" ry="74" fill="#9A6A44" stroke="#4A2E1A" stroke-width="4"/>
+            <ellipse cx="120" cy="190" rx="44" ry="34" fill="#D9B48A" stroke="#4A2E1A" stroke-width="3"/>
+            <g class="kk-brauen" fill="#4A2E1A"><path d="M72 120 l36 10 l-2 7 l-36 -8 Z"/><path d="M168 120 l-36 10 l2 7 l36 -8 Z"/></g>
+            <g class="kk-auge" data-x="94" data-y="146" transform="translate(94 146)"><ellipse rx="13" ry="13" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="1" cy="3" r="7" fill="#1F2937"/><path d="M-14 -4 h28 v-12 h-28 Z" fill="#9A6A44"/><path d="M-14 -4 h28" stroke="#4A2E1A" stroke-width="3"/></g>
+            <g class="kk-auge" data-x="146" data-y="146" transform="translate(146 146)"><ellipse rx="13" ry="13" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="-1" cy="3" r="7" fill="#1F2937"/><path d="M-14 -4 h28 v-12 h-28 Z" fill="#9A6A44"/><path d="M-14 -4 h28" stroke="#4A2E1A" stroke-width="3"/></g>
+            <ellipse cx="120" cy="174" rx="16" ry="11" fill="#1F2937"/><ellipse cx="114" cy="170" rx="5" ry="3" fill="#fff" opacity=".6"/>
+            <g class="kk-mund" transform="translate(120 204)"><ellipse class="kk-mund-innen" rx="18" ry="4" fill="#3B1A0A" stroke="#4A2E1A" stroke-width="3"/><ellipse class="kk-zunge" cx="0" cy="3" rx="9" ry="3" fill="#FB7185"/></g>
+          </g>
+          <g class="kk-extra" fill="none" stroke="#4A2E1A" stroke-width="4" stroke-linecap="round" opacity=".8"><path d="M190 190 q10 -6 0 -12 q-10 -6 0 -12"/><path d="M206 196 q12 -8 0 -16 q-12 -8 0 -16"/><path d="M50 190 q-10 -6 0 -12 q10 -6 0 -12"/></g>
+        </svg>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="charly" hidden>
+          <g class="kk-koerper">
+            <path d="M48 300 C50 252 78 226 120 224 C162 226 190 252 192 300 Z" fill="#3B82F6" stroke="#1E3A8A" stroke-width="4"/>
+            <g fill="#FACC15"><circle cx="86" cy="270" r="9"/><circle cx="154" cy="262" r="9"/><circle cx="120" cy="290" r="9"/></g>
+            <path d="M96 228 l24 14 l24 -14 v26 l-24 -12 l-24 12 Z" fill="#E11D48" stroke="#881337" stroke-width="3" stroke-linejoin="round"/>
+          </g>
+          <g class="kk-kopf">
+            <g fill="#22C55E" stroke="#14532D" stroke-width="3"><circle cx="54" cy="132" r="22"/><circle cx="46" cy="160" r="20"/><circle cx="58" cy="106" r="18"/><circle cx="186" cy="132" r="22"/><circle cx="194" cy="160" r="20"/><circle cx="182" cy="106" r="18"/></g>
+            <ellipse cx="120" cy="152" rx="66" ry="70" fill="#FFF7ED" stroke="#7C2D12" stroke-width="4"/>
+            <g transform="translate(120 96)"><path d="M-62 4 C-56 -14 56 -14 62 4 C40 -2 -40 -2 -62 4 Z" fill="#111827"/><rect x="-50" y="-8" width="40" height="22" rx="10" fill="#111827"/><rect x="10" y="-8" width="40" height="22" rx="10" fill="#111827"/><path d="M-40 -2 l10 0" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+            <g class="kk-brauen" fill="none" stroke="#7C2D12" stroke-width="4" stroke-linecap="round"><path d="M80 126 q14 -6 28 0"/><path d="M132 126 q14 -6 28 0"/></g>
+            <g class="kk-auge" data-x="96" data-y="146" transform="translate(96 146)"><ellipse rx="13" ry="14" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="2" cy="3" r="6.5" fill="#1F2937"/><path d="M-14 -3 h28 v-12 h-28 Z" fill="#FFF7ED"/><path d="M-14 -3 h28" stroke="#7C2D12" stroke-width="3"/></g>
+            <g class="kk-auge" data-x="144" data-y="146" transform="translate(144 146)"><ellipse rx="13" ry="14" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="-2" cy="3" r="6.5" fill="#1F2937"/><path d="M-14 -3 h28 v-12 h-28 Z" fill="#FFF7ED"/><path d="M-14 -3 h28" stroke="#7C2D12" stroke-width="3"/></g>
+            <path d="M80 190 C96 214 144 214 160 190" fill="#FCA5A5" stroke="#B91C1C" stroke-width="3" opacity=".7"/>
+            <g class="kk-mund" transform="translate(120 200)"><ellipse class="kk-mund-innen" rx="22" ry="5" fill="#7F1D1D" stroke="#B91C1C" stroke-width="3"/><ellipse class="kk-zunge" cx="0" cy="3" rx="10" ry="3" fill="#FB7185"/></g>
+            <circle cx="120" cy="172" r="15" fill="#EF4444" stroke="#991B1B" stroke-width="3"/><circle cx="115" cy="167" r="4" fill="#fff" opacity=".8"/>
+          </g>
+          <g class="kk-extra">
+            <g transform="translate(176 56) rotate(20)"><path d="M0 0 l34 -14 v28 Z" fill="#FACC15" stroke="#854D0E" stroke-width="3" stroke-linejoin="round"/><circle cx="-8" cy="0" r="12" fill="#EF4444" stroke="#991B1B" stroke-width="3"/></g>
+            <g fill="#2563EB"><path d="M40 70 v-24 l14 -4 v22" stroke="#2563EB" stroke-width="3" fill="none"/><circle cx="36" cy="70" r="6"/><circle cx="50" cy="66" r="6"/><path d="M92 40 v-20" stroke="#2563EB" stroke-width="3"/><circle cx="88" cy="40" r="6"/></g>
+          </g>
+        </svg>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="dagobert" hidden>
+          <g class="kk-koerper">
+            <path d="M46 300 C48 250 78 224 120 222 C162 224 192 250 194 300 Z" fill="#6B7280" stroke="#1F2937" stroke-width="4"/>
+            <ellipse cx="120" cy="284" rx="40" ry="30" fill="#E5E7EB"/>
+          </g>
+          <g class="kk-kopf">
+            <g fill="#6B7280" stroke="#1F2937" stroke-width="4"><circle cx="64" cy="98" r="20"/><circle cx="176" cy="98" r="20"/></g>
+            <path d="M120 82 C170 82 196 120 192 156 C188 196 152 226 120 226 C88 226 52 196 48 156 C44 120 70 82 120 82 Z" fill="#9CA3AF" stroke="#1F2937" stroke-width="4"/>
+            <path d="M120 84 C134 84 142 120 140 150 L138 200 C134 212 106 212 102 200 L100 150 C98 120 106 84 120 84 Z" fill="#F9FAFB"/>
+            <path d="M84 96 C70 120 72 150 88 176 L104 168 C100 140 100 116 104 94 Z" fill="#111827"/><path d="M156 96 C170 120 168 150 152 176 L136 168 C140 140 140 116 136 94 Z" fill="#111827"/>
+            <ellipse cx="146" cy="84" rx="14" ry="9" fill="#F9A8D4" stroke="#BE185D" stroke-width="2.5" class="kk-beule"/>
+            <g class="kk-brauen" fill="none" stroke="#F9FAFB" stroke-width="4" stroke-linecap="round"><path d="M80 122 q12 -10 24 -2"/><path d="M160 120 q-12 -6 -24 4"/></g>
+            <g class="kk-auge" data-x="98" data-y="146" transform="translate(98 146)"><ellipse rx="14" ry="16" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="6" cy="4" r="7" fill="#1F2937"/><circle cx="4" cy="1" r="2.5" fill="#fff"/></g>
+            <g class="kk-auge" data-x="142" data-y="146" transform="translate(142 146)"><ellipse rx="14" ry="16" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="-6" cy="4" r="7" fill="#1F2937"/><circle cx="-8" cy="1" r="2.5" fill="#fff"/></g>
+            <ellipse cx="120" cy="180" rx="13" ry="9" fill="#1F2937"/><ellipse cx="115" cy="177" rx="4" ry="2.5" fill="#fff" opacity=".6"/>
+            <g class="kk-mund" transform="translate(120 202)"><ellipse class="kk-mund-innen" rx="16" ry="4" fill="#4A1D2A" stroke="#1F2937" stroke-width="2.5"/><ellipse class="kk-zunge" cx="6" cy="6" rx="8" ry="5" fill="#FB7185" stroke="#BE185D" stroke-width="2"/></g>
+          </g>
+          <g class="kk-extra" fill="#FACC15" stroke="#A16207" stroke-width="2">
+            <path d="M80 50 l4 9 10 1 -8 6 3 10 -9 -6 -9 6 3 -10 -8 -6 10 -1 Z"/><path d="M150 30 l4 9 10 1 -8 6 3 10 -9 -6 -9 6 3 -10 -8 -6 10 -1 Z"/><path d="M190 64 l3 7 8 1 -6 5 2 8 -7 -5 -7 5 2 -8 -6 -5 8 -1 Z"/>
+          </g>
+        </svg>
+
+      </div>
+      </div>
+      <div class="skala" id="skala" role="meter" aria-label="Einhornskala: wie nah das Ziel ist" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
+        <svg viewBox="0 0 60 262" aria-hidden="true">
+          <defs>
+            <clipPath id="hornform"><path d="M30 8 L53 240 Q30 256 7 240Z"/></clipPath>
+            <linearGradient id="regen" gradientUnits="userSpaceOnUse" x1="0" y1="252" x2="0" y2="8">
+              <stop offset="0" style="stop-color:var(--lila)"/><stop offset=".25" style="stop-color:var(--blau)"/><stop offset=".5" style="stop-color:var(--gruen)"/><stop offset=".75" style="stop-color:var(--gelb)"/><stop offset="1" style="stop-color:var(--rot)"/>
+            </linearGradient>
+          </defs>
+          <g clip-path="url(#hornform)">
+            <rect x="0" y="0" width="60" height="262" style="fill:var(--surface)"/>
+            <rect id="skala-fuell" x="0" y="252" width="60" height="0" fill="url(#regen)"/>
+            <path d="M0 214 L60 196 M0 172 L60 154 M0 130 L60 112 M0 88 L60 70 M0 46 L60 28" fill="none" style="stroke:var(--gold-b)" stroke-width="2.5" opacity=".55"/>
+          </g>
+          <path d="M30 8 L53 240 Q30 256 7 240Z" fill="none" style="stroke:var(--gold-b)" stroke-width="3.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="mirror-read" id="mirror-read"></div>
+    <div class="leiste" id="leiste"><button type="button" class="btn ghost" id="btn-nochmal">Noch einmal hören</button><button type="button" class="btn quiet" id="btn-mehr" aria-pressed="false">Mehr</button><button type="button" class="btn quiet hand" id="btn-hand" hidden>Station von Hand öffnen</button></div>
+    <div class="story">
+      <h2 id="scene-title"></h2>
+      <p class="say" id="scene-say"></p>
+      <div class="choices" id="choices" hidden></div>
+      <div class="jetzt"><span class="lab">Jetzt<span class="lab-knoepfe"><button type="button" class="aufg-hoer" id="btn-aufgabe" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg><span id="btn-aufgabe-txt">Aufgabe vorlesen</span></button><button type="button" class="info-knopf" id="btn-info" aria-expanded="false" aria-controls="jetzt-info" aria-label="Was ist zu tun?" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.2" r="1.7" fill="currentColor"/><rect x="8.4" y="8.3" width="3.2" height="9" rx="1.6" fill="currentColor"/></svg></button></span></span><span class="was" id="jetzt-was"></span><ul class="jetzt-info" id="jetzt-info" hidden></ul><span class="dann" id="jetzt-dann"></span></div>
+      <div class="actions">
+        <button type="button" class="btn primary" id="btn-main"></button>
+        <button type="button" class="btn ghost" id="btn-speak">Noch einmal hören</button>
+      </div>
+    </div>
+    <div class="foot">
+      <p class="chip" id="gps-chip"></p>
+      <button type="button" class="btn quiet" id="btn-test">Testknopf: Station ohne GPS öffnen</button>
+      <button type="button" class="btn quiet" id="btn-linse" hidden>Kamera aus</button>
+      <button type="button" class="btn ghost" id="btn-foto" hidden>Gruppenfoto mit Rahmen</button>
+    </div>
+  </div>
+
+  <div class="setup" id="view-setup" hidden>
+    <details class="karte" id="k-variante" open>
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h12M3 17h8"/></svg></span><span class="tt"><b>Variante</b><span id="sum-variante"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead">Geschichte, Mitbringsel und Funkels Sätze sind in allen drei gleich. Die Variante ändert die Hinweise im Feld „Jetzt“, die Orte und die Vorbereitungsliste. Indoor läuft ohne GPS.</p>
+        <div class="seg" id="variante" role="group" aria-label="Variante">
+          <button type="button" data-v="a">Outdoor, voll</button>
+          <button type="button" data-v="b">Outdoor ohne Ausdrucke</button>
+          <button type="button" data-v="c">Indoor</button>
+        </div>
+        <p class="lead" id="variante-note"></p>
+      </div>
+    </details>
+
+    <details class="karte" id="k-tour">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg></span><span class="tt"><b>Tour</b><span id="sum-tour"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <label class="schalter" for="auto-sag"><span class="st"><b>Funkel spricht von selbst</b><span>Aufgaben und Lösungen werden vorgelesen, sobald sie erscheinen. Die Sätze für unterwegs nie, die startest du immer selbst.</span></span><input type="checkbox" id="auto-sag"><span class="knopf"></span></label>
+        <label class="schalter" for="show-test"><span class="st"><b>Testknopf immer zeigen</b><span>Auch wenn das GPS läuft. Ohne GPS erscheint er sowieso.</span></span><input type="checkbox" id="show-test"><span class="knopf"></span></label>
+        <p class="lead">Zu einem bestimmten Schritt springst du über „Ablauf“ oben links.</p>
+        <div class="row"><button type="button" class="btn ghost small" id="btn-restart">Tour von vorn beginnen</button><button type="button" class="btn ghost small" id="btn-foto-2">Gruppenfoto mit Rahmen</button></div>
+        <p class="lead">Das Gruppenfoto am besten mit dem Handy machen, das hat die bessere Kamera: dieselbe Seite dort öffnen, Knopf drücken.</p>
+      </div>
+    </details>
+
+    <details class="karte" id="k-erz">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/><path d="M19 4l2-2M21 8h2"/></svg></span><span class="tt"><b>Erzähler für die Aufgaben</b><span id="sum-erz"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead">Wer den Kindern nach Funkel die Aufgabe vorliest. Die Wahl gilt für alle Aufgaben; einzelne kannst du darunter anders besetzen. „Anhören“ spielt die Begrüßung der Figur.</p>
+        <div class="erz-wahl" id="erz-wahl"></div>
+        <details class="box" id="erz-je-box">
+          <summary>Einzelne Aufgaben anders besetzen</summary>
+          <ol class="points" id="erz-je"></ol>
+        </details>
+      </div>
+    </details>
+    <details class="karte" id="k-gaben">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S10 8 12 8zM12 8c2-4 6-4 6-1.5S14 8 12 8z"/></svg></span><span class="tt"><b>Wer bekommt was wo</b><span>Unterwegs nur der Glücksstein, die Geschenke am Ende</span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead">Was die Kinder an welcher Station in die Hand bekommen, für die gewählte Variante. Tattoo und Haarreif sind Verkleidung und gehören in die Geschichte, deshalb kommen sie am Anfang.</p>
+        <ol class="points gaben" id="gaben"></ol>
+      </div>
+    </details>
+    <details class="karte" id="k-vorbereitung">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="tt"><b>Vorbereitung</b><span id="sum-vorbereitung"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead">Alles, was vor der Tour erledigt sein muss, für 10 Kinder. Was an den Stationen selbst zu tun ist, zeigt die Tour im Feld „Jetzt“, wenn es so weit ist. Haken bleiben auf diesem Gerät gespeichert.</p>
+        <div class="liste" id="liste"></div>
+        <div class="zwischen"><span class="chip" id="liste-note"></span><button type="button" class="btn quiet small" id="btn-liste-reset">Alle Haken entfernen</button></div>
+      </div>
+    </details>
+
+    <details class="karte" id="k-protokoll">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="tt"><b>Probelauf-Protokoll</b><span id="sum-protokoll"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead">Bei jedem Durchlauf merkt sich der Spiegel je Station, wie lang der Weg dauerte, wie lange ihr am Pop gesammelt habt, wie genau das GPS war und ob die Station per GPS oder von Hand aufging. So siehst du nach dem Probelauf, wo es hakt.</p>
+        <div id="protokoll"></div>
+        <div class="row"><button type="button" class="btn quiet small" id="btn-proto-reset">Protokoll löschen</button></div>
+      </div>
+    </details>
+
+    <details class="karte" id="k-kamera">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span><span class="tt"><b>Kamera</b><span id="sum-kamera"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <label class="schalter" for="kamera-an"><span class="st"><b>Kamera-Zauber</b><span>Aus: der Spiegel zeigt nur Funkel und die Bilder, und das Gerät fragt nie nach der Kamera.</span></span><input type="checkbox" id="kamera-an"><span class="knopf"></span></label>
+        <p class="lead">An: Unterwegs zeigt der Spiegel das Kamerabild, Funkel steht darin dort, wo das Ziel liegt. Nach jedem gelösten Farbrätsel wird der Spiegel zur Zauberlinse, im Zauberkreis hat das gedruckte Bild wieder seine echte Farbe. Kostet Akku und ist noch wenig erprobt.</p>
+      </div>
+    </details>
+
+    <details class="karte" id="k-stimme">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg></span><span class="tt"><b>Funkels Stimme</b><span id="sum-stimme"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead">Am natürlichsten klingt eine echte Stimme. Nimm Funkels Sätze hier auf, dann spielt der Spiegel sie statt der Computerstimme ab.</p>
+        <p class="chip" id="rec-note"></p>
+        <details class="box" id="clips-box">
+          <summary>Sätze aufnehmen und anhören</summary>
+          <ol class="points clips" id="clips"></ol>
+        </details>
+        <div class="row">
+          <span id="lab-rate">Aufnahmen abspielen</span>
+          <div class="seg" id="rec-rate" role="group" aria-labelledby="lab-rate">
+            <button type="button" data-v="1">normal</button>
+            <button type="button" data-v="1.15">etwas höher</button>
+            <button type="button" data-v="1.3">Einhorn-hoch</button>
+          </div>
+        </div>
+        <h3>Aufnahmen auf andere Geräte bringen</h3>
+        <p class="lead">Aufnahmen liegen nur auf diesem Gerät. „Als Datei sichern“ erzeugt <code>funkel-stimme.json</code>. Liegt sie neben der Seite auf GitHub, lädt jedes Gerät die Sätze beim Öffnen von selbst.</p>
+        <div class="row">
+          <button type="button" class="btn ghost small" id="btn-clips-export">Aufnahmen als Datei sichern</button>
+          <label class="btn ghost small" for="clips-file">Datei einlesen<input type="file" id="clips-file" accept=".json,application/json" hidden></label>
+        </div>
+        <h3>Computerstimme für Sätze ohne Aufnahme</h3>
+        <div class="row">
+          <label for="voice">Stimme</label>
+          <select id="voice"></select>
+          <button type="button" class="btn ghost small" id="btn-probe">Probe hören</button>
+        </div>
+        <div class="row">
+          <span id="lab-pitch">Tonhöhe</span>
+          <div class="seg" id="pitch" role="group" aria-labelledby="lab-pitch">
+            <button type="button" data-v="1">normal</button>
+            <button type="button" data-v="1.15">etwas höher</button>
+            <button type="button" data-v="1.35">sehr hoch</button>
+          </div>
+        </div>
+        <p class="lead" id="voice-note" hidden></p>
+      </div>
+    </details>
+
+    <details class="karte" id="k-punkte">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="tt"><b>GPS-Punkte</b><span id="sum-punkte"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead"><a href="#" id="planer-link">Tour im Planer öffnen</a>: dort Adresse, Richtung und Strecke wählen, die Stationen kommen dann von selbst hierher.</p>
+        <p class="lead">Feinschliff vor Ort: Beim Probelauf an jeder Station stehen bleiben, warten bis das GPS genau ist, und den Punkt setzen. Die Haustür braucht keinen Punkt.</p>
+        <div class="row">
+          <button type="button" class="btn ghost small" id="btn-gps">GPS starten</button>
+          <p class="chip" id="gps-chip-2"></p>
+        </div>
+        <ol class="points" id="points"></ol>
+        <h3>Wie nah ist nah genug?</h3>
+        <p class="lead">Die Station öffnet sich, sobald das Gerät so nah am Punkt ist. Unter Bäumen lieber 25 m.</p>
+        <div class="seg" id="radius" role="group" aria-label="Abstand zum Öffnen">
+          <button type="button" data-r="10">10 m</button>
+          <button type="button" data-r="15">15 m</button>
+          <button type="button" data-r="25">25 m</button>
+        </div>
+        <h3>Punkte als Code</h3>
+        <p class="lead">Notlösung ohne Netz: Code kopieren und auf einem anderen Gerät einlesen.</p>
+        <textarea id="code" spellcheck="false" aria-label="Punkte-Code"></textarea>
+        <div class="row">
+          <button type="button" class="btn ghost small" id="btn-copy">Code kopieren</button>
+          <button type="button" class="btn ghost small" id="btn-import">Code einlesen</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="karte achtung" id="k-loeschen">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></span><span class="tt"><b>Alles löschen</b><span>Punkte löschen und Tour auf Anfang</span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead">Löscht alle sechs Punkte und setzt die Tour auf den Anfang. Aufnahmen und Vorbereitungsliste bleiben erhalten. Den Knopf drei Sekunden gedrückt halten.</p>
+        <div class="row">
+          <button type="button" class="btn small hold" id="btn-reset"><span class="fill"></span><span>Alle Punkte löschen (3 Sekunden halten)</span></button>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="backdrop" id="backdrop" hidden></div>
+  <aside class="faden" id="faden" aria-label="Ablauf der Tour" hidden>
+    <div class="faden-kopf"><h2>Ablauf</h2><button type="button" class="btn ghost small" id="faden-zu">Schließen</button></div>
+    <p class="faden-hinweis">Antippen springt zu diesem Schritt.</p>
+    <nav class="faden-scroll" id="faden-scroll" aria-label="Schritte der Tour"><ol id="faden-liste"></ol></nav>
+  </aside>
+
+  <div class="foto" id="foto" hidden>
+    <div class="buehne" id="foto-buehne">
+      <video id="foto-video" playsinline muted autoplay></video>
+      <img class="vorschau" id="foto-bild" alt="Gruppenfoto" hidden>
+      <div class="rahmen-vorschau" id="foto-rahmen" aria-hidden="true"></div>
+      <p class="hinweis" id="foto-hinweis">Alle ins Bild, Hörner hoch!</p>
+    </div>
+    <div class="leiste" id="foto-leiste-1">
+      <button type="button" class="btn ghost" id="foto-zu">Schließen</button>
+      <button type="button" class="ausloeser" id="foto-knips" aria-label="Foto aufnehmen"></button>
+      <button type="button" class="btn ghost" id="foto-wechsel">Kamera wechseln</button>
+    </div>
+    <div class="leiste" id="foto-leiste-2" hidden>
+      <button type="button" class="btn ghost" id="foto-nochmal">Noch mal</button>
+      <button type="button" class="btn primary" id="foto-teilen">Sichern oder teilen</button>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</div>
+
+<script>
+window.__START=function(TOUR, TPLAN){
+'use strict';
+var KEY=TOUR.speicher+'.v1';
+var ARCS=['rot','gelb','gruen','blau','lila'];           // die fünf Funde, außen nach innen
+var FARBE={rot:'--rot',gelb:'--gelb',gruen:'--gruen',blau:'--blau',lila:'--indigo'};
+var PAARE={rot:['--rot','--rotorange'], gelb:['--orange','--gelb'], gruen:['--hellgruen','--gruen'], blau:['--tuerkis','--blau'], lila:['--indigo','--kern']};   // jeder Fund sind zwei benachbarte Holzbögen
+
+var STATIONS=TOUR.stationen;
+var N=STATIONS.length;
+
+/* ---------- Varianten ---------- */
+var VARIANTEN=TOUR.varianten;
+function stv(i){                        // Station mit den Abweichungen der gewählten Variante
+  var st=STATIONS[i], v=VARIANTEN[state.variante], o=v && v.st && v.st[i];
+  if(!o) return st;
+  var r={}; for(var k in st) r[k]=st[k]; for(var k2 in o) r[k2]=o[k2]; return r;
+}
+function indoor(){ return state.variante==='c'; }
+
+/* ---------- Vorbereitungsliste ---------- */
+var LISTE_GEMEINSAM=TOUR.vorbereitung.gemeinsam, LISTE_VARIANTE=TOUR.vorbereitung.variante;
+var LISTE_ALT={};
+function LISTE_AKTUELL(){ return LISTE_GEMEINSAM.slice(0,1).concat(LISTE_VARIANTE[state.variante]||LISTE_VARIANTE.a, LISTE_GEMEINSAM.slice(1)); }
+var LISTE_KEY=TOUR.speicher+'.liste';
+var haken={};
+try{ haken=JSON.parse(localStorage.getItem(LISTE_KEY)||'{}')||{}; }catch(e){ haken={}; }
+(function(){ var um=false; for(var k in haken){ if(/^[abc]\.\d+\.\d+$/.test(k)){ if(haken[k] && LISTE_ALT[k]) haken[LISTE_ALT[k]]=true; delete haken[k]; um=true; } } if(um) hakenSave(); })();
+function hakenSave(){ try{ localStorage.setItem(LISTE_KEY, JSON.stringify(haken)); }catch(e){} }
+var GABEN=TOUR.gaben;                             // i = Station (0-basiert), 'start' = Ankommen, 'ende' = Schatz
+function renderGaben(){
+  var h='';
+  GABEN.forEach(function(g){
+    var nr, ort;
+    if(g.i==='start'){ nr='–'; ort='Ankommen an der Haustür'; }
+    else if(g.i==='ende'){ nr='★'; ort='Am Ende: '+stv(N-1).wo; }
+    else { nr=String(g.i+1); ort='Station '+(g.i+1)+' · '+(g.i===0?STATIONS[0].name:indoor()?stv(g.i).wo:STATIONS[g.i].name+', '+stv(g.i).wo); }
+    h+='<li><span class="nr">'+nr+'</span><div class="txt"><div class="nm">'+esc(g.was)+' <span class="art'+(g.art==='Schatz'?' schatz':'')+'">'+esc(g.art)+'</span></div><div class="wo">'+esc(ort)+'</div><div class="st">'+esc(g.wie)+'</div></div></li>';
+  });
+  $('gaben').innerHTML=h;
+}
+function renderListe(){
+  var h='', n=0, g=0;
+  var LISTE=LISTE_AKTUELL();
+  LISTE.forEach(function(grp,gi){
+    h+='<h3'+(grp.w?' class="weg"':'')+'>'+esc(grp.t)+'</h3>';
+    grp.items.forEach(function(it,ii){
+      var id=state.variante+'|'+it, an=!!haken[id]; g++; if(an) n++;
+      h+='<label class="haken"><input type="checkbox" data-haken="'+id+'"'+(an?' checked':'')+'><span>'+esc(it)+'</span></label>';
+    });
+  });
+  $('liste').innerHTML=h;
+  $('liste-note').textContent=n+' von '+g+' erledigt'; $('liste-note').className='chip '+(n===g?'on':'');
+  $('sum-vorbereitung').textContent = n+' von '+g+' Punkten erledigt';
+}
+
+/* ---------- Zustand ---------- */
+function frisch(){ return {points:STATIONS.map(function(){ return null; }), idx:0, phase:'start', step:0, radius:15, showTest:true, autoSag:true, kamera:false, variante:TPLAN.variante||'a', startZeit:null, heim:null, voice:null, pitch:1.15, recRate:1.15, erz:'kakapups', erzJe:{}}; }
+var PUNKTE_CODE=TPLAN.punkteCode||null;   // Stationen 2 bis N aus dem Tourplaner
+var PUNKTE_STAND=TPLAN.stand||'';   // neuer Plan: jedes Gerät übernimmt die Punkte einmal
+function load(){
+  var s=frisch(), o=null;
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(raw){ o=JSON.parse(raw);
+      if(o && Array.isArray(o.points) && o.points.length===N){ s.points=o.points.map(okPoint); }
+      if(o && o.idx>=0 && o.idx<N) s.idx=o.idx|0;
+      if(o && ['start','seek','scene','end'].indexOf(o.phase)>=0) s.phase=o.phase;
+      if(o && o.step>=0 && o.step<4) s.step=o.step|0;
+      if(o && [10,15,25].indexOf(o.radius)>=0) s.radius=o.radius;
+      if(o && typeof o.showTest==='boolean') s.showTest=o.showTest;
+      if(o && typeof o.autoSag==='boolean') s.autoSag=o.autoSag;
+      if(o && typeof o.kamera==='boolean') s.kamera=o.kamera;
+      if(o && VARIANTEN[o.variante]) s.variante=o.variante;
+      if(o && typeof o.startZeit==='number') s.startZeit=o.startZeit;
+      if(o && o.heim && typeof o.heim.lat==='number') s.heim=o.heim;
+      if(o && typeof o.voice==='string') s.voice=o.voice;
+      if(o && [1,1.15,1.35].indexOf(o.pitch)>=0) s.pitch=o.pitch;
+      if(o && [1,1.15,1.3].indexOf(o.recRate)>=0) s.recRate=o.recRate;
+      var FIGUREN=TOUR.erzaehler.reihe;
+      if(o && FIGUREN.indexOf(o.erz)>=0) s.erz=o.erz;
+      if(o && o.erzJe && typeof o.erzJe==='object'){ s.erzJe={}; Object.keys(o.erzJe).forEach(function(k){ if(/^\d\.\d$/.test(k) && FIGUREN.indexOf(o.erzJe[k])>=0) s.erzJe[k]=o.erzJe[k]; }); }
+    }
+  }catch(e){}
+  if(!o || o.punkteStand!==PUNKTE_STAND){ if(PUNKTE_CODE){ try{ s.points=codeEin(PUNKTE_CODE); }catch(e){} } if(TPLAN.variante && VARIANTEN[TPLAN.variante]) s.variante=TPLAN.variante; }   // neuer Plan: Punkte und Variante einmal übernehmen   // hinterlegte Punkte einmal übernehmen
+  s.punkteStand=PUNKTE_STAND;
+  s.points[0]=null;
+  return s;
+}
+function okPoint(p){
+  if(!p || typeof p.lat!=='number' || typeof p.lng!=='number') return null;
+  if(!(Math.abs(p.lat)<=90) || !(Math.abs(p.lng)<=180)) return null;
+  return {lat:p.lat, lng:p.lng, acc:typeof p.acc==='number'?p.acc:null};
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+var state=load();
+var view='tour';
+var mehrAn=false, letzterModus='';
+function modus(){                         // welcher Moment gerade ist, steuert die ruhige Ansicht
+  var ph=state.phase;
+  if(ph==='start') return 'start';
+  if(ph==='end' || (ph==='heim' && state.step>=1)) return 'ende';
+  if(ph==='seek' && (ankunft || wartet)) return 'da';
+  if(unterwegs()) return gehoert[akt().key] ? 'laufen' : 'sammeln';
+  return 'szene';
+}
+/* ---------- Mitscrollen ----------
+   Spricht jemand, rückt der Spiegel ins Bild (Funkel und die Erzähler treten dort auf).
+   Ist es still, rückt das ins Bild, was als Nächstes angetippt wird.
+   Hat jemand während des Sprechens selbst gescrollt, bleibt die Seite danach stehen. */
+var handGescrollt=false, fokusTimer=null, warSprechend=false;
+['touchmove','wheel'].forEach(function(ev){ window.addEventListener(ev, function(){ handGescrollt=true; }, {passive:true}); });
+function sanft(){ try{ return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'; }catch(e){ return 'smooth'; } }
+function scrollNach(el, wie){            // wie: 'mitte' = Element mittig, 'unten' = gerade so ganz sichtbar
+  if(!el || view!=='tour' || el.offsetParent===null) return;
+  var r=el.getBoundingClientRect(), vh=window.innerHeight||document.documentElement.clientHeight, rand=12, dy=0;
+  if(r.top>=rand && r.bottom<=vh-rand) return;                     // schon ganz zu sehen
+  if(wie==='mitte' || r.height>vh-2*rand) dy = r.top - Math.max(rand, (vh-r.height)/2);
+  else dy = r.bottom>vh-rand ? r.bottom-(vh-rand) : r.top-rand;
+  if(Math.abs(dy)<4) return;
+  try{ window.scrollBy({top:dy, behavior:sanft()}); }catch(e){ window.scrollBy(0, dy); }
+}
+function fokusSpiegel(){ scrollNach($('spiegel-ecke'), 'mitte'); }
+function aktionsZiel(){                  // was als Nächstes angetippt wird
+  var m=modus();
+  if(m==='da') return $('spiegel-ecke');
+  if(m==='laufen' && !mehrAn) return $('leiste');
+  var ch=$('choices'); if(ch && !ch.hidden && ch.children.length) return ch;
+  var a=document.querySelector('.story .actions'); return a;
+}
+function fokusAktion(){ var z=aktionsZiel(); if(z===$('spiegel-ecke')) fokusSpiegel(); else scrollNach(z, 'unten'); }
+function sprechBeginn(){ if(fokusTimer){ clearTimeout(fokusTimer); fokusTimer=null; } if(!warSprechend) handGescrollt=false; warSprechend=true; fokusSpiegel(); }
+function fokusPlanen(ms){                // nach einem Wechsel: wenn gleich niemand spricht, das Nächste zeigen
+  if(fokusTimer) clearTimeout(fokusTimer);
+  fokusTimer=setTimeout(function(){ fokusTimer=null; if(sprichtGerade()) return; var m=modus(); if(m==='da' || m==='laufen') fokusSpiegel(); fokusAktion(); }, ms||80);
+}
+function sprechEndeFokus(){              // aus sprechKnopf: alle sind fertig
+  if(!warSprechend || sprichtGerade()) return;
+  warSprechend=false;
+  if(handGescrollt) return;
+  fokusPlanen(450);
+}
+/* ---------- Mitscrollen Ende ---------- */
+function modusZeigen(){
+  var m=modus(), b=document.body;
+  if(m!==letzterModus){ var vorher=letzterModus; mehrAn=false; letzterModus=m; if(vorher) fokusPlanen(); }
+  ['start','ende','da','laufen','sammeln','szene'].forEach(function(x){ b.classList.toggle('m-'+x, x===m && view==='tour'); });
+  b.classList.toggle('m-tour', view==='tour');
+  b.classList.toggle('mehr', mehrAn);
+  var mb=$('btn-mehr'); if(mb){ mb.textContent = mehrAn ? 'Weniger' : 'Mehr'; mb.setAttribute('aria-pressed', String(mehrAn)); }
+}
+var trackTaps={};          // angetippte falsche Spuren in der Spuren-Szene
+var trackMsg='';
+var galN=0;                // Zaun-Station, Outdoor voll: welches Bild der Spiegel gerade zeigt (4 = alle gesehen)
+function galerieAktiv(){
+  var st=STATIONS[state.idx];
+  return state.variante==='a' && state.phase==='scene' && st.pic==='galerie' && state.step===0 && galN<st.optionen.length;
+}
+
+/* ---------- Rechnen ---------- */
+function meter(a,b){            // Abstand zweier Punkte in Metern (Haversine)
+  var R=6371000, r=Math.PI/180;
+  var dLat=(b.lat-a.lat)*r, dLng=(b.lng-a.lng)*r;
+  var h=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));
+}
+function sollOeffnen(dist, acc, radius){ return dist<=radius && acc<=40; }
+function waerme(dist, radius){
+  if(dist<=radius+10) return 'heiß';
+  if(dist<=radius+30) return 'warm';
+  if(dist<=radius+70) return 'wärmer';
+  return 'kalt';
+}
+function naehe(dist, radius){ var d=Math.max(0, dist-3); return Math.max(0, Math.min(1, 1-Math.sqrt(d/150))); }   // 3 m voll, 11 m gut drei Viertel, 150 m leer
+function codeAus(points){
+  return JSON.stringify(points.slice(1).map(function(p){ return p?[+p.lat.toFixed(6), +p.lng.toFixed(6)]:null; }));
+}
+function codeEin(text){
+  var arr=JSON.parse(text);
+  if(!Array.isArray(arr) || arr.length!==N-1) throw new Error('form');
+  var out=[null];
+  arr.forEach(function(e){
+    if(e===null){ out.push(null); return; }
+    if(!Array.isArray(e) || e.length!==2) throw new Error('form');
+    var p=okPoint({lat:e[0], lng:e[1]});
+    if(!p) throw new Error('form');
+    out.push(p);
+  });
+  return out;
+}
+function arcsFound(){
+  var s={};
+  if(state.phase==='start') return s;
+  if(state.phase==='end' || state.phase==='heim'){ ARCS.forEach(function(a){ s[a]=true; }); return s; }
+  STATIONS.forEach(function(st,i){
+    if(!st.arc) return;
+    if(i<state.idx) s[st.arc]=true;
+    else if(i===state.idx && state.phase==='scene'){
+      if(st.kind==='plain') s[st.arc]=true;
+      if((st.kind==='recolor' || st.kind==='wahl') && state.step>=1) s[st.arc]=true;
+    }
+  });
+  return s;
+}
+function gesetzt(){ return state.points.filter(Boolean).length; }
+
+/* ---------- Bilder ---------- */
+function css(v){ return 'var('+v+')'; }
+function bogenSVG(found, such, cls){     // der Holz-Regenbogen mit zehn Bögen, der innerste ist der volle Kern
+  var out='<svg class="'+(cls||'bogen')+'" viewBox="0 0 300 165" role="img" aria-label="Funkels Regenbogen"><title>Funkels Regenbogen</title>', n=0;
+  ARCS.forEach(function(a){
+    PAARE[a].forEach(function(farbe){
+      var kern=n===9, r=kern ? 14 : 137-n*13, c='arc '+a+(kern?' kern':'')+(found[a]?' da':'')+(such===a&&!found[a]?' such':'');
+      out+='<path class="'+c+'" style="--c:'+css(farbe)+'" d="M'+(150-r)+' 152 A'+r+' '+r+' 0 0 1 '+(150+r)+' 152"/>';
+      n++;
+    });
+  });
+  return out+'</svg>';
+}
+function strahlen(){ var s=''; for(var k=0;k<12;k++) s+='<rect x="94" y="10" width="12" height="30" rx="6" transform="rotate('+(k*30)+' 100 100)"/>'; return s; }
+var PIC={
+  erdbeere:function(c){ return '<svg class="pic" viewBox="0 0 200 200" role="img" aria-label="Erdbeere">'+
+    '<path class="main" style="fill:'+c+'" d="M100 64 C150 40 182 88 164 126 C150 156 120 182 100 188 C80 182 50 156 36 126 C18 88 50 40 100 64Z"/>'+
+    '<g fill="#FFF3B0"><ellipse cx="76" cy="100" rx="4" ry="6"/><ellipse cx="124" cy="100" rx="4" ry="6"/><ellipse cx="100" cy="116" rx="4" ry="6"/><ellipse cx="66" cy="128" rx="4" ry="6"/><ellipse cx="134" cy="128" rx="4" ry="6"/><ellipse cx="86" cy="144" rx="4" ry="6"/><ellipse cx="114" cy="144" rx="4" ry="6"/><ellipse cx="100" cy="166" rx="4" ry="6"/></g>'+
+    '<path fill="#2E8B3D" stroke="#2E8B3D" stroke-width="8" stroke-linejoin="round" d="M100 66 L62 46 L88 46 L100 18 L112 46 L138 46Z"/></svg>'; },
+  sonne:function(c){ return '<svg class="pic" viewBox="0 0 200 200" role="img" aria-label="Sonne">'+
+    '<g class="main" style="fill:'+c+'"><circle cx="100" cy="100" r="46"/>'+strahlen()+'</g>'+
+    '<circle class="inkfill" cx="84" cy="92" r="5.5"/><circle class="inkfill" cx="116" cy="92" r="5.5"/><path class="inkline" d="M82 110 Q100 128 118 110"/></svg>'; },
+  frosch:function(c){ return '<svg class="pic" viewBox="0 0 200 200" role="img" aria-label="Frosch">'+
+    '<g class="main" style="fill:'+c+'"><ellipse cx="100" cy="124" rx="70" ry="52"/><circle cx="64" cy="74" r="27"/><circle cx="136" cy="74" r="27"/></g>'+
+    '<circle cx="64" cy="72" r="16" fill="#fff"/><circle cx="136" cy="72" r="16" fill="#fff"/><circle class="inkfill" cx="67" cy="74" r="7.5"/><circle class="inkfill" cx="133" cy="74" r="7.5"/>'+
+    '<circle class="inkfill" cx="92" cy="110" r="2.6"/><circle class="inkfill" cx="108" cy="110" r="2.6"/><path class="inkline" d="M60 130 Q100 164 140 130"/></svg>'; },
+  fuchs:function(){ return '<svg viewBox="0 0 200 200" role="img" aria-label="Fuchs Fridolin mit Einhorn-Horn">'+
+    '<path fill="#E9772B" stroke="#E9772B" stroke-width="8" stroke-linejoin="round" d="M40 78 L50 30 L86 66Z M160 78 L150 30 L114 66Z"/>'+
+    '<path fill="#3A2A22" d="M54 62 L56 44 L70 60Z M146 62 L144 44 L130 60Z"/>'+
+    '<path fill="#E9772B" stroke="#E9772B" stroke-width="8" stroke-linejoin="round" d="M36 78 Q100 52 164 78 L100 184Z"/>'+
+    '<path fill="#fff" d="M38 84 L100 184 L82 122Z M162 84 L100 184 L118 122Z"/>'+
+    '<circle class="inkfill" cx="78" cy="104" r="7"/><circle class="inkfill" cx="122" cy="104" r="7"/><circle class="inkfill" cx="100" cy="180" r="9"/>'+
+    '<path style="fill:'+css('--gold-a')+';stroke:'+css('--gold-b')+'" stroke-width="3" stroke-linejoin="round" d="M100 4 L88 66 L112 66Z"/>'+
+    '<path fill="none" style="stroke:'+css('--gold-b')+'" stroke-width="3" stroke-linecap="round" d="M96 28 L104 34 M93 44 L107 52"/></svg>'; },
+  moehre:function(c){ return '<svg class="pic" viewBox="0 0 200 200" role="img" aria-label="Möhre">'+
+    '<path fill="#2E8B3D" stroke="#2E8B3D" stroke-width="7" stroke-linejoin="round" d="M100 58 L78 18 L96 38 L100 10 L104 38 L122 18Z"/>'+
+    '<path class="main" style="fill:'+c+'" d="M64 66 Q100 44 136 66 C134 112 118 160 100 192 C82 160 66 112 64 66Z"/>'+
+    '<path fill="none" stroke="rgba(36,26,61,.28)" stroke-width="4" stroke-linecap="round" d="M78 90 H98 M104 118 H124 M86 144 H102"/></svg>'; },
+  elefant:function(c){ return '<svg class="pic" viewBox="0 0 200 200" role="img" aria-label="Elefant">'+
+    '<g class="main" style="fill:'+c+'"><circle cx="42" cy="88" r="36"/><circle cx="158" cy="88" r="36"/><circle cx="100" cy="94" r="50"/></g>'+
+    '<path d="M100 128 Q96 172 118 180" style="fill:none;stroke:'+c+'" stroke-width="26" stroke-linecap="round"/>'+
+    '<circle cx="42" cy="88" r="20" fill="rgba(255,255,255,.38)"/><circle cx="158" cy="88" r="20" fill="rgba(255,255,255,.38)"/>'+
+    '<circle class="inkfill" cx="82" cy="88" r="6.5"/><circle class="inkfill" cx="118" cy="88" r="6.5"/></svg>'; },
+  kuh:function(){ return '<svg class="pic" viewBox="0 0 200 200" role="img" aria-label="Kuh">'+
+    '<defs><pattern id="karo" width="28" height="28" patternUnits="userSpaceOnUse"><rect width="28" height="28" fill="#fff"/><rect width="14" height="14" style="fill:'+css('--rot')+'"/><rect x="14" y="14" width="14" height="14" style="fill:'+css('--rot')+'"/></pattern></defs>'+
+    '<path d="M74 46 Q66 26 82 22 M126 46 Q134 26 118 22" fill="none" style="stroke:'+css('--gold-b')+'" stroke-width="8" stroke-linecap="round"/>'+
+    '<ellipse cx="44" cy="72" rx="24" ry="13" transform="rotate(-24 44 72)" fill="url(#karo)" style="stroke:'+css('--ink')+'" stroke-width="3"/>'+
+    '<ellipse cx="156" cy="72" rx="24" ry="13" transform="rotate(24 156 72)" fill="url(#karo)" style="stroke:'+css('--ink')+'" stroke-width="3"/>'+
+    '<path d="M60 80 Q60 42 100 42 Q140 42 140 80 L134 142 Q132 152 100 152 Q68 152 66 142Z" fill="url(#karo)" style="stroke:'+css('--ink')+'" stroke-width="3" stroke-linejoin="round"/>'+
+    '<ellipse cx="100" cy="152" rx="42" ry="29" fill="#F9D9E8" style="stroke:'+css('--ink')+'" stroke-width="3"/><ellipse class="inkfill" cx="86" cy="152" rx="5" ry="7"/><ellipse class="inkfill" cx="114" cy="152" rx="5" ry="7"/>'+
+    '<circle class="inkfill" cx="82" cy="92" r="7"/><circle class="inkfill" cx="118" cy="92" r="7"/></svg>'; },
+  einhorn:function(){ return '<svg viewBox="0 0 200 200" role="img" aria-label="Funkel zeigt mit dem Horn zum Ziel">'+
+    '<circle cx="58" cy="86" r="17" style="fill:'+css('--rot')+'"/><circle cx="50" cy="110" r="16" style="fill:'+css('--gelb')+'"/><circle cx="50" cy="134" r="15" style="fill:'+css('--gruen')+'"/><circle cx="56" cy="156" r="13" style="fill:'+css('--blau')+'"/>'+
+    '<path d="M66 78 L60 38 L90 64Z M134 78 L140 38 L110 64Z" fill="#fff" style="stroke:'+css('--ink')+'" stroke-width="4" stroke-linejoin="round"/>'+
+    '<path d="M70 66 L67 50 L80 62Z M130 66 L133 50 L120 62Z" fill="#F4B6D2"/>'+
+    '<path d="M100 2 L87 62 L113 62Z" style="fill:'+css('--gold-a')+';stroke:'+css('--gold-b')+'" stroke-width="3.5" stroke-linejoin="round"/>'+
+    '<path d="M96 24 L104 30 M93 40 L108 48" fill="none" style="stroke:'+css('--gold-b')+'" stroke-width="3" stroke-linecap="round"/>'+
+    '<path d="M62 84 Q62 58 100 58 Q138 58 138 84 L132 150 Q130 190 100 190 Q70 190 68 150Z" fill="#fff" style="stroke:'+css('--ink')+'" stroke-width="4" stroke-linejoin="round"/>'+
+    '<circle cx="88" cy="70" r="13" style="fill:'+css('--lila')+'"/><circle cx="108" cy="72" r="10" style="fill:'+css('--lila')+'"/>'+
+    '<ellipse cx="100" cy="162" rx="27" ry="22" fill="#F9D9E8"/><ellipse class="inkfill" cx="90" cy="162" rx="3.5" ry="5"/><ellipse class="inkfill" cx="110" cy="162" rx="3.5" ry="5"/>'+
+    '<circle class="inkfill" cx="82" cy="112" r="8"/><circle class="inkfill" cx="118" cy="112" r="8"/><circle cx="85" cy="109" r="2.6" fill="#fff"/><circle cx="121" cy="109" r="2.6" fill="#fff"/>'+
+    '<circle cx="74" cy="132" r="7" fill="#F4B6D2" opacity=".7"/><circle cx="126" cy="132" r="7" fill="#F4B6D2" opacity=".7"/></svg>'; },
+  horn:function(){ return '<svg viewBox="0 0 200 200" role="img" aria-label="Funkels Horn">'+
+    '<path style="fill:'+css('--gold-a')+';stroke:'+css('--gold-b')+'" stroke-width="5" stroke-linejoin="round" d="M104 18 L64 176 Q100 192 136 176Z"/>'+
+    '<path fill="none" style="stroke:'+css('--gold-b')+'" stroke-width="5" stroke-linecap="round" d="M96 62 L113 72 M88 96 L120 110 M79 130 L127 148"/>'+
+    stern(44,58,16,'--lila')+stern(160,84,13,'--blau')+stern(38,138,11,'--rot')+stern(166,150,9,'--gruen')+'</svg>'; },
+  hufe:function(){ return '<svg viewBox="0 0 200 200" role="img" aria-label="Hufspuren"><g fill="none" style="stroke:'+css('--ink')+'" stroke-width="16" stroke-linecap="round">'+
+    '<path d="M42 62 C34 100 46 124 66 124 C86 124 98 100 90 62"/><path d="M112 96 C104 134 116 158 136 158 C156 158 168 134 160 96"/></g></svg>'; },
+  pfote:function(){ return '<svg viewBox="0 0 200 200" role="img" aria-label="Kleine Pfote">'+SPUR.fuchs.replace('<g>','<g style="fill:'+css('--ink')+'">')+'</svg>'; }
+};
+function stern(x,y,s,farbe){
+  return '<path style="fill:'+css(farbe)+'" d="M'+x+' '+(y-s)+' Q'+x+' '+y+' '+(x+s)+' '+y+' Q'+x+' '+y+' '+x+' '+(y+s)+' Q'+x+' '+y+' '+(x-s)+' '+y+' Q'+x+' '+y+' '+x+' '+(y-s)+'Z"/>';
+}
+var SPUR={
+  fuchs:'<g><ellipse cx="100" cy="132" rx="34" ry="28"/><ellipse cx="56" cy="92" rx="13" ry="18" transform="rotate(-22 56 92)"/><ellipse cx="86" cy="66" rx="13" ry="19" transform="rotate(-6 86 66)"/><ellipse cx="114" cy="66" rx="13" ry="19" transform="rotate(6 114 66)"/><ellipse cx="144" cy="92" rx="13" ry="18" transform="rotate(22 144 92)"/></g>',
+  ente:'<g><path d="M100 172 L48 66 Q76 84 100 48 Q124 84 152 66Z"/></g>',
+  hase:'<g><ellipse cx="76" cy="76" rx="15" ry="44" transform="rotate(-8 76 76)"/><ellipse cx="124" cy="76" rx="15" ry="44" transform="rotate(8 124 76)"/><circle cx="86" cy="150" r="13"/><circle cx="116" cy="172" r="13"/></g>'
+};
+
+/* ---------- Ton, Stimme, Bildschirm ---------- */
+var actx=null, beruehrt=false;
+function tonAn(){ beruehrt=true; kompassStart(); if(state.phase!=='start') wachBleiben(); try{ var ae=audioElement(); if(!ae.src){ ae.muted=true; var p0=ae.play(); if(p0&&p0['catch']) p0['catch'](function(){}); ae.pause(); ae.muted=false; } }catch(e){} try{ if(!actx){ var AC=window.AudioContext||window.webkitAudioContext; if(AC) actx=new AC(); } if(actx && actx.state==='suspended') actx.resume(); }catch(e){} }
+function klang(noten){
+  if(!actx) return;
+  try{
+    var t=actx.currentTime+0.02;
+    noten.forEach(function(f,i){
+      var o=actx.createOscillator(), g=actx.createGain();
+      o.type='triangle'; o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t+i*0.13); g.gain.exponentialRampToValueAtTime(0.22,t+i*0.13+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.13+0.5);
+      o.connect(g); g.connect(actx.destination); o.start(t+i*0.13); o.stop(t+i*0.13+0.55);
+    });
+  }catch(e){}
+}
+var KLANG_DA=[523,659,784,1047], KLANG_ZAUBER=[784,988,1175,1568], KLANG_ENDE=[523,659,784,1047,1319,1568];
+var kannSprechen=('speechSynthesis' in window) && ('SpeechSynthesisUtterance' in window);
+function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function deStimmen(){
+  var vs=[];
+  try{ vs=(speechSynthesis.getVoices()||[]).filter(function(v){ return v.lang && v.lang.toLowerCase().replace('_','-').indexOf('de')===0; }); }catch(e){}
+  return vs;
+}
+function stimmWert(name){               // höher = klingt eher natürlich und weiblich
+  var n=name||'', w=0;
+  if(/premium/i.test(n)) w+=4;
+  if(/enhanced|erweitert|natural|neural/i.test(n)) w+=3;
+  if(/anna|petra|helena|marlene|vicki|katja|hedda|amelie|seraphina/i.test(n)) w+=2;
+  if(/markus|viktor|yannick|martin|stefan|conrad|hans|daniel|florian|killian/i.test(n)) w-=5;
+  if(/eddy|flo\b|grandma|grandpa|gro(ß|ss)(mutter|vater)|reed|rocko|sandy|shelley/i.test(n)) w-=3;   // blecherne Stimmen
+  return w;
+}
+function besteStimme(vs){
+  var best=null, bw=-99;
+  vs.forEach(function(v){ var w=stimmWert(v.name); if(w>bw){ bw=w; best=v; } });
+  return best;
+}
+function waehleStimme(){
+  var vs=deStimmen();
+  if(state.voice){ for(var i=0;i<vs.length;i++){ if(vs[i].voiceURI===state.voice) return vs[i]; } }
+  return besteStimme(vs);
+}
+function sprich(text, cb){
+  if(!kannSprechen){ if(cb) cb(); return; }
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang='de-DE'; u.rate=1; u.pitch=state.pitch;
+    var v=waehleStimme(); if(v) u.voice=v;
+    if(cb){ u.onend=cb; u.onerror=cb; }
+    speechSynthesis.speak(u);
+    f3dSprich('computer', null, function(){ return 0; });
+  }catch(e){ if(cb) cb(); }
+}
+var tonLaeuft=false, tonGen=0, tonTimer=null;
+function tonEnde(){ tonLaeuft=false; try{ $('mirror').classList.remove('spricht'); }catch(e){} f3dStill(); sprechKnopf(); }
+var erzFolgt=false;                      // Funkel ist fertig, der Erzähler kommt gleich
+function sprichtGerade(){ var k=$('kaka'); return tonLaeuft || erzFolgt || !!tonTimer || !!(k && k.classList.contains('da')); }
+function sprechKnopf(){                  // ein Knopf, der immer zu dem passt, was gerade zu hören ist
+  var b=$('btn-speak'), n=$('btn-nochmal'); if(!b) return;
+  sprechEndeFokus();
+  if(n) n.textContent = sprichtGerade() ? 'Stopp' : 'Noch einmal hören';
+  if(sprichtGerade()){ b.textContent='Stopp'; b.className='btn ghost'; return; }
+  var offen=!gehoert[akt().key];
+  b.textContent = offen ? 'Funkel sprechen lassen' : 'Noch einmal hören';
+  b.className = 'btn '+(offen && (state.phase==='seek' || !state.autoSag) ? 'primary' : 'ghost');
+}
+function still(){ erzFolgt=false; kakaGen++; kakaTimers.forEach(clearTimeout); kakaTimers=[]; sprecherHinweis=null; try{ kakaWeg(); }catch(e){} tonGen++; if(tonTimer){ clearTimeout(tonTimer); tonTimer=null; } try{ if(kannSprechen) speechSynthesis.cancel(); }catch(e){} stopClip(); tonEnde(); }
+function spielen(key, text, cb){          // eigene Aufnahme oder Computerstimme, ruft cb am Ende
+  var g=++tonGen; tonLaeuft=true; try{ $('mirror').classList.add('spricht'); }catch(e){} sprechBeginn(); sprechKnopf(); bogenBeimWort(text, g, key);
+  function fertig(){ if(g!==tonGen) return; tonEnde(); if(cb) cb(); }
+  if(!spielClip(key, fertig)) sprich(text, fertig);
+}
+
+/* ---------- Eigene Aufnahmen ---------- */
+var clips={}, puffer={}, idb=null, quelle=null, audioEl=null, gespielt=0;
+var strom=null, rec=null, recKey=null, recTimer=null;
+function kannAufnehmen(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); }
+function dbOpen(cb){
+  try{
+    var rq=indexedDB.open(TOUR.speicher,1);
+    rq.onupgradeneeded=function(){ rq.result.createObjectStore('clips'); };
+    rq.onsuccess=function(){ idb=rq.result; cb(); };
+    rq.onerror=function(){ cb(); };
+  }catch(e){ cb(); }
+}
+function dbLoad(cb){
+  if(!idb){ cb(); return; }
+  try{
+    var rq=idb.transaction('clips','readonly').objectStore('clips').openCursor();
+    rq.onsuccess=function(){ var c=rq.result; if(c){ if(c.value && c.value.buf) clips[c.key]=c.value; c['continue'](); } else cb(); };
+    rq.onerror=function(){ cb(); };
+  }catch(e){ cb(); }
+}
+function dbPut(key,val){ clips[key]=val; delete puffer[key]; try{ if(idb) idb.transaction('clips','readwrite').objectStore('clips').put(val,key); }catch(e){} }
+function b64von(buf){ var a=new Uint8Array(buf), s='', i; for(i=0;i<a.length;i+=0x8000) s+=String.fromCharCode.apply(null, a.subarray(i,i+0x8000)); return btoa(s); }
+function b64zu(s){ var r=atob(s), a=new Uint8Array(r.length); for(var i=0;i<r.length;i++) a[i]=r.charCodeAt(i); return a.buffer; }
+function clipsExport(){
+  var o={version:1, rate:state.recRate, clips:{}}, n=0;
+  Object.keys(clips).forEach(function(k){ o.clips[k]={type:clips[k].type, b64:b64von(clips[k].buf)}; if(typeof clips[k].rate==='number') o.clips[k].rate=clips[k].rate; if(clips[k].h) o.clips[k].h=clips[k].h; n++; });
+  if(!n){ toast('Noch keine Aufnahmen vorhanden.'); return; }
+  var blob=new Blob([JSON.stringify(o)],{type:'application/json'}), url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download='funkel-stimme.json'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  toast(n+' Aufnahmen in funkel-stimme.json gesichert.');
+}
+function clipsImport(o, nurFehlende){        // Aufnahmen aus einer Datei übernehmen; nurFehlende: eigene Aufnahmen auf dem Gerät behalten
+  if(!o || !o.clips) return 0;
+  var n=0;
+  Object.keys(o.clips).forEach(function(k){
+    var c=o.clips[k]; if(!c || !c.b64 || !(KEYPOS.hasOwnProperty(k) || /^[kge]\./.test(k))) return;
+    var alt=clips[k];
+    if(nurFehlende && alt && (alt.eigen || !c.h || (alt.h===c.h && (alt.rolle || !c.rolle)))) return;   // eigene Aufnahme oder schon dieselbe Fassung
+    var neu={type:c.type||'audio/mp4', buf:b64zu(c.b64)};
+    if(typeof c.rate==='number') neu.rate=c.rate;
+    if(c.h) neu.h=c.h;
+    if(c.rolle) neu.rolle=c.rolle;
+    try{ dbPut(k,neu); n++; }catch(e){}
+  });
+  return n;
+}
+function clipsVomServer(){                 // funkel-stimme.json neben der Seite, falls vorhanden
+  if(!window.fetch || location.protocol==='file:') return;
+  fetch(TOUR.stimmen.datei,{cache:'no-cache'}).then(function(r){ return r.ok ? r.json() : null; }).then(function(o){
+    var n=clipsImport(o,true); if(n){ renderClips(); render(); }
+  })['catch'](function(){});
+}
+function dbDel(key){ delete clips[key]; delete puffer[key]; try{ if(idb) idb.transaction('clips','readwrite').objectStore('clips')['delete'](key); }catch(e){} }
+var IOS=/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+var clipUrl=null;
+function stopClip(){
+  try{ if(quelle){ quelle.stop(); } }catch(e){} quelle=null;
+  try{ if(audioEl){ audioEl.pause(); audioEl.removeAttribute('src'); audioEl.load(); } }catch(e){}
+  if(clipUrl){ try{ URL.revokeObjectURL(clipUrl); }catch(e){} clipUrl=null; }
+}
+function audioElement(){               // ein einziges Element, beim ersten Tippen freigeschaltet; so spielt es auf dem iPhone auch ohne neue Berührung
+  if(!audioEl){
+    audioEl=new Audio(); audioEl.setAttribute('playsinline',''); audioEl.preload='auto';
+    try{ audioEl.preservesPitch=false; audioEl.webkitPreservesPitch=false; }catch(e){}
+  }
+  return audioEl;
+}
+/* ---------- Funkel in 3D ---------- */
+var huellen={};                          // Lautstärke je Satz, 60 Werte pro Sekunde
+function f3d(){ return window.Funkel3D || null; }
+function f3dStart(){ var F=f3d(), el=$('funkel3d'); if(F && el) try{ F.start(el); }catch(e){} }
+window.addEventListener('funkel3d-bereit', f3dStart); if(f3d()) f3dStart();
+function huelleAus(buf){
+  var d=buf.getChannelData(0), sr=buf.sampleRate, w=Math.max(1,Math.floor(sr/60)), n=Math.ceil(d.length/w), h=new Float32Array(n), max=0;
+  for(var i=0;i<n;i++){ var s=0, a=i*w, e=Math.min(d.length,a+w); for(var j=a;j<e;j+=2) s+=d[j]*d[j]; h[i]=Math.sqrt(s/Math.max(1,(e-a)/2)); if(h[i]>max) max=h[i]; }
+  var ruhe=max*0.06;
+  for(var k=0;k<n;k++) h[k]=Math.pow(Math.max(0,(h[k]-ruhe)/Math.max(1e-6,max*0.7-ruhe)),0.8);
+  return h;
+}
+function huelleHolen(key, c){            // einmal pro Satz aus der Aufnahme berechnen, auch auf dem iPad
+  if(huellen[key] || huellen[key]===false) return;
+  huellen[key]=false;
+  try{
+    var OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext; if(!OAC) return;
+    var oc=new OAC(1,44100,44100), kopie=c.buf.slice(0);
+    var fertig=function(b){ try{ huellen[key]=huelleAus(b); }catch(e){} };
+    var pr=oc.decodeAudioData(kopie, fertig, function(){});
+    if(pr && pr.then) pr.then(fertig, function(){});
+  }catch(e){}
+}
+function zuckeln(){ var t=performance.now()/1000; return Math.max(0,.55+.45*Math.sin(t*15))*(.65+.35*Math.sin(t*3.3)); }   // Ersatz ohne Lautstärke-Daten
+function f3dPegel(key, c, zeit){
+  if(c) huelleHolen(key, c);
+  return function(){ var h=huellen[key]; if(!h) return zuckeln(); var i=Math.floor((zeit()+0.03)*60); return i<h.length ? (h[i]||0) : 0; };
+}
+var sprecherHinweis=null;
+function f3dSprich(key, c, zeit){        // zeit(): Sekunden im Satz
+  var F=f3d(); if(!F) return;
+  var rolle=(c && c.rolle) || sprecherHinweis || 'funkel';
+  if(ERZ[rolle]){ F.hoeren(); kakaMund(f3dPegel(key, c, zeit)); return; }
+  if(rolle==='geraeusch'){ F.hoeren(); return; }
+  if(rolle!=='funkel'){ F.hoeren(); f3dGross(false); return; }
+  f3dGross(true);
+  if(c) huelleHolen(key, c);
+  F.sprich(f3dPegel(key, c, zeit));
+}
+var f3dZurueckTimer=null;
+function f3dGross(an){                    // spricht Funkel, rückt sie groß in die Mitte; nach kurzer Ruhe wieder in die Ecke
+  var e=$('spiegel-ecke'); if(!e) return;
+  if(f3dZurueckTimer){ clearTimeout(f3dZurueckTimer); f3dZurueckTimer=null; }
+  if(an) e.classList.add('funkel-gross');
+  else f3dZurueckTimer=setTimeout(function(){ f3dZurueckTimer=null; e.classList.remove('funkel-gross'); }, 1600);
+}
+function f3dStill(){ var F=f3d(); if(F) F.still(); f3dGross(false); kakaMund(null); }
+
+/* ---------- Kakapups auftreten lassen ---------- */
+var kakaGen=0, kakaPegel=null, kakaLaeuft=false, kakaTimers=[], kakaAnimGen=0;
+function kakaNach(ms, g, fn){ kakaTimers.push(setTimeout(function(){ if(g===kakaGen) fn(); }, ms)); }
+function erzFuer(i, s){                  // Erzähler für Station i, Schritt s: eigene Besetzung, sonst Standard
+  var j=state.erzJe && state.erzJe[i+'.'+s];
+  return ERZ[j] ? j : (ERZ[state.erz] ? state.erz : 'kakapups');
+}
+function kakaSatz(){                     // Aufgabe zum aktuellen Schritt, passend zu Erzähler und Variante
+  if(state.phase!=='scene') return null;
+  var fig=erzFuer(state.idx, state.step), t=erzSatz(fig, state.idx, state.step, state.variante);
+  if(t) t.fig=fig; return t;
+}
+function kakaMund(fn){ kakaPegel=fn; }
+function kakaAnimieren(){                // Mund, Brauen, Blinzeln, Wackeln
+  if(kakaLaeuft) return; kakaLaeuft=true; var meinGen=++kakaAnimGen;
+  var el=$('kaka'), sv=el.querySelector('svg.kk:not([hidden])') || el.querySelector('svg.kk'),
+      mund=sv.querySelector('.kk-mund-innen'), zunge=sv.querySelector('.kk-zunge'), kopf=sv.querySelector('.kk-kopf'),
+      brauen=sv.querySelector('.kk-brauen'), augen=sv.querySelectorAll('.kk-auge'), m=0, blinzelnAb=0, naechstes=performance.now()+1800,
+      ry0=+(mund.getAttribute('data-ry')||mund.getAttribute('ry')); mund.setAttribute('data-ry', ry0);
+  (function bild(t){
+    if(meinGen!==kakaAnimGen) return;
+    if(!el.classList.contains('da')){ kakaLaeuft=false; return; }
+    var p=0; if(kakaPegel){ try{ p=Math.max(0,Math.min(1,kakaPegel()||0)); }catch(e){} }
+    m+=(p-m)*(p>m?.6:.3);
+    mund.setAttribute('ry', (ry0+m*13).toFixed(1)); zunge.setAttribute('cy', (3+m*6).toFixed(1));
+    brauen.setAttribute('transform','translate(0 '+(-m*5).toFixed(1)+')');
+    if(t>naechstes){ blinzelnAb=t; naechstes=t+2000+Math.random()*3000; }
+    var b=t-blinzelnAb<150 ? Math.sin((t-blinzelnAb)/150*Math.PI) : 0;
+    augen.forEach(function(a){ a.setAttribute('transform','translate('+a.getAttribute('data-x')+' '+a.getAttribute('data-y')+') scale(1 '+(1-b*.9).toFixed(2)+')'); });
+    if(!el.classList.contains('pupst')) kopf.style.transform='rotate('+(Math.sin(t/380)*3+m*2).toFixed(2)+'deg)';
+    requestAnimationFrame(bild);
+  })(performance.now());
+}
+function pupsSynth(){                    // Notfall-Pups, falls die Geräusch-Datei fehlt
+  try{ if(!actx) return; var t=actx.currentTime, o=actx.createOscillator(), l=actx.createOscillator(), lg=actx.createGain(), f=actx.createBiquadFilter(), g=actx.createGain();
+    o.type='sawtooth'; o.frequency.setValueAtTime(110,t); o.frequency.exponentialRampToValueAtTime(55,t+.6);
+    l.frequency.value=28; lg.gain.value=30; l.connect(lg); lg.connect(o.frequency);
+    f.type='lowpass'; f.frequency.value=420; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.5,t+.04); g.gain.exponentialRampToValueAtTime(.0001,t+.65);
+    o.connect(f); f.connect(g); g.connect(actx.destination); o.start(t); l.start(t); o.stop(t+.7); l.stop(t+.7);
+  }catch(e){}
+}
+function pups(cb){
+  var da=['g.pups1','g.pups2','g.pups3'].filter(function(k){ return clips[k]; });
+  if(da.length){ var k=da[Math.floor(Math.random()*da.length)]; if(spielClip(k, cb)) return; }
+  pupsSynth(); setTimeout(cb, 700);
+}
+function gagTon(fig, cb){                // Auftritts-Geräusch: Kakapups pupst, die anderen haben ihr eigenes
+  if(fig==='kakapups'){ pups(cb); return; }
+  if(clips['g.'+fig] && spielClip('g.'+fig, cb)) return;
+  klang([392,523]); setTimeout(cb, 500);
+}
+function kakaWeg(){ var el=$('kaka'); if(!el) return; el.classList.remove('da','pupst','haufen'); kakaMund(null); sprechKnopf(); setTimeout(function(){ if(!el.classList.contains('da')) el.hidden=true; }, 450); }
+function kakaAuftritt(satz){             // reinploppen, pupsen, Häufchen legen, vorlesen, wieder gehen
+  var el=$('kaka'); if(!el || !satz) return;
+  var g=++kakaGen; sprechBeginn();
+  var e=$('spiegel-ecke'); if(e) e.classList.remove('funkel-gross');   // Funkel macht Platz
+  var fig=satz.fig||'kakapups';
+  el.querySelectorAll('svg.kk').forEach(function(v){ if(v.getAttribute('data-figur')===fig) v.removeAttribute('hidden'); else v.setAttribute('hidden',''); });   // SVG kennt .hidden nicht, nur das Attribut
+  kakaLaeuft=false;
+  el.hidden=false; el.classList.remove('pupst','haufen'); void el.offsetWidth; el.classList.add('da'); kakaAnimieren();
+  erzFolgt=false; tonLaeuft=true; sprechKnopf();
+  kakaNach(550, g, function(){
+    el.classList.add('pupst');
+    gagTon(fig, function(){ if(g!==kakaGen) return;
+      el.classList.add('haufen');
+      kakaNach(650, g, function(){
+        sprecherHinweis=fig;
+        spielen(satz.key, satz.text, function(){ sprecherHinweis=null; if(g!==kakaGen) return; kakaMund(null); kakaNach(1400, g, kakaWeg); });
+      });
+    });
+  });
+}
+function tempo(c){ return (c && typeof c.rate==='number') ? c.rate : state.recRate; }   // erzeugte Stimmen bringen ihr Tempo mit
+function perElement(c, cb){
+  try{
+    stopClip();
+    var el=audioElement();
+    clipUrl=URL.createObjectURL(new Blob([c.buf],{type:c.type}));
+    el.onended=function(){ if(cb) cb(); }; el.onerror=function(){ if(cb) cb(); };
+    el.src=clipUrl; el.playbackRate=tempo(c);
+    var pr=el.play(); if(pr && pr['catch']) pr['catch'](function(){});
+    f3dSprich(c.key, c, function(){ return el.currentTime||0; });
+    gespielt++;
+  }catch(e){}
+}
+function spielClip(key, cb){            // true, wenn es für den Satz eine eigene Aufnahme gibt
+  var c=clips[key]; if(!c) return false;
+  c.key=key; tonAn();
+  function los(buf){
+    try{ stopClip(); var q=actx.createBufferSource(); q.buffer=buf; q.playbackRate.value=tempo(c); q.connect(actx.destination); q.onended=function(){ if(quelle===q && cb) cb(); }; q.start(); quelle=q; (function(t0,r){ if(!huellen[key]) try{ huellen[key]=huelleAus(buf); }catch(e){} f3dSprich(key, c, function(){ return (actx.currentTime-t0)*r; }); })(actx.currentTime, tempo(c)); gespielt++; }
+    catch(e){ perElement(c, cb); }
+  }
+  if(IOS){ perElement(c, cb); return true; }    // Web Audio ist auf dem iPhone bei Stummschalter stumm, das Audio-Element nicht
+  if(puffer[key]){ los(puffer[key]); return true; }
+  if(actx && actx.decodeAudioData){
+    try{ actx.decodeAudioData(c.buf.slice(0), function(b){ puffer[key]=b; los(b); }, function(){ perElement(c, cb); }); return true; }catch(e){}
+  }
+  perElement(c, cb); return true;
+}
+var gesagt=0;
+function sagen(){                       // der Satz des Schritts; ein zweiter Teil folgt nach einer kurzen Pause
+  tonAn(); var a=akt(); gehoert[a.key]=true; gesagt++; still();
+  var kk=kakaSatz(), mg=kakaGen;
+  function danach(){ if(!kk || mg!==kakaGen) return; erzFolgt=true; sprechKnopf(); kakaNach(600, mg, function(){ kakaAuftritt(kk); }); }
+  var zw=a.zweit || (a.live && clips[a.live] && !indoor() ? {key:a.live, text:a.liveText} : null);   // Ortsansage nur draußen und nur, wenn sie live erzeugt wurde
+  spielen(a.key, a.text, function(){
+    if(!zw){ danach(); return; }
+    var g=tonGen; tonLaeuft=true; try{ $('mirror').classList.add('spricht'); }catch(e){}
+    tonTimer=setTimeout(function(){ tonTimer=null; if(g!==tonGen) return; spielen(zw.key, zw.text, danach); }, 1200);
+  });
+  live();
+}
+function hoere(key){
+  tonAn(); still();
+  for(var i=0;i<TEXTE.length;i++){ if(TEXTE[i].key===key){ spielen(key, TEXTE[i].text); return; } }
+}
+function mikroAus(){ try{ if(strom){ strom.getTracks().forEach(function(t){ t.stop(); }); } }catch(e){} strom=null; }
+function stoppAufnahme(){ try{ if(rec && rec.state!=='inactive') rec.stop(); }catch(e){} }
+function aufnehmen(key){
+  if(rec){ stoppAufnahme(); return; }
+  if(!kannAufnehmen()){ toast('Aufnehmen geht in dieser Ansicht nicht. In der https-Version auf dem iPad funktioniert es.'); return; }
+  still();
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(s){
+    strom=s;
+    try{
+      var teile=[], r=new MediaRecorder(s);
+      rec=r; recKey=key;
+      r.ondataavailable=function(e){ if(e.data && e.data.size) teile.push(e.data); };
+      r.onstop=function(){
+        var typ=r.mimeType || (teile[0] && teile[0].type) || 'audio/mp4';
+        clearTimeout(recTimer); rec=null; recKey=null; mikroAus();   // Mikrofon loslassen, sonst spielt das iPad leise ab
+        var fr=new FileReader();
+        fr.onload=function(){
+          if(fr.result && fr.result.byteLength>800){ dbPut(key,{buf:fr.result, type:typ, eigen:true}); toast('Aufnahme gespeichert.'); }
+          else toast('Die Aufnahme war leer. Bitte noch einmal.');
+          renderClips(); render();
+        };
+        fr.onerror=function(){ toast('Die Aufnahme ließ sich nicht speichern.'); renderClips(); };
+        fr.readAsArrayBuffer(new Blob(teile,{type:typ}));
+        renderClips();
+      };
+      r.start(); recTimer=setTimeout(stoppAufnahme, 30000); renderClips();
+    }catch(e){ rec=null; recKey=null; mikroAus(); toast('Die Aufnahme ließ sich nicht starten.'); renderClips(); }
+  }, function(){ toast('Kein Zugriff aufs Mikrofon. In der https-Version auf dem iPad den Zugriff erlauben.'); });
+}
+var wake=null;
+function wachBleiben(){
+  if(wake && !wake.released) return;
+  try{ if(navigator.wakeLock && document.visibilityState==='visible'){ navigator.wakeLock.request('screen').then(function(w){ wake=w; }).catch(function(){}); } }catch(e){}
+}
+document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible' && state.phase!=='start') wachBleiben(); });
+
+/* ---------- GPS ---------- */
+var gps='aus', fix=null, watchId=null;
+function gpsStart(){
+  if(watchId!==null || indoor()) return;
+  if(!('geolocation' in navigator)){ gps='keins'; live(); return; }
+  gps='sucht'; live();
+  try{
+    watchId=navigator.geolocation.watchPosition(function(pos){
+      fix={lat:pos.coords.latitude, lng:pos.coords.longitude, acc:pos.coords.accuracy, t:jetztMs()};
+      gps='an';
+      if(!state.heim && state.startZeit && jetztMs()-state.startZeit<180000 && fix.acc<=40 && state.phase!=='start'){ state.heim={lat:fix.lat, lng:fix.lng}; save(); }   // die Haustür: erster guter Fix nach dem Aufwecken
+      if(!kursVomKompass){               // ohne Kompass: Laufrichtung aus dem GPS
+        var h=pos.coords.heading;
+        if(typeof h==='number' && !isNaN(h) && pos.coords.speed>0.5) kurs=h;
+        else if(vorher && meter(vorher,fix)>4){ kurs=peilung(vorher,fix); vorher=fix; }
+        if(!vorher) vorher=fix;
+      }
+      pruefeAnkunft();
+      live();
+    }, function(err){
+      if(err && err.code===1){ gps='keins'; try{ navigator.geolocation.clearWatch(watchId); }catch(e){} watchId=null; }
+      else if(gps!=='an'){ gps='sucht'; }
+      live();
+    }, {enableHighAccuracy:true, maximumAge:1000, timeout:20000});
+  }catch(e){ gps='keins'; watchId=null; live(); }
+}
+function fixAlter(){ return fix ? jetztMs()-fix.t : Infinity; }   // ms seit der letzten GPS-Messung
+function fixFrisch(){ return fixAlter()<=15000; }
+function ziel(){ return state.phase==='heim' ? state.heim : state.points[state.idx]; }   // wohin es gerade geht
+function unterwegs(){ return state.phase==='seek' || (state.phase==='heim' && state.step===0); }
+function abstand(){
+  var p=ziel();
+  if(!fix || !p) return null;
+  return meter(fix,p);
+}
+function spruenge(d){ return Math.max(0, Math.round(d/0.6)); }   // Einhorn-Sprünge eines Dreijährigen
+var seekSeit=0;                         // wann die aktuelle Suche begann; das GPS öffnet erst nach einer Schonfrist
+function jetztMs(){ return Date.now(); }
+var imRadiusSeit=0, verlassen=false;    // Ankunft erst, wenn das GPS 2,5 s lang im Radius bleibt, das Signal frisch ist und man vorher außerhalb war
+function pruefeAnkunft(){
+  if(!unterwegs()) return;
+  var d=abstand();
+  if(d!==null && d>state.radius+15) verlassen=true;
+  if(jetztMs()-seekSeit<10000){ imRadiusSeit=0; return; }
+  if(!indoor() && d!==null && verlassen && fixFrisch() && sollOeffnen(d, fix.acc, state.radius)){
+    if(!imRadiusSeit) imRadiusSeit=jetztMs();
+    else if(jetztMs()-imRadiusSeit>=2500){ if(state.phase==='heim') heimAngekommen(); else ankommen('gps'); }
+  } else imRadiusSeit=0;
+}
+
+
+/* ---------- Live-Ortsansagen (ElevenLabs über den eigenen Worker) ---------- */
+function liveVorbereiten(){               // erzeugt fehlende Ortsansagen einmal und legt sie wie Aufnahmen ab, danach offline nutzbar
+  var url=TPLAN.liveUrl || (TOUR.stimmen.live && TOUR.stimmen.live.url); if(!url || !window.fetch || !navigator.onLine) return;
+  var rolle=(TOUR.stimmen.live && TOUR.stimmen.live.rolle) || 'spiegel';
+  TEXTE.forEach(function(t){
+    if(!t.live || !t.liveText) return;
+    var c=clips[t.live]; if(c && c.h===t.liveText) return;
+    fetch(url.replace(/\/$/,'')+'/sprechen', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({thema:TOUR.id, rolle:rolle, text:t.liveText})})
+      .then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.arrayBuffer(); })
+      .then(function(buf){ dbPut(t.live, {type:'audio/mpeg', buf:buf, h:t.liveText, rolle:rolle, rate:1}); })
+      ['catch'](function(){});
+  });
+}
+/* ---------- Kamera und Zauberlinse ---------- */
+var kamStrom=null, kamStartet=false, kamGesperrt=false, linseRaf=null, lctx=null, linseBilder=0;
+var LINSE={blau:{a:190,b:262,m:222}, gruen:{a:70,b:170,m:125}, lila:{a:255,b:325,m:280}};   // Farbton-Bereiche der falschen Farben
+var ZIELTON={rot:356, gelb:48, gruen:128}, HELLER={rot:1.1, gelb:1.5, gruen:1};
+function kannKamera(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia); }
+function kameraSoll(){ return state.kamera && !kamGesperrt && view==='tour' && state.phase!=='start' && state.phase!=='end' && document.visibilityState!=='hidden'; }
+function kameraAn(){
+  if(kamStrom || kamStartet || !kannKamera()) return;
+  kamStartet=true;
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:960}, height:{ideal:720}}, audio:false}).then(function(s){
+    kamStartet=false;
+    if(!kameraSoll()){ s.getTracks().forEach(function(t){ t.stop(); }); return; }
+    kamStrom=s; var v=$('kamera'); v.srcObject=s;
+    try{ var pr=v.play(); if(pr && pr['catch']) pr['catch'](function(){}); }catch(e){}
+    render();
+  }, function(){ kamStartet=false; kamGesperrt=true; render(); toast('Kein Zugriff auf die Kamera. Der Spiegel läuft ohne Kamerabild weiter.'); });
+}
+function kameraAus(){
+  try{ if(kamStrom) kamStrom.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+  kamStrom=null; try{ $('kamera').srcObject=null; }catch(e){}
+}
+function kameraPflege(){ if(kameraSoll()) kameraAn(); else kameraAus(); }
+function linseAn(){                     // Zauberlinse: nach einem gelösten Farbrätsel
+  var st=STATIONS[state.idx];
+  return !!kamStrom && state.phase==='scene' && !!st.linse && state.step>=1;
+}
+function kamImBild(){ return !!kamStrom && state.phase==='seek'; }
+function umfaerben(px, w, h, von, zu){  // färbt im Zauberkreis den falschen Farbton in den echten um, alles andere bleibt
+  var L=LINSE[von], ziel=ZIELTON[zu], hell=HELLER[zu], cx=w/2, cy=h/2, R=Math.min(w,h)*0.31, R2=R*R, n=0;
+  for(var y=Math.max(0,Math.floor(cy-R)); y<Math.min(h,Math.ceil(cy+R)); y++){
+    var dy=y+0.5-cy, halb=Math.sqrt(Math.max(0,R2-dy*dy)), x0=Math.max(0,Math.floor(cx-halb)), x1=Math.min(w,Math.ceil(cx+halb));
+    for(var x=x0; x<x1; x++){
+      var i=(y*w+x)*4, r=px[i], g=px[i+1], b=px[i+2];
+      var mx=r>g?(r>b?r:b):(g>b?g:b), mn=r<g?(r<b?r:b):(g<b?g:b), d=mx-mn;
+      if(mx<60 || d<38 || d/mx<0.3) continue;                 // grau, dunkel oder blass: so lassen
+      var hu = mx===r ? ((g-b)/d)%6 : mx===g ? (b-r)/d+2 : (r-g)/d+4;
+      hu*=60; if(hu<0) hu+=360;
+      if(hu<L.a || hu>L.b) continue;
+      var nh=(ziel+(hu-L.m)*0.25+360)%360, v=Math.min(255,mx*hell), c=v*(d/mx), hp=nh/60, z=c*(1-Math.abs(hp%2-1)), m=v-c, rr, gg, bb;
+      if(hp<1){ rr=c; gg=z; bb=0; } else if(hp<2){ rr=z; gg=c; bb=0; } else if(hp<3){ rr=0; gg=c; bb=z; }
+      else if(hp<4){ rr=0; gg=z; bb=c; } else if(hp<5){ rr=z; gg=0; bb=c; } else { rr=c; gg=0; bb=z; }
+      px[i]=rr+m; px[i+1]=gg+m; px[i+2]=bb+m; n++;
+    }
+  }
+  return n;
+}
+function linseSchleife(){
+  linseRaf=null;
+  var cvs=$('linse'), v=$('kamera');
+  if(cvs.hidden || view!=='tour' || !kamStrom) return;
+  var st=STATIONS[state.idx];
+  if(!lctx){ try{ lctx=cvs.getContext('2d',{willReadFrequently:true}); }catch(e){ lctx=cvs.getContext('2d'); } }
+  if(v.readyState>=2 && v.videoWidth && st.linse){
+    var w=cvs.width, h=cvs.height, vw=v.videoWidth, vh=v.videoHeight, q=Math.min(vw,vh);
+    try{
+      lctx.drawImage(v,(vw-q)/2,(vh-q)/2,q,q,0,0,w,h);
+      var im=lctx.getImageData(0,0,w,h); umfaerben(im.data,w,h,st.linse.von,st.linse.zu); lctx.putImageData(im,0,0);
+      lctx.strokeStyle=farbe('--gold-a'); lctx.lineWidth=3; lctx.setLineDash([7,8]);
+      lctx.beginPath(); lctx.arc(w/2,h/2,Math.min(w,h)*0.31,0,6.2832); lctx.stroke(); lctx.setLineDash([]);
+      linseBilder++;
+    }catch(e){}
+  }
+  linseRaf=requestAnimationFrame(linseSchleife);
+}
+function linseStart(){ if(linseRaf===null && !$('linse').hidden) linseRaf=requestAnimationFrame(linseSchleife); }
+document.addEventListener('visibilitychange', kameraPflege);
+setInterval(function(){ if(view==='tour' && (unterwegs() || state.startZeit)) live(); }, 2000);
+
+/* ---------- Kompass ---------- */
+var kurs=null, kursVomKompass=false, kompassAn=false, vorher=null;   // kurs = wohin die Oberkante des Bildschirms zeigt, in Grad ab Nord
+function norm(w){ return ((w%360)+360)%360; }
+function peilung(a,b){                  // Richtung von a nach b in Grad ab Nord
+  var r=Math.PI/180, y=Math.sin((b.lng-a.lng)*r)*Math.cos(b.lat*r);
+  var x=Math.cos(a.lat*r)*Math.sin(b.lat*r)-Math.sin(a.lat*r)*Math.cos(b.lat*r)*Math.cos((b.lng-a.lng)*r);
+  return norm(Math.atan2(y,x)/r);
+}
+function bildschirmWinkel(){
+  try{ if(typeof window.orientation==='number') return window.orientation; if(screen.orientation && typeof screen.orientation.angle==='number') return screen.orientation.angle; }catch(e){}
+  return 0;
+}
+function kompassStart(){                // braucht auf dem iPad eine Berührung und die Erlaubnis für Bewegungsdaten
+  if(kompassAn) return; kompassAn=true;
+  function hoer(){
+    window.addEventListener('deviceorientation', function(e){
+      var h=null;
+      if(typeof e.webkitCompassHeading==='number' && !isNaN(e.webkitCompassHeading)) h=e.webkitCompassHeading;
+      else if(e.absolute===true && typeof e.alpha==='number') h=360-e.alpha;
+      if(h===null) return;
+      kurs=norm(h+bildschirmWinkel()); kursVomKompass=true;
+    });
+    window.addEventListener('deviceorientationabsolute', function(e){
+      if(typeof e.alpha==='number'){ kurs=norm(360-e.alpha+bildschirmWinkel()); kursVomKompass=true; }
+    });
+  }
+  try{
+    if(window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission==='function'){
+      DeviceOrientationEvent.requestPermission().then(function(r){ if(r==='granted') hoer(); }, function(){ kompassAn=false; });
+    } else if(window.DeviceOrientationEvent){ hoer(); }
+  }catch(e){}
+}
+var naeheZiel=0, naeheIst=0, winkelIst=0;
+function zielWinkel(t){
+  var p=ziel();
+  if(ankunft) return 0;
+  if(fix && p && kurs!==null) return norm(peilung(fix,p)-kurs);
+  return ruhig ? 0 : 12*Math.sin(t/800);            // ohne Richtung wiegt Funkel nur den Kopf
+}
+function kompassZeichnen(t){
+  if(!unterwegs()) return;
+  if(!ankunft && !wartet && gps==='an') pruefeAnkunft();
+  naeheIst+=(naeheZiel-naeheIst)*(ruhig ? 1 : ankunft ? 0.045 : 0.12);
+  var d=((zielWinkel(t||0)-winkelIst+540)%360)-180;
+  winkelIst=norm(winkelIst+d*(ruhig ? 1 : 0.18));
+  var el=$('kompass').firstChild, rel=((winkelIst+540)%360)-180, tx=0, dreh=rel;
+  if(kamImBild() && kurs!==null && fix && state.points[state.idx] && !ankunft){   // Kamerabild: Funkel wandert seitlich mit und steht aufrecht, solange das Ziel im Bild ist
+    tx=Math.max(-1,Math.min(1,rel/32))*46;
+    dreh=rel*Math.max(0,Math.min(1,(Math.abs(rel)-20)/25));
+  }
+  if(el) el.style.transform='translate('+tx.toFixed(1)+'%,0) rotate('+dreh.toFixed(1)+'deg) scale('+(0.4+0.6*naeheIst+(ankunft?0.06:0)).toFixed(3)+')';
+  var h=Math.round(naeheIst*244), f=$('skala-fuell');
+  f.setAttribute('y', 252-h); f.setAttribute('height', h);
+  $('skala').setAttribute('aria-valuenow', Math.round(naeheIst*100));
+  $('skala').classList.toggle('voll', naeheIst>0.96);
+}
+
+/* ---------- Uhr und Zeitplan ---------- */
+var PLAN=TOUR.zeitplan.stationen, PLAN_ENDE=TOUR.zeitplan.ende;            // Minuten nach dem Aufwecken, wann jede Station dran sein sollte
+function uhrZeigen(){
+  var el=$('uhr');
+  if(!state.startZeit || state.phase==='start' || state.phase==='heim'){ el.hidden=true; return; }
+  var jetzt=new Date(), hh=jetzt.getHours(), mm=jetzt.getMinutes();
+  var vergangen=(jetztMs()-state.startZeit)/60000, soll = state.phase==='end' ? PLAN_ENDE : PLAN[state.idx], diff=Math.round(vergangen-soll);
+  var txt = Math.abs(diff)<2 ? 'im Plan' : diff>0 ? diff+' min hinter dem Plan' : (-diff)+' min vor dem Plan';
+  el.textContent=hh+':'+(mm<10?'0':'')+mm+' · '+txt;
+  el.className='count'+(diff>=2?' spaet':diff<=-2?' frueh':'');
+  el.hidden=false;
+}
+
+/* ---------- Probelauf-Protokoll ---------- */
+var PROTO_KEY=TOUR.speicher+'.protokoll', proto=[];
+try{ proto=JSON.parse(localStorage.getItem(PROTO_KEY)||'[]')||[]; }catch(e){ proto=[]; }
+function protoSave(){ try{ localStorage.setItem(PROTO_KEY, JSON.stringify(proto.slice(-5))); }catch(e){} }
+function protoNeu(){ proto.push({start:jetztMs(), variante:state.variante, eintraege:[]}); protoSave(); }
+function protoEintrag(e){ if(!proto.length) protoNeu(); proto[proto.length-1].eintraege.push(e); protoSave(); renderProtokoll(); }
+function protoWarte(sek){ var l=proto.length && proto[proto.length-1].eintraege; if(l && l.length){ l[l.length-1].warte=sek; protoSave(); renderProtokoll(); } }
+function mmss(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+':'+(s%60<10?'0':'')+(s%60); }
+function renderProtokoll(){
+  var box=$('protokoll'), sum=$('sum-protokoll');
+  if(!proto.length){ box.innerHTML='<p class="lead">Noch kein Durchlauf. Das Protokoll füllt sich beim Probelauf von selbst.</p>'; sum.textContent='Noch kein Durchlauf'; return; }
+  var h='';
+  proto.slice().reverse().slice(0,3).forEach(function(r,ri){
+    var d=new Date(r.start), ges=r.eintraege.reduce(function(a,e){ return a+e.dauer+(e.warte||0); },0);
+    h+='<h3>'+(ri===0?'Letzter Durchlauf':'Davor')+': '+d.toLocaleDateString('de-DE')+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' · '+VARIANTEN[r.variante||'a'].name+' · Wege '+mmss(ges)+'</h3>';
+    if(!r.eintraege.length){ h+='<p class="lead">Keine Station erreicht.</p>'; return; }
+    h+='<table class="proto"><tr><th>Station</th><th>Weg</th><th>Sammeln</th><th>GPS</th><th>Geöffnet</th></tr>';
+    r.eintraege.forEach(function(e){
+      h+='<tr><td>'+(e.i+1)+' · '+esc(STATIONS[e.i].name)+'</td><td class="z">'+mmss(e.dauer)+'</td><td class="z">'+(e.warte!=null?e.warte+' s':'–')+'</td><td class="z">'+(e.acc!=null?'±'+e.acc+' m':'–')+'</td><td>'+(e.modus==='gps'?'per GPS':'von Hand')+'</td></tr>';
+    });
+    h+='</table>';
+  });
+  box.innerHTML=h;
+  var letzt=proto[proto.length-1];
+  sum.textContent=letzt.eintraege.length+' von '+(N-1)+' Stationen im letzten Durchlauf';
+}
+
+/* ---------- Gruppenfoto mit Rahmen ---------- */
+var fotoStrom=null, fotoSeite='environment', fotoBlob=null;
+function fotoRahmenSVG(w,h,ohneText){        // Regenbogen oben, Funkel unten links, Banner unten – alles an der kürzeren Seite bemessen
+  var m=Math.min(w,h), r0=m*0.26, cx=w/2, cy=m*0.30, out='', farben=['--rot','--rotorange','--orange','--gelb','--hellgruen','--gruen','--tuerkis','--blau','--indigo'];
+  var sw=r0*0.075;
+  farben.forEach(function(f,i){ var r=r0-i*sw*1.15; out+='<path d="M'+(cx-r)+' '+cy+' A'+r+' '+r+' 0 0 1 '+(cx+r)+' '+cy+'" fill="none" stroke="'+farbe(f)+'" stroke-width="'+sw+'" stroke-linecap="round"/>'; });
+  var ein=PIC.einhorn().replace(/var\((--[a-z-]+)\)/g, function(m2,v){ return farbe(v); }).replace('<svg ', '<svg x="'+(m*0.03)+'" y="'+(h-m*0.30)+'" width="'+(m*0.27)+'" height="'+(m*0.27)+'" ').replace(/class="inkfill"/g,'fill="'+farbe('--ink')+'"');
+  var b=fotoBanner(w,h);
+  out+='<rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="'+(b.h/2)+'" fill="rgba(255,255,255,.88)"/>';
+  if(!ohneText) out+='<text x="'+(b.x+b.w/2)+'" y="'+(b.y+b.h*0.66)+'" text-anchor="middle" font-family="Baloo 2, Trebuchet MS, sans-serif" font-weight="800" font-size="'+b.fs+'" fill="'+farbe('--magic-deep')+'">'+FOTO_TEXT+'</text>';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'">'+out+ein+'</svg>';
+}
+var FOTO_TEXT=TOUR.texte.foto;
+function fotoBanner(w,h){                       // Lage des Schriftbands
+  var m=Math.min(w,h), bw=Math.min(w-m*0.36, m*0.75), bh=m*0.085, bx=w-bw-m*0.04, by=h-bh-m*0.04;
+  return {x:bx,y:by,w:bw,h:bh,fs:Math.min(bh*0.5, bw/12)};
+}
+function fotoBuehne(){ var b=$('foto-buehne'); return {w:b.clientWidth||innerWidth, h:b.clientHeight||innerHeight}; }
+function fotoAuf(){
+  if(!kannKamera()){ toast('Diese Ansicht hat keine Kamera. Die Seite auf dem Handy öffnen.'); return; }
+  $('foto').hidden=false; $('foto-bild').hidden=true; $('foto-video').hidden=false; $('foto-leiste-1').hidden=false; $('foto-leiste-2').hidden=true; fotoBlob=null;
+  var bb=fotoBuehne(); $('foto-rahmen').innerHTML=fotoRahmenSVG(1000, Math.round(1000*bb.h/bb.w));
+  $('foto-video').classList.toggle('spiegeln', fotoSeite==='user');
+  fotoKamera();
+}
+function fotoKamera(){
+  fotoZuStrom();
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:fotoSeite}, width:{ideal:1920}, height:{ideal:1440}}, audio:false}).then(function(st){
+    fotoStrom=st; var v=$('foto-video'); v.srcObject=st; try{ var pr=v.play(); if(pr&&pr['catch']) pr['catch'](function(){}); }catch(e){}
+  }, function(){ toast('Kein Zugriff auf die Kamera.'); fotoZu(); });
+}
+function fotoZuStrom(){ try{ if(fotoStrom) fotoStrom.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} fotoStrom=null; }
+function fotoZu(){ fotoZuStrom(); $('foto').hidden=true; try{ $('foto-video').srcObject=null; }catch(e){} }
+function fotoKnips(){
+  var v=$('foto-video'), vw=v.videoWidth, vh=v.videoHeight;
+  if(!vw){ toast('Die Kamera ist noch nicht bereit.'); return; }
+  // Ausschnitt wie in der Vorschau (object-fit: cover): auf das Seitenverhältnis der Bühne zuschneiden
+  var bb=fotoBuehne(), ziel=bb.w/bb.h, w=vw, h=vh, sx=0, sy=0;
+  if(vw/vh>ziel){ w=Math.round(vh*ziel); sx=Math.round((vw-w)/2); } else { h=Math.round(vw/ziel); sy=Math.round((vh-h)/2); }
+  var cv=document.createElement('canvas'); cv.width=w; cv.height=h; var cx2=cv.getContext('2d');
+  if(fotoSeite==='user'){ cx2.translate(w,0); cx2.scale(-1,1); }
+  cx2.drawImage(v,sx,sy,w,h,0,0,w,h); cx2.setTransform(1,0,0,1,0,0);
+  var img=new Image(), svg=new Blob([fotoRahmenSVG(w,h,true)],{type:'image/svg+xml;charset=utf-8'}), url=URL.createObjectURL(svg);
+  img.onload=function(){
+    cx2.drawImage(img,0,0,w,h); URL.revokeObjectURL(url);
+    var b=fotoBanner(w,h);                       // Schrift direkt auf die Leinwand, damit die Seitenschrift greift (im SVG-Bild lädt sie nicht)
+    cx2.font='800 '+b.fs+'px "Baloo 2", "Trebuchet MS", sans-serif'; cx2.textAlign='center'; cx2.textBaseline='middle'; cx2.fillStyle=farbe('--magic-deep');
+    cx2.fillText(FOTO_TEXT, b.x+b.w/2, b.y+b.h*0.53);
+    cv.toBlob(function(bl){ fotoBlob=bl; var u=URL.createObjectURL(bl); var bild=$('foto-bild'); bild.src=u; bild.hidden=false; $('foto-video').hidden=true; $('foto-rahmen').innerHTML=''; $('foto-leiste-1').hidden=true; $('foto-leiste-2').hidden=false; fotoZuStrom(); konfetti(60,.5,.3); }, 'image/jpeg', 0.92);
+  };
+  img.onerror=function(){ toast('Der Rahmen ließ sich nicht zeichnen.'); };
+  img.src=url;
+}
+function fotoTeilen(){
+  if(!fotoBlob) return;
+  var name='Einhorn-Helfer-'+new Date().toISOString().slice(0,10)+'.jpg';
+  try{
+    var f=new File([fotoBlob], name, {type:'image/jpeg'});
+    if(navigator.canShare && navigator.canShare({files:[f]})){ navigator.share({files:[f], title:'Funkels Einhorn-Helfer'})['catch'](function(){}); return; }
+  }catch(e){}
+  var a=document.createElement('a'); a.href=URL.createObjectURL(fotoBlob); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  toast('Foto gesichert.');
+}
+
+/* ---------- Konfetti ---------- */
+var konf=[], konfRaf=null, konfCv=null, konfCx=null;
+function konfetti(n, x, y){                 // kurzer Regen bunter Schnipsel, x/y als Anteil der Fensterbreite/-höhe
+  try{ var F=f3d(); if(F) F.freude(); }catch(e){}
+  if(ruhig) return;
+  try{
+    if(!konfCv){ konfCv=$('konfetti'); konfCx=konfCv.getContext('2d'); }
+    var w=innerWidth, h=innerHeight, dpr=Math.min(devicePixelRatio||1,2);
+    konfCv.width=Math.round(w*dpr); konfCv.height=Math.round(h*dpr); konfCv.hidden=false;
+    var farben=['--rot','--gelb','--gruen','--blau','--lila','--orange','--tuerkis'];
+    for(var i=0;i<n;i++){
+      var a=-Math.PI/2+(Math.random()-.5)*1.6, v=6+Math.random()*9;
+      konf.push({x:w*(x===undefined?.5:x), y:h*(y===undefined?.45:y), vx:Math.cos(a)*v, vy:Math.sin(a)*v, r:Math.random()*6.28, vr:(Math.random()-.5)*.3, s:5+Math.random()*6, f:farbe(farben[i%farben.length]), t:0, stern:Math.random()<.3});
+    }
+    if(konfRaf===null) konfRaf=requestAnimationFrame(konfSchritt);
+  }catch(e){}
+}
+function konfSchritt(){
+  konfRaf=null;
+  var dpr=Math.min(devicePixelRatio||1,2), w=innerWidth, h=innerHeight;
+  konfCx.setTransform(dpr,0,0,dpr,0,0); konfCx.clearRect(0,0,w,h);
+  var lebt=[];
+  konf.forEach(function(k){
+    k.t++; k.vy+=0.28; k.vx*=0.985; k.x+=k.vx; k.y+=k.vy; k.r+=k.vr;
+    if(k.y>h+20 || k.t>160) return;
+    lebt.push(k);
+    konfCx.save(); konfCx.translate(k.x,k.y); konfCx.rotate(k.r); konfCx.globalAlpha=k.t>120 ? 1-(k.t-120)/40 : 1; konfCx.fillStyle=k.f;
+    if(k.stern){ var z=k.s*0.9; konfCx.beginPath(); konfCx.moveTo(0,-z); konfCx.quadraticCurveTo(0,0,z,0); konfCx.quadraticCurveTo(0,0,0,z); konfCx.quadraticCurveTo(0,0,-z,0); konfCx.quadraticCurveTo(0,0,0,-z); konfCx.fill(); }
+    else konfCx.fillRect(-k.s/2,-k.s/3,k.s,k.s*0.66);
+    konfCx.restore();
+  });
+  konf=lebt;
+  if(konf.length) konfRaf=requestAnimationFrame(konfSchritt); else konfCv.hidden=true;
+}
+
+/* ---------- Ablauf ---------- */
+function aufwecken(){ tonAn(); wachBleiben(); gpsStart(); state.phase='scene'; state.idx=0; state.step=0; state.startZeit=jetztMs(); state.heim=null; protoNeu(); klang(KLANG_DA); save(); render(); toast('Jetzt erklingt ein Zauberklang. Bleibt es still: Stummschalter und Lautstärke prüfen.'); }
+var ankunft=false, ankunftT=null, wartet=false, wartetSeit=0, popTimer=null;
+function popAus(){ if(popTimer){ clearInterval(popTimer); popTimer=null; } $('pop-seit').textContent=''; }   // wartet: angekommen, Kinder sammeln sich, Station öffnet erst auf „Weiter“
+function ankommen(modus){               // drei Sekunden blinken, dann das Pop mit „Weiter“
+  if(ankunft || wartet || state.phase!=='seek') return;
+  ankunft=true; naeheZiel=1; funkelZiel=1;
+  protoEintrag({i:state.idx, modus:modus||'hand', acc:fix?Math.round(fix.acc):null, dauer:Math.round((jetztMs()-seekSeit)/1000), zeit:jetztMs()});
+  klang(KLANG_DA); try{ if(navigator.vibrate) navigator.vibrate([120,80,120,80,300]); }catch(e){}
+  $('stage').classList.add('da'); live(); funkelStart();
+  ankunftT=setTimeout(function(){
+    ankunftT=null; ankunft=false; wartet=true; wartetSeit=jetztMs();
+    klang(KLANG_ZAUBER); render(); konfetti(90, .5, .4);
+    popTimer=setInterval(function(){ var sek=Math.round((jetztMs()-wartetSeit)/1000); $('pop-seit').textContent = sek>=5 ? 'Alle da? Seit '+sek+' s' : ''; }, 1000);
+  }, ruhig ? 700 : 3000);
+}
+function stationOeffnen(){               // „Weiter“ im Pop: jetzt liest Funkel die Aufgabe vor
+  if(!wartet) return;
+  tonAn(); wartet=false; popAus();
+  protoWarte(Math.round((jetztMs()-wartetSeit)/1000));
+  state.phase='scene'; state.step=0; trackTaps={}; galN=0; trackMsg=''; save(); render();
+}
+function ankunftAbbrechen(){ if(ankunftT){ clearTimeout(ankunftT); ankunftT=null; } ankunft=false; wartet=false; popAus(); }
+function weiter(){
+  still();
+  if(state.idx>=N-1){ state.phase='end'; state.step=0; klang(KLANG_ENDE); konfetti(160, .5, .3); setTimeout(function(){ konfetti(120, .2, .35); konfetti(120, .8, .35); }, 500); }
+  else { state.idx+=1; state.phase='seek'; state.step=0; naeheIst=0; naeheZiel=0; seekSeit=jetztMs(); verlassen=false; imRadiusSeit=0; }
+  save(); render(); pruefeAnkunft();
+}
+function verzaubern(){
+  if(state.phase!=='scene' || STATIONS[state.idx].kind!=='recolor' || state.step!==0) return;
+  tonAn(); state.step=1; klang(KLANG_ZAUBER); save();
+  var svg=document.querySelector('#mirror-pic .pic');
+  var st=STATIONS[state.idx];
+  if(svg){ var m=svg.querySelector('.main'); if(m) m.style.fill=css(st.richtig); svg.classList.add('pop'); }
+  render(true); konfetti(50, .5, .4);
+}
+function haupt(){
+  tonAn();
+  if(state.phase==='start'){ aufwecken(); return; }
+  if(state.phase==='seek'){ if(wartet) stationOeffnen(); else ankommen('hand'); return; }
+  if(state.phase==='end'){ heimStart(); return; }
+  if(state.phase==='heim'){ if(state.step===0) heimAngekommen(); else vonVorn(); return; }
+  if(state.phase!=='scene') return;
+  var st=STATIONS[state.idx];
+  if(st.kind==='plain'){ weiter(); }
+  else if(st.kind==='recolor'){ if(state.step===0) verzaubern(); else weiter(); }
+  else if(st.kind==='wahl'){ if(galerieAktiv()){ galN++; still(); klang(KLANG_ZAUBER); render(); var mp=$('mirror-pic'); mp.classList.remove('neu'); void mp.offsetWidth; mp.classList.add('neu'); return; } if(state.step>=1) weiter(); }
+  else if(st.kind==='finale'){
+    if(state.step<st.steps.length-1){ state.step+=1; still(); klang(KLANG_ZAUBER); save(); render(); }
+    else weiter();
+  }
+}
+function spurTipp(id){
+  var st=STATIONS[state.idx];
+  if(state.phase!=='scene' || st.kind!=='wahl' || state.step!==0) return;
+  tonAn();
+  var t=st.optionen.filter(function(x){ return x.id===id; })[0]; if(!t) return;
+  if(t.ja){ state.step=1; klang(KLANG_ZAUBER); save(); render(); konfetti(50, .5, .45); }
+  else { trackTaps[id]=true; trackMsg=t.nein; render(); var fn=erzFuer(state.idx, state.step), nt=erzNein(fn, id); if(nt){ nt.fig=fn; still(); kakaAuftritt(nt); } var el=document.querySelector('.choice[data-id="'+id+'"]'); if(el) el.classList.add('wackel'); }
+}
+function test(){ tonAn(); if(state.phase==='seek') ankommen('hand'); }
+function heimStart(){                   // nach dem Schatz: Sprünge bis zur Haustür zählen
+  tonAn(); still(); state.phase='heim'; state.step=0; seekSeit=jetztMs(); verlassen=false; imRadiusSeit=0; naeheIst=0; naeheZiel=0; heimMarke=Infinity;
+  wachBleiben(); gpsStart(); save(); render(); pruefeAnkunft();
+}
+var heimMarke=Infinity;
+function heimAngekommen(){
+  if(state.phase!=='heim' || state.step>=1) return;
+  tonAn(); state.step=1; klang(KLANG_ENDE); konfetti(140, .5, .35); save(); render();
+}
+function gehZu(n){                      // Sprung aus dem Ablauf-Faden zu einem beliebigen Schritt
+  var t=TEXTE[n]; if(!t) return;
+  tonAn(); still(); ankunftAbbrechen(); trackTaps={}; galN=0; trackMsg=''; naeheIst=0; naeheZiel=0; heimMarke=Infinity;
+  state.idx=t.i; state.phase=t.phase; state.step=t.step; seekSeit=jetztMs(); verlassen=false; imRadiusSeit=0;
+  if(t.phase!=='start'){ wachBleiben(); gpsStart(); }
+  save(); zeige('tour'); render(); pruefeAnkunft();
+}
+function vonVorn(){ ankunftAbbrechen(); still(); state.idx=0; state.phase='start'; state.step=0; trackTaps={}; galN=0; trackMsg=''; save(); render(); zeige('tour'); }
+function allesLoeschen(){
+  ankunftAbbrechen(); still(); state.points=[null,null,null,null,null,null,null]; state.idx=0; state.phase='start'; state.step=0; save(); render();
+  toast('Alle Punkte gelöscht. Die Tour steht wieder am Anfang.');
+}
+
+/* ---------- Anzeige ---------- */
+function $(id){ return document.getElementById(id); }
+var T_START=TOUR.texte.start, T_ENDE=TOUR.texte.ende, T_ENDE2=TOUR.texte.ende2, T_HEIM=TOUR.texte.heim, T_HEIM2=TOUR.texte.heim2;
+function texte(){                       // alle Schritte der Tour in Reihenfolge, mit dem Satz, den Funkel dort spricht
+  var l=[{key:'start', label:'Vor dem Start', kurz:'Vor dem Start', text:T_START, i:0, phase:'start', step:0}];
+  STATIONS.forEach(function(st,i){
+    var n='Station '+(i+1);
+    if(st.seek) l.push({key:'s'+i+'.weg', label:n+' · unterwegs', kurz:'Weg dorthin', text:st.seek, i:i, phase:'seek', step:0, mit:!!(st.ohne&&st.ohne.seek), live:st.ansageText?'live.s'+i:null, liveText:st.ansageText||null});
+    if(st.ohne&&st.ohne.seek) l.push({key:'s'+i+'.weg.ohne', label:n+' · unterwegs (ohne Ausdrucke)', kurz:'Weg dorthin', text:st.ohne.seek, i:i, phase:'seek', step:0, nurOhne:true, live:st.ansageText?'live.s'+i:null, liveText:st.ansageText||null});
+    if(st.kind==='finale'){ st.steps.forEach(function(sp,j){ l.push({key:'s'+i+'.f'+j, label:n+' · '+sp.title, kurz:sp.title, text:sp.say, i:i, phase:'scene', step:j}); }); }
+    else {
+      if(st.say2){ l.push({key:'s'+i+'.a', label:n+' · '+st.title+', Teil 1', kurz:st.title, text:st.say, i:i, phase:'scene', step:0, zweit:'s'+i+'.b'}); l.push({key:'s'+i+'.b', label:n+' · '+st.title+', Teil 2', kurz:st.title+', Teil 2', text:st.say2, i:i, phase:'scene', step:0, teil:true}); }
+      else l.push({key:'s'+i+'.frage', label:n+' · '+st.title, kurz:st.title, text:st.say, i:i, phase:'scene', step:0, mit:!!(st.ohne&&st.ohne.say)});
+      if(st.ohne&&st.ohne.say) l.push({key:'s'+i+'.frage.ohne', label:n+' · '+st.title+' (ohne Ausdrucke)', kurz:st.title, text:st.ohne.say, i:i, phase:'scene', step:0, nurOhne:true});
+      if(st.after) l.push({key:'s'+i+'.antwort', label:n+' · Lösung', kurz:'Lösung', text:st.after, i:i, phase:'scene', step:1, mit:!!(st.ohne&&st.ohne.after)});
+      if(st.ohne&&st.ohne.after) l.push({key:'s'+i+'.antwort.ohne', label:n+' · Lösung (ohne Ausdrucke)', kurz:'Lösung', text:st.ohne.after, i:i, phase:'scene', step:1, nurOhne:true});
+    }
+  });
+  l.push({key:'ende.a', label:'Schluss, Teil 1', kurz:'Schluss', text:T_ENDE, i:N-1, phase:'end', step:0, zweit:'ende.b'});
+  l.push({key:'ende.b', label:'Schluss, Teil 2', kurz:'Schluss, Teil 2', text:T_ENDE2, i:N-1, phase:'end', step:0, teil:true});
+  l.push({key:'heim', label:'Heimweg', kurz:'Heimweg', text:T_HEIM, i:N-1, phase:'heim', step:0});
+  l.push({key:'heim.ende', label:'Zu Hause', kurz:'Zu Hause', text:T_HEIM2, i:N-1, phase:'heim', step:1});
+  return l;
+}
+var TEXTE=texte();
+/* ---------- Kakapups ---------- */
+// Professor Kakapups liest die Aufgaben für die Kinder vor. Vorher pupst er und legt ein Häufchen.
+// Je Station und Schritt: a = Outdoor voll; b, c nur, wo die Kinder etwas anderes tun sollen.
+var KAKA=TOUR.erzaehler.kaka, KAKA_NEIN=TOUR.erzaehler.kakaNein;
+function kakaTexte(){                    // alle Sätze, die Kakapups spricht, mit Schlüssel
+  var l=[];
+  Object.keys(KAKA).forEach(function(i){ Object.keys(KAKA[i]).forEach(function(s){ var e=KAKA[i][s];
+    Object.keys(e).forEach(function(v){ l.push({key:'k.s'+i+'.'+s+(v==='a'?'':'.'+v), text:e[v]}); }); }); });
+  Object.keys(KAKA_NEIN).forEach(function(id){ l.push({key:'k.nein.'+id, text:KAKA_NEIN[id]}); });
+  return l;
+}
+/* ---------- Kakapups Ende ---------- */
+/* ---------- Erzähler ---------- */
+// Wer die Aufgaben vorliest. Kakapups hat eigene, ganze Sätze (KAKA oben); die anderen sagen
+// ihren Einstiegs-Gag, dann die Aufgabe (KERN) und zum Schluss die kurze Zusammenfassung (ALSO).
+var EZ=TOUR.erzaehler, ERZ=EZ.figuren, ERZ_REIHE=EZ.reihe, KERN=EZ.kern, ALSO=EZ.also, GAG=EZ.gag, NEIN_KERN=EZ.neinKern;
+function erzSatz(fig, i, s, v){           // Satz einer Figur für Station i, Schritt s, Variante v (oder null)
+  if(fig==='kakapups'){ var e=KAKA[i] && KAKA[i][s]; if(!e) return null; var k='k.s'+i+'.'+s; return (v!=='a' && e[v]) ? {key:k+'.'+v, text:e[v]} : {key:k, text:e.a}; }
+  var kn=KERN[i] && KERN[i][s], g=GAG[fig] && GAG[fig][i+'.'+s], al=ALSO[i+'.'+s]; if(!kn || !g || !al) return null;
+  var vv=(v!=='a' && kn[v]) ? v : 'a';
+  return {key:'e.'+fig+'.s'+i+'.'+s+(vv==='a'?'':'.'+vv), text:g+' '+kn[vv]+' '+ERZ[fig].also+' '+(al[vv]||al.a)};
+}
+function erzNein(fig, id){
+  if(fig==='kakapups') return KAKA_NEIN[id] ? {key:'k.nein.'+id, text:KAKA_NEIN[id]} : null;
+  return NEIN_KERN[id] ? {key:'e.'+fig+'.nein.'+id, text:ERZ[fig].nein+' '+NEIN_KERN[id]} : null;
+}
+function erzTexte(){                     // alle Sätze der neuen Erzähler, für den Stimmen-Generator
+  var l=[];
+  ERZ_REIHE.forEach(function(fig){ if(fig==='kakapups') return;
+    Object.keys(KERN).forEach(function(i){ Object.keys(KERN[i]).forEach(function(s){ Object.keys(KERN[i][s]).forEach(function(v){ var t=erzSatz(fig, +i, +s, v); if(t) l.push(t); }); }); });
+    Object.keys(NEIN_KERN).forEach(function(id){ l.push(erzNein(fig, id)); });
+  });
+  return l;
+}
+/* ---------- Erzähler Ende ---------- */
+/* ---------- Kurz-Info ---------- */
+// Was konkret zu tun oder zu finden ist, in Stichpunkten hinter dem Info-Knopf.
+// Schlüssel: 'start', 'w'+Station (unterwegs), Station+'.'+Schritt, 'ende', 'heim', 'heim.ende'.
+// Je Eintrag a = Outdoor voll; b, c nur, wo es abweicht. Jede Zeile: [Stichwort, Text].
+var INFO=TOUR.info;
+function infoKey(){
+  var ph=state.phase;
+  if(ph==='start') return 'start';
+  if(ph==='end') return 'ende';
+  if(ph==='heim') return state.step>=1 ? 'heim.ende' : 'heim';
+  if(ph==='seek') return 'w'+state.idx;
+  return state.idx+'.'+state.step;
+}
+function infoZeilen(){                    // Stichpunkte zum aktuellen Schritt, passend zur Variante
+  var e=INFO[infoKey()]; if(!e) return [];
+  var z=((state.variante!=='a' && e[state.variante]) || e.a).slice();
+  var ph=state.phase, st=stv(state.idx);
+  if(ph==='seek'){
+    if(st.vorOrt) z.push(['Vor Ort', st.vorOrt]);
+    z.push(['Weiter', manuell() ? 'Am Ziel „Station öffnen“ tippen' : 'Station öffnet sich am Ziel von selbst']);
+  }
+  if(ph==='heim' && state.step===0) z.push(['Weiter', !manuell() ? 'Der Spiegel öffnet sich an der Tür von selbst' : 'An der Tür „Zu Hause angekommen“ tippen']);
+  return z;
+}
+var infoOffen=false;
+function infoZeigen(){
+  var z=infoZeilen(), b=$('btn-info'), l=$('jetzt-info'); if(!b || !l) return;
+  b.hidden=!z.length;
+  var an=infoOffen && z.length>0;
+  b.setAttribute('aria-expanded', String(an));
+  l.hidden=!an;
+  l.innerHTML = an ? z.map(function(r){ return '<li><b>'+esc(r[0])+':</b> '+esc(r[1])+'</li>'; }).join('') : '';
+}
+/* ---------- Kurz-Info Ende ---------- */
+
+
+var KEYPOS={}; TEXTE.forEach(function(t,n){ KEYPOS[t.key]=n; });
+function pos(){ return KEYPOS[akt().key]; }
+function akt(){                         // der Satz, der gerade dran ist
+  if(state.phase==='start') return {key:'start', text:T_START};
+  if(state.phase==='end') return {key:'ende.a', text:T_ENDE, zweit:{key:'ende.b', text:T_ENDE2}};
+  if(state.phase==='heim') return state.step>=1 ? {key:'heim.ende', text:T_HEIM2} : {key:'heim', text:T_HEIM};
+  var i=state.idx, st=STATIONS[i], o=(state.variante!=='a' && st.ohne) ? st.ohne : null;   // ohne Ausdrucke: eigene Sätze
+  if(state.phase==='seek') return o&&o.seek ? {key:'s'+i+'.weg.ohne', text:o.seek} : {key:'s'+i+'.weg', text:st.seek};
+  if(st.kind==='finale') return {key:'s'+i+'.f'+state.step, text:st.steps[state.step].say};
+  if(st.after && state.step>=1) return o&&o.after ? {key:'s'+i+'.antwort.ohne', text:o.after} : {key:'s'+i+'.antwort', text:st.after};
+  if(o&&o.say && !st.say2) return {key:'s'+i+'.frage.ohne', text:o.say};
+  if(st.say2) return {key:'s'+i+'.a', text:st.say, zweit:{key:'s'+i+'.b', text:st.say2}};
+  return {key:'s'+i+'.frage', text:st.say};
+}
+function aktText(){ var a=akt(); return a.text+(a.zweit ? ' '+a.zweit.text : ''); }
+function manuell(){ return unterwegs() && (indoor() || !(gps==='an' && ziel())); }   // Station muss von Hand geöffnet werden
+function hauptText(){                   // Beschriftung des einen Hauptknopfs, leer = kein Knopf nötig
+  var ph=state.phase, st=STATIONS[state.idx];
+  if(ph==='start') return 'Spiegel aufwecken';
+  if(ph==='end') return 'Heimweg starten';
+  if(ph==='heim') return state.step>=1 ? 'Zurück zum Anfang' : (manuell() ? 'Zu Hause angekommen' : '');
+  if(ph==='seek') return (manuell() && !ankunft && !wartet) ? 'Station öffnen' : '';
+  if(st.kind==='plain') return st.go;
+  if(st.kind==='recolor') return state.step===0 ? 'Bild verzaubern' : 'Bögen gefunden, weiter';
+  if(st.kind==='wahl'){ if(galerieAktiv()) return galN<st.optionen.length-1 ? 'Nächstes Bild' : 'Alle vier gesehen'; return state.step>=1 ? st.go : ''; }
+  return st.steps[state.step].go;
+}
+function jetzt(){                       // was der Erzähler in diesem Moment tun soll
+  var ph=state.phase, st=stv(state.idx);
+  if(ph==='start') return indoor() ? 'Variante Indoor: Stationen öffnest du von Hand. Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : gesetzt() ? 'Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : 'Zum Ausprobieren „Spiegel aufwecken“ tippen. Für die echte Tour vorher unter „Einrichten“ die Punkte setzen.';
+  if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Währenddessen kommt die Schatzkiste zur Parkbank. Darin liegen Kratzbilder, Zaubertafeln und Zeichenschablonen. Nach Schatz und Snack „Heimweg starten“.';
+  if(ph==='heim') return state.step>=1 ? 'Geschafft! Tattoos abwischen, den Schatz gibt es nach dem Essen.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
+  if(ph==='seek'){
+    if(ankunft) return 'Angekommen!';
+    if(wartet) return 'Alle Kinder einsammeln. Wenn alle schauen, „Weiter“ tippen, dann liest Funkel die Aufgabe vor.';
+    var vor = (gehoert[akt().key] ? '' : 'Erst alle Kinder sammeln, dann „Funkel sprechen lassen“ tippen. ') + (st.vorOrt ? st.vorOrt+' ' : '');
+    if(indoor()) return vor+'Nächster Ort: '+st.wo+'. Dort „Station öffnen“ tippen.';
+    if(!state.points[state.idx]) return vor+'Für diese Station ist kein Punkt gesetzt. Am Ziel „Station öffnen“ tippen.';
+    if(gps!=='an') return vor+'Ohne GPS: zur Station laufen und dort „Station öffnen“ tippen.';
+    if(kurs===null) return vor+'Dann lauft los. Funkel wird größer, je näher ihr kommt, und die Station öffnet sich von selbst.';
+    if(kamImBild()) return vor+'Schwenkt den Spiegel, bis Funkel im Bild steht, und lauft dorthin. Funkel wird größer, je näher ihr kommt.';
+    return vor+'Dreht euch, bis Funkels Horn nach oben zeigt, und lauft los. Funkel wird größer, je näher ihr kommt.';
+  }
+  if(st.kind==='plain') return st.task;
+  var lin = linseAn() ? 'Haltet den Spiegel vor das gedruckte Bild. Im Zauberkreis hat es wieder seine echte Farbe. ' : '';
+  if(st.kind==='recolor') return state.step===0 ? 'Die Kinder rufen, was nicht stimmt. Dann aufs Bild oder auf „Bild verzaubern“ tippen.' : lin+st.dann;
+  if(st.kind==='wahl'){
+    if(galerieAktiv()){ var go=st.optionen[galN], m=st.optionen.length;
+      return 'Bild '+(galN+1)+' von '+m+': '+go.name+'. Die Kinder rufen, was falsch ist und welche Farbe es in echt hat. '+(galN<m-1 ? 'Dann ein paar Schritte am Zaun weiter und „Nächstes Bild“ tippen.' : 'Dann „Alle vier gesehen“ tippen.'); }
+    return state.step===0 ? st.frage : lin+st.dann;
+  }
+  return st.steps[state.step].dann;
+}
+function zaehler(){
+  if(state.phase==='start') return gesetzt()+' von '+(N-1)+' Punkten gesetzt';
+  if(state.phase==='end') return 'Geschafft';
+  if(state.phase==='heim') return state.step>=1 ? 'Zu Hause' : 'Heimweg';
+  var meine=TEXTE.filter(function(t){ return t.i===state.idx && t.phase!=='start' && t.phase!=='end'; }), k=akt().key, nr=1;
+  meine.forEach(function(t,j){ if(t.key===k) nr=j+1; });
+  return 'Station '+(state.idx+1)+' von '+N+' · Schritt '+nr+' von '+meine.length;
+}
+var letzterKey=null, gehoert={}, letzteFound={};
+var schwebTimer=null, schwebTimer2=null, neueBoegen={}, geschwebtBei=null;
+// Der Regenbogen schwebt einmal je Schritt ein, und zwar genau dann, wenn „Regenbogen“ oder „Bögen“ gesagt wird.
+var BOGEN_WORT=/Regenbogen|Bögen|Bogen/, ZEICHEN_PRO_S=14;
+function bogenBeimWort(text, g, key){
+  if(document.body.classList.contains('bogen-inline') || state.phase==='start') return;
+  var k=akt().key; if(geschwebtBei===k) return;
+  var m=BOGEN_WORT.exec(text||''); if(!m) return;
+  geschwebtBei=k;
+  var anteil=m.index/Math.max(1,text.length), PRUEF=400;
+  setTimeout(function(){                  // nach kurzem Anlauf ist die Länge der Aufnahme bekannt, sonst schätzen
+    if(!(g===tonGen || tonLaeuft)) return;
+    var c=clips[key], d=null;
+    try{ if(c && puffer[key]) d=puffer[key].duration; else if(c && audioEl && audioEl.src && isFinite(audioEl.duration)) d=audioEl.duration; }catch(e){}
+    var ms = d ? Math.round((0.25+anteil*Math.max(0,d-0.25))/tempo(c)*1000) : 250+Math.round(m.index/ZEICHEN_PRO_S*1000);
+    setTimeout(function(){ if(g===tonGen || tonLaeuft) bogenSchweben(); }, Math.max(0, ms-PRUEF));
+  }, PRUEF);
+}
+function bogenSchweben(){                // Regenbogen schwebt kurz oben ein, ohne die Seite zu verschieben
+  var w=$('bogen-wrap'); if(!w) return;
+  Object.keys(neueBoegen).forEach(function(a){ var el=w.querySelectorAll('.arc.'+a); for(var q=0;q<el.length;q++){ el[q].classList.remove('neu'); void el[q].getBoundingClientRect(); el[q].classList.add('neu'); } });
+  neueBoegen={};
+  clearTimeout(schwebTimer); clearTimeout(schwebTimer2);
+  w.classList.remove('raus'); w.classList.add('schwebt');
+  schwebTimer=setTimeout(function(){ w.classList.add('raus'); schwebTimer2=setTimeout(function(){ w.classList.remove('schwebt','raus'); }, 500); }, 4200);
+}
+function render(keepPic){
+  var st=STATIONS[state.idx], ph=state.phase, found=arcsFound();
+  var fin = ph==='scene' && st.kind==='finale';
+  var galerie0 = ph==='scene' && st.pic==='galerie' && state.step===0;
+  $('bogen-wrap').innerHTML=bogenSVG(found, fin && state.step<=1 ? 'blau' : galerie0 ? st.arc : null);
+  var dazu=false;
+  ARCS.forEach(function(a){ if(found[a] && !letzteFound[a]){ dazu=true; if(letzterKey!==null) neueBoegen[a]=true; var neu=document.querySelectorAll('#bogen-wrap .arc.'+a); for(var q=0;q<neu.length;q++) neu[q].classList.add('neu'); } });
+  ARCS.forEach(function(a){ if(!found[a]) delete neueBoegen[a]; });
+  letzteFound=found;
+  var inline = (ph==='scene' && st.kind==='finale') || ph==='end' || (ph==='heim' && state.step>=1);
+  document.body.classList.toggle('bogen-inline', inline);
+
+  $('count').textContent=zaehler();
+
+  var title, pic='', tap=false;
+  if(ph==='start'){ title='Der Spiegel schläft'; pic=PIC.horn(); }
+  else if(ph==='end'){ title='Der Schatz erscheint!'; pic=PIC.einhorn(); }
+  else if(ph==='heim'){ title = state.step>=1 ? 'Zu Hause!' : 'Hüpft nach Hause!'; pic = state.step>=1 ? PIC.einhorn() : ''; }
+  else if(ph==='seek'){ title='Folgt der Spur!'; }
+  else if(st.kind==='plain'){ title=st.title; pic=PIC[st.pic](); }
+  else if(st.kind==='recolor'){ title=st.title; tap=state.step===0; pic=PIC[st.pic](css(state.step===0 ? st.falsch : st.richtig)); }
+  else if(st.kind==='wahl'){ title=st.title; var gb=galerieAktiv() ? st.optionen[galN] : null; pic = gb ? PIC[gb.id](gb.farbe) : st.pic==='pfote' ? PIC.pfote() : state.step===0 ? bogenSVG(found,st.arc,'bogen-gross') : PIC.sonne(css('--gelb')); }
+  else { var sp=st.steps[state.step]; title=sp.title; pic = sp.pic==='bogen' ? bogenSVG(found,'blau','bogen-gross') : PIC[sp.pic](); }
+  $('scene-title').textContent=title;
+  $('scene-say').textContent = (ph==='scene' && st.kind==='wahl' && state.step===0 && trackMsg) ? trackMsg : aktText();
+  $('btn-speak').hidden=!(kannSprechen || Object.keys(clips).length);
+  sprechKnopf();
+
+  var mp=$('mirror-pic');
+  if(!keepPic) mp.innerHTML=pic;
+  var uw=unterwegs();
+  mp.hidden = uw;
+  mp.classList.toggle('tap', tap);
+  $('funkeln').hidden = !(uw || ph==='end' || ph==='heim');
+  $('mirror-read').hidden = !uw;
+  $('kompass').hidden = !uw; $('skala').hidden = !uw;
+  $('stage').classList.toggle('mit-skala', uw);
+  $('stage').classList.toggle('da', ankunft && ph==='seek');
+  $('pop').hidden = !(wartet && ph==='seek');
+  $('kompass').hidden = !uw || wartet;
+  kameraPflege();
+  var linse=linseAn();
+  $('kamera').hidden = !(kamStrom && (ph==='seek' || linse));
+  $('linse').hidden = !linse;
+  if(linse) mp.hidden=true;
+  linseStart();
+
+  var ch=$('choices');
+  if(ph==='scene' && st.kind==='wahl' && !galerieAktiv()){
+    ch.hidden=false;
+    ch.innerHTML=st.optionen.map(function(o){
+      var geloest=state.step>=1, zeigen = !!st.namenOffen || geloest || !!trackTaps[o.id];
+      var cls='choice'+(o.ja && geloest ? ' richtig' : (!o.ja && (trackTaps[o.id]||geloest) ? ' falsch' : ''));
+      var bild = st.pic==='pfote' ? '<svg viewBox="0 0 200 200" aria-hidden="true">'+SPUR[o.id]+'</svg>' : PIC[o.id](o.ja && geloest ? o.richtig : o.farbe);
+      return '<button type="button" class="'+cls+'" data-id="'+o.id+'" aria-label="'+esc(zeigen ? o.name : 'Spur antippen')+'">'+bild+'<span>'+(zeigen ? esc(o.name) : '?')+'</span></button>';
+    }).join('');
+  } else { ch.hidden=true; ch.innerHTML=''; }
+
+  renderSetup();
+  live();
+  funkelStart();
+  if(fadenOffen) renderFaden();
+  var k=akt().key, alt=letzterKey; letzterKey=k;        // neuen Schritt von selbst sprechen
+  if(alt!==null && k!==alt) fokusPlanen();
+  if(k!==alt){                                           // weicher Wechsel: Text und Bild gleiten herein
+    var sty=document.querySelector('.story'), mp2=$('mirror-pic');
+    sty.classList.remove('neu'); mp2.classList.remove('neu'); void sty.offsetWidth; sty.classList.add('neu'); if(!keepPic) mp2.classList.add('neu');
+  }
+  $('stage').classList.toggle('atmet', uw && !ankunft && !wartet);
+  $('btn-foto').hidden = !(ph==='end' || ph==='heim');
+  if(alt!==null && k!==alt && k!=='start' && ph!=='seek' && state.autoSag && beruehrt && view==='tour') sagen();   // unterwegs nie von selbst: erst sammeln, dann tippen
+}
+function chipText(){
+  if(gps==='an'){
+    var alt=Math.round(fixAlter()/1000), k = kursVomKompass ? 'Kompass an' : (kurs!==null ? 'Richtung aus der Bewegung' : 'Kompass aus');
+    if(alt>10) return ['wait','GPS seit '+alt+' s nicht erneuert (zuletzt ±'+Math.round(fix.acc)+' m) · '+k];
+    return ['on','GPS an, genau auf ±'+Math.round(fix.acc)+' m · '+k];
+  }
+  if(gps==='sucht') return ['wait','GPS sucht noch …'];
+  if(gps==='keins') return ['off','Kein GPS in dieser Ansicht. Stationen öffnest du von Hand.'];
+  return ['','GPS ist aus'];
+}
+
+/* ---------- Ablauf-Faden ---------- */
+var fadenOffen=false, breit=window.matchMedia ? window.matchMedia('(min-width:1080px)') : {matches:false};
+function renderFaden(){
+  var p=pos(), h='';
+  function zeile(n, art, label, vorschau, farbe){
+    var z = art==='kopf' ? (n<=p ? 'war' : 'kommt') : (n<p ? 'war' : n===p ? 'hier' : 'kommt');
+    return '<li class="'+z+(art?' gross':'')+(art==='kopf'?' kopf':'')+'"><button type="button" class="fs" data-n="'+n+'"'+(z==='hier'?' aria-current="step"':'')+'>'+
+      '<span class="dot"'+(farbe?' style="--c:'+css(farbe)+'"':'')+'></span><span class="t">'+esc(label)+'</span>'+(vorschau?'<span class="v">'+esc(vorschau)+'</span>':'')+'</button></li>';
+  }
+  var station=-1;
+  TEXTE.forEach(function(t,n){
+    if(t.teil) return;
+    if(t.nurOhne && state.variante==='a') return;
+    if(t.mit && state.variante!=='a') return;
+    if(t.phase==='start'){ h+=zeile(n,'ende',t.kurz,t.text); return; }
+    if(t.phase==='end' || t.phase==='heim'){ h+=zeile(n,'ende',t.kurz,t.text); return; }
+    if(t.i!==station){ station=t.i; var st=STATIONS[t.i]; h+=zeile(n,'kopf',(t.i+1)+' · '+st.name,'', st.arc ? FARBE[st.arc] : null); }
+    h+=zeile(n,'',t.kurz,t.text);
+  });
+  $('faden-liste').innerHTML=h;
+}
+function fadenZeigen(an){
+  fadenOffen=an;
+  $('faden').hidden=!an; $('backdrop').hidden=!an;
+  document.body.classList.toggle('faden-offen', an);
+  $('btn-ablauf').setAttribute('aria-expanded', String(an));
+  if(an){
+    renderFaden();
+    var sc=$('faden-scroll'), c=sc.querySelector('[aria-current="step"]');
+    if(c) sc.scrollTop=Math.max(0, c.parentNode.offsetTop - sc.clientHeight/2 + 30);
+    try{ $('faden-zu').focus({preventScroll:true}); }catch(e){}
+  }
+  funkelStart();
+}
+var funkelZiel=0.12;
+function live(){
+  var mt=hauptText(); $('btn-main').textContent=mt; $('btn-main').hidden=!mt;
+  modusZeigen();
+  $('jetzt-was').textContent=jetzt();
+  var ka=kakaSatz(), kb=$('btn-aufgabe');
+  if(kb){                                // Szene: der Erzähler liest die Aufgabe; sonst liest Funkel den Satz des Schritts noch einmal
+    var sprechbar=!!ka || (state.phase!=='start' && (kannSprechen || Object.keys(clips).length>0));
+    kb.hidden=!sprechbar;
+    $('btn-aufgabe-txt').textContent = ka ? ERZ[ka.fig].kurz+' liest vor' : 'Funkel liest vor';
+  }
+  infoZeigen();
+  var nx=TEXTE[pos()+1]; while(nx && (nx.teil || (nx.nurOhne && state.variante==='a') || (nx.mit && state.variante!=='a'))) nx=TEXTE[KEYPOS[nx.key]+1];
+  $('jetzt-dann').textContent = (state.phase==='heim' || !nx) ? '' : 'Danach: '+nx.label;
+  $('btn-linse').hidden=!linseAn();
+  sprechKnopf();
+  $('btn-test').hidden = !(state.showTest && state.phase==='seek' && !manuell() && !ankunft && !wartet);
+  $('btn-hand').hidden = $('btn-test').hidden;
+  var c=chipText();
+  ['gps-chip','gps-chip-2'].forEach(function(id){ var el=$(id); el.className='chip '+c[0]; el.textContent=c[1]; });
+  $('btn-gps').hidden = gps==='an' || gps==='sucht';
+  uhrZeigen();
+  var read=$('mirror-read');
+  if(state.phase==='heim' && state.step===0){
+    var dh=abstand();
+    if(dh!==null){
+      var alt2=!fixFrisch(), spr=spruenge(dh), marke=Math.floor(dh/100);
+      read.innerHTML='<span class="big"'+(alt2?' style="opacity:.45"':'')+'>'+spr+'</span><span class="lab">Sprünge, noch '+Math.round(dh)+' m</span>';
+      naeheZiel=Math.max(0, 1-dh/400); funkelZiel=0.12+0.88*naeheZiel;
+      if(marke<heimMarke && heimMarke!==Infinity && marke>=1){ klang(KLANG_ZAUBER); toast('Nur noch '+spr+' Sprünge!'); }
+      if(heimMarke===Infinity || marke<heimMarke) heimMarke=marke;
+    } else {
+      read.innerHTML='<span class="lab">'+(!state.heim ? 'Haustür unbekannt' : gps==='keins' ? 'Ohne GPS unterwegs' : 'Suche die Haustür …')+'</span>';
+      naeheZiel=0; funkelZiel=0.3;
+    }
+    kompassZeichnen(window.performance && performance.now ? performance.now() : 0);
+  } else if(state.phase==='seek'){
+    var d=abstand(), p=state.points[state.idx];
+    if(ankunft || wartet){
+      read.innerHTML = wartet ? '' : '<span class="big">Angekommen!</span>';
+    } else if(d!==null){
+      var alt=!fixFrisch();
+      read.innerHTML='<span class="big"'+(alt?' style="opacity:.45"':'')+'>'+Math.round(d)+' m</span><span class="lab">'+(alt?'altes Signal':waerme(d,state.radius))+'</span>';
+      naeheZiel=naehe(d,state.radius); funkelZiel=0.12+0.88*naeheZiel;
+    } else {
+      read.innerHTML='<span class="lab">'+(!p ? 'Kein Punkt gesetzt' : gps==='keins' ? 'Ohne GPS unterwegs' : 'Suche die Spur …')+'</span>';
+      naeheZiel=0; funkelZiel=0.25;
+    }
+    kompassZeichnen(window.performance && performance.now ? performance.now() : 0);
+  } else if(state.phase==='end' || state.phase==='heim'){ funkelZiel=1; }
+  var rows=document.querySelectorAll('#points li');
+  for(var i=0;i<rows.length;i++){
+    var k=i+1, pt=state.points[k], stEl=rows[i].querySelector('.st'), b=rows[i].querySelector('button');
+    if(pt){
+      var txt='Gesetzt'+(pt.acc!==null?' (±'+Math.round(pt.acc)+' m)':'');
+      if(fix) txt+=', '+Math.round(meter(fix,pt))+' m von hier';
+      stEl.textContent=txt; stEl.className='st ok';
+    } else { stEl.textContent='Noch offen'; stEl.className='st offen'; }
+    b.disabled=!fix;
+    b.textContent = !fix ? 'Erst GPS starten' : pt ? 'Neu setzen' : 'Punkt hier setzen';
+  }
+}
+function erzAufgaben(){                  // alle Aufgaben, die ein Erzähler vorliest, mit Beschriftung
+  var l=[];
+  Object.keys(KERN).forEach(function(i){ var st=STATIONS[i]; Object.keys(KERN[i]).forEach(function(s){
+    var t=st.kind==='finale' ? st.steps[s].title : (+s===0 ? st.title : st.title+', danach');
+    l.push({k:i+'.'+s, label:'Station '+(+i+1)+' · '+t}); }); });
+  return l;
+}
+function renderErz(){
+  var w=$('erz-wahl'); if(!w) return;
+  if(!w.childNodes.length){
+    w.innerHTML=ERZ_REIHE.map(function(f){ var sv=document.querySelector('#kaka svg[data-figur="'+f+'"]');
+      return '<div class="erz-k" role="button" tabindex="0" data-erz="'+f+'" aria-pressed="false"><span class="ava">'+(sv?sv.outerHTML.replace(' hidden=""','').replace(' hidden>','>').replace(/(id="|url\(#)kk-(braun|kittel|wolke)/g,'$1ava-$2'):'')+'</span><b>'+esc(ERZ[f].kurz)+'</b><small>'+esc(ERZ[f].was)+'</small><button type="button" class="erz-hoer" data-hoer="'+f+'">Anhören</button></div>'; }).join('');
+    $('erz-je').innerHTML=erzAufgaben().map(function(a){
+      return '<li class="erz-zeile"><button type="button" class="erz-probe" data-probe="'+a.k+'" aria-label="'+esc(a.label)+' anhören"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg></button><span>'+esc(a.label)+'</span><select data-k="'+a.k+'" aria-label="Erzähler für '+esc(a.label)+'"><option value="">Wie oben</option>'+
+        ERZ_REIHE.map(function(f){ return '<option value="'+f+'">'+esc(ERZ[f].kurz)+'</option>'; }).join('')+'</select></li>'; }).join('');
+  }
+  w.querySelectorAll('.erz-k').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-erz')===state.erz ? 'true' : 'false'); });
+  var n=0; $('erz-je').querySelectorAll('select').forEach(function(sel){ var v=state.erzJe[sel.getAttribute('data-k')]||''; sel.value=v; if(v) n++; });
+  $('sum-erz').textContent=ERZ[state.erz].kurz+(n ? ', '+n+(n===1?' Aufgabe':' Aufgaben')+' anders besetzt' : '');
+}
+function renderSetup(){
+  renderErz(); renderGaben();
+  var ol=$('points');
+  if(ol.getAttribute('data-v')!==state.variante){ ol.innerHTML=''; ol.setAttribute('data-v', state.variante); }
+  if(!ol.children.length){
+    var h='';
+    for(var i=1;i<N;i++){
+      h+='<li><span class="nr">'+(i+1)+'</span><div class="txt"><div class="nm">'+STATIONS[i].name+'</div><div class="wo">'+stv(i).wo+'</div><div class="st"></div></div><button type="button" class="btn ghost small" data-set="'+i+'"></button></li>';
+    }
+    ol.innerHTML=h;
+  }
+  var rb=document.querySelectorAll('#radius button');
+  for(var r=0;r<rb.length;r++) rb[r].setAttribute('aria-pressed', String(+rb[r].getAttribute('data-r')===state.radius));
+  $('show-test').checked=state.showTest; $('auto-sag').checked=state.autoSag; $('kamera-an').checked=state.kamera;
+  var vb=document.querySelectorAll('#variante button'); for(var vi=0;vi<vb.length;vi++) vb[vi].setAttribute('aria-pressed', String(vb[vi].getAttribute('data-v')===state.variante));
+  $('sum-variante').textContent=VARIANTEN[state.variante].name+': '+VARIANTEN[state.variante].kurz;
+  $('variante-note').textContent = state.variante==='a' ? 'Mit Ausdrucken an einigen Stationen. Die Quatschbilder am Zaun und die Spuren an der Kreuzung zeigt nur der Spiegel, dort hängt und liegt nichts. Das GPS öffnet die Stationen.' : state.variante==='b' ? 'Bilder zeigt nur der Spiegel. Am Zaun hängen vier bunte Bänder, die Spuren an der Kreuzung zeigt nur der Spiegel, die Wolke ist ein Bettlaken. Das GPS öffnet die Stationen.' : 'Die Stationen sind Räume, der Vorausgeher legt sie nach. Jede Station öffnest du von Hand, das GPS bleibt aus.';
+  $('sum-tour').textContent=(state.autoSag?'Funkel spricht von selbst':'Funkel spricht auf Tipp')+(state.showTest?', Testknopf an':'');
+  $('sum-kamera').textContent = state.kamera ? 'An: Kamerabild und Zauberlinse' : 'Aus';
+  $('sum-punkte').textContent = gesetzt()+' von '+(N-1)+' Punkten gesetzt, öffnet bei '+state.radius+' m';
+  seg('rec-rate', state.recRate); seg('pitch', state.pitch);
+  $('voice').value=state.voice||''; if($('voice').value!==(state.voice||'')) $('voice').value='';
+  var ta=$('code'); if(document.activeElement!==ta) ta.value=codeAus(state.points);
+}
+function seg(id, wert){
+  var bs=document.querySelectorAll('#'+id+' button');
+  for(var i=0;i<bs.length;i++) bs[i].setAttribute('aria-pressed', String(+bs[i].getAttribute('data-v')===wert));
+}
+function fuelleStimmen(){
+  var sel=$('voice'), vs=deStimmen(), best=besteStimme(vs);
+  var h='<option value="">Automatisch'+(best?' ('+esc(best.name)+')':'')+'</option>';
+  vs.forEach(function(v){ h+='<option value="'+esc(v.voiceURI)+'">'+esc(v.name)+'</option>'; });
+  sel.innerHTML=h; sel.value=state.voice||''; if(sel.value!==(state.voice||'')) sel.value='';
+  var note=$('voice-note');
+  note.textContent = !kannSprechen ? 'Dieses Gerät hat keine Computerstimme.' : vs.length ? '' : 'Keine deutsche Stimme gefunden. Das Gerät nimmt dann seine Standardstimme.';
+  note.hidden=!note.textContent;
+}
+function renderClips(){
+  var n=0, kann=kannAufnehmen(), h='';
+  TEXTE.forEach(function(t){
+    var hat=!!clips[t.key], laeuft=recKey===t.key; if(hat) n++;
+    h+='<li><div class="txt"><div class="nm">'+esc(t.label)+'</div><div class="wo">'+esc(t.text)+'</div>'+
+       '<div class="st'+(hat?' ok':'')+'">'+(laeuft?'Aufnahme läuft …':hat?'Eigene Aufnahme':'Computerstimme')+'</div></div><div class="btns">'+
+       '<button type="button" class="btn small '+(laeuft?'rec':'ghost')+'" data-rec="'+t.key+'"'+(rec && !laeuft?' disabled':'')+'>'+(laeuft?'Stopp':hat?'Neu aufnehmen':'Aufnehmen')+'</button>'+
+       '<button type="button" class="btn ghost small" data-play="'+t.key+'">Anhören</button>'+
+       (hat?'<button type="button" class="btn quiet small" data-del="'+t.key+'">Löschen</button>':'')+'</div></li>';
+  });
+  $('clips').innerHTML=h;
+  var note=$('rec-note'); note.className='chip '+(kann?(n?'on':''):'off');
+  $('sum-stimme').textContent = n ? n+' von '+TEXTE.length+' Sätzen aufgenommen' : 'Noch keine Aufnahme, Computerstimme';
+  note.textContent = kann ? n+' von '+TEXTE.length+' Sätzen aufgenommen' : 'Aufnehmen geht in dieser Ansicht nicht. In der https-Version auf dem iPad funktioniert es.';
+}
+function zeige(v){
+  if(v==='tour') stoppAufnahme();
+  view=v;
+  $('view-tour').hidden = v!=='tour'; $('view-setup').hidden = v!=='setup';
+  kameraPflege(); if(v!=='tour'){ $('kamera').hidden=true; $('linse').hidden=true; }
+  $('tab-tour').setAttribute('aria-pressed', String(v==='tour')); $('tab-setup').setAttribute('aria-pressed', String(v==='setup'));
+  try{ modusZeigen(); }catch(e){}
+  try{ if(location.hash!=='#'+(v==='setup'?'einrichten':'tour')) history.replaceState(null,'','#'+(v==='setup'?'einrichten':'tour')); }catch(e){}
+  funkelStart();
+}
+var toastT=null;
+function toast(msg){ var t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(function(){ t.hidden=true; }, 3200); }
+
+/* ---------- Funkeln im Spiegel ---------- */
+var cv=$('funkeln'), cx=cv.getContext('2d'), sterne=[], funkelIst=0.12, raf=null;
+var ruhig=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+(function(){
+  var seed=7; function rnd(){ seed=(seed*16807)%2147483647; return seed/2147483647; }
+  var farben=['--rot','--gelb','--gruen','--blau','--lila'];
+  for(var i=0;i<110;i++) sterne.push({a:rnd()*Math.PI*2, r:0.54+rnd()*0.38, ph:rnd()*6.28, sp:0.6+rnd()*1.6, s:0.5+rnd()*0.9, f:farben[i%5]});
+})();
+var farbWert={};
+function farbe(v){ if(!farbWert[v]){ farbWert[v]=getComputedStyle(document.documentElement).getPropertyValue(v).trim()||'#888'; } return farbWert[v]; }
+function zeichne(t){
+  var w=cv.clientWidth, h=cv.clientHeight; if(!w||!h) return;
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  if(cv.width!==Math.round(w*dpr)){ cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr); }
+  cx.setTransform(dpr,0,0,dpr,0,0); cx.clearRect(0,0,w,h);
+  funkelIst+=(funkelZiel-funkelIst)*0.06;
+  var R=Math.min(w,h)/2, base=R*0.085, maxN=Math.min(sterne.length, Math.round(R/3.6)), n=Math.round(maxN*(0.12+funkelIst*0.88));
+  for(var i=0;i<n && i<sterne.length;i++){
+    var s=sterne[i], tw=ruhig?0.8:0.45+0.55*Math.abs(Math.sin(t/1000*s.sp+s.ph));
+    var x=w/2+Math.cos(s.a)*s.r*R, y=h/2+Math.sin(s.a)*s.r*R, z=base*s.s*(0.6+funkelIst*0.9)*tw;
+    cx.globalAlpha=0.35+0.65*tw; cx.fillStyle=farbe(s.f);
+    cx.beginPath(); cx.moveTo(x,y-z); cx.quadraticCurveTo(x,y,x+z,y); cx.quadraticCurveTo(x,y,x,y+z); cx.quadraticCurveTo(x,y,x-z,y); cx.quadraticCurveTo(x,y,x,y-z); cx.fill();
+  }
+  cx.globalAlpha=1;
+}
+function schleife(t){ raf=null; if(cv.hidden || view!=='tour') return; zeichne(t||0); kompassZeichnen(t||0); if(!ruhig) raf=requestAnimationFrame(schleife); }
+function funkelStart(){ if(raf===null && !cv.hidden && view==='tour') raf=requestAnimationFrame(schleife); }
+window.addEventListener('resize', funkelStart);
+
+/* ---------- Bedienung ---------- */
+$('tab-tour').addEventListener('click', function(){ zeige('tour'); render(); });
+$('tab-setup').addEventListener('click', function(){ zeige('setup'); });
+$('btn-main').addEventListener('click', haupt);
+$('mirror').addEventListener('click', function(){ if(tonLaeuft){ still(); toast('Funkel ist still.'); return; } verzaubern(); });
+$('btn-pop').addEventListener('click', function(e){ e.stopPropagation(); });
+$('btn-hand').addEventListener('click', test);
+$('btn-mehr').addEventListener('click', function(){ mehrAn=!mehrAn; modusZeigen(); if(!mehrAn) fokusSpiegel(); });
+$('btn-nochmal').addEventListener('click', function(){ if(sprichtGerade()){ still(); sprechKnopf(); return; } sagen(); });
+$('btn-speak').addEventListener('click', function(){ if(sprichtGerade()){ still(); sprechKnopf(); return; } sagen(); });
+$('btn-test').addEventListener('click', test);
+$('choices').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('.choice') : null; if(b) spurTipp(b.getAttribute('data-id')); });
+$('btn-gps').addEventListener('click', function(){ wachBleiben(); gpsStart(); });
+$('points').addEventListener('click', function(e){
+  var b=e.target.closest ? e.target.closest('button[data-set]') : null; if(!b || !fix) return;
+  var i=+b.getAttribute('data-set');
+  if(!fixFrisch()){ toast('Das GPS hat seit '+Math.round(fixAlter()/1000)+' s keine neue Position. Unter freiem Himmel kurz warten, dann setzen.'); return; }
+  if(fix.acc>40){ toast('Das GPS ist zu ungenau (±'+Math.round(fix.acc)+' m). Kurz stehen bleiben, bis es unter 40 m ist.'); return; }
+  state.points[i]={lat:fix.lat, lng:fix.lng, acc:fix.acc}; save(); render();
+  toast(fix.acc>25 ? 'Punkt '+(i+1)+' gesetzt, aber das GPS ist ungenau (±'+Math.round(fix.acc)+' m). Besser kurz warten und neu setzen.' : 'Punkt '+(i+1)+' gesetzt.');
+});
+$('radius').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-r]') : null; if(!b) return; state.radius=+b.getAttribute('data-r'); save(); render(); });
+$('show-test').addEventListener('change', function(){ state.showTest=this.checked; save(); render(); });
+$('variante').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-v]') : null; if(!b) return; state.variante=b.getAttribute('data-v'); save(); renderListe(); render(); toast('Variante: '+VARIANTEN[state.variante].name); });
+$('kamera-an').addEventListener('change', function(){
+  var box=this;
+  if(!box.checked){ state.kamera=false; save(); kameraAus(); render(); return; }
+  function nein(){ box.checked=false; toast('Kein Zugriff auf die Kamera. In der Vorschau ist sie gesperrt, in der https-Version auf dem iPad den Zugriff erlauben.'); }
+  if(!kannKamera()){ nein(); return; }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}, audio:false}).then(function(st){
+    st.getTracks().forEach(function(t){ t.stop(); });
+    kamGesperrt=false; state.kamera=true; save(); render(); toast('Kamera-Zauber ist an.');
+  }, nein);
+});
+$('erz-wahl').addEventListener('click', function(e){
+  var h=e.target.closest ? e.target.closest('[data-hoer]') : null;
+  if(h){ e.stopPropagation(); tonAn(); still(); var f=h.getAttribute('data-hoer'), t=erzSatz(f, 0, 0, 'a'); if(t){ t.fig=f; kakaAuftritt(t); } return; }
+  var b=e.target.closest ? e.target.closest('[data-erz]') : null; if(!b) return;
+  state.erz=b.getAttribute('data-erz'); save(); renderErz();
+});
+$('erz-wahl').addEventListener('keydown', function(e){ if((e.key==='Enter'||e.key===' ') && e.target.hasAttribute && e.target.hasAttribute('data-erz')){ e.preventDefault(); e.target.click(); } });
+$('erz-je').addEventListener('click', function(e){
+  var b=e.target.closest ? e.target.closest('[data-probe]') : null; if(!b) return;
+  var t=b.getAttribute('data-probe').split('.'), i=+t[0], st=+t[1], f=erzFuer(i, st), sz=erzSatz(f, i, st, state.variante);
+  if(sz){ sz.fig=f; tonAn(); still(); kakaAuftritt(sz); }
+});
+$('btn-aufgabe').addEventListener('click', function(){ var sz=kakaSatz(); if(!sz){ if(state.phase!=='start') sagen(); return; } tonAn(); still(); kakaAuftritt(sz); });
+$('btn-info').addEventListener('click', function(){ infoOffen=!infoOffen; infoZeigen(); });
+$('erz-je').addEventListener('change', function(e){
+  var sel=e.target; if(!sel.getAttribute || !sel.getAttribute('data-k')) return;
+  if(sel.value) state.erzJe[sel.getAttribute('data-k')]=sel.value; else delete state.erzJe[sel.getAttribute('data-k')];
+  save(); renderErz();
+});
+$('auto-sag').addEventListener('change', function(){ state.autoSag=this.checked; save(); render(); });
+$('btn-pop').addEventListener('click', stationOeffnen);
+$('btn-foto').addEventListener('click', fotoAuf); $('btn-foto-2').addEventListener('click', fotoAuf);
+$('foto-zu').addEventListener('click', fotoZu); $('foto-knips').addEventListener('click', fotoKnips);
+$('foto-wechsel').addEventListener('click', function(){ fotoSeite = fotoSeite==='user' ? 'environment' : 'user'; $('foto-video').classList.toggle('spiegeln', fotoSeite==='user'); fotoKamera(); });
+$('foto-nochmal').addEventListener('click', function(){ fotoAuf(); });
+$('foto-teilen').addEventListener('click', fotoTeilen);
+$('btn-proto-reset').addEventListener('click', function(){ proto=[]; protoSave(); renderProtokoll(); toast('Protokoll gelöscht.'); });
+$('btn-linse').addEventListener('click', function(){ state.kamera=false; save(); kameraAus(); render(); toast('Kamera ist aus. Unter „Einrichten“ lässt sie sich wieder einschalten.'); });
+$('btn-ablauf').addEventListener('click', function(){ fadenZeigen(!fadenOffen); });
+$('faden-zu').addEventListener('click', function(){ fadenZeigen(false); });
+$('backdrop').addEventListener('click', function(){ fadenZeigen(false); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && fadenOffen) fadenZeigen(false); });
+document.addEventListener('touchend', function(){ kompassStart(); }, {passive:true});
+document.addEventListener('click', function(){ kompassStart(); });
+$('faden-liste').addEventListener('click', function(e){
+  var b=e.target.closest ? e.target.closest('button[data-n]') : null; if(!b) return;
+  gehZu(+b.getAttribute('data-n'));
+  if(!breit.matches) fadenZeigen(false);
+});
+$('clips').addEventListener('click', function(e){
+  var b=e.target.closest ? e.target.closest('button') : null; if(!b) return;
+  tonAn();
+  if(b.hasAttribute('data-rec')) aufnehmen(b.getAttribute('data-rec'));
+  else if(b.hasAttribute('data-play')) hoere(b.getAttribute('data-play'));
+  else if(b.hasAttribute('data-del')){ still(); dbDel(b.getAttribute('data-del')); renderClips(); render(); toast('Aufnahme gelöscht.'); }
+});
+$('rec-rate').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-v]') : null; if(!b) return; state.recRate=+b.getAttribute('data-v'); save(); render(); });
+$('pitch').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-v]') : null; if(!b) return; state.pitch=+b.getAttribute('data-v'); save(); render(); });
+$('voice').addEventListener('change', function(){ state.voice=this.value||null; save(); });
+$('btn-probe').addEventListener('click', function(){ tonAn(); still(); sprich('Hallo, ich bin Funkel, das Einhorn! Folgt den Hufspuren.'); });
+$('btn-restart').addEventListener('click', vonVorn);
+$('btn-copy').addEventListener('click', function(){
+  var ta=$('code'); ta.value=codeAus(state.points);
+  function markieren(){ ta.focus(); ta.select(); toast('Code ist markiert. Jetzt kopieren.'); }
+  try{ navigator.clipboard.writeText(ta.value).then(function(){ toast('Code kopiert.'); }, markieren); }catch(e){ markieren(); }
+});
+$('liste').addEventListener('change', function(e){ var b=e.target; if(!b.hasAttribute('data-haken')) return; haken[b.getAttribute('data-haken')]=b.checked; hakenSave(); renderListe(); });
+$('btn-liste-reset').addEventListener('click', function(){ haken={}; hakenSave(); renderListe(); });
+$('btn-clips-export').addEventListener('click', clipsExport);
+$('clips-file').addEventListener('change', function(){
+  var f=this.files && this.files[0]; this.value=''; if(!f) return;
+  var fr=new FileReader();
+  fr.onload=function(){ try{ var n=clipsImport(JSON.parse(fr.result),false); renderClips(); render(); toast(n+' Aufnahmen eingelesen.'); }catch(e){ toast('Diese Datei kann ich nicht lesen.'); } };
+  fr.readAsText(f);
+});
+/* Punkte kommen aus dem Tourplaner (planer.html) */
+$('planer-link').href='planer.html?thema='+encodeURIComponent(TOUR.id);
+$('btn-import').addEventListener('click', function(){
+  try{ state.points=codeEin($('code').value); save(); $('code').blur(); render(); toast(gesetzt()+' Punkte eingelesen.'); }
+  catch(e){ toast('Das ist kein gültiger Punkte-Code. Er sieht so aus: [[53.58,9.79],null,…] mit sechs Einträgen.'); }
+});
+(function(){
+  var b=$('btn-reset'), timer=null;
+  function los(e){ if(timer) return; if(e && e.preventDefault && e.type!=='keydown') e.preventDefault(); b.classList.add('pressing'); timer=setTimeout(function(){ timer=null; b.classList.remove('pressing'); allesLoeschen(); }, 3000); }
+  function stopp(){ if(timer){ clearTimeout(timer); timer=null; } b.classList.remove('pressing'); }
+  b.addEventListener('pointerdown', los); b.addEventListener('pointerup', stopp); b.addEventListener('pointerleave', stopp); b.addEventListener('pointercancel', stopp);
+  b.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  b.addEventListener('keydown', function(e){ if((e.key===' '||e.key==='Enter') && !e.repeat) los(e); });
+  b.addEventListener('keyup', stopp); b.addEventListener('blur', stopp);
+})();
+window.addEventListener('hashchange', function(){ zeige(location.hash==='#einrichten'?'setup':'tour'); });
+
+/* ---------- Start ---------- */
+$('kompass').innerHTML=PIC.einhorn();
+fuelleStimmen(); renderClips(); renderListe(); renderProtokoll();
+if(kannSprechen){ try{ speechSynthesis.addEventListener('voiceschanged', fuelleStimmen); }catch(e){ try{ speechSynthesis.onvoiceschanged=fuelleStimmen; }catch(e2){} } }
+render();
+zeige(location.hash==='#einrichten'?'setup':'tour');
+dbOpen(function(){ dbLoad(function(){ renderClips(); render(); clipsVomServer(); liveVorbereiten(); }); });
+if(state.phase!=='start') gpsStart();
+
+/* Für den Selbsttest: reine Funktionen */
+window.__zs={proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};
+};
+</script>
+
+<script src="tour-laden.js"></script>
+<script type="module" src="../funkel3d.js"></script>
+</body></html>

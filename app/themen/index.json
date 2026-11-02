@@ -1,0 +1,14 @@
+{
+ "themen": [
+  {
+   "id": "einhorn",
+   "titel": "Funkels Regenbogen",
+   "untertitel": "Eine Einhorn-Schnitzeljagd mit Zauberspiegel",
+   "kurz": "Über Nacht ist Funkels Regenbogen verschwunden, und alle Farben sind durcheinander. Die Kinder folgen Hufspuren, lösen Farbrätsel im Zauberspiegel, sammeln die Bögen ein und finden heraus, wer sie gemopst hat.",
+   "alter": "3 bis 6 Jahre",
+   "dauer": "etwa 50 Minuten plus Heimweg",
+   "stationen": 7,
+   "tour": "themen/einhorn/tour.json"
+  }
+ ]
+}

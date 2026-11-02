@@ -1,0 +1,63 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Schnitzeljagden mit Zauberspiegel</title>
+<link rel="stylesheet" href="stil.css">
+<style>
+.fakten{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:10px;margin:12px 0}
+.fakt{background:var(--tint);border-radius:14px;padding:10px 12px}
+.fakt b{display:block;font-size:1.25rem}
+.fakt span{color:var(--soft);font-size:.9rem}
+ol.st,ul.fig,ul.ut{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:6px}
+.klein{color:var(--soft);font-size:.92rem}
+.themen-wahl{display:flex;gap:8px;flex-wrap:wrap}
+</style></head><body>
+<main class="seite">
+  <h1>Schnitzeljagden mit Zauberspiegel</h1>
+  <p class="lead">Eine Geschichte, ein Tablet als sprechender Spiegel, und die Tour plant sich für jeden Ort von selbst.</p>
+  <div class="themen-wahl" id="themen"></div>
+  <article class="karte-box" id="thema" aria-live="polite"><p class="lead">Lädt …</p></article>
+</main>
+<script>
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function j(u){ return fetch(u).then(function(r){ if(!r.ok) throw new Error(u+': HTTP '+r.status); return r.json(); }); }
+  function zeigen(t){
+    var plan=null; try{ plan=JSON.parse(localStorage.getItem('sj.plan.'+t.id)||'null'); }catch(e){}
+    var st=t.stationen.map(function(s,i){
+      var titel=s.title||(s.steps?s.steps.map(function(x){ return x.title; }).join(' → '):'');
+      return '<li><b>'+esc(titel)+'</b> <span class="klein">· '+esc((s.ort&&s.ort.typ==='start')?'an der Haustür':s.wo)+'</span></li>';
+    }).join('');
+    var fig=t.figuren.map(function(f){ return '<li><b>'+esc(f.name)+'</b> <span class="klein">· '+esc(f.rolle)+'</span><br><span class="klein">'+esc(f.text)+'</span></li>'; }).join('');
+    var ut=t.utensilien.map(function(u){ var n=u.link?'<a href="'+esc(u.link)+'" rel="sponsored noopener" target="_blank">'+esc(u.name)+'</a>':esc(u.name); return '<li>'+n+' <span class="klein">· '+esc(u.menge==='je Kind'||/Kind/.test(String(u.menge))?u.menge:u.menge+'×')+' · '+esc(u.wann)+'</span></li>'; }).join('');
+    var gaben=t.gaben.map(function(g){ return '<li><b>'+esc(g.was)+'</b> <span class="klein">· '+esc(g.art)+'</span></li>'; }).join('');
+    var vari=Object.keys(t.varianten).map(function(k){ var v=t.varianten[k]; return '<li><b>'+esc(v.name)+'</b> <span class="klein">· '+esc(v.kurz)+'</span></li>'; }).join('');
+    $('thema').innerHTML=
+      '<h2>'+esc(t.titel)+'</h2><p class="lead">'+esc(t.untertitel)+'</p><p style="margin-top:10px">'+esc(t.kurz)+'</p>'+
+      '<div class="fakten">'+
+        '<div class="fakt"><b>'+esc(t.dauer.minuten)+' min</b><span>'+esc(t.dauer.text)+'</span></div>'+
+        '<div class="fakt"><b>'+t.stationen.length+'</b><span>Stationen</span></div>'+
+        '<div class="fakt"><b>'+esc(t.alter)+'</b><span>Alter</span></div>'+
+        '<div class="fakt"><b>'+t.kinder.min+'–'+t.kinder.max+'</b><span>Kinder</span></div>'+
+        '<div class="fakt"><b>'+esc(t.strecke.text)+'</b><span>Strecke draußen</span></div>'+
+        '<div class="fakt"><b>'+t.figuren.length+'</b><span>Figuren</span></div>'+
+      '</div>'+
+      '<div class="row"><a class="btn primary" href="planer.html?thema='+encodeURIComponent(t.id)+'">'+(plan?'Tour ansehen oder neu planen':'Tour planen')+'</a>'+
+      (plan?'<a class="btn ghost" href="spiel.html?thema='+encodeURIComponent(t.id)+'">Spiel öffnen</a>':'')+'</div>'+
+      (plan&&plan.strecke?'<p class="hinweis">Gespeicherte Tour auf diesem Gerät: '+esc(plan.adresse||'')+', '+plan.strecke+' m.</p>':'')+
+      '<h3>Varianten</h3><ul class="fig">'+vari+'</ul>'+
+      '<h3>Stationen</h3><ol class="st">'+st+'</ol>'+
+      '<h3>Figuren</h3><ul class="fig">'+fig+'</ul>'+
+      '<h3>Was die Kinder bekommen</h3><ul class="fig">'+gaben+'</ul>'+
+      '<h3>Utensilien</h3><ul class="ut">'+ut+'</ul>';
+  }
+  j('themen/index.json').then(function(ix){
+    var q=new URLSearchParams(location.search), id=q.get('thema')||ix.themen[0].id;
+    $('themen').innerHTML=ix.themen.length>1 ? ix.themen.map(function(t){ return '<a class="btn '+(t.id===id?'primary':'ghost')+' small" href="?thema='+encodeURIComponent(t.id)+'">'+esc(t.titel)+'</a>'; }).join('') : '';
+    var e=ix.themen.filter(function(t){ return t.id===id; })[0]||ix.themen[0];
+    return j(e.tour).then(zeigen);
+  })['catch'](function(e){ $('thema').innerHTML='<p class="fehler">Übersicht lässt sich nicht laden: '+esc(e.message)+'</p>'; });
+})();
+</script>
+</body></html>
