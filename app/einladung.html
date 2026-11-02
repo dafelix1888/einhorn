@@ -1,0 +1,75 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0F0B17">
+<meta name="robots" content="noindex">
+<title>Einladung · Zauberspiegel</title>
+<link rel="stylesheet" href="dunkel.css">
+<style>
+.held{text-align:center;padding:24px 0 8px}
+.held img{width:min(260px,70vw);aspect-ratio:1;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.held .art{color:var(--leise);font-weight:600;margin-top:18px}
+.held h1{font-size:clamp(2.4rem,9vw,3.6rem);margin:6px 0 4px}
+.daten{display:grid;gap:1px;background:var(--linie);border-radius:14px;overflow:hidden;margin:20px 0}
+.daten div{background:var(--karte);padding:14px 16px;display:grid;grid-template-columns:7.5rem 1fr;gap:10px}
+.daten span{color:var(--leise)}
+.daten b{font-weight:700}
+.antwort{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.antwort .knopf{text-align:center}
+.probe{display:flex;align-items:center;gap:14px;background:var(--karte);border-radius:14px;padding:12px;margin:14px 0}
+.probe button{width:52px;height:52px;border-radius:50%;border:0;background:var(--akzent);color:#160C2B;display:grid;place-items:center;flex:0 0 auto}
+.probe svg{width:22px;height:22px}
+.fuss{margin-top:28px;border-top:1px solid var(--linie);padding-top:18px}
+</style></head><body>
+<main class="seite" id="seite"></main>
+<audio id="ton" preload="none"></audio>
+<div class="toast" id="toast" hidden></div>
+<script src="party.js"></script>
+<script>
+(function(){
+  'use strict';
+  var PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg>', PAUSE='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
+  function $(id){ return document.getElementById(id); }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3000); }
+  var e=null; try{ e=Party.decode(new URLSearchParams(location.search).get('e')||''); }catch(x){}
+  if(!e || !e.d){ $('seite').innerHTML='<h1>Einladung nicht gefunden</h1><p class="leise">Der Link ist unvollständig. Bitte die Gastgeber, ihn noch einmal zu schicken.</p>'; return; }
+  var name=String(e.n||'').slice(0,30), alter=e.a, start=new Date(e.d+'T'+(e.s||'15:00')+':00');
+  var datumLang=start.toLocaleDateString('de-DE',{weekday:'long', day:'numeric', month:'long'});
+  var bis=e.r ? new Date(e.r+'T12:00:00').toLocaleDateString('de-DE',{day:'numeric', month:'long'}) : '';
+  var draussen=e.o!=='drinnen';
+  document.title=name+' wird '+alter+'! · Einladung';
+
+  function antwortText(ja){ return ja ? 'Hallo! Wir kommen gern zu '+name+'s Einhorn-Party am '+datumLang+'. 🦄' : 'Hallo! Leider können wir am '+datumLang+' nicht zu '+name+'s Party kommen. Ganz liebe Grüße!'; }
+  function antwortLink(ja){
+    var t=encodeURIComponent(antwortText(ja)), tel=String(e.tel||'').replace(/[^0-9+]/g,'');
+    if(tel){ var wa=/^\+/.test(tel) ? tel.slice(1) : /^00/.test(tel) ? tel.slice(2) : tel.replace(/^0/,'49'); return 'https://wa.me/'+wa+'?text='+t; }
+    return null;
+  }
+  function ics(){
+    function z(n){ return ('0'+n).slice(-2); } function f(d){ return d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'T'+z(d.getHours())+z(d.getMinutes())+'00'; }
+    var ende=e.b ? new Date(e.d+'T'+e.b+':00') : new Date(start.getTime()+150*60000);
+    return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Zauberspiegel//Einladung//DE','BEGIN:VEVENT','UID:einladung-'+e.d+'-'+encodeURIComponent(name)+'@zauberspiegel','DTSTAMP:'+f(new Date()),
+      'DTSTART:'+f(start),'DTEND:'+f(ende),'SUMMARY:'+name+'s Einhorn-Party','LOCATION:'+String(e.w||'').replace(/[,;]/g,'\\$&'),'DESCRIPTION:Abholen um '+(e.b||'')+' Uhr'+(draussen?'. Feste Schuhe und Kleidung für draußen.':''),'END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';
+  }
+  var ja=antwortLink(true), nein=antwortLink(false);
+  $('seite').innerHTML=
+    '<div class="held"><img src="themen/'+String(e.t||'einhorn').replace(/[^a-z0-9-]/gi,'')+'/cover.svg" alt=""><div class="art">Einladung zum Kindergeburtstag</div><h1>'+esc(name)+' wird '+esc(alter)+'!</h1>'+
+    '<p class="leise">Komm mit auf Funkels Regenbogen-Abenteuer: eine Einhorn-Schnitzeljagd, bei der ein sprechender Zauberspiegel die Kinder von Station zu Station führt.</p></div>'+
+    '<div class="daten"><div><span>Wann</span><b>'+esc(datumLang)+', '+esc(e.s)+' Uhr</b></div><div><span>Wo</span><b>'+esc(e.w)+'</b></div><div><span>Abholen</span><b>'+esc(e.b)+' Uhr</b></div>'+
+    (draussen?'<div><span>Mitbringen</span><b>Feste Schuhe und Kleidung für draußen</b></div>':'')+'</div>'+
+    (bis?'<p class="leise">Bitte sagt bis '+esc(bis)+' Bescheid.</p>':'')+
+    '<div class="antwort">'+(ja?'<a class="knopf" href="'+ja+'" target="_blank" rel="noopener">Wir kommen</a><a class="knopf leer" href="'+nein+'" target="_blank" rel="noopener">Wir können nicht</a>':'<button class="knopf" data-antwort="1">Zusage kopieren</button><button class="knopf leer" data-antwort="0">Absage kopieren</button>')+'</div>'+
+    '<div class="reihe" style="margin-top:12px"><button class="knopf leer klein" id="kal">In den Kalender</button></div>'+
+    '<div class="probe"><button id="probe" aria-label="Hörprobe abspielen">'+PLAY+'</button><div><b>So klingt Funkel</b><br><span class="leise">Der Anfang der Geschichte, 21 Sekunden</span></div></div>'+
+    '<div class="fuss"><p class="leise">Selbst bald eine Party? Funkels Regenbogen plant die Schnitzeljagd für jeden Park und jede Wohnung.</p><a href="index.html#/abenteuer/einhorn">Mehr erfahren</a></div>';
+  document.addEventListener('click', function(ev){
+    var b=ev.target.closest('[data-antwort]');
+    if(b){ var t=antwortText(b.getAttribute('data-antwort')==='1'); if(navigator.share){ navigator.share({text:t})['catch'](function(){}); return; } try{ navigator.clipboard.writeText(t).then(function(){ toast('Text kopiert. An die Gastgeber schicken.'); }); }catch(x){ prompt('Text kopieren:', t); } return; }
+    if(ev.target.closest('#kal')){ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics()],{type:'text/calendar'})); a.download='einladung.ics'; document.body.appendChild(a); a.click(); a.remove(); return; }
+    if(ev.target.closest('#probe')){ var au=$('ton'); if(!au.paused){ au.pause(); return; } if(!au.src) au.src='themen/'+String(e.t||'einhorn').replace(/[^a-z0-9-]/gi,'')+'/hoerprobe.mp3'; au.play()['catch'](function(){}); }
+  });
+  $('ton').addEventListener('play', function(){ $('probe').innerHTML=PAUSE; });
+  $('ton').addEventListener('pause', function(){ $('probe').innerHTML=PLAY; });
+})();
+</script>
+</body></html>

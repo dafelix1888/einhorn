@@ -18,7 +18,7 @@
       try{
         p=planAusCode(q.get('plan'));
         if(p.party && p.party.thema===thema){ var alt=null; try{ alt=JSON.parse(localStorage.getItem('sj.party.'+thema)||'null'); }catch(e){}   // Party-Angaben mitnehmen, Haken des Geräts behalten
-          p.party.erledigt=(alt&&alt.erledigt)||{}; p.party.einkauf=(alt&&alt.einkauf)||{}; localStorage.setItem('sj.party.'+thema, JSON.stringify(p.party)); }
+          p.party.erledigt=(alt&&alt.erledigt)||{}; p.party.einkauf=(alt&&alt.einkauf)||{}; p.party.aufgebaut=(alt&&alt.aufgebaut)||{}; localStorage.setItem('sj.party.'+thema, JSON.stringify(p.party)); }
         delete p.party; localStorage.setItem(PLAN_KEY, JSON.stringify(p));
       }catch(e){ p=null; }
       try{ q.delete('plan'); history.replaceState(null,'',location.pathname+'?'+q.toString()+location.hash); }catch(e){}

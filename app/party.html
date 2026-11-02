@@ -132,19 +132,18 @@
     h+='<h2 id="einkauf">Einkaufsliste <span class="leise" style="font-size:1rem">· '+(offen?offen+' offen':'alles da')+'</span></h2>'+
       ek.map(function(x){ return '<div class="ding"><input type="checkbox" data-kauf="'+x.id+'"'+(x.fertig?' checked':'')+' aria-label="'+esc(x.name)+' besorgt"><div><span class="menge">'+x.menge+'×</span> '+esc(x.name)+'<br><span>'+esc(x.wann)+'</span></div>'+(x.link?'<a class="knopf klein leer" href="'+esc(x.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'<span class="leise" style="font-size:.85rem">Link folgt</span>')+'</div>'; }).join('')+
       '<p class="leise" style="font-size:.85rem;margin-top:10px">Bastelsachen wie Schuhkarton und Kreide stehen in der Checkliste im Spiel.</p>';
+    h+='<h2>Teilen</h2><div class="karte"><b>Gast-Eltern einladen</b><p class="leise" style="margin:4px 0 10px">Eine Einladungsseite mit Datum, Treffpunkt, Abholzeit und Zusage per WhatsApp. Ohne Anmeldung.</p><div class="reihe"><button class="knopf klein" id="gast-link">Einladungslink teilen</button><a class="knopf klein leer" href="einladung.html?e='+Party.einladungsLink(party, pl).split('?e=')[1]+'">Vorschau</a></div></div>'+
+      (party.vorausgeher?'<div class="karte"><b>Vorausgeher</b><p class="leise" style="margin:4px 0 10px">Karte mit allen Stationen, was wo hingelegt wird, und Startzeit '+Party.uhr(party,-20)+' Uhr.</p><div class="reihe"><button class="knopf klein" id="vg-link">Link für den Vorausgeher</button><a class="knopf klein leer" href="vorausgeher.html?thema='+thema+'">Selbst öffnen</a></div></div>':'');
     h+='<h2>Spiel-Gerät</h2><div class="karte"><p>Öffne die Party auf dem iPad, das zum Zauberspiegel wird. Der Link bringt Route, Kinderzahl und Variante mit.</p>'+
       '<div class="reihe" style="margin-top:10px"><button class="knopf" id="teilen">Link fürs iPad</button><a class="knopf leer" href="bereit.html?thema='+thema+'">Bereit-Check</a><a class="knopf leer" href="druck.html?thema='+thema+'">Druckvorlagen</a></div></div>'+
       '<div class="reihe" style="margin-top:24px"><button class="knopf leer klein" id="loeschen">Party löschen</button></div>';
     $('seite').innerHTML=h;
   }
 
-  function linkFuersIpad(){
-    var pl=Party.plan(thema)||{}, k={format:1, thema:thema, stand:pl.stand, variante:pl.variante, kinder:pl.kinder,
-      stationen:(pl.stationen||[]).map(function(s){ return {lat:s.lat, lng:s.lng, name:s.name, an:s.an, zu:s.zu}; }),
-      party:{thema:thema, kind:party.kind, datum:party.datum, start:party.start, kinder:party.kinder, helfer:party.helfer, vorausgeher:party.vorausgeher, ort:party.ort, planB:party.planB, ausdrucke:party.ausdrucke}};
-    var b=new TextEncoder().encode(JSON.stringify(k)), s=''; for(var i=0;i<b.length;i++) s+=String.fromCharCode(b[i]);
-    var u=new URL('spiel.html', location.href); u.searchParams.set('thema', thema); u.searchParams.set('plan', btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''));
-    return u.toString();
+  function linkFuersIpad(){ return Party.spielLink(party, Party.plan(thema)); }
+  function teilen(link, titel, ok){
+    if(navigator.share){ navigator.share({title:titel, url:link})['catch'](function(){}); return; }
+    try{ navigator.clipboard.writeText(link).then(function(){ toast(ok); }, function(){ prompt('Link kopieren:', link); }); }catch(x){ prompt('Link kopieren:', link); }
   }
 
   function zeigen(){ if(entwurf) assistent(); else uebersicht(); }
@@ -171,12 +170,9 @@
       var blob=new Blob([Party.ics(party, tour, Party.plan(thema))],{type:'text/calendar'}), a=document.createElement('a');
       a.href=URL.createObjectURL(blob); a.download=thema+'-party.ics'; document.body.appendChild(a); a.click(); a.remove(); toast('Kalenderdatei erstellt. Öffnen, dann landen alle Termine im Kalender.'); return;
     }
-    if(t.closest('#teilen')){
-      var link=linkFuersIpad();
-      if(navigator.share){ navigator.share({title:partyTitel(party), url:link})['catch'](function(){}); return; }
-      try{ navigator.clipboard.writeText(link).then(function(){ toast('Link kopiert. Auf dem iPad öffnen.'); }, function(){ prompt('Link kopieren:', link); }); }catch(x){ prompt('Link kopieren:', link); }
-      return;
-    }
+    if(t.closest('#teilen')){ teilen(linkFuersIpad(), partyTitel(party), 'Link kopiert. Auf dem iPad öffnen.'); return; }
+    if(t.closest('#vg-link')){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+partyTitel(party), 'Link kopiert. An den Vorausgeher schicken.'); return; }
+    if(t.closest('#gast-link')){ teilen(Party.einladungsLink(party, Party.plan(thema)), 'Einladung: '+partyTitel(party), 'Einladungslink kopiert. In die Eltern-Gruppe schicken.'); return; }
     if(t.closest('#loeschen')){ if(confirm('Party wirklich löschen? Route und Checkliste bleiben erhalten.')){ Party.loeschen(thema); party=null; neu(); } return; }
   });
   document.addEventListener('change', function(ev){
