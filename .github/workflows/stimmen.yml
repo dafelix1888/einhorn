@@ -34,13 +34,16 @@ jobs:
           ZAUBERWORT: ${{ secrets.ZAUBERWORT }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
         run: node stimmen/erzeugen.mjs
+      - name: Stimmen in Pakete für die App aufteilen
+        if: success() || failure()
+        run: node stimmen/aufteilen.mjs
       - name: Neue Stimmen-Datei einchecken
         if: success() || failure()
         run: |
-          if git diff --quiet -- funkel-stimme.json; then echo "Keine Änderung."; exit 0; fi
+          if git diff --quiet -- funkel-stimme.json stimmen/pakete && [ -z "$(git status --porcelain stimmen/pakete)" ]; then echo "Keine Änderung."; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add funkel-stimme.json
+          git add funkel-stimme.json stimmen/pakete
           git commit -m "Stimmen neu erzeugt"
           git push
           # Pushes dieses Workflows lösen GitHub Pages nicht immer selbst aus, darum ausdrücklich neu bauen

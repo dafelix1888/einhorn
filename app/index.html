@@ -152,6 +152,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   <aside class="flaeche jetzt" id="jetzt" aria-label="Deine nächste Tour"></aside>
 </div>
 <audio id="ton" preload="none"></audio>
+<script src="party.js"></script>
 <script>
 (function(){
   'use strict';
@@ -170,18 +171,23 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   function thema(id){ return THEMEN.filter(function(t){ return t.id===id; })[0]; }
   function verfuegbar(t){ return t.status==='verfuegbar'; }
   function dauerMin(t, p){ var d=(TOUR[t.id]||{}).dauer||{}; if(!p || !p.strecke) return t.minuten; return (d.stationenMinuten||35)+Math.round(p.strecke/(d.meterProMinute||35)); }
-  function zielLink(t){ return plan(t.id) ? 'spiel.html?thema='+t.id : 'planer.html?thema='+t.id; }
+  function zielLink(t){ return 'party.html?thema='+t.id; }
+  function party(id){ return Party.lesen(id); }
+  function genitiv(n){ return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
+  function partyName(pa){ return pa.kind && pa.kind.name ? genitiv(pa.kind.name)+' Party' : 'Eure Party'; }
+  function countdown(pa){ var t=Party.tageBis(pa); return t==null?'':t>1?'in '+t+' Tagen':t===1?'morgen':t===0?'heute':'vorbei'; }
   function ortText(t){ return t.orte.map(function(o){ return o==='draussen'?'draußen':'drinnen'; }).join(' & '); }
 
   // ---------- Bibliothek links ----------
   function bibZeichnen(){
-    var meine=THEMEN.filter(function(t){ return plan(t.id) || merkliste().indexOf(t.id)>=0; });
-    $('bib-chips').innerHTML=[['alle','Alle'],['geplant','Geplant'],['gemerkt','Gemerkt']].map(function(c){ return '<button class="chip" data-bf="'+c[0]+'" aria-pressed="'+(bibFilter===c[0])+'">'+c[1]+'</button>'; }).join('');
-    var l=meine.filter(function(t){ return bibFilter==='alle' || (bibFilter==='geplant' ? !!plan(t.id) : merkliste().indexOf(t.id)>=0); });
+    var meine=THEMEN.filter(function(t){ return party(t.id) || plan(t.id) || merkliste().indexOf(t.id)>=0; });
+    $('bib-chips').innerHTML=[['alle','Alle'],['geplant','Partys'],['gemerkt','Gemerkt']].map(function(c){ return '<button class="chip" data-bf="'+c[0]+'" aria-pressed="'+(bibFilter===c[0])+'">'+c[1]+'</button>'; }).join('');
+    var l=meine.filter(function(t){ return bibFilter==='alle' || (bibFilter==='geplant' ? !!(party(t.id)||plan(t.id)) : merkliste().indexOf(t.id)>=0); });
     $('bib-liste').innerHTML=l.length ? l.map(function(t){
       var p=plan(t.id);
-      var sub=p ? (p.strecke ? 'Geplant · '+km(p.strecke)+(p.rundkurs?' · Rundkurs':'') : 'Geplant · drinnen') : (verfuegbar(t)?'Gemerkt · noch nicht geplant':'Gemerkt · bald verfügbar');
-      return '<a class="zeile" href="#/abenteuer/'+t.id+'"><img src="'+t.cover+'" alt=""><div class="txt"><b>'+esc(t.titel)+'</b><span>'+esc(sub)+'</span></div></a>';
+      var pa=party(t.id);
+      var sub=pa ? partyName(pa)+' · '+countdown(pa) : p ? (p.strecke ? 'Geplant · '+km(p.strecke)+(p.rundkurs?' · Rundkurs':'') : 'Geplant · drinnen') : (verfuegbar(t)?'Gemerkt · noch nicht geplant':'Gemerkt · bald verfügbar');
+      return '<a class="zeile" href="'+(pa?'party.html?thema='+t.id:'#/abenteuer/'+t.id)+'"><img src="'+t.cover+'" alt=""><div class="txt"><b>'+esc(t.titel)+'</b><span>'+esc(sub)+'</span></div></a>';
     }).join('') : '<p class="leer"><b>Noch nichts hier</b>Plane eine Tour oder merke dir ein Abenteuer mit ＋, dann taucht es hier auf.</p>';
   }
 
@@ -195,11 +201,19 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
     return {n:n, fertig:fertig};
   }
   function jetztHtml(){
+    var tp=THEMEN.filter(function(x){ return party(x.id); })[0];
+    if(tp){
+      var pa=party(tp.id), l=Party.aufgaben(pa, TOUR[tp.id], plan(tp.id)), n=Party.naechste(l), fertig=l.filter(function(a){ return a.fertig; }).length;
+      return '<h2>Deine nächste Party</h2><a href="party.html?thema='+tp.id+'"><img class="cover" src="'+tp.cover+'" alt=""></a><h3>'+esc(partyName(pa))+'</h3><p class="unter">'+esc(Party.datumText(Party.datum(pa)))+', '+esc(pa.start)+' Uhr · '+esc(countdown(pa))+'</p>'+
+        (n?'<div class="box"><h4>Als Nächstes</h4><b>'+esc(n.titel)+'</b><p class="unter" style="margin:4px 0 0">'+esc(n.text||'')+'</p></div>':'')+
+        '<div class="box"><h4>Vorbereitung</h4><div class="balken"><i style="width:'+Math.round(fertig/l.length*100)+'%"></i></div><p class="unter" style="margin:0">'+fertig+' von '+l.length+' Schritten erledigt</p></div>'+
+        '<div class="knopfreihe"><a class="voll" href="party.html?thema='+tp.id+'">Zur Party</a><a class="pille" href="spiel.html?thema='+tp.id+'">Spiel öffnen</a></div>';
+    }
     var t=THEMEN.filter(function(x){ return plan(x.id); })[0];
     if(!t){
       var e=THEMEN.filter(verfuegbar)[0];
       return '<h2>Deine nächste Tour</h2><img class="cover" src="'+e.cover+'" alt=""><h3>'+esc(e.titel)+'</h3><p class="unter">Noch nicht geplant</p>'+
-        '<div class="box"><h4>So geht’s</h4><p class="unter" style="margin:0">Adresse eingeben, Richtung wählen, fertig. Die Stationen sucht der Planer passend zur Geschichte.</p><div class="knopfreihe"><a class="voll" href="planer.html?thema='+e.id+'">Tour planen</a></div></div>';
+        '<div class="box"><h4>So geht’s</h4><p class="unter" style="margin:0">Name, Datum und Kinderzahl eingeben, dann die Route ab eurer Haustür. In rund 15 Minuten steht der Plan.</p><div class="knopfreihe"><a class="voll" href="party.html?thema='+e.id+'">Party planen</a></div></div>';
     }
     var p=plan(t.id), vb=vorbereitung(t,p), tour=TOUR[t.id]||{};
     var variante=(tour.varianten && tour.varianten[p.variante||'a'] || {}).name||'';
@@ -230,13 +244,13 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   }
   function startZeigen(){
     var h=new Date().getHours(), gruss=h<11?'Guten Morgen':h<18?'Hallo':'Guten Abend';
-    var geplant=THEMEN.filter(function(t){ return plan(t.id); });
+    var geplant=THEMEN.filter(function(t){ return party(t.id) || plan(t.id); });
     var l=THEMEN.filter(passt), da=l.filter(verfuegbar), bald=l.filter(function(t){ return !verfuegbar(t); });
     var chips=[['alle','Alle'],['draussen','Draußen'],['drinnen','Drinnen'],['3-6','3–6 Jahre'],['6-10','6–10 Jahre']];
     $('haupt').innerHTML='<div class="inhalt">'+
       '<p class="gruss">'+gruss+'</p>'+
       '<div class="chips" style="margin:0 0 18px">'+chips.map(function(c){ return '<button class="chip" data-f="'+c[0]+'" aria-pressed="'+(filter===c[0])+'">'+c[1]+'</button>'; }).join('')+'</div>'+
-      (geplant.length && !suche ? '<div class="kurzreihe">'+geplant.map(function(t){ return '<a class="kurz" href="#/abenteuer/'+t.id+'"><img src="'+t.cover+'" alt="">'+esc(t.titel)+'</a>'; }).join('')+'</div>' : '')+
+      (geplant.length && !suche ? '<div class="kurzreihe">'+geplant.map(function(t){ return '<a class="kurz" href="'+(party(t.id)?'party.html?thema='+t.id:'#/abenteuer/'+t.id)+'"><img src="'+t.cover+'" alt="">'+esc(party(t.id)?partyName(party(t.id))+' · '+countdown(party(t.id)):t.titel)+'</a>'; }).join('')+'</div>' : '')+
       (l.length?'<h2 class="abschnitt">Alle Abenteuer</h2><div class="kacheln">'+da.concat(bald).map(kachel).join('')+'</div>':'')+
       (!l.length?'<p class="leer" style="margin-top:20px"><b>Nichts gefunden</b>Andere Suche oder anderen Filter versuchen.</p>':'')+
       '<div class="mobil-jetzt" style="margin-top:30px">'+jetztHtml()+'</div>'+
@@ -251,13 +265,13 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       '<div class="held"><img src="'+t.cover+'" alt=""><div><div class="art">Schnitzeljagd'+(verfuegbar(t)?'':' · bald verfügbar')+'</div><h1>'+esc(t.titel)+'</h1>'+
       '<div class="wer">'+esc(t.held)+' <span>· '+esc(t.alter)+' · '+t.stationen+' Stationen · ca. '+t.minuten+' min</span></div></div></div>'+
       '<div class="aktion">'+
-        (verfuegbar(t)?'<a class="gross" href="'+zielLink(t)+'" aria-label="'+(p?'Spiel öffnen':'Tour planen')+'">'+PLAY+'</a><a class="pille" href="planer.html?thema='+id+'">'+(p?'Route ändern':'Tour planen')+'</a>':'<button class="pille" disabled>Kommt bald</button>')+
+        (verfuegbar(t)?'<a class="gross" href="party.html?thema='+id+'" aria-label="'+(party(id)?'Zur Party':'Party planen')+'">'+PLAY+'</a><a class="pille" href="party.html?thema='+id+'">'+(party(id)?'Zur Party':'Party planen')+'</a>'+(party(id)?'<a class="pille" href="spiel.html?thema='+id+'">Spiel öffnen</a>':''):'<button class="pille" disabled>Kommt bald</button>')+
         '<button class="pille'+(gemerkt?' an':'')+'" data-merken="'+id+'">'+(gemerkt?'✓ Gemerkt':'＋ Merken')+'</button>'+
       '</div>';
     h+='<section class="abschnitt-d"><h2>Informationen</h2><p class="info zu" id="info">'+esc(t.kurz)+(tour?' '+esc(tour.untertitel)+'. Das Tablet wird zum sprechenden Zauberspiegel: Er erzählt die Geschichte, stellt Rätsel und führt per GPS von Station zu Station. Draußen plant der Planer die Route an jedem Ort, drinnen öffnet ihr die Stationen per Knopf.':'')+'</p>'+
       '<button class="mehr" id="mehr">… Mehr anzeigen</button>'+
       '<div class="fakten"><span class="fakt"><b>'+esc(t.alter)+'</b></span><span class="fakt">'+t.stationen+' Stationen</span><span class="fakt">ca. '+t.minuten+' min</span><span class="fakt">'+esc(ortText(t))+'</span>'+
-      (tour?'<span class="fakt">'+tour.kinder.min+'–'+tour.kinder.max+' Kinder</span><span class="fakt">'+esc(tour.strecke.text)+'</span>':'')+'</div>'+
+      (tour?'<span class="fakt">ca. 90 min Vorbereitung</span><span class="fakt">'+tour.kinder.min+'–'+tour.kinder.max+' Kinder</span><span class="fakt">'+esc(tour.strecke.text)+'</span>':'')+'</div>'+
       (t.hoerprobe?'<div class="probe"><img src="'+t.cover+'" alt=""><div><b>Hörprobe: '+esc(t.held)+' stellt sich vor</b><span>Der Anfang der Geschichte · 21 Sek.</span></div><button class="gross klein" id="probe" aria-label="Hörprobe abspielen">'+PLAY+'</button></div>':'')+
       '</section>';
     if(tour){

@@ -1276,10 +1276,23 @@ function clipsImport(o, nurFehlende){        // Aufnahmen aus einer Datei übern
   });
   return n;
 }
-function clipsVomServer(){                 // funkel-stimme.json neben der Seite, falls vorhanden
+var paketeGeladen={};
+function benoetigteErzaehler(){ var s={}; s[state.erz]=1; Object.keys(state.erzJe||{}).forEach(function(k){ s[state.erzJe[k]]=1; }); return Object.keys(s); }
+function clipsVomServer(){                 // Stimmen-Pakete: Geschichte plus nur die gewählten Erzähler (statt aller 33 MB)
   if(!window.fetch || location.protocol==='file:') return;
-  fetch(TOUR.stimmen.datei,{cache:'no-cache'}).then(function(r){ return r.ok ? r.json() : null; }).then(function(o){
-    var n=clipsImport(o,true); if(n){ renderClips(); render(); }
+  var p=TOUR.stimmen.pakete;
+  function holen(u){
+    if(paketeGeladen[u]) return; paketeGeladen[u]=true;
+    fetch(u,{cache:'no-cache'}).then(function(r){ return r.ok ? r.json() : null; }).then(function(o){
+      var n=clipsImport(o,true); if(n){ renderClips(); render(); }
+    })['catch'](function(){ delete paketeGeladen[u]; });
+  }
+  if(!p){ holen(TOUR.stimmen.datei); return; }
+  fetch(p.index,{cache:'no-cache'}).then(function(r){ return r.json(); }).then(function(ix){   // nur Pakete holen, in denen etwas fehlt oder neu ist
+    ['basis'].concat(benoetigteErzaehler()).forEach(function(f){
+      var e=ix[f]||{}, fehlt=Object.keys(e).some(function(k){ var c=clips[k]; return !c || (!c.eigen && e[k] && c.h!==e[k]); });
+      if(fehlt) holen(f==='basis' ? p.basis : p.erzaehler.replace('{figur}', f));
+    });
   })['catch'](function(){});
 }
 function dbDel(key){ delete clips[key]; delete puffer[key]; try{ if(idb) idb.transaction('clips','readwrite').objectStore('clips')['delete'](key); }catch(e){} }
@@ -2423,7 +2436,7 @@ $('erz-wahl').addEventListener('click', function(e){
   var h=e.target.closest ? e.target.closest('[data-hoer]') : null;
   if(h){ e.stopPropagation(); tonAn(); still(); var f=h.getAttribute('data-hoer'), t=erzSatz(f, 0, 0, 'a'); if(t){ t.fig=f; kakaAuftritt(t); } return; }
   var b=e.target.closest ? e.target.closest('[data-erz]') : null; if(!b) return;
-  state.erz=b.getAttribute('data-erz'); save(); renderErz();
+  state.erz=b.getAttribute('data-erz'); save(); renderErz(); clipsVomServer();
 });
 $('erz-wahl').addEventListener('keydown', function(e){ if((e.key==='Enter'||e.key===' ') && e.target.hasAttribute && e.target.hasAttribute('data-erz')){ e.preventDefault(); e.target.click(); } });
 $('erz-je').addEventListener('click', function(e){
@@ -2436,7 +2449,7 @@ $('btn-info').addEventListener('click', function(){ infoOffen=!infoOffen; infoZe
 $('erz-je').addEventListener('change', function(e){
   var sel=e.target; if(!sel.getAttribute || !sel.getAttribute('data-k')) return;
   if(sel.value) state.erzJe[sel.getAttribute('data-k')]=sel.value; else delete state.erzJe[sel.getAttribute('data-k')];
-  save(); renderErz();
+  save(); renderErz(); clipsVomServer();
 });
 $('auto-sag').addEventListener('change', function(){ state.autoSag=this.checked; save(); render(); });
 $('btn-pop').addEventListener('click', stationOeffnen);

@@ -9,6 +9,9 @@ Das Repo enthält zwei Fassungen:
 
 | Datei | Zweck |
 |---|---|
+| `party.html`, `party.js` | Party-Assistent (Kind, Termin, Gäste, Ort mit Plan B) und Party-Übersicht: nächster Schritt, Zeitplan mit Kalender-Export, Einkaufsliste mit Mengen, Link fürs iPad |
+| `druck.html` | Druckvorlagen mit Namen und Datum: Einladung (auch als Text für WhatsApp), Urkunden für alle Kinder, schlafende Wolke |
+| `bereit.html` | Bereit-Check auf dem Spiel-Gerät: Ton, Stimmen offline, GPS, Akku, Sperre, Offline-Speicher |
 | `index.html` | Übersicht je Thema: Dauer, Stationen, Figuren, Varianten, Geschenke, Utensilien (mit Platz für Affiliate-Links) |
 | `planer.html`, `planer.js` | Tourplaner: Adresse, grobe Richtung, Strecke und Kinderzahl eingeben, Route wird geplant, Stationen lassen sich auf der Karte verschieben |
 | `planer-kern.js` | Planungslogik ohne Oberfläche: Wegenetz aus OpenStreetMap, kürzeste Wege, passende Orte je Station, Höhenprofil |
@@ -32,6 +35,8 @@ Alle Dienste sind frei und brauchen keinen API-Schlüssel: Nominatim, Overpass, 
 Der Planer speichert den Plan im Browser. „Link fürs Spiel-Gerät“ erzeugt einen Link der Form `spiel.html?thema=einhorn&plan=…`. Öffnet man ihn auf dem iPad, ist die Tour dort gespeichert.
 
 ## Stimmen
+
+- **Pakete:** `stimmen/aufteilen.mjs` teilt `funkel-stimme.json` in `stimmen/pakete/` auf: Geschichte (2,4 MB) und je Erzähler etwa 5 MB. Das Spiel lädt nur die Geschichte und die gewählten Erzähler, und nur, wenn sich laut `einhorn-index.json` etwas geändert hat. Die GitHub Action teilt nach jedem Erzeugen neu auf.
 
 - **Feste Sätze** (Geschichte, Aufgaben) kommen wie bisher aus `funkel-stimme.json`. Die GitHub Action erzeugt sie einmal pro Thema.
 - **Ortsansagen** wie „Die Parkbank steht im Wolkenpark.“ werden live erzeugt. Das übernimmt der Cloudflare Worker in `worker/`. Er kennt nur die Vorlagen aus `tour.json` (`stationen[].ansage`), speichert jeden Satz zwischen und lässt nur die eigene Seite zu. Die Spiel-Engine holt die Ansagen beim Öffnen und hält sie offline bereit.

@@ -1,0 +1,196 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0F0B17">
+<title>Party planen · Zauberspiegel</title>
+<link rel="stylesheet" href="dunkel.css">
+<style>
+.kopf{display:flex;gap:16px;align-items:center;margin:8px 0 18px}
+.kopf img{width:96px;height:96px;border-radius:10px;flex:0 0 auto}
+.kopf .art{color:var(--leise);font-size:.9rem;font-weight:600}
+.countdown{display:inline-block;background:var(--akzent);color:#160C2B;font-weight:800;border-radius:999px;padding:4px 12px;font-size:.9rem;margin-top:6px}
+.next{background:linear-gradient(130deg,#3B2A64,#1F1929);border-radius:16px;padding:18px;margin-bottom:12px}
+.next .klein{color:var(--leise);font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.next h3{font-size:1.4rem;margin:6px 0}
+.tag{color:var(--leise);font-size:.85rem;font-weight:700;margin:18px 0 6px}
+.aufgabe{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--linie)}
+.aufgabe input{width:24px;height:24px;accent-color:var(--gruen);margin:2px 0 0}
+.aufgabe b{display:block}
+.aufgabe span{color:var(--leise);font-size:.92rem}
+.aufgabe.fertig b{text-decoration:line-through;color:var(--leise)}
+.aufgabe .auto{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--hover);font-size:.8rem}
+.aufgabe .auto.ja{background:var(--gruen);color:#062B12}
+.ding{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--linie)}
+.ding input{width:24px;height:24px;accent-color:var(--gruen)}
+.ding .menge{font-weight:800;color:var(--akzent)}
+.ding span{color:var(--leise);font-size:.88rem}
+.planb{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.summe div{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--linie)}
+.summe span{color:var(--leise)}
+</style></head><body>
+<main class="seite" id="seite"><p class="leise">Lädt …</p></main>
+<div class="toast" id="toast" hidden></div>
+<script src="party.js"></script>
+<script>
+(function(){
+  'use strict';
+  var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
+  var tour=null, info=null, party=null, entwurf=null, schritt=0;
+  var SCHRITTE=['Kind','Termin','Gäste','Ort','Fertig'];
+  function $(id){ return document.getElementById(id); }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3200); }
+  function heute(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  function genitiv(n){ return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
+  function partyTitel(p){ return p.kind && p.kind.name ? genitiv(p.kind.name)+' Einhorn-Party' : 'Eure Einhorn-Party'; }
+  function km(m){ return m>=1000 ? (m/1000).toFixed(1).replace('.',',')+' km' : Math.round(m)+' m'; }
+
+  // ---------- Assistent ----------
+  function assistent(){
+    var e=entwurf, h='<div class="oben"><a href="'+(party?'party.html?thema='+thema:'index.html#/abenteuer/'+thema)+'">← '+(party?'Zur Party':'Zurück')+'</a><span class="leise">Schritt '+(schritt+1)+' von '+SCHRITTE.length+'</span></div>'+
+      '<div class="fortschritt">'+SCHRITTE.map(function(_,i){ return '<i class="'+(i<=schritt?'an':'')+'"></i>'; }).join('')+'</div>';
+    if(schritt===0){
+      h+='<h1>Für wen ist die Party?</h1><p class="leise">Name und Alter stehen auf Einladung und Urkunden.</p>'+
+        '<label for="name">Vorname des Geburtstagskinds</label><input id="name" type="text" autocomplete="off" value="'+esc(e.kind.name)+'" placeholder="z. B. Emma">'+
+        '<label for="alter">Wird wie alt?</label><input id="alter" type="number" min="2" max="12" inputmode="numeric" value="'+esc(e.kind.alter||'')+'" placeholder="5">'+
+        '<p class="hinweis" style="margin-top:16px">Der Name bleibt auf diesem Gerät. Dass Funkel das Kind mit Namen begrüßt, kommt bald als Extra.</p>';
+    } else if(schritt===1){
+      h+='<h1>Wann wird gefeiert?</h1><p class="leise">Daraus entsteht dein Zeitplan: was du wann vorbereitest.</p>'+
+        '<div class="zwei"><div><label for="datum">Datum</label><input id="datum" type="date" min="'+heute()+'" value="'+esc(e.datum||'')+'"></div>'+
+        '<div><label for="start">Start der Schnitzeljagd</label><input id="start" type="time" step="900" value="'+esc(e.start||'15:00')+'"></div></div>'+
+        '<p class="leise" style="margin-top:12px">Die Jagd dauert etwa '+tour.dauer.minuten+' Minuten, plus Heimweg und Schatz.</p>';
+    } else if(schritt===2){
+      h+='<h1>Wer ist dabei?</h1>'+
+        '<label>Kinder (mit Geburtstagskind)</label><div class="zaehler"><button type="button" data-z="kinder" data-d="-1" aria-label="Weniger Kinder">–</button><b>'+e.kinder+'</b><button type="button" data-z="kinder" data-d="1" aria-label="Mehr Kinder">+</button></div>'+
+        '<label>Erwachsene</label><div class="zaehler"><button type="button" data-z="helfer" data-d="-1" aria-label="Weniger Erwachsene">–</button><b>'+e.helfer+'</b><button type="button" data-z="helfer" data-d="1" aria-label="Mehr Erwachsene">+</button></div>'+
+        '<div class="schalter" style="margin-top:18px"><div><b>Ein Erwachsener geht voraus</b><br><span class="leise">Baut die Stationen kurz vorher auf. Ohne Vorausgeher liegt alles schon vorher bereit.</span></div><input type="checkbox" id="vorausgeher"'+(e.vorausgeher?' checked':'')+(e.helfer<2?' disabled':'')+'></div>'+
+        (e.helfer<2?'<p class="leise">Mit nur einem Erwachsenen wird alles vorher aufgebaut.</p>':'');
+    } else if(schritt===3){
+      var d=e.ort==='draussen';
+      h+='<h1>Wo spielt ihr?</h1><div class="wahl">'+
+        '<button type="button" data-ort="draussen" aria-pressed="'+d+'"><span class="ico">🌳</span><div><b>Draußen ab der Haustür</b><span>Der Planer sucht Stationen in eurer Umgebung, das iPad führt per GPS.</span></div></button>'+
+        '<button type="button" data-ort="drinnen" aria-pressed="'+(!d)+'"><span class="ico">🏠</span><div><b>Drinnen in der Wohnung</b><span>Küche, Flur, Treppe, Kissenberg. Stationen öffnet ihr per Knopf.</span></div></button></div>'+
+        (d?'<div class="schalter" style="margin-top:16px"><div><b>Plan B bei Regen</b><br><span class="leise">Drinnen-Variante mit vorbereiten, am Partytag mit einem Tipp umschalten.</span></div><input type="checkbox" id="planb"'+(e.planB?' checked':'')+'></div>'+
+           '<div class="schalter"><div><b>Mit Ausdrucken</b><br><span class="leise">Eine A3-Wolke zum Aufhängen. Ohne: Bilder nur im Spiegel, dafür ein weißes Laken.</span></div><input type="checkbox" id="ausdrucke"'+(e.ausdrucke!==false?' checked':'')+'></div>':'');
+    } else {
+      var vName=tour.varianten[Party.variante(e)].name;
+      h+='<h1>Passt alles?</h1><div class="karte summe">'+
+        '<div><span>Geburtstagskind</span><b>'+esc(e.kind.name)+', wird '+esc(e.kind.alter)+'</b></div>'+
+        '<div><span>Termin</span><b>'+Party.datumText(Party.datum(e))+', '+esc(e.start)+' Uhr</b></div>'+
+        '<div><span>Kinder</span><b>'+e.kinder+'</b></div>'+
+        '<div><span>Erwachsene</span><b>'+e.helfer+(e.vorausgeher?', einer geht voraus':'')+'</b></div>'+
+        '<div><span>Variante</span><b>'+esc(vName)+(e.ort==='draussen'&&e.planB?', Plan B drinnen':'')+'</b></div></div>'+
+        (e.ort==='draussen'?'<p class="leise">Als Nächstes planst du die Route ab eurer Haustür.</p>':'');
+    }
+    h+='<div class="reihe" style="margin-top:22px">'+(schritt>0?'<button class="knopf leer" id="zurueck">Zurück</button>':'')+
+      '<button class="knopf" id="weiter">'+(schritt<SCHRITTE.length-1?'Weiter':(e.ort==='draussen'&&!routeDa()?'Speichern und Route planen':'Party speichern'))+'</button></div><p class="fehler" id="fehler" style="color:var(--rot);margin-top:10px"></p>';
+    $('seite').innerHTML=h;
+    var f=$('seite').querySelector('input'); if(f && schritt<2) try{ f.focus(); }catch(x){}
+  }
+  function routeDa(){ var pl=Party.plan(thema); return !!(pl && pl.stationen && pl.stationen.length); }
+  function uebernehmen(){                         // Felder des aktuellen Schritts in den Entwurf
+    var e=entwurf;
+    if(schritt===0){ e.kind.name=$('name').value.trim().replace(/\s+/g,' ').slice(0,30); e.kind.alter=+$('alter').value||null;
+      if(!e.kind.name) return 'Bitte den Vornamen eingeben.'; if(!e.kind.alter || e.kind.alter<2 || e.kind.alter>12) return 'Bitte ein Alter zwischen 2 und 12 eingeben.'; }
+    if(schritt===1){ e.datum=$('datum').value; e.start=$('start').value||'15:00'; if(!e.datum) return 'Bitte ein Datum wählen.'; }
+    if(schritt===2){ var v=$('vorausgeher'); e.vorausgeher=!!(v && v.checked && e.helfer>=2); }
+    if(schritt===3 && e.ort==='draussen'){ e.planB=$('planb').checked; e.ausdrucke=$('ausdrucke').checked; }
+    return '';
+  }
+
+  // ---------- Party-Übersicht ----------
+  function uebersicht(){
+    var p=party, pl=Party.plan(thema), l=Party.aufgaben(p, tour, pl), n=Party.naechste(l), tage=Party.tageBis(p);
+    var cd=tage==null?'':tage>1?'in '+tage+' Tagen':tage===1?'morgen':tage===0?'heute':'vorbei';
+    var vName=tour.varianten[Party.variante(p)].name;
+    var h='<div class="oben"><a href="index.html">← Alle Abenteuer</a><a href="#" id="aendern">Angaben ändern</a></div>'+
+      '<div class="kopf"><img src="'+info.cover+'" alt=""><div><div class="art">'+esc(tour.titel)+' · '+esc(vName)+'</div><h1>'+esc(partyTitel(p))+'</h1>'+
+      '<div class="leise">'+Party.datumText(Party.datum(p))+', '+esc(p.start)+' Uhr · '+p.kinder+' Kinder</div><span class="countdown">'+cd+'</span></div></div>';
+    if(n){
+      var wann=n.tag===0&&n.uhr?'Am Partytag, '+n.uhr+' Uhr':Party.datumText(n.datum);
+      var faellig=n.datum<new Date(new Date().setHours(0,0,0,0));
+      h+='<div class="next"><div class="klein">Als Nächstes · '+(faellig&&n.tag<0?'jetzt fällig':esc(wann))+'</div><h3>'+esc(n.titel)+'</h3>'+(n.text?'<p class="leise">'+esc(n.text)+'</p>':'')+
+        '<div class="reihe" style="margin-top:10px">'+(n.link?'<a class="knopf" href="'+n.link+'">Los geht’s</a>':'')+(!n.auto?'<button class="knopf leer" data-fertig="'+n.id+'">Erledigt</button>':'')+'</div></div>';
+    }
+    if(p.planB || p.ort==='drinnen' && p.warDraussen){
+      var drin=p.ort==='drinnen';
+      h+='<div class="karte planb"><div><b>'+(drin?'Plan B aktiv: drinnen':'Plan B bereit')+'</b><br><span class="leise">'+(drin?'Zurück nach draußen mit der geplanten Route.':'Regen? Ein Tipp, und das Spiel läuft drinnen.')+'</span></div><button class="knopf klein '+(drin?'':'leer')+'" id="umschalten">'+(drin?'Nach draußen':'Drinnen spielen')+'</button></div>';
+    }
+    if(p.ort==='draussen'){
+      h+='<div class="karte"><b>Route</b><p class="leise" style="margin:4px 0 10px">'+(pl&&pl.strecke?km(pl.strecke)+' bis zum Ziel'+(pl.rundkurs?', Rundkurs':'')+(pl.adresse?' · ab '+esc(pl.adresse):''):'Noch nicht geplant')+'</p><a class="knopf klein leer" href="planer.html?thema='+thema+'">'+(pl&&pl.strecke?'Route ansehen':'Route planen')+'</a></div>';
+    }
+    h+='<h2>Zeitplan</h2>';
+    var tag=null;
+    l.forEach(function(a){
+      var heute0=new Date(); heute0.setHours(0,0,0,0);
+      var t=a.tag===0?'Partytag':(!a.fertig && a.datum<heute0)?'Jetzt fällig':Party.datumText(a.datum)+' · '+(-a.tag)+(a.tag===-1?' Tag':' Tage')+' vor der Party';
+      if(t!==tag){ h+='<div class="tag">'+esc(t)+'</div>'; tag=t; }
+      h+='<div class="aufgabe'+(a.fertig?' fertig':'')+'">'+(a.auto?'<span class="auto'+(a.fertig?' ja':'')+'" aria-label="'+(a.fertig?'erledigt':'offen')+'">'+(a.fertig?'✓':'')+'</span>':'<input type="checkbox" data-haken="'+a.id+'"'+(a.fertig?' checked':'')+' aria-label="'+esc(a.titel)+' erledigt">')+
+        '<div><b>'+(a.uhr?a.uhr+' · ':'')+esc(a.titel)+'</b>'+(a.text?'<span>'+esc(a.text)+'</span>':'')+'</div>'+(a.link?'<a href="'+a.link+'" class="knopf klein leer">Öffnen</a>':'<span></span>')+'</div>';
+    });
+    h+='<div class="reihe" style="margin-top:14px"><button class="knopf leer klein" id="kalender">In den Kalender</button></div>';
+    var ek=Party.einkauf(p, tour), offen=ek.filter(function(x){ return !x.fertig; }).length;
+    h+='<h2 id="einkauf">Einkaufsliste <span class="leise" style="font-size:1rem">· '+(offen?offen+' offen':'alles da')+'</span></h2>'+
+      ek.map(function(x){ return '<div class="ding"><input type="checkbox" data-kauf="'+x.id+'"'+(x.fertig?' checked':'')+' aria-label="'+esc(x.name)+' besorgt"><div><span class="menge">'+x.menge+'×</span> '+esc(x.name)+'<br><span>'+esc(x.wann)+'</span></div>'+(x.link?'<a class="knopf klein leer" href="'+esc(x.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'<span class="leise" style="font-size:.85rem">Link folgt</span>')+'</div>'; }).join('')+
+      '<p class="leise" style="font-size:.85rem;margin-top:10px">Bastelsachen wie Schuhkarton und Kreide stehen in der Checkliste im Spiel.</p>';
+    h+='<h2>Spiel-Gerät</h2><div class="karte"><p>Öffne die Party auf dem iPad, das zum Zauberspiegel wird. Der Link bringt Route, Kinderzahl und Variante mit.</p>'+
+      '<div class="reihe" style="margin-top:10px"><button class="knopf" id="teilen">Link fürs iPad</button><a class="knopf leer" href="bereit.html?thema='+thema+'">Bereit-Check</a><a class="knopf leer" href="druck.html?thema='+thema+'">Druckvorlagen</a></div></div>'+
+      '<div class="reihe" style="margin-top:24px"><button class="knopf leer klein" id="loeschen">Party löschen</button></div>';
+    $('seite').innerHTML=h;
+  }
+
+  function linkFuersIpad(){
+    var pl=Party.plan(thema)||{}, k={format:1, thema:thema, stand:pl.stand, variante:pl.variante, kinder:pl.kinder,
+      stationen:(pl.stationen||[]).map(function(s){ return {lat:s.lat, lng:s.lng, name:s.name, an:s.an, zu:s.zu}; }),
+      party:{thema:thema, kind:party.kind, datum:party.datum, start:party.start, kinder:party.kinder, helfer:party.helfer, vorausgeher:party.vorausgeher, ort:party.ort, planB:party.planB, ausdrucke:party.ausdrucke}};
+    var b=new TextEncoder().encode(JSON.stringify(k)), s=''; for(var i=0;i<b.length;i++) s+=String.fromCharCode(b[i]);
+    var u=new URL('spiel.html', location.href); u.searchParams.set('thema', thema); u.searchParams.set('plan', btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''));
+    return u.toString();
+  }
+
+  function zeigen(){ if(entwurf) assistent(); else uebersicht(); }
+  document.addEventListener('click', function(ev){
+    var t=ev.target, b;
+    if(entwurf){
+      if((b=t.closest('[data-z]'))){ var k=b.getAttribute('data-z'), d=+b.getAttribute('data-d'); if(k==='kinder') entwurf.kinder=Math.max(tour.kinder.min, Math.min(tour.kinder.max, entwurf.kinder+d)); else { entwurf.helfer=Math.max(1, Math.min(6, entwurf.helfer+d)); if(entwurf.helfer<2) entwurf.vorausgeher=false; } var v=$('vorausgeher'); if(v && v.checked && entwurf.helfer>=2) entwurf.vorausgeher=true; assistent(); return; }
+      if((b=t.closest('[data-ort]'))){ entwurf.ort=b.getAttribute('data-ort'); assistent(); return; }
+      if(t.closest('#zurueck')){ uebernehmen(); schritt--; assistent(); return; }
+      if(t.closest('#weiter')){
+        var f=uebernehmen(); if(f){ $('fehler').textContent=f; return; }
+        if(schritt<SCHRITTE.length-1){ schritt++; assistent(); window.scrollTo(0,0); return; }
+        if(entwurf.ort==='draussen') entwurf.warDraussen=true;
+        party=Party.speichern(entwurf); entwurf=null;
+        if(party.ort==='draussen' && !routeDa()){ location.href='planer.html?thema='+thema; return; }
+        uebersicht(); window.scrollTo(0,0); toast('Party gespeichert.'); return;
+      }
+      return;
+    }
+    if(t.closest('#aendern')){ ev.preventDefault(); entwurf=JSON.parse(JSON.stringify(party)); schritt=0; assistent(); return; }
+    if((b=t.closest('[data-fertig]'))){ party.erledigt=party.erledigt||{}; party.erledigt[b.getAttribute('data-fertig')]=true; party=Party.speichern(party); uebersicht(); return; }
+    if(t.closest('#umschalten')){ party.ort=party.ort==='drinnen'?'draussen':'drinnen'; party=Party.speichern(party); uebersicht(); toast(party.ort==='drinnen'?'Das Spiel läuft jetzt drinnen.':'Das Spiel läuft wieder draußen.'); return; }
+    if(t.closest('#kalender')){
+      var blob=new Blob([Party.ics(party, tour, Party.plan(thema))],{type:'text/calendar'}), a=document.createElement('a');
+      a.href=URL.createObjectURL(blob); a.download=thema+'-party.ics'; document.body.appendChild(a); a.click(); a.remove(); toast('Kalenderdatei erstellt. Öffnen, dann landen alle Termine im Kalender.'); return;
+    }
+    if(t.closest('#teilen')){
+      var link=linkFuersIpad();
+      if(navigator.share){ navigator.share({title:partyTitel(party), url:link})['catch'](function(){}); return; }
+      try{ navigator.clipboard.writeText(link).then(function(){ toast('Link kopiert. Auf dem iPad öffnen.'); }, function(){ prompt('Link kopieren:', link); }); }catch(x){ prompt('Link kopieren:', link); }
+      return;
+    }
+    if(t.closest('#loeschen')){ if(confirm('Party wirklich löschen? Route und Checkliste bleiben erhalten.')){ Party.loeschen(thema); party=null; neu(); } return; }
+  });
+  document.addEventListener('change', function(ev){
+    var t=ev.target;
+    if(t.hasAttribute('data-haken')){ party.erledigt=party.erledigt||{}; party.erledigt[t.getAttribute('data-haken')]=t.checked; party=Party.speichern(party); uebersicht(); }
+    if(t.hasAttribute('data-kauf')){ party.einkauf=party.einkauf||{}; party.einkauf[t.getAttribute('data-kauf')]=t.checked; party=Party.speichern(party); var y=window.scrollY; uebersicht(); window.scrollTo(0,y); }
+  });
+  function neu(){ entwurf={format:1, thema:thema, kind:{name:'', alter:null}, datum:'', start:'15:00', kinder:tour.kinder.standard, helfer:2, vorausgeher:true, ort:'draussen', planB:true, ausdrucke:true, erledigt:{}, einkauf:{}, erstellt:new Date().toISOString()}; schritt=0; assistent(); }
+
+  Promise.all([fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }), fetch('themen/index.json').then(function(r){ return r.json(); })]).then(function(r){
+    tour=r[0]; info=r[1].themen.filter(function(t){ return t.id===thema; })[0];
+    party=Party.lesen(thema);
+    if(!party || q.has('neu')) neu(); else uebersicht();
+  })['catch'](function(e){ $('seite').innerHTML='<p>Die Party lässt sich nicht laden: '+esc(e.message)+'</p>'; });
+})();
+</script>
+</body></html>

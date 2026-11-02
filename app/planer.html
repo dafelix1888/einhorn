@@ -26,11 +26,11 @@
 .drinnen-hinweis{background:var(--tint);border-radius:14px;padding:12px 14px}
 </style></head><body>
 <main class="seite">
-  <p><a href="index.html">← Übersicht</a></p>
+  <p><a href="index.html" id="zurueck-link">← Übersicht</a></p>
   <h1 id="titel">Tour planen</h1>
   <p class="lead" id="untertitel"></p>
 
-  <section class="karte-box">
+  <section class="karte-box" id="sek-variante">
     <h2>1 · Wo wird gespielt?</h2>
     <div class="seg" id="variante" role="group" aria-label="Variante"></div>
     <p class="hinweis" id="variante-kurz"></p>
@@ -62,7 +62,7 @@
     <p class="drinnen-hinweis">Drinnen gibt es kein GPS. Jede Station öffnet ihr mit „Station öffnen“ im Spiegel. Die Räume stehen in der Vorbereitungsliste.</p>
   </section>
 
-  <section class="karte-box">
+  <section class="karte-box" id="sek-kinder">
     <h2>3 · Wie viele Kinder?</h2>
     <div class="row"><button type="button" class="btn ghost small" id="k-minus" aria-label="Weniger">–</button><b id="kinder" class="zahl"></b><button type="button" class="btn ghost small" id="k-plus" aria-label="Mehr">+</button></div>
   </section>
@@ -92,5 +92,6 @@
 </main>
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="planer-kern.js"></script>
+<script src="party.js"></script>
 <script src="planer.js"></script>
 </body></html>

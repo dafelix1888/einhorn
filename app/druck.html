@@ -1,0 +1,125 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Druckvorlagen · Zauberspiegel</title>
+<link rel="stylesheet" href="dunkel.css">
+<style>
+.steuer{max-width:44rem;margin:0 auto;padding:16px 18px}
+.auswahl{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.auswahl label{display:flex;gap:8px;align-items:center;background:var(--karte);border-radius:999px;padding:8px 14px;margin:0;font-weight:600}
+.auswahl input{width:20px;height:20px;accent-color:var(--akzent)}
+.vorschau{display:flex;flex-direction:column;align-items:center;gap:24px;padding:12px 0 60px}
+.blatt{width:210mm;height:297mm;background:#fff;color:#241A3D;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.5);transform-origin:top center;font-family:"Trebuchet MS","Avenir Next",Arial,sans-serif}
+.blatt.quer{width:297mm;height:210mm}
+@media screen and (max-width:900px){ .blatt{zoom:.45} }
+@media screen and (min-width:901px){ .blatt{zoom:.75} }
+/* Einladung: zwei A5 untereinander */
+.einladung{height:148.5mm;padding:12mm 16mm;display:grid;grid-template-columns:52mm 1fr;gap:10mm;align-items:center;border-bottom:1px dashed #C9C2DA}
+.einladung:last-child{border-bottom:0}
+.einladung img{width:52mm;height:52mm;border-radius:4mm}
+.einladung h2{font-size:30pt;margin:0 0 2mm;color:#6B35C9;line-height:1.05}
+.einladung .unter{font-size:13pt;margin:0 0 6mm}
+.einladung dl{display:grid;grid-template-columns:28mm 1fr;gap:2mm 4mm;font-size:12pt;margin:0}
+.einladung dt{font-weight:700;color:#6B35C9}
+.einladung dd{margin:0}
+.einladung .klein{font-size:10pt;color:#5A5073;margin-top:5mm}
+/* Urkunde */
+.urkunde{padding:22mm 20mm;text-align:center;height:100%;display:flex;flex-direction:column;align-items:center;border:6mm solid transparent;border-image:linear-gradient(90deg,#E23A3F,#F28C1B,#F2B90F,#3A9D4B,#2B6FE0,#9050C8) 1}
+.urkunde img{width:70mm;height:70mm;border-radius:6mm;margin-bottom:8mm}
+.urkunde h2{font-size:46pt;margin:0;color:#6B35C9;letter-spacing:.04em}
+.urkunde .linie{border-bottom:1.5pt solid #241A3D;width:130mm;height:20mm;margin:12mm 0 3mm}
+.urkunde p{font-size:16pt;margin:3mm 0;max-width:150mm}
+.urkunde .unterschrift{margin-top:auto;font-size:13pt;color:#5A5073}
+.urkunde .unterschrift b{display:block;font-size:26pt;color:#241A3D;font-style:italic}
+/* Wolke */
+.wolke{display:grid;place-items:center;height:100%}
+.wolke svg{width:92%}
+@page{size:A4;margin:0}
+@media print{
+  body{background:#fff}
+  .steuer{display:none}
+  .vorschau{padding:0;gap:0}
+  .blatt{box-shadow:none;zoom:1!important;page-break-after:always;break-after:page}
+  .blatt.quer{width:297mm;height:210mm;page:quer}
+  .aus{display:none!important}
+}
+@page quer{size:A4 landscape;margin:0}
+</style></head><body>
+<div class="steuer">
+  <div class="oben"><a href="#" id="zurueck">← Zur Party</a><button class="knopf" id="drucken">Drucken oder als PDF sichern</button></div>
+  <h1>Druckvorlagen</h1>
+  <p class="leise">Mit Namen, Datum und Kinderzahl aus deiner Party. Beim Drucken „Hintergrundgrafiken“ einschalten, damit der Regenbogenrand mitkommt.</p>
+  <div class="zwei">
+    <div><label for="treff">Treffpunkt</label><input id="treff" type="text"></div>
+    <div><label for="abholen">Abholen um</label><input id="abholen" type="time" step="900"></div>
+  </div>
+  <div class="auswahl" id="auswahl"></div>
+  <div class="reihe"><button class="knopf leer klein" id="text">Einladung als Text kopieren</button></div>
+  <p class="leise" id="hinweis" style="margin-top:10px"></p>
+</div>
+<div class="vorschau" id="vorschau"></div>
+<div class="toast" id="toast" hidden></div>
+<script src="party.js"></script>
+<script>
+(function(){
+  'use strict';
+  var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
+  var tour=null, info=null, party=Party.lesen(thema), plan=Party.plan(thema), an={einladung:true, urkunde:true, wolke:true};
+  function $(id){ return document.getElementById(id); }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3000); }
+  $('zurueck').href='party.html?thema='+thema;
+  if(!party){ document.body.innerHTML='<main class="seite"><h1>Erst die Party anlegen</h1><p class="leise">Die Druckvorlagen brauchen Name, Datum und Kinderzahl.</p><a class="knopf" href="party.html?thema='+thema+'">Party anlegen</a></main>'; return; }
+  var v=Party.variante(party), name=party.kind.name, alter=party.kind.alter, d=Party.datum(party);
+  var datumLang=d.toLocaleDateString('de-DE',{weekday:'long', day:'numeric', month:'long'});
+  var antwortBis=new Date(d); antwortBis.setDate(antwortBis.getDate()-7);
+  $('treff').value=party.treffpunkt || (party.ort==='drinnen' || !plan || !plan.adresse || plan.adresse==='Mein Standort' ? 'bei uns zu Hause' : plan.adresse);
+  $('abholen').value=party.abholen || Party.uhr(party, 150);
+
+  var WOLKE="<svg viewBox='0 0 1000 620' xmlns='http://www.w3.org/2000/svg'><path d='M220 520 Q90 520 90 420 Q90 320 200 310 Q200 180 340 170 Q400 70 520 90 Q640 60 700 170 Q840 160 860 290 Q960 310 950 410 Q940 520 820 520 Z' fill='#fff' stroke='#7A8CA8' stroke-width='14' stroke-linejoin='round'/><path d='M370 360 q40 30 80 0 M560 360 q40 30 80 0' fill='none' stroke='#241A3D' stroke-width='14' stroke-linecap='round'/><ellipse cx='330' cy='420' rx='34' ry='18' fill='#F4B6D2'/><ellipse cx='680' cy='420' rx='34' ry='18' fill='#F4B6D2'/><path d='M470 450 q35 22 70 0' fill='none' stroke='#241A3D' stroke-width='12' stroke-linecap='round'/><text x='790' y='150' font-family='Trebuchet MS, Arial' font-weight='800' font-size='70' fill='#7A8CA8'>z</text><text x='850' y='90' font-family='Trebuchet MS, Arial' font-weight='800' font-size='96' fill='#7A8CA8'>Z</text><text x='920' y='40' font-family='Trebuchet MS, Arial' font-weight='800' font-size='56' fill='#7A8CA8'>z</text></svg>";
+
+  function einladung(){
+    var draussen=party.ort!=='drinnen';
+    var karte='<div class="einladung"><img src="'+info.cover+'" alt=""><div><h2>'+esc(name)+' wird '+esc(alter)+'!</h2><p class="unter">Komm mit auf Funkels Regenbogen-Abenteuer, einer Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.</p>'+
+      '<dl><dt>Wann</dt><dd>'+esc(datumLang)+', '+esc(party.start)+' Uhr</dd><dt>Wo</dt><dd>'+esc($('treff').value)+'</dd><dt>Abholen</dt><dd>'+esc($('abholen').value)+' Uhr</dd>'+
+      (draussen?'<dt>Mitbringen</dt><dd>Feste Schuhe und Kleidung für draußen</dd>':'')+'</dl>'+
+      '<p class="klein">Bitte sagt bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.</p></div></div>';
+    return '<section class="blatt" id="einladung">'+karte+karte+'</section>';
+  }
+  function urkunden(){
+    var h='', n=party.kinder;
+    for(var i=0;i<n;i++) h+='<section class="blatt'+(i>0?' kopie':'')+'"><div class="urkunde"><img src="'+info.cover+'" alt=""><h2>URKUNDE</h2><div class="linie"></div><p>gehört ab heute zu Funkels Einhorn-Helfern und hat den Regenbogen gerettet.</p>'+
+      '<p style="font-size:13pt;color:#5A5073">Auf '+esc(/[sßxz]$/i.test(name)?name+'’':name+'s')+' '+esc(alter)+'. Geburtstag am '+d.toLocaleDateString('de-DE',{day:'numeric', month:'long', year:'numeric'})+'</p>'+
+      '<div class="unterschrift"><b>Funkel</b>Einhorn und Hüterin des Regenbogens</div></div></section>';
+    return h;
+  }
+  function wolke(){ return '<section class="blatt quer" id="wolke"><div class="wolke">'+WOLKE+'</div></section>'; }
+
+  function zeichnen(){
+    var teile=[['einladung','Einladungen (2 pro Blatt)'],['urkunde','Urkunden ('+party.kinder+' Stück)']].concat(v==='a'?[['wolke','Schlafende Wolke (Station 6, gern auf A3)']]:[]);
+    $('auswahl').innerHTML=teile.map(function(t){ return '<label><input type="checkbox" data-teil="'+t[0]+'"'+(an[t[0]]?' checked':'')+'> '+t[1]+'</label>'; }).join('');
+    $('hinweis').textContent=v==='a' ? 'Die Wolke auf A3 drucken oder im Copyshop vergrößern. Auf A4 geht es auch, dann steht sie etwas kleiner am Hügel.' : v==='b' ? 'Ohne Ausdrucke: Statt der Wolke ein weißes Laken nehmen.' : 'Drinnen: Statt der Wolke ein weißes Kissen oder Laken auf dem Kissenberg.';
+    $('vorschau').innerHTML=(an.einladung?einladung():'')+(an.urkunde?urkunden():'')+(v==='a'&&an.wolke?wolke():'');
+  }
+  function textFuerChat(){
+    return name+' wird '+alter+'! 🦄\n\nWir laden zu Funkels Regenbogen-Abenteuer ein, einer Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.\n\n'+
+      'Wann: '+datumLang+', '+party.start+' Uhr\nWo: '+$('treff').value+'\nAbholen: '+$('abholen').value+' Uhr\n'+(party.ort!=='drinnen'?'Bitte feste Schuhe und Kleidung für draußen.\n':'')+
+      '\nGebt bitte bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.';
+  }
+  document.addEventListener('change', function(e){
+    var t=e.target;
+    if(t.hasAttribute('data-teil')){ an[t.getAttribute('data-teil')]=t.checked; zeichnen(); }
+    if(t.id==='treff' || t.id==='abholen'){ party.treffpunkt=$('treff').value; party.abholen=$('abholen').value; Party.speichern(party); zeichnen(); }
+  });
+  $('drucken').addEventListener('click', function(){ window.print(); });
+  $('text').addEventListener('click', function(){
+    var t=textFuerChat();
+    if(navigator.share){ navigator.share({text:t})['catch'](function(){}); return; }
+    try{ navigator.clipboard.writeText(t).then(function(){ toast('Text kopiert. In WhatsApp oder die Mail einfügen.'); }, function(){ prompt('Text kopieren:', t); }); }catch(x){ prompt('Text kopieren:', t); }
+  });
+  Promise.all([fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }), fetch('themen/index.json').then(function(r){ return r.json(); })]).then(function(r){
+    tour=r[0]; info=r[1].themen.filter(function(t){ return t.id===thema; })[0]; zeichnen();
+    if(location.hash==='#einladung'){ an.urkunde=false; an.wolke=false; zeichnen(); }
+  });
+})();
+</script>
+</body></html>

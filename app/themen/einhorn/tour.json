@@ -30,6 +30,11 @@
   "rollen": "stimmen/rollen.json",
   "live": {
    "rolle": "spiegel"
+  },
+  "pakete": {
+   "basis": "../stimmen/pakete/einhorn-basis.json",
+   "erzaehler": "../stimmen/pakete/einhorn-{figur}.json",
+   "index": "../stimmen/pakete/einhorn-index.json"
   }
  },
  "figuren": [
