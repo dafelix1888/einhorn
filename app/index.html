@@ -106,6 +106,23 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
 .figur .kreis{width:130px;height:130px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;font-size:3rem;font-weight:800;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .figur b{display:block;font-size:.98rem}
 .figur span{color:var(--leise);font-size:.85rem}
+/* Charaktere */
+.figurreihe{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px}
+.fig-link{flex:0 0 100px;text-align:center;text-decoration:none;border-radius:12px;padding:6px 2px}
+.fig-link:hover{background:var(--karte)}
+.fig-bild{width:84px;height:84px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-size:2rem;font-weight:800;color:#fff;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.fig-bild img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.4);transform-origin:50% 72%}   /* Cover ohne Titel: auf die Figur zoomen */
+.fig-link b{display:block;font-size:.9rem;font-weight:600;line-height:1.2}
+.fig-link span{display:block;color:var(--leise);font-size:.78rem}
+.zeile .fig-bild{display:grid;width:48px;height:48px;margin:0;font-size:1.2rem;flex:0 0 auto;box-shadow:none}
+.zeile .fig-bild span{display:inline;color:#fff;font-size:inherit}
+.zeile.an{background:var(--hover)}
+.figur-kopf{display:flex;gap:24px;align-items:flex-end;padding:56px 24px 24px;background:linear-gradient(180deg,var(--farbe) 0%,color-mix(in srgb,var(--farbe) 40%,var(--panel)) 100%)}
+.figur-kopf .fig-bild{width:180px;height:180px;margin:0;font-size:4.5rem;flex:0 0 auto}
+.figur-kopf h1{font-size:clamp(2rem,5vw,3.6rem);line-height:1;margin:8px 0 10px}
+.figur-kopf p{margin:0;max-width:40rem}
+.figur-kopf .art{font-size:.9rem;font-weight:600}
+@media (max-width:700px){ .figur-kopf{flex-direction:column;align-items:flex-start;padding-top:20px} .figur-kopf .fig-bild{width:130px;height:130px;font-size:3.2rem} }
 .ausruestung{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;max-width:60rem}
 .ding{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--karte);border-radius:10px;padding:12px 14px}
 .ding b{display:block;font-size:.98rem}
@@ -215,10 +232,37 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   function countdown(pa){ var t=Party.tageBis(pa); return t==null?'':t>1?'in '+t+' Tagen':t===1?'morgen':t===0?'heute':'vorbei'; }
   function ortText(t){ return t.orte.map(function(o){ return o==='draussen'?'draußen':'drinnen'; }).join(' & '); }
 
+  // ---------- Charaktere ----------
+  function slug(n){ return String(n).toLowerCase().replace(/[äöüß]/g,function(c){ return {'ä':'ae','ö':'oe','ü':'ue','ß':'ss'}[c]; }).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+  // Alle Figuren über alle Themen: aus tour.json, sonst die Hauptfigur aus dem Katalog. Gleiche id = gleiche Figur.
+  function figuren(){
+    var m={}, l=[];
+    THEMEN.forEach(function(t){
+      var fl=TOUR[t.id] ? TOUR[t.id].figuren : [{id:slug(t.held), name:t.held, rolle:'Hauptfigur'}];
+      fl.forEach(function(f, i){
+        var id=f.id||slug(f.name), x=m[id];
+        if(!x){ x=m[id]={id:id, name:f.name, rolle:f.rolle, text:f.text||'', themen:[], haupt:false, farbe:FIG_FARBEN[l.length%FIG_FARBEN.length]}; l.push(x); }
+        if(x.themen.indexOf(t)<0) x.themen.push(t);
+        if(f.rolle==='Hauptfigur' || i===0 && !TOUR[t.id]){ x.haupt=true; x.bild=t.cover; }
+      });
+    });
+    return l.sort(function(a,b){ return (b.haupt-a.haupt) || (verfuegbar(b.themen[0])-verfuegbar(a.themen[0])); });
+  }
+  function figur(id){ return figuren().filter(function(f){ return f.id===id; })[0]; }
+  function figBild(f){ return '<span class="fig-bild" style="background:'+f.farbe+'">'+(f.bild?'<img src="'+f.bild+'" alt="">':'<span aria-hidden="true">'+esc(f.name.replace(/^(Professor|Der|Die)\s+/,'').charAt(0))+'</span>')+'</span>'; }
+  function figurReihe(l){ return '<div class="figurreihe">'+l.map(function(f){ return '<a class="fig-link" href="#/figur/'+f.id+'">'+figBild(f)+'<b>'+esc(f.name.replace(/,.*$/,''))+'</b><span>'+esc(f.haupt?'Hauptfigur':f.rolle.replace(/\s*\(.*\)$/,''))+'</span></a>'; }).join('')+'</div>'; }
+
   // ---------- Bibliothek links ----------
   function bibZeichnen(){
     var meine=THEMEN.filter(function(t){ return party(t.id) || plan(t.id) || merkliste().indexOf(t.id)>=0; });
-    $('bib-chips').innerHTML=[['alle','Alle'],['geplant','Partys'],['gemerkt','Gemerkt']].map(function(c){ return '<button class="chip" data-bf="'+c[0]+'" aria-pressed="'+(bibFilter===c[0])+'">'+c[1]+'</button>'; }).join('');
+    $('bib-chips').innerHTML=[['alle','Alle'],['geplant','Partys'],['gemerkt','Gemerkt'],['figuren','Charaktere']].map(function(c){ return '<button class="chip" data-bf="'+c[0]+'" aria-pressed="'+(bibFilter===c[0])+'">'+c[1]+'</button>'; }).join('');
+    if(bibFilter==='figuren'){
+      var aktiv=(location.hash.match(/^#\/figur\/([a-z0-9-]+)/)||[])[1];
+      $('bib-liste').innerHTML=figuren().map(function(f){
+        return '<a class="zeile'+(f.id===aktiv?' an':'')+'" href="#/figur/'+f.id+'">'+figBild(f)+'<div class="txt"><b>'+esc(f.name)+'</b><span>'+esc(f.themen.map(function(t){ return t.titel; }).join(', '))+'</span></div></a>';
+      }).join('');
+      return;
+    }
     var l=meine.filter(function(t){ return bibFilter==='alle' || (bibFilter==='geplant' ? !!(party(t.id)||plan(t.id)) : merkliste().indexOf(t.id)>=0); });
     $('bib-liste').innerHTML=l.length ? l.map(function(t){
       var p=plan(t.id);
@@ -269,7 +313,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   function passt(t){
     if(filter==='draussen' || filter==='drinnen'){ if(t.orte.indexOf(filter)<0) return false; }
     else if(filter!=='alle'){ if(t.altersgruppen.indexOf(filter)<0) return false; }
-    if(suche){ var s=(t.titel+' '+t.untertitel+' '+t.kurz+' '+t.held).toLowerCase(); if(s.indexOf(suche)<0) return false; }
+    if(suche){ var s=(t.titel+' '+t.untertitel+' '+t.kurz+' '+t.held+' '+(TOUR[t.id]?TOUR[t.id].figuren.map(function(f){ return f.name; }).join(' '):'')).toLowerCase(); if(s.indexOf(suche)<0) return false; }
     return true;
   }
   function kachel(t){
@@ -288,6 +332,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       '<p class="gruss">'+gruss+'</p>'+
       '<div class="chips" style="margin:0 0 18px">'+chips.map(function(c){ return '<button class="chip" data-f="'+c[0]+'" aria-pressed="'+(filter===c[0])+'">'+c[1]+'</button>'; }).join('')+'</div>'+
       (geplant.length && !suche ? '<div class="kurzreihe">'+geplant.map(function(t){ return '<a class="kurz" href="'+(party(t.id)?'party.html?thema='+t.id:'#/abenteuer/'+t.id)+'"><img src="'+t.cover+'" alt="">'+esc(party(t.id)?partyName(party(t.id))+' · '+countdown(party(t.id)):t.titel)+'</a>'; }).join('')+'</div>' : '')+
+      (!suche && filter==='alle'?'<h2 class="abschnitt">Charaktere</h2>'+figurReihe(figuren()):'')+
       (l.length?'<h2 class="abschnitt">Alle Abenteuer</h2><div class="kacheln">'+da.concat(bald).map(kachel).join('')+'</div>':'')+
       (!l.length?'<p class="leer" style="margin-top:20px"><b>Nichts gefunden</b>Andere Suche oder anderen Filter versuchen.</p>':'')+
       '<div class="mobil-jetzt" style="margin-top:30px">'+jetztHtml()+'</div>'+
@@ -310,11 +355,22 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
         (t.hoerprobe?'<button type="button" class="probeknopf" data-probe="'+t.id+'" aria-label="Hörprobe abspielen">'+PLAY+'</button><span class="klein0">Hörprobe, 21 Sek.</span>':'')+'</div></div></section>'+
         '<div class="zahlen"><div><b>15 Min.</b><span>zum Planen</span></div><div><b>6</b><span>Schritte bis zur Party</span></div><div><b>'+(tour.dauer&&tour.dauer.minuten||t.minuten)+' Min.</b><span>Abenteuer</span></div></div>';
     }
+    h+='<section class="reihe-bald"><h2>Charaktere</h2>'+figurReihe(figuren())+'</section>';
     var bald=THEMEN.filter(function(x){ return !verfuegbar(x); });
     if(bald.length) h+='<section class="reihe-bald"><h2>Bald verfügbar</h2><div class="band">'+bald.map(function(x){
       return '<a href="#/abenteuer/'+x.id+'"><img src="'+x.cover+'" alt="" loading="lazy"><b>'+esc(x.titel)+'</b><span>'+esc(x.alter)+'</span></a>';
     }).join('')+'</div></section>';
     return '<div class="handy">'+h+'</div>';
+  }
+
+  // ---------- Figurenseite: alle Geschichten mit dieser Figur ----------
+  function figurZeigen(id){
+    var f=figur(id); if(!f){ location.hash='#/'; return; }
+    var andere=figuren().filter(function(x){ return x.id!==f.id; });
+    $('haupt').innerHTML='<div style="--farbe:'+f.farbe+'"><div class="figur-kopf">'+figBild(f)+'<div><div class="art">Charakter · '+esc(f.haupt?'Hauptfigur':f.rolle)+'</div><h1>'+esc(f.name)+'</h1>'+(f.text?'<p>'+esc(f.text)+'</p>':'')+'</div></div>'+
+      '<section class="abschnitt-d"><h2>'+(f.themen.length>1?'Kommt vor in '+f.themen.length+' Abenteuern':'Kommt vor in')+'</h2><div class="kacheln">'+f.themen.map(kachel).join('')+'</div></section>'+
+      '<section class="abschnitt-d" style="padding-bottom:30px"><h2>Weitere Charaktere</h2>'+figurReihe(andere)+'</section></div>';
+    $('haupt').scrollTop=0;
   }
 
   // ---------- Detailseite ----------
@@ -343,7 +399,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       }).join('')+'</ol></section>';
       h+='<section class="abschnitt-d"><h2>Figuren</h2><div class="figuren">'+tour.figuren.map(function(f,i){
         var bild=f.id==='funkel'?'<img src="'+t.cover+'" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">':esc(f.name.replace(/^(Professor|Der|Die)\s+/,'').charAt(0));
-        return '<div class="figur"><div class="kreis" style="background:'+FIG_FARBEN[i%FIG_FARBEN.length]+';overflow:hidden">'+bild+'</div><b>'+esc(f.name)+'</b><span>'+esc(f.rolle)+'</span></div>';
+        return '<a class="figur" style="text-decoration:none" href="#/figur/'+(f.id||slug(f.name))+'"><div class="kreis" style="background:'+FIG_FARBEN[i%FIG_FARBEN.length]+';overflow:hidden">'+bild+'</div><b>'+esc(f.name)+'</b><span>'+esc(f.rolle)+'</span></a>';
       }).join('')+'</div></section>';
       h+='<section class="abschnitt-d"><h2>Was die Kinder bekommen</h2><div class="ausruestung">'+tour.gaben.map(function(g){
         return '<div class="ding"><div><b>'+esc(g.was)+'</b><span>'+esc(g.art)+' · '+esc(g.i==='start'?'beim Ankommen':g.i==='ende'?'am Ende':'Station '+(g.i+1))+'</span></div></div>';
@@ -364,8 +420,8 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
 
   // ---------- Steuerung ----------
   function zeigen(){
-    var m=location.hash.match(/^#\/abenteuer\/([a-z0-9-]+)/);
-    if(m) detailZeigen(m[1]); else startZeigen();
+    var m=location.hash.match(/^#\/abenteuer\/([a-z0-9-]+)/), fm=location.hash.match(/^#\/figur\/([a-z0-9-]+)/);
+    if(m) detailZeigen(m[1]); else if(fm){ figurZeigen(fm[1]); } else startZeigen();
     bibZeichnen(); $('jetzt').innerHTML=jetztHtml();
   }
   document.addEventListener('click', function(e){
@@ -383,7 +439,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   $('ton').addEventListener('play', function(){ probeKnoepfe(PAUSE, 'Hörprobe anhalten'); });
   $('ton').addEventListener('pause', function(){ probeKnoepfe(PLAY, 'Hörprobe abspielen'); });
   $('ton').addEventListener('ended', function(){ probeKnoepfe(PLAY, 'Hörprobe abspielen'); });
-  $('suche').addEventListener('input', function(){ suche=this.value.trim().toLowerCase(); if(location.hash.indexOf('#/abenteuer/')===0) location.hash='#/'; else startZeigen(); });
+  $('suche').addEventListener('input', function(){ suche=this.value.trim().toLowerCase(); if(location.hash.indexOf('#/abenteuer/')===0 || location.hash.indexOf('#/figur/')===0) location.hash='#/'; else startZeigen(); });
   window.addEventListener('hashchange', function(){ $('ton').pause(); zeigen(); });
 
   try{ if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js'); }catch(e){}
