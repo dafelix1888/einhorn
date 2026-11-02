@@ -1,95 +1,111 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Tour planen · Schnitzeljagd</title>
+<meta name="theme-color" content="#0F0B17">
+<title>Route planen · Schnitzeljagd</title>
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="stil.css">
-<style>
-.richtung{display:grid;grid-template-columns:repeat(3,3.4rem);gap:6px}
-.richtung button{height:3.4rem;padding:0;border-radius:14px;font-size:1rem}
-#karte{height:min(62vh,520px);border-radius:18px;border:2px solid var(--line);margin-top:6px}
-.kennzahlen{position:sticky;top:0;z-index:1000;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:10px 12px;margin-top:6px;transition:border-color .2s,box-shadow .2s}
-.kennzahlen span{display:block;color:var(--soft);font-size:.8rem}
-.kennzahlen b{display:block;font-size:1.15rem;line-height:1.2}
-.kennzahlen small{display:block;color:var(--soft);font-size:.75rem;line-height:1.2}
-.kennzahlen.zieht{border-color:var(--magic);box-shadow:0 4px 16px rgba(107,53,201,.25)}
-.nr-marker{background:var(--magic);color:#fff;font-weight:800;border-radius:50%;width:38px!important;height:38px!important;margin:-19px 0 0 -19px!important;touch-action:none;display:grid;place-items:center;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);font-size:15px}
-.nr-marker.ersatz{background:#9A5A08}
-.nr-marker.start{background:var(--ink)}
-.stationen{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
-.stationen li{display:grid;grid-template-columns:2.2rem 1fr;gap:10px;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:10px 12px}
-.stationen .nr{font-weight:800;font-size:1.2rem;color:var(--magic)}
-.stationen .h{font-size:.92rem;color:var(--soft)}
-.stationen .ok{color:var(--ok);font-weight:700}
-.stationen .warn{color:var(--warn);font-weight:700}
-.profil{width:100%;height:120px;display:block}
-.status{min-height:1.4em}
-.drinnen-hinweis{background:var(--tint);border-radius:14px;padding:12px 14px}
-</style></head><body>
-<main class="seite">
-  <p><a href="index.html" id="zurueck-link">← Übersicht</a></p>
-  <h1 id="titel">Tour planen</h1>
-  <p class="lead" id="untertitel"></p>
+</head><body>
 
-  <section class="karte-box" id="sek-variante">
-    <h2>1 · Wo wird gespielt?</h2>
+<!-- Schritt 1: Eingabe -->
+<main class="eingabe" id="eingabe">
+  <div class="kopf">
+    <a class="rund" href="index.html" id="zurueck-eingabe" aria-label="Zurück"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></a>
+    <h1 id="titel">Route planen<small id="untertitel"></small></h1>
+  </div>
+
+  <section class="feld" id="sek-variante">
+    <p class="titel">Wo wird gespielt?</p>
     <div class="seg" id="variante" role="group" aria-label="Variante"></div>
     <p class="hinweis" id="variante-kurz"></p>
   </section>
 
-  <section class="karte-box" id="draussen">
-    <h2>2 · Start und Richtung</h2>
-    <label for="adresse">Startadresse (Haustür)</label>
-    <div class="row"><input id="adresse" type="text" autocomplete="street-address" placeholder="Straße Hausnummer, Ort"><button type="button" class="btn ghost small" id="hier">Mein Standort</button></div>
-    <p class="hinweis" id="start-info"></p>
-    <span class="label" style="margin-top:12px">Form der Tour</span>
-    <div class="seg" id="form" role="group" aria-label="Form der Tour"></div>
-    <p class="hinweis" id="form-kurz"></p>
-    <div class="zwei">
-      <div>
-        <span class="label">Grobe Richtung</span>
-        <div class="richtung" id="richtung" role="group" aria-label="Himmelsrichtung"></div>
+  <div id="draussen" class="stapel">
+    <section class="feld">
+      <label class="titel" for="adresse">Start (eure Haustür)</label>
+      <div class="zeile">
+        <input id="adresse" type="text" autocomplete="street-address" placeholder="Straße Hausnummer, Ort">
+        <button type="button" class="standort" id="hier" aria-label="Mein Standort"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
       </div>
-      <div>
-        <label for="distanz"><span id="distanz-label">Strecke bis zum Ziel: </span><b id="distanz-wert"></b></label>
-        <input type="range" id="distanz" step="50">
-        <p class="hinweis" id="distanz-hinweis"></p>
+      <p class="hinweis" id="start-info"></p>
+    </section>
+    <section class="feld">
+      <p class="titel">Form</p>
+      <div class="seg" id="form" role="group" aria-label="Form der Tour"></div>
+      <p class="hinweis" id="form-kurz"></p>
+    </section>
+    <section class="feld">
+      <div class="richtung-zeile">
+        <div>
+          <p class="titel" style="margin:0 0 6px;font-weight:700">Richtung</p>
+          <div class="richtung" id="richtung" role="group" aria-label="Himmelsrichtung"></div>
+        </div>
+        <div>
+          <label class="titel" for="distanz" style="display:block;font-weight:700"><span id="distanz-label">Bis zum Ziel</span><br><b id="distanz-wert" style="color:var(--akzent)"></b></label>
+          <input type="range" id="distanz" step="50">
+          <p class="hinweis" id="distanz-hinweis" style="color:var(--leise);font-size:.85rem"></p>
+        </div>
       </div>
-    </div>
+    </section>
+  </div>
+
+  <section class="feld" id="drinnen" hidden>
+    <p class="titel">Drinnen</p>
+    <p class="hinweis">Drinnen gibt es kein GPS. Jede Station öffnet ihr mit „Station öffnen“ im Spiegel. Die Räume stehen in der Vorbereitungsliste.</p>
   </section>
 
-  <section class="karte-box" id="drinnen" hidden>
-    <h2>2 · Drinnen</h2>
-    <p class="drinnen-hinweis">Drinnen gibt es kein GPS. Jede Station öffnet ihr mit „Station öffnen“ im Spiegel. Die Räume stehen in der Vorbereitungsliste.</p>
+  <section class="feld" id="sek-kinder">
+    <p class="titel">Wie viele Kinder?</p>
+    <div class="zaehler"><button type="button" id="k-minus" aria-label="Weniger">–</button><b id="kinder"></b><button type="button" id="k-plus" aria-label="Mehr">+</button></div>
   </section>
 
-  <section class="karte-box" id="sek-kinder">
-    <h2>3 · Wie viele Kinder?</h2>
-    <div class="row"><button type="button" class="btn ghost small" id="k-minus" aria-label="Weniger">–</button><b id="kinder" class="zahl"></b><button type="button" class="btn ghost small" id="k-plus" aria-label="Mehr">+</button></div>
-  </section>
-
-  <div class="row"><button type="button" class="btn primary" id="planen">Tour planen</button></div>
+  <button type="button" class="knopf breit" id="planen">Route planen</button>
+  <button type="button" class="knopf leer breit" id="zur-route" hidden>Zurück zur Route</button>
   <p class="status" id="status" role="status" aria-live="polite"></p>
-
-  <section id="ergebnis" hidden>
-    <h2>Deine Tour</h2>
-    <p class="lead" id="zusammenfassung"></p>
-    <div class="kennzahlen" id="kennzahlen" aria-live="polite">
-      <div><span>Bis zum Ziel</span><b id="k-strecke">–</b></div>
-      <div><span>Tourdauer</span><b id="k-dauer">–</b><small id="k-dauer-teile"></small></div>
-      <div><span id="k-heim-titel">Heimweg</span><b id="k-heim">–</b><small id="k-heim-min"></small></div>
-    </div>
-    <div id="karte"></div>
-    <p class="hinweis">Lila: Hinweg, grün gepunktet: Heimweg. Nummer mit dem Finger festhalten und ziehen: Route, Strecke und Dauer rechnen sich beim Ziehen neu. Beim Loslassen rutscht die Station auf den nächsten Weg. Kartendaten © OpenStreetMap-Mitwirkende, Höhen: Open-Meteo.</p>
-    <svg class="profil" id="profil" viewBox="0 0 600 120" preserveAspectRatio="none" aria-label="Höhenprofil"></svg>
-    <ol class="stationen" id="liste"></ol>
-    <div class="row">
-      <button type="button" class="btn ghost" id="anders">Andere Route</button>
-      <button type="button" class="btn primary" id="speichern">Speichern und spielen</button>
-      <button type="button" class="btn ghost" id="teilen">Link fürs Spiel-Gerät</button>
-    </div>
-  </section>
-  <div class="toast" id="toast" role="status" hidden></div>
 </main>
+
+<!-- Schritt 2: Karte mit Sheet -->
+<div id="ergebnis" hidden>
+  <div id="karte" aria-label="Karte mit Route"></div>
+  <div class="oben-leiste">
+    <a class="rund" href="index.html" id="zurueck-karte" aria-label="Zurück"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></a>
+    <button type="button" class="start-pille" id="start-pille" aria-label="Start und Strecke ändern"><span id="start-text">Ab: eure Haustür</span><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
+  </div>
+
+  <section class="sheet" id="sheet" aria-label="Euer Weg">
+    <i class="griff" aria-hidden="true"></i>
+    <div class="sheet-kopf" id="sheet-kopf" aria-live="polite">
+      <h1>Euer Weg</h1>
+      <span id="k-kurz">–</span>
+    </div>
+    <div class="station" id="station"><b id="st-titel"></b><span id="st-text"></span></div>
+    <p class="tipp">Tipp auf eine Station, um sie anzusehen. Ziehen verschiebt sie.</p>
+    <p class="sheet-status" id="sheet-status" role="status" hidden></p>
+    <div class="haupt">
+      <button type="button" class="knopf leer" id="anders">Andere Route</button>
+      <button type="button" class="knopf" id="speichern">Route übernehmen</button>
+    </div>
+    <details class="mehr" id="mehr">
+      <summary>Alle Stationen, Höhen, Link<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="mehr-inhalt">
+        <p class="klein-text" id="zusammenfassung"></p>
+        <div class="kennzahlen">
+          <div><span>Bis zum Ziel</span><b id="k-strecke">–</b></div>
+          <div><span>Dauer</span><b id="k-dauer">–</b><small id="k-dauer-teile"></small></div>
+          <div><span id="k-heim-titel">Heimweg</span><b id="k-heim">–</b><small id="k-heim-min"></small></div>
+        </div>
+        <svg class="profil" id="profil" viewBox="0 0 600 120" preserveAspectRatio="none" aria-label="Höhenprofil"></svg>
+        <ol class="liste" id="liste"></ol>
+        <div class="zwei-knoepfe">
+          <button type="button" class="knopf leer klein" id="teilen">Link fürs Spiel-Gerät</button>
+          <button type="button" class="knopf leer klein" id="aendern">Start ändern</button>
+        </div>
+        <p class="klein-text">Lila: Hinweg, grün gepunktet: Heimweg. Gestrichelte Stationen haben keinen passenden Ort gefunden: auf eine Ecke, einen Zaun oder eine Bank ziehen. Beim Loslassen rutscht die Station auf den nächsten Weg. Kartendaten © OpenStreetMap-Mitwirkende, Höhen: Open-Meteo.</p>
+      </div>
+    </details>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="planer-kern.js"></script>
 <script src="party.js"></script>

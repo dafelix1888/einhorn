@@ -29,32 +29,66 @@
   function plus(p, tage){ var d=datum(p); d.setDate(d.getDate()+tage); return d; }
   function datumText(d){ return d.toLocaleDateString('de-DE',{weekday:'short', day:'numeric', month:'long'}); }
 
-  // Zeitplan der Vorbereitung: Tag relativ zur Party, was zu tun ist, wohin es führt, ob die App es selbst abhaken kann
+  // Zeitplan der Vorbereitung: sechs gebündelte Schritte. Jeder Schritt hat Teile; ein Teil ist entweder
+  // automatisch erkannt (erkannt; nurAuto = nur automatisch, z. B. Route geplant) oder von Hand abgehakt (p.erledigt[teil.id]).
+  // Der Schritt ist fertig, wenn alle Teile fertig sind oder er als Ganzes abgehakt wurde (p.erledigt['schritt.'+id]).
+  // Die Teil-IDs entsprechen den früheren Einzelschritten, damit vorhandene Haken erhalten bleiben.
   function aufgaben(p, tour, pl){
-    var draussen=p.ort!=='drinnen', v=variante(p), route=!!(pl && pl.stationen && pl.stationen.length);
-    var l=[
-      {id:'anlegen', tag:-14, titel:'Party angelegt', auto:true, fertig:true},
-      draussen ? {id:'route', tag:-14, titel:'Route planen', text:'Adresse, Richtung und Strecke, die Stationen sucht der Planer.', link:'planer.html?thema='+p.thema, auto:true, fertig:route} : null,
-      {id:'bestellen', tag:-14, titel:'Utensilien bestellen', text:'Haarreifen, Holz-Regenbogen, Glückssteine, Zaubertafeln. Mengen stehen in der Einkaufsliste.', link:'#einkauf'},
-      {id:'einladen', tag:-12, titel:'Einladungen verschicken', text:'Druckvorlage mit Name, Datum und Abholzeit.', link:'druck.html?thema='+p.thema+'#einladung'},
-      {id:'basteln', tag:-7, titel:'Basteln', text:'Schatzkiste bekleben, Fuchsbau grau anmalen, Sticker in '+p.kinder+' Stücke schneiden.', link:'spiel.html?thema='+p.thema+'#einrichten'},
-      {id:'drucken', tag:-5, titel:'Ausdrucke vorbereiten', text:v==='a'?'Schlafende Wolke (A3) und Urkunden für alle Kinder.':'Urkunden für alle Kinder.', link:'druck.html?thema='+p.thema},
-      draussen ? {id:'wetter', tag:-2, titel:'Wetter prüfen', text:p.planB?'Bei Regen mit einem Tipp auf drinnen umschalten.':'Ohne Plan B: bei Regen Termin oder Ort überlegen.'} : null,
-      {id:'probelauf', tag:-1, titel:draussen?'Probelauf: Route abgehen':'Probelauf: Räume festlegen', text:draussen?'Stationen ansehen, im Planer verschieben, wo es nicht passt.':'Küche, Flur, Treppe, Toberaum und Sofa wie in der Liste.', link:draussen?'planer.html?thema='+p.thema:'spiel.html?thema='+p.thema+'#einrichten'},
-      {id:'geraet', tag:-1, titel:'Spiel-Gerät vorbereiten', text:'Bereit-Check auf dem iPad: Stimmen laden, Ton, GPS, Sperre aus.', link:'bereit.html?thema='+p.thema},
-      draussen && v!=='c' ? {id:'kreide', tag:0, minuten:-60, titel:'Kreidespur malen', text:'Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.'} : null,
-      p.vorausgeher ? {id:'vorausgeher', tag:0, minuten:-20, titel:'Vorausgeher startet', text:'Mit der Tasche vorgehen und die Stationen 2 bis 7 aufbauen.'} : null,
-      {id:'start', tag:0, minuten:0, titel:'Party! Spiel starten', link:'spiel.html?thema='+p.thema}
-    ].filter(Boolean);
+    var draussen=p.ort!=='drinnen', v=variante(p), route=!!(pl && pl.stationen && pl.stationen.length), t=p.thema;
     var erledigt=p.erledigt||{};
+    var ek=tour && tour.utensilien ? einkauf(p, tour) : [], allesGekauft=ek.length>0 && ek.every(function(x){ return x.fertig; });
+    var km=pl && pl.strecke ? (pl.strecke>=1000 ? (pl.strecke/1000).toFixed(1).replace('.',',')+' km' : Math.round(pl.strecke)+' m') : '';
+    var wetter=!draussen ? '' : p.planB ? ' Regen gemeldet? Dann schaltest du mit einem Tipp auf drinnen um.' : ' Ohne Plan B: bei Regen Termin oder Ort überlegen.';
+    var l=[
+      {id:'einladen', tag:-14, titel:'Einladung als Link schicken', kurz:'Per WhatsApp, Eltern sagen mit einem Tipp zu',
+        text:'Ein Link für alle Gast-Eltern: Termin, Treffpunkt, Abholzeit und Zusage.', knopf:'Link teilen', aktion:'gast-link',
+        link:'einladung.html?e='+code(einladungsDaten(p, pl)), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
+      {id:'bestellen', tag:-14, titel:'Alles auf einmal bestellen', kurz:'Eine Liste, Mengen passend zu '+p.kinder+' Kindern',
+        text:'Haarreifen, Holz-Regenbogen, Glückssteine und Zaubertafeln. Alle Mengen stehen in der Einkaufsliste.', knopf:'Zur Einkaufsliste', link:'#einkauf',
+        teile:[{id:'bestellen', titel:'Alles bestellt', erkannt:allesGekauft}]},
+      draussen ?
+        {id:'route', tag:-7, titel:'Route planen und einmal ablaufen', kurz:route?'Route steht'+(km?', '+km:'')+'. Jetzt einmal ablaufen':'Der Planer findet die Orte für die Stationen',
+          text:route?'Die Route steht'+(km?' ('+km+')':'')+'. Geh sie einmal ab und verschieb Stationen, wo es nicht passt.':'Adresse eingeben, Route prüfen, beim Spaziergang Stationen verschieben, wo es nicht passt.',
+          knopf:route?'Route ansehen':'Route planen', link:'planer.html?thema='+t,
+          teile:[{id:'route', titel:'Route geplant', nurAuto:true, erkannt:route}, {id:'probelauf', titel:'Einmal abgelaufen'}]} :
+        {id:'route', tag:-7, titel:'Räume festlegen', kurz:'Küche, Flur, Treppe, Toberaum und Sofa',
+          text:'Leg fest, welche Station in welchem Raum steht. Die Liste im Spiel hilft dabei.', knopf:'Liste öffnen', link:'spiel.html?thema='+t+'#einrichten',
+          teile:[{id:'probelauf', titel:'Räume festgelegt'}]},
+      {id:'basteln', tag:-7, titel:'Bastel- und Druckabend', kurz:'Schatzkiste, Fuchsbau, Urkunden'+(v==='a'?', Wolke':''),
+        text:'Etwa eine Stunde: Schatzkiste bekleben, Fuchsbau grau anmalen, Sticker in '+p.kinder+' Stücke schneiden. '+(v==='a'?'Dazu Urkunden und die schlafende Wolke (A3) drucken.':'Dazu die Urkunden drucken.'),
+        knopf:'Druckvorlagen öffnen', link:'druck.html?thema='+t, neben:{text:'Bastelliste im Spiel', link:'spiel.html?thema='+t+'#einrichten'},
+        teile:[{id:'basteln', titel:'Gebastelt'}, {id:'drucken', titel:'Gedruckt'}]},
+      {id:'geraet', tag:-1, titel:'iPad startklar machen', kurz:'Stimmen laden, Ton'+(draussen?' und GPS':'')+' prüfen',
+        text:'Fünf Minuten im WLAN: Stimmen laden, Ton'+(draussen?', GPS':'')+' und Akku prüfen.'+wetter, knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
+        teile:[{id:'geraet', titel:'iPad ist startklar'}]},
+      {id:'partytag', tag:0, titel:'Partytag', kurz:[draussen&&v!=='c'?'Kreidespur':'', p.vorausgeher?'Vorausgeher':'', 'Spiegel starten'].filter(Boolean).join(', '),
+        text:[draussen&&v!=='c'?'Eine Stunde vorher die Kreidespur malen.':'', p.vorausgeher?'20 Minuten vorher geht der Vorausgeher los.':'', draussen?'Dann alle an die Haustür und den Zauberspiegel starten.':'Dann alle zusammenholen und den Zauberspiegel starten.'].filter(Boolean).join(' '),
+        knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
+        teile:[
+          draussen && v!=='c' ? {id:'kreide', minuten:-60, titel:'Kreidespur malen', text:'Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.'} : null,
+          p.vorausgeher ? {id:'vorausgeher', minuten:-20, titel:'Vorausgeher startet', text:'Mit der Tasche vorgehen und die Stationen 2 bis 7 aufbauen.'} : null,
+          {id:'start', minuten:0, titel:draussen?'Alle an der Haustür':'Alle zusammen', text:'Tattoos verteilen, dann den Zauberspiegel aufwecken.'}
+        ].filter(Boolean)}
+    ];
     l.forEach(function(a){
       a.datum=plus(p, a.tag);
-      if(a.minuten!=null) a.uhr=uhr(p, a.minuten);
-      if(!a.auto) a.fertig=!!erledigt[a.id];
+      a.teile.forEach(function(x){
+        x.auto=!!x.nurAuto; x.fertig=!!x.erkannt || (!x.nurAuto && !!erledigt[x.id]);
+        if(x.minuten!=null) x.uhr=uhr(p, x.minuten);
+      });
+      a.fertig=!!erledigt['schritt.'+a.id] || a.teile.every(function(x){ return x.fertig; });
+      a.auto=false;
     });
     return l;
   }
   function naechste(l){ return l.filter(function(a){ return !a.fertig; })[0]||null; }
+  // Haken für einen ganzen Schritt setzen oder lösen (alle Teile, die man von Hand abhaken kann)
+  function abhaken(p, a, an){
+    p.erledigt=p.erledigt||{};
+    a.teile.forEach(function(x){ if(!x.nurAuto) p.erledigt[x.id]=!!an; });
+    p.erledigt['schritt.'+a.id]=!!an;
+    return p;
+  }
 
   function einkauf(p, tour){
     return tour.utensilien.map(function(u, i){
@@ -80,9 +114,11 @@
     var name=p.kind && p.kind.name ? (/[sßxz]$/i.test(p.kind.name) ? p.kind.name+'’' : p.kind.name+'s') : 'Unsere';
     termin('party', name+' Einhorn-Party ('+tour.titel+')', 'Spiel öffnen: '+basis+'spiel.html?thema='+p.thema, datum(p), true, (tour.dauer.minuten||50)+30);
     aufgaben(p, tour, pl).forEach(function(a){
-      if(a.id==='anlegen' || a.id==='start') return;
-      var d=new Date(a.datum); if(a.minuten!=null){ d=new Date(datum(p).getTime()+a.minuten*60000); }
-      termin(a.id, tour.titel+': '+a.titel, (a.text||'')+(a.link&&a.link.charAt(0)!=='#'?'\n'+basis+a.link:''), d, a.minuten!=null, 20);
+      if(a.tag===0){                                                      // Partytag: einzelne Termine mit Uhrzeit, ohne den Start (das ist die Party selbst)
+        a.teile.forEach(function(x){ if(x.minuten!=null && x.minuten<0) termin(x.id, tour.titel+': '+x.titel, x.text||'', new Date(datum(p).getTime()+x.minuten*60000), true, 20); });
+        return;
+      }
+      termin(a.id, tour.titel+': '+a.titel, (a.text||'')+(a.link&&a.link.charAt(0)!=='#'?'\n'+basis+a.link:''), new Date(a.datum), false, 20);
     });
     return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Zauberspiegel//Party//DE','CALSCALE:GREGORIAN'].concat(ev,['END:VCALENDAR']).join('\r\n')+'\r\n';
   }
@@ -110,5 +146,5 @@
     delete o.party; schreib('sj.plan.'+thema, o); return o;
   }
 
-  root.Party={lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, ausLinkUebernehmen:ausLinkUebernehmen};
+  root.Party={lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, ausLinkUebernehmen:ausLinkUebernehmen};
 })(this);

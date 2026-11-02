@@ -1,19 +1,26 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Zauberspiegel"><title>Funkels Zauberspiegel</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Baloo+2:wght@600;800&display=swap"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
 <style>
-/* Layout: ein runder Spiegel in der Mitte, darüber der Regenbogen als Fortschritt,
-   darunter großer Vorlesetext und ein Hauptknopf. Ein festes helles Design,
-   weil das iPad draußen bei Tageslicht gelesen wird. */
+/* Layout: oben Fortschritt und der Knopf für Erwachsene, in der Mitte der runde Spiegel,
+   darunter Titel, Sprechtext und ein großer Hauptknopf. Dunkler Nachthimmel wie auf der
+   Startseite; das Spiegelinnere und die Bildkarten bleiben hell (siehe „Helle Inseln“). */
 :root{
-  --ground:#F1EEF8; --surface:#FFFFFF; --ink:#241A3D; --ink-soft:#5A5073; --line:#D8D2E6;
-  --magic:#6B35C9; --magic-deep:#4E22A0; --magic-ink:#FFFFFF; --tint:#E6DEF7;
+  --ground:#0F0B17; --surface:#1F1929; --ink:#F5F2FA; --ink-soft:#B3A9C4; --line:#2F2740;
+  --magic:#A78BFA; --magic-deep:#C4B2FF; --magic-schatten:#6B4FD0; --magic-ink:#160C2B; --tint:#2A2236;
   --gold-a:#EBCB78; --gold-b:#B8862B;
-  --rot:#E23A3F; --gelb:#F2B90F; --gruen:#3A9D4B; --blau:#2B6FE0; --lila:#9050C8; --fehlt:#CFC9DD;
+  --rot:#E23A3F; --gelb:#F2B90F; --gruen:#3A9D4B; --blau:#2B6FE0; --lila:#9050C8; --fehlt:#3A3150;
   --rotorange:#EC5B2B; --orange:#F28C1B; --hellgruen:#9BCB3C; --tuerkis:#27A7A0; --indigo:#2F2C73; --kern:#7B3F2B;
-  --ok:#1F7A45; --warn:#9A5A08; --danger:#B3262E;
+  --ok:#4ADE80; --warn:#F0B45A; --danger:#F87171;
   --font-display:"Baloo 2","Trebuchet MS","Avenir Next",sans-serif;
   --font-body:"Atkinson Hyperlegible","Helvetica Neue",Arial,sans-serif;
-  color-scheme:light;
+  color-scheme:dark;
 }
+/* Helle Inseln: im Spiegel, auf den Bildkarten und im schwebenden Regenbogen gilt die alte helle Palette,
+   weil Bilder, Kompass und 3D-Funkel auf hellem Grund gezeichnet sind. */
+.mirror,.choice,#bogen-wrap.schwebt{
+  --surface:#FFFFFF; --ink:#241A3D; --ink-soft:#5A5073; --line:#D8D2E6;
+  --magic:#6B35C9; --magic-deep:#4E22A0; --magic-schatten:#4E22A0; --magic-ink:#FFFFFF; --magic-hell:#8D5DF2; --tint:#E6DEF7;
+  --fehlt:#CFC9DD; --ok:#1F7A45; --warn:#9A5A08; --danger:#B3262E; color:var(--ink); color-scheme:light}
+a{color:var(--magic-deep)}
 *{box-sizing:border-box}
 html,body{margin:0}
 [hidden]{display:none!important}
@@ -29,9 +36,6 @@ button{font:inherit;color:inherit;touch-action:manipulation}
 :focus-visible{outline:3px solid var(--magic);outline-offset:3px}
 
 .top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
-.tabs{display:flex;gap:4px;background:var(--tint);border-radius:999px;padding:4px}
-.tab{border:0;background:transparent;border-radius:999px;padding:8px 18px;font-family:var(--font-display);font-weight:600;font-size:1.05rem;cursor:pointer;color:var(--ink-soft)}
-.tab[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(36,26,61,.18)}
 
 /* Tour */
 .tour{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
@@ -128,7 +132,8 @@ button{font:inherit;color:inherit;touch-action:manipulation}
 @keyframes wackel{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
 
 .story{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:34rem;width:100%}
-.say{font-size:1.1rem;line-height:1.4;color:var(--ink)}
+.say{font-size:1.15rem;line-height:1.45;color:var(--ink)}
+.story h2{font-size:2rem}
 .task{font-size:1.05rem;color:var(--ink-soft)}
 .choices{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;width:100%}
 .choice{flex:1 1 150px;max-width:230px;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:10px 10px 8px;cursor:pointer;
@@ -138,8 +143,8 @@ button{font:inherit;color:inherit;touch-action:manipulation}
 .choice.richtig{border-color:var(--ok);color:var(--ok)} .choice.richtig svg{fill:var(--ok)}
 .actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:6px}
 .btn{border:0;border-radius:999px;padding:14px 26px;font-family:var(--font-display);font-weight:800;font-size:1.25rem;line-height:1.1;cursor:pointer}
-.btn.primary{background:var(--magic);color:var(--magic-ink);box-shadow:0 4px 0 var(--magic-deep)}
-.btn.primary:active{transform:translateY(3px);box-shadow:0 1px 0 var(--magic-deep)}
+.btn.primary{background:var(--magic);color:var(--magic-ink);box-shadow:0 4px 0 var(--magic-schatten)}
+.btn.primary:active{transform:translateY(3px);box-shadow:0 1px 0 var(--magic-schatten)}
 .btn.ghost{background:var(--tint);color:var(--magic-deep)}
 .btn.quiet{background:transparent;border:2px dashed var(--line);color:var(--ink-soft);font-weight:600;font-size:1rem;padding:10px 18px}
 .btn.small{font-size:1rem;padding:10px 18px;font-weight:600}
@@ -171,7 +176,7 @@ details.karte.achtung{border-color:#F0C6C9}
 .schalter .st b{display:block;font-weight:700}
 .schalter .st span{display:block;color:var(--ink-soft);font-size:.92rem;line-height:1.3}
 .schalter input{position:absolute;opacity:0;width:1px;height:1px}
-.schalter .knopf{flex:none;width:54px;height:32px;border-radius:999px;background:var(--line);position:relative;transition:background .2s}
+.schalter .knopf{flex:none;width:54px;height:32px;border-radius:999px;background:var(--fehlt);position:relative;transition:background .2s}
 .schalter .knopf::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s}
 .schalter input:checked+.knopf{background:var(--magic)}
 .schalter input:checked+.knopf::after{left:25px}
@@ -179,7 +184,7 @@ details.karte.achtung{border-color:#F0C6C9}
 .setup section{display:flex;flex-direction:column;gap:10px}
 .gaben .nr{font-size:1rem;width:auto;min-width:1.6rem}
 .gaben .art{display:inline-block;vertical-align:2px;margin-left:6px;font-size:.75rem;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:3px 10px;background:var(--tint);color:var(--magic-deep)}
-.gaben .art.schatz{background:var(--magic);color:#fff}
+.gaben .art.schatz{background:var(--magic);color:var(--magic-ink)}
 .liste{display:flex;flex-direction:column;gap:4px}
 .liste h3{margin:14px 0 4px;display:flex;align-items:baseline;gap:10px}
 .liste h3 small{font-family:var(--font-body);font-weight:400;font-size:.9rem;color:var(--ink-soft)}
@@ -187,7 +192,7 @@ details.karte.achtung{border-color:#F0C6C9}
 .haken{display:flex;align-items:flex-start;gap:12px;padding:7px 0;cursor:pointer;line-height:1.35}
 .haken input{appearance:none;-webkit-appearance:none;flex:none;width:26px;height:26px;border:2px solid var(--line);border-radius:8px;background:var(--surface);display:grid;place-items:center;margin-top:1px}
 .haken input:checked{background:var(--magic);border-color:var(--magic)}
-.haken input:checked::after{content:"";width:7px;height:13px;border-right:3px solid #fff;border-bottom:3px solid #fff;transform:rotate(45deg) translate(-1px,-2px)}
+.haken input:checked::after{content:"";width:7px;height:13px;border-right:3px solid var(--magic-ink);border-bottom:3px solid var(--magic-ink);transform:rotate(45deg) translate(-1px,-2px)}
 .haken input:checked+span{color:var(--ink-soft);text-decoration:line-through}
 .liste .zwischen{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
 .lead{color:var(--ink-soft);max-width:38rem}
@@ -202,7 +207,7 @@ details.karte.achtung{border-color:#F0C6C9}
 .row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
 .seg{display:inline-flex;align-self:flex-start;background:var(--tint);border-radius:999px;padding:4px;gap:4px}
 .seg button{border:0;background:transparent;border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;color:var(--ink-soft);font-variant-numeric:tabular-nums}
-.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(36,26,61,.18)}
+.seg button[aria-pressed="true"]{background:var(--magic);color:var(--magic-ink);box-shadow:0 1px 3px rgba(0,0,0,.3)}
 label.check{display:flex;align-items:center;gap:10px;cursor:pointer}
 label.check input{width:22px;height:22px;accent-color:var(--magic)}
 select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:8px 10px}
@@ -223,21 +228,25 @@ details.box .points{border-top:1px solid var(--line)}
 details.box .points li:last-child{border-bottom:0}
 .sub{font-weight:700;margin-top:8px}
 .top-left{display:flex;align-items:center;gap:12px;min-width:0}
-.ablauf-btn{border:0;background:var(--tint);color:var(--magic-deep);border-radius:999px;padding:8px 16px 8px 12px;font-family:var(--font-display);font-weight:800;font-size:1.05rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px;flex:none}
-.ablauf-btn svg{width:20px;height:20px;flex:none}
-.jetzt{background:var(--tint);border-radius:18px;padding:12px 18px;display:flex;flex-direction:column;gap:2px;width:100%;text-align:left}
-.jetzt .lab{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--magic-deep)}
-.jetzt .was{font-size:1rem;line-height:1.4}
-.jetzt .dann{font-size:.85rem;color:var(--ink-soft);margin-top:6px;padding-top:6px;border-top:1px solid rgba(78,34,160,.15)}
+/* Hinweis für Erwachsene: eine leise Zeile unter dem Hauptknopf, antippen zeigt den ganzen Text */
+.jetzt{order:9;width:100%;max-width:660px;display:flex;flex-direction:column;gap:4px;text-align:left;
+  border-top:1px solid var(--line);padding:12px 2px 0;margin-top:4px}
+.jetzt-zeile{display:flex;align-items:flex-start;gap:10px}
+.was-zeile{flex:1;min-width:0;font-size:1rem;line-height:1.4;color:var(--ink-soft);cursor:pointer;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.jetzt.lang .was-zeile{display:block;-webkit-line-clamp:none;overflow:visible}
+.jetzt .lab{font-weight:700;color:var(--ink)}
+.jetzt .dann{font-size:.9rem;color:var(--ink-soft)}
+.jetzt:not(.lang) .dann{display:none}
 .jetzt .dann:empty{display:none}
-.aufg-hoer{margin-left:auto;display:inline-flex;align-items:center;gap:5px;border:0;background:var(--tint);color:var(--magic-deep);border-radius:999px;padding:5px 12px 5px 9px;font:inherit;font-family:var(--font-body,inherit);font-weight:700;font-size:.82rem;cursor:pointer;line-height:1.2}
+.aufg-hoer{display:inline-flex;align-items:center;gap:5px;border:0;background:var(--tint);color:var(--magic-deep);border-radius:999px;padding:5px 12px 5px 9px;font:inherit;font-family:var(--font-body,inherit);font-weight:700;font-size:.82rem;cursor:pointer;line-height:1.2}
 .aufg-hoer svg{width:14px;height:14px;flex:none}
 .aufg-hoer:active{transform:scale(.96)}
-.lab-knoepfe{margin-left:auto;display:inline-flex;align-items:center;gap:6px}
+.lab-knoepfe{flex:none;display:inline-flex;align-items:center;gap:6px}
 .lab-knoepfe .aufg-hoer{margin-left:0}
-.info-knopf{flex:none;width:30px;height:30px;border-radius:50%;border:0;padding:0;background:var(--tint);color:var(--magic-deep);display:grid;place-items:center;cursor:pointer;box-shadow:none}
+.info-knopf{flex:none;width:34px;height:34px;border-radius:50%;border:0;padding:0;background:var(--tint);color:var(--magic-deep);display:grid;place-items:center;cursor:pointer;box-shadow:none}
 .info-knopf svg{width:16px;height:16px}
-.info-knopf[aria-expanded="true"]{background:var(--magic);color:#fff}
+.info-knopf[aria-expanded="true"]{background:var(--magic);color:var(--magic-ink)}
 .info-knopf:active{transform:scale(.94)}
 .jetzt-info{list-style:none;margin:8px 0 2px;padding:10px 12px;background:var(--tint);border-radius:12px;display:flex;flex-direction:column;gap:5px;font-size:.95rem;line-height:1.35}
 .jetzt-info li{position:relative;padding-left:16px}
@@ -248,7 +257,7 @@ details.box .points li:last-child{border-bottom:0}
 .mirror.spricht{cursor:pointer}
 .eyebrow{font-size:.85rem;letter-spacing:.09em;text-transform:uppercase;color:var(--magic-deep);font-weight:700;border-top:2px solid var(--line);padding-top:14px}
 .setup .eyebrow:first-child{border-top:0;padding-top:0}
-.backdrop{position:fixed;inset:0;background:rgba(36,26,61,.38);z-index:8}
+.backdrop{position:fixed;inset:0;background:rgba(5,3,10,.6);z-index:8}
 .faden{position:fixed;left:0;top:0;bottom:0;width:min(350px,88vw);background:var(--surface);z-index:9;display:flex;flex-direction:column;
   box-shadow:6px 0 24px rgba(36,26,61,.22);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);animation:rein .2s ease}
 @keyframes rein{from{transform:translateX(-36px);opacity:0}}
@@ -267,8 +276,8 @@ details.box .points li:last-child{border-bottom:0}
 .fs{position:relative;display:flex;flex-direction:column;gap:1px;width:100%;text-align:left;border:0;background:transparent;border-radius:14px;padding:8px 10px 8px 46px;cursor:pointer;color:var(--ink);font:inherit}
 .fs .dot{position:absolute;left:15px;top:11px;width:17px;height:17px;border-radius:50%;border:3px solid var(--line);background:var(--surface)}
 .faden li.war .fs .dot{background:var(--magic);border-color:var(--magic)}
-.faden li.war .fs .dot::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;border-right:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(45deg)}
-.faden li.gross.war .fs .dot::after{left:8px;top:4px;width:6px;height:12px}
+.faden li.war .fs .dot::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;border-right:2.5px solid var(--magic-ink);border-bottom:2.5px solid var(--magic-ink);transform:rotate(45deg)}
+.faden li.gross.war .fs .dot::after{left:8px;top:4px;width:6px;height:12px;border-color:#fff}
 .faden li.hier .fs{background:var(--tint)}
 .faden li.hier .fs .dot{background:var(--magic);border-color:var(--magic);box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--magic)}
 .faden li.gross .fs .dot{left:10px;top:8px;width:27px;height:27px;background:var(--c,var(--gold-b));border-color:var(--c,var(--gold-b))}
@@ -290,13 +299,10 @@ details.box .points li:last-child{border-bottom:0}
   .mirror,.spiegel-ecke{flex-basis:560px} .skala{width:84px} .stage.mit-skala::before{width:84px}
   .mirror-read .big{font-size:2.8rem} .mirror-read .lab{font-size:1.5rem}
   h2{font-size:1.8rem}
-  .say{font-size:1.15rem}
-  .story{max-width:none;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-areas:"t j" "s j" "s a" "c c";column-gap:28px;row-gap:10px;align-items:start;text-align:left;margin-top:4px}
-  .story h2{grid-area:t;text-wrap:pretty}
-  .story .say{grid-area:s}
-  .story .jetzt{grid-area:j;height:auto}
-  .story .actions{grid-area:a;justify-content:flex-start;margin-top:0}
-  .story .choices{grid-area:c;justify-content:center}
+  .story{max-width:680px;gap:14px}
+  .story h2{font-size:2.6rem}
+  .say{font-size:1.3rem}
+  .actions .btn.haupt{font-size:1.8rem}
   .foot{flex-direction:row;justify-content:space-between;flex-wrap:wrap}
 }
 @media (min-width:1000px) and (orientation:portrait){ .mirror,.spiegel-ecke{flex-basis:640px} .bogen{width:min(100%,440px)} }
@@ -305,15 +311,11 @@ details.box .points li:last-child{border-bottom:0}
 
 /* ---------- Designpass: Morgenhimmel, Spiegel als Held, weiche Bewegung ---------- */
 @property --winkel{syntax:"<angle>";inherits:false;initial-value:0deg}
-:root{--himmel-a:#EEF4FF;--himmel-b:#F6EEFF;--morgen:#FFE8D4;--gold-c:#FFF2C2;--magic-hell:#8D5DF2}
-body{background:#F4F0FB}
+:root{--gold-c:#FFF2C2;--magic-hell:#C4B2FF}
+body{background:var(--ground)}
 .himmel{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;
-  background:
-    radial-gradient(70% 55% at 8% -8%, var(--morgen) 0%, rgba(255,232,212,0) 65%),
-    radial-gradient(60% 50% at 100% -5%, #DCEBFF 0%, rgba(220,235,255,0) 65%),
-    radial-gradient(60% 45% at 50% 108%, #E8D6FF 0%, rgba(232,214,255,0) 65%),
-    linear-gradient(180deg,#F7F3FD 0%,#F3EEFA 100%)}
-.himmel .st{position:absolute;width:18px;height:18px;opacity:.55}
+  background:radial-gradient(ellipse 90% 70% at 50% 30%, #2A1F45 0%, #120D1D 60%, var(--ground) 100%)}
+.himmel .st{position:absolute;width:18px;height:18px;opacity:.7}
 .himmel .st svg{width:100%;height:100%;display:block}
 .himmel .st:nth-child(1){left:6%;top:14%;width:14px;height:14px}
 .himmel .st:nth-child(2){left:92%;top:9%;width:22px;height:22px}
@@ -325,10 +327,7 @@ body{background:#F4F0FB}
 .himmel .st:nth-child(8){left:96%;top:72%}
 .top{padding-bottom:4px}
 h1{letter-spacing:-.01em}
-.tabs{background:rgba(255,255,255,.7);box-shadow:0 1px 4px rgba(36,26,61,.08)}
-.tab[aria-pressed="true"]{background:var(--magic);color:#fff;box-shadow:0 3px 10px rgba(107,53,201,.35)}
-.ablauf-btn{background:rgba(255,255,255,.75);box-shadow:0 1px 4px rgba(36,26,61,.08)}
-.count{font-size:.9rem;letter-spacing:0;text-transform:none;font-weight:600;color:var(--magic-deep);background:rgba(255,255,255,.7);border-radius:999px;padding:4px 14px;box-shadow:0 1px 3px rgba(36,26,61,.08)}
+.count{font-size:.9rem;letter-spacing:0;text-transform:none;font-weight:600;color:var(--magic-deep);background:var(--surface);border-radius:999px;padding:4px 14px}
 .arc{transition:stroke .9s, stroke-width .4s}
 .arc.neu{animation:bogenPuls .9s cubic-bezier(.2,1.4,.4,1)}
 @keyframes bogenPuls{40%{stroke-width:17}100%{stroke-width:11}}
@@ -339,10 +338,15 @@ h1{letter-spacing:-.01em}
   background:
     radial-gradient(circle at 34% 28%,#FFFFFF 0,#FAF7FF 40%,#E9E1F8 100%) padding-box,
     conic-gradient(from var(--winkel), var(--gold-b) 0deg, var(--gold-a) 55deg, var(--gold-c) 85deg, var(--gold-a) 115deg, var(--gold-b) 180deg, var(--gold-a) 240deg, var(--gold-c) 270deg, var(--gold-a) 300deg, var(--gold-b) 360deg) border-box;
-  box-shadow:0 18px 40px rgba(78,34,160,.18), 0 2px 0 rgba(255,255,255,.9), inset 0 0 0 2px rgba(255,255,255,.75), inset 0 0 40px rgba(141,93,242,.08);
+  box-shadow:0 0 80px rgba(167,139,250,.35), inset 0 0 0 2px rgba(255,255,255,.75), inset 0 0 40px rgba(141,93,242,.08);
   animation:glanz 16s steps(160) infinite}   /* in Stufen, damit der Rahmen nicht 60-mal pro Sekunde neu gemalt wird */
 @keyframes glanz{to{--winkel:360deg}}
-.mirror.spricht{box-shadow:0 18px 40px rgba(78,34,160,.18), 0 0 0 6px rgba(141,93,242,.25), inset 0 0 0 2px rgba(255,255,255,.75)}
+.mirror.spricht{box-shadow:0 0 90px rgba(167,139,250,.5), 0 0 0 6px rgba(167,139,250,.35), inset 0 0 0 2px rgba(255,255,255,.75)}
+/* zwei leise Lichtringe um den Spiegel */
+.spiegel-ecke::before,.spiegel-ecke::after{content:"";position:absolute;border-radius:50%;pointer-events:none;z-index:0}
+.spiegel-ecke::before{inset:-12px;border:3px solid rgba(167,139,250,.35)}
+.spiegel-ecke::after{inset:-26px;border:2px solid rgba(167,139,250,.15)}
+@media (min-width:700px){ .spiegel-ecke::before{inset:-22px} .spiegel-ecke::after{inset:-44px} .stage{padding-block:20px} }
 .lichter{width:100%;height:100%;pointer-events:none;animation:lichter 60s linear infinite}
 .lichter circle{fill:none;stroke:var(--gold-b);stroke-width:1.6;stroke-dasharray:0 9.4;stroke-linecap:round;opacity:.55}
 @keyframes lichter{to{transform:rotate(360deg)}}
@@ -350,24 +354,22 @@ h1{letter-spacing:-.01em}
 @keyframes atmen{50%{transform:scale(1.012)}}
 .mirror-pic.neu svg{animation:popIn .7s cubic-bezier(.2,1.5,.4,1)}
 @keyframes popIn{0%{transform:scale(.6) rotate(-6deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
-.mirror-read .big{color:var(--magic-deep);text-shadow:0 2px 0 #fff}
+.mirror-read .big{color:var(--magic-deep)}
 
 .story.neu>h2,.story.neu>.say{animation:rein2 .5s cubic-bezier(.2,1,.3,1) both}
 .story.neu>.jetzt,.story.neu>.actions{animation:rein2 .5s cubic-bezier(.2,1,.3,1) .08s both}
 @keyframes rein2{from{opacity:0;transform:translateY(10px)}}
 h2{color:var(--magic-deep)}
-.jetzt{background:rgba(255,255,255,.85);border:1.5px solid #E3D9F7;box-shadow:0 6px 18px rgba(78,34,160,.08);border-radius:20px;padding:14px 18px 14px 20px;position:relative;overflow:hidden}
-.jetzt::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(180deg,var(--rot),var(--gelb),var(--gruen),var(--blau),var(--lila))}
-.jetzt .lab{font-size:.95rem;letter-spacing:0;text-transform:none;font-family:var(--font-display);font-weight:800;color:var(--magic-deep);display:flex;align-items:center;gap:6px}
-.jetzt .lab::before{content:"";width:14px;height:14px;background:var(--magic);-webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z"/></svg>') center/contain no-repeat;mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0Z"/></svg>') center/contain no-repeat}
+.story h2{color:var(--ink)}
+.say{color:#D9D2E8}
 
 .btn{transition:transform .14s cubic-bezier(.2,1.4,.4,1), box-shadow .14s}
-.btn.primary{background:linear-gradient(180deg,var(--magic-hell) 0%,var(--magic) 100%);box-shadow:0 5px 0 var(--magic-deep), 0 12px 24px rgba(107,53,201,.32), inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.primary{background:linear-gradient(180deg,var(--magic-hell) 0%,var(--magic) 100%);box-shadow:0 6px 0 var(--magic-schatten), 0 12px 24px rgba(107,53,201,.32), inset 0 1px 0 rgba(255,255,255,.35)}
 .btn.primary:hover{transform:translateY(-1px)}
-.btn.primary:active{transform:translateY(4px) scale(.99);box-shadow:0 1px 0 var(--magic-deep), 0 4px 10px rgba(107,53,201,.25), inset 0 1px 0 rgba(255,255,255,.35)}
-.btn.ghost{background:rgba(255,255,255,.85);color:var(--magic-deep);box-shadow:0 2px 0 #E3D9F7, 0 6px 14px rgba(78,34,160,.08)}
-.btn.ghost:active{transform:translateY(2px);box-shadow:0 0 0 #E3D9F7}
-.btn.quiet{border-color:#DCD3EE;background:rgba(255,255,255,.4)}
+.btn.primary:active{transform:translateY(4px) scale(.99);box-shadow:0 1px 0 var(--magic-schatten), 0 4px 10px rgba(107,53,201,.25), inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.ghost{background:var(--surface);color:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn.ghost:active{transform:translateY(2px);box-shadow:none}
+.btn.quiet{border-color:var(--line);background:transparent}
 .choice{border-radius:26px;border-color:#E6DEF7;box-shadow:0 6px 16px rgba(78,34,160,.08);transition:transform .16s cubic-bezier(.2,1.4,.4,1), box-shadow .16s}
 .choice:active{transform:scale(.96)}
 .choice.richtig{box-shadow:0 0 0 4px rgba(31,122,69,.18), 0 8px 20px rgba(31,122,69,.18)}
@@ -383,13 +385,14 @@ h2{color:var(--magic-deep)}
 .skala.voll svg{animation:skalaGlanz 1.2s ease-in-out infinite}
 @keyframes skalaGlanz{50%{filter:brightness(1.18)}}
 #konfetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:11}
-.chip{background:rgba(255,255,255,.55);border-radius:999px;padding:4px 12px 4px 10px}
-details.karte{border-color:#E6DEF7;box-shadow:0 8px 24px rgba(78,34,160,.07)}
-details.karte>summary .ico{background:linear-gradient(135deg,#EFE7FF,#DDEBFF);color:var(--magic)}
+.chip{background:rgba(255,255,255,.06);border-radius:999px;padding:4px 12px 4px 10px}
+details.karte{border-color:var(--line);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+details.karte>summary .ico{background:var(--tint);color:var(--magic-deep)}
+details.karte.achtung{border-color:rgba(248,113,113,.45)}
 .faden li.war::before{background:linear-gradient(180deg,var(--magic),var(--blau))}
-.faden li.hier .fs{background:linear-gradient(90deg,#EFE7FF,#F6F1FF)}
-.faden li.hier .fs .dot{box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--magic),0 0 18px rgba(107,53,201,.5)}
-.toast{background:var(--ink);color:#fff;box-shadow:0 10px 30px rgba(36,26,61,.35);border-radius:16px}
+.faden li.hier .fs{background:rgba(167,139,250,.14)}
+.faden li.hier .fs .dot{box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--magic),0 0 18px rgba(167,139,250,.5)}
+.toast{background:var(--ink);color:var(--magic-ink);box-shadow:0 10px 30px rgba(0,0,0,.5);border-radius:16px}
 @media (prefers-reduced-motion:no-preference){
   .himmel .st{animation:schweben 11s ease-in-out infinite alternate}
   .himmel .st:nth-child(2n){animation-duration:14s;animation-delay:-4s}
@@ -400,13 +403,55 @@ details.karte>summary .ico{background:linear-gradient(135deg,#EFE7FF,#DDEBFF);co
 }
 @media (prefers-reduced-motion:reduce){ .mirror,.stage.atmet .mirror,.lichter,.arc.neu,.mirror-pic.neu svg,.story.neu>*,.skala.voll svg{animation:none} }
 
+/* ---------- Kopfzeile: Fortschritt links, Erwachsene rechts ---------- */
+.top{flex-wrap:nowrap}
+.top-left{gap:14px}
+.fortschritt{flex:none;width:96px}
+.fortschritt .bogen{width:100%;height:auto;display:block}
+.fortschritt .arc:not(.da){stroke:#4A4060}
+.station-txt{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+.station-txt b{font-family:var(--font-display);font-weight:800;font-size:1.3rem}
+.station-txt span{color:var(--ink-soft);font-size:.95rem}
+body:not(.m-tour) .fortschritt, body:not(.m-tour) .station-txt{display:none}
+.erw-wrap{position:relative;display:flex;align-items:center;gap:10px;flex:none}
+.erw-btn,.zur-tour{border:0;border-radius:999px;background:var(--surface);color:var(--ink-soft);font-weight:700;font-size:1rem;
+  padding:10px 18px;min-height:44px;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.erw-btn svg{width:20px;height:20px;flex:none}
+.erw-btn[aria-expanded="true"]{color:var(--ink);box-shadow:0 0 0 2px var(--magic)}
+.zur-tour{background:var(--magic);color:var(--magic-ink);font-family:var(--font-display);font-weight:800;font-size:1.05rem}
+body.m-tour .zur-tour{display:none}
+.erw-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:10;min-width:250px;background:var(--surface);border:1px solid var(--line);
+  border-radius:18px;padding:8px;box-shadow:0 18px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:2px;animation:rein2 .18s ease}
+.erw-menu .hinweis{font-size:.85rem;color:var(--ink-soft);padding:6px 12px 8px}
+.erw-menu button{border:0;background:transparent;border-radius:12px;padding:12px;display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;color:var(--ink);min-height:48px}
+.erw-menu button:hover,.erw-menu button:focus-visible{background:var(--tint)}
+.erw-menu button svg{width:22px;height:22px;flex:none;color:var(--magic-deep)}
+.erw-menu b{display:block;font-family:var(--font-display);font-weight:800;font-size:1.1rem;line-height:1.2}
+.erw-menu small{display:block;color:var(--ink-soft);font-size:.85rem;line-height:1.3}
+@media (max-width:480px){
+  .app{padding-inline:16px}
+  .fortschritt{width:72px}
+  .station-txt b{font-size:1.1rem} .station-txt span{font-size:.85rem}
+  .erw-btn{padding:10px 12px} .erw-btn .t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+}
+
+/* ---------- Unter dem Spiegel: großer Hauptknopf, rund „Noch einmal hören“ ---------- */
+.story .actions{width:100%;flex-wrap:wrap;align-items:center;gap:16px;margin-top:8px}
+.actions .btn.haupt,.actions #btn-speak.primary{flex:1 1 230px;max-width:520px;min-height:88px;font-size:1.5rem;padding:12px 24px}
+.actions #btn-speak{order:-1}
+.btn.rund{flex:none;width:88px;height:88px;padding:0;border-radius:50%;background:var(--surface);color:var(--ink);display:grid;place-items:center;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn.rund svg{width:34px;height:34px}
+.btn.rund:active{transform:translateY(2px);box-shadow:none}
+.btn.rund.stopp{background:var(--tint);box-shadow:0 0 0 3px var(--magic)}
+.nur-vorleser{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:480px){ .btn.rund{width:76px;height:76px} .actions .btn.haupt{font-size:1.3rem;padding:12px 18px} .story .actions{gap:12px} }
+
 /* ---------- Uhr, Protokoll, Foto ---------- */
 .pillen{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 /* Ruhige Ansicht: je nach Moment nur das, was der Erwachsene gerade braucht.
    sammeln = unterwegs, Funkel hat noch nicht gesprochen · laufen = unterwegs, Kompass und Skala reichen
    da = angekommen, nur die Plakette · szene = Aufgabe an der Station. „Mehr“ zeigt wieder alles. */
 body.m-tour:not(.mehr) .top h1{display:none}
-body.m-laufen:not(.mehr) .top, body.m-da:not(.mehr) .top{display:none!important}
 body.m-laufen:not(.mehr) .pillen, body.m-da:not(.mehr) .pillen{display:none!important}
 body.m-sammeln:not(.mehr) #scene-title, body.m-sammeln:not(.mehr) #scene-say{display:none!important}
 body.m-laufen:not(.mehr) #scene-title, body.m-laufen:not(.mehr) #scene-say, body.m-laufen:not(.mehr) .jetzt, body.m-laufen:not(.mehr) #btn-speak{display:none!important}
@@ -462,21 +507,33 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
 <div class="app">
   <header class="top">
     <div class="top-left">
-      <button type="button" class="ablauf-btn" id="btn-ablauf" aria-expanded="false" aria-controls="faden">
-        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4v12" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="5" cy="4" r="3" fill="currentColor"/><circle cx="5" cy="10" r="3" fill="currentColor"/><circle cx="5" cy="16" r="3" fill="currentColor"/><path d="M11 4h7M11 10h7M11 16h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        Ablauf
-      </button>
+      <div class="fortschritt" id="fortschritt" role="img" aria-label="Regenbogen"></div>
+      <p class="station-txt"><b id="station-nr"></b><span id="count"></span></p>
       <h1>Funkels Zauberspiegel</h1>
     </div>
-    <nav class="tabs" aria-label="Ansicht">
-      <button type="button" class="tab" id="tab-tour" aria-pressed="true">Tour</button>
-      <button type="button" class="tab" id="tab-setup" aria-pressed="false">Einrichten</button>
-    </nav>
+    <div class="erw-wrap">
+      <button type="button" class="zur-tour" id="tab-tour" aria-pressed="true">Zurück zur Tour</button>
+      <button type="button" class="erw-btn" id="btn-erw" aria-expanded="false" aria-controls="erw-menu" aria-label="Menü für Erwachsene">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        <span class="t">Erwachsene</span>
+      </button>
+      <div class="erw-menu" id="erw-menu" hidden>
+        <p class="hinweis">Nur für Erwachsene</p>
+        <button type="button" id="btn-ablauf" aria-expanded="false" aria-controls="faden">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4v12" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="5" cy="4" r="3" fill="currentColor"/><circle cx="5" cy="10" r="3" fill="currentColor"/><circle cx="5" cy="16" r="3" fill="currentColor"/><path d="M11 4h7M11 10h7M11 16h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span><b>Ablauf</b><small>Zu einem Schritt springen</small></span>
+        </button>
+        <button type="button" id="tab-setup" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          <span><b>Einrichten</b><small>Variante, Stimme, GPS, Vorbereitung</small></span>
+        </button>
+      </div>
+    </div>
   </header>
 
   <div class="tour" id="view-tour">
     <div id="bogen-wrap" class="bogen-wrap-float"></div>
-    <div class="pillen"><p class="count" id="count"></p><p class="count" id="uhr" hidden></p></div>
+    <div class="pillen"><p class="count" id="uhr" hidden></p></div>
     <div class="stage" id="stage">
       <div class="spiegel-ecke" id="spiegel-ecke">
       <div class="mirror" id="mirror">
@@ -684,9 +741,9 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       <h2 id="scene-title"></h2>
       <p class="say" id="scene-say"></p>
       <div class="choices" id="choices" hidden></div>
-      <div class="jetzt"><span class="lab">Jetzt<span class="lab-knoepfe"><button type="button" class="aufg-hoer" id="btn-aufgabe" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg><span id="btn-aufgabe-txt">Aufgabe vorlesen</span></button><button type="button" class="info-knopf" id="btn-info" aria-expanded="false" aria-controls="jetzt-info" aria-label="Was ist zu tun?" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.2" r="1.7" fill="currentColor"/><rect x="8.4" y="8.3" width="3.2" height="9" rx="1.6" fill="currentColor"/></svg></button></span></span><span class="was" id="jetzt-was"></span><ul class="jetzt-info" id="jetzt-info" hidden></ul><span class="dann" id="jetzt-dann"></span></div>
+      <div class="jetzt" id="jetzt"><div class="jetzt-zeile"><p class="was-zeile" id="jetzt-zeile"><b class="lab">Für Erwachsene:</b> <span class="was" id="jetzt-was"></span></p><span class="lab-knoepfe"><button type="button" class="aufg-hoer" id="btn-aufgabe" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg><span id="btn-aufgabe-txt">Aufgabe vorlesen</span></button><button type="button" class="info-knopf" id="btn-info" aria-expanded="false" aria-controls="jetzt-info" aria-label="Was ist zu tun?" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.2" r="1.7" fill="currentColor"/><rect x="8.4" y="8.3" width="3.2" height="9" rx="1.6" fill="currentColor"/></svg></button></span></div><ul class="jetzt-info" id="jetzt-info" hidden></ul><span class="dann" id="jetzt-dann"></span></div>
       <div class="actions">
-        <button type="button" class="btn primary" id="btn-main"></button>
+        <button type="button" class="btn primary haupt" id="btn-main"></button>
         <button type="button" class="btn ghost" id="btn-speak">Noch einmal hören</button>
       </div>
     </div>
@@ -702,7 +759,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
     <details class="karte" id="k-variante" open>
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h12M3 17h8"/></svg></span><span class="tt"><b>Variante</b><span id="sum-variante"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Geschichte, Mitbringsel und Funkels Sätze sind in allen drei gleich. Die Variante ändert die Hinweise im Feld „Jetzt“, die Orte und die Vorbereitungsliste. Indoor läuft ohne GPS.</p>
+        <p class="lead">Geschichte, Mitbringsel und Funkels Sätze sind in allen drei gleich. Die Variante ändert die Hinweise „Für Erwachsene“, die Orte und die Vorbereitungsliste. Indoor läuft ohne GPS.</p>
         <div class="seg" id="variante" role="group" aria-label="Variante">
           <button type="button" data-v="a">Outdoor, voll</button>
           <button type="button" data-v="b">Outdoor ohne Ausdrucke</button>
@@ -717,7 +774,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       <div class="inhalt">
         <label class="schalter" for="auto-sag"><span class="st"><b>Funkel spricht von selbst</b><span>Aufgaben und Lösungen werden vorgelesen, sobald sie erscheinen. Die Sätze für unterwegs nie, die startest du immer selbst.</span></span><input type="checkbox" id="auto-sag"><span class="knopf"></span></label>
         <label class="schalter" for="show-test"><span class="st"><b>Testknopf immer zeigen</b><span>Auch wenn das GPS läuft. Ohne GPS erscheint er sowieso.</span></span><input type="checkbox" id="show-test"><span class="knopf"></span></label>
-        <p class="lead">Zu einem bestimmten Schritt springst du über „Ablauf“ oben links.</p>
+        <p class="lead">Zu einem bestimmten Schritt springst du über „Erwachsene“ oben rechts, dann „Ablauf“.</p>
         <div class="row"><button type="button" class="btn ghost small" id="btn-restart">Tour von vorn beginnen</button><button type="button" class="btn ghost small" id="btn-foto-2">Gruppenfoto mit Rahmen</button></div>
         <p class="lead">Das Gruppenfoto am besten mit dem Handy machen, das hat die bessere Kamera: dieselbe Seite dort öffnen, Knopf drücken.</p>
       </div>
@@ -744,7 +801,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
     <details class="karte" id="k-vorbereitung">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="tt"><b>Vorbereitung</b><span id="sum-vorbereitung"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Alles, was vor der Tour erledigt sein muss, für 10 Kinder. Was an den Stationen selbst zu tun ist, zeigt die Tour im Feld „Jetzt“, wenn es so weit ist. Haken bleiben auf diesem Gerät gespeichert.</p>
+        <p class="lead">Alles, was vor der Tour erledigt sein muss, für 10 Kinder. Was an den Stationen selbst zu tun ist, zeigt die Tour unter „Für Erwachsene“, wenn es so weit ist. Haken bleiben auf diesem Gerät gespeichert.</p>
         <div class="liste" id="liste"></div>
         <div class="zwischen"><span class="chip" id="liste-note"></span><button type="button" class="btn quiet small" id="btn-liste-reset">Alle Haken entfernen</button></div>
       </div>
@@ -1221,12 +1278,22 @@ function sprichtGerade(){ var k=$('kaka'); return tonLaeuft || erzFolgt || !!ton
 function sprechKnopf(){                  // ein Knopf, der immer zu dem passt, was gerade zu hören ist
   var b=$('btn-speak'), n=$('btn-nochmal'); if(!b) return;
   sprechEndeFokus();
-  if(n) n.textContent = sprichtGerade() ? 'Stopp' : 'Noch einmal hören';
-  if(sprichtGerade()){ b.textContent='Stopp'; b.className='btn ghost'; return; }
-  var offen=!gehoert[akt().key];
-  b.textContent = offen ? 'Funkel sprechen lassen' : 'Noch einmal hören';
-  b.className = 'btn '+(offen && (state.phase==='seek' || !state.autoSag) ? 'primary' : 'ghost');
+  var stopp=sprichtGerade();
+  if(n) n.textContent = stopp ? 'Stopp' : 'Noch einmal hören';
+  var offen=!stopp && !gehoert[akt().key], txt = stopp ? 'Stopp' : offen ? 'Funkel sprechen lassen' : 'Noch einmal hören';
+  var art = stopp ? 'stopp' : (offen && (state.phase==='seek' || !state.autoSag)) ? 'gross' : offen ? 'los' : 'nochmal';
+  if(b.getAttribute('data-art')===art) return;
+  b.setAttribute('data-art', art);
+  if(art==='gross'){ b.className='btn primary'; b.textContent=txt; b.removeAttribute('title'); return; }   // noch nicht gehört: breiter Knopf mit Text
+  b.className='btn rund'+(stopp?' stopp':'');                                                               // sonst rund, nur mit Bild
+  b.title=txt;
+  b.innerHTML=(SPRECH_BILD[art])+'<span class="nur-vorleser">'+txt+'</span>';
 }
+var SPRECH_BILD={
+  nochmal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>',
+  los:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>',
+  stopp:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>'
+};
 function still(){ erzFolgt=false; kakaGen++; kakaTimers.forEach(clearTimeout); kakaTimers=[]; sprecherHinweis=null; try{ kakaWeg(); }catch(e){} tonGen++; if(tonTimer){ clearTimeout(tonTimer); tonTimer=null; } try{ if(kannSprechen) speechSynthesis.cancel(); }catch(e){} stopClip(); tonEnde(); }
 function spielen(key, text, cb){          // eigene Aufnahme oder Computerstimme, ruft cb am Ende
   var g=++tonGen; tonLaeuft=true; try{ $('mirror').classList.add('spricht'); }catch(e){} sprechBeginn(); sprechKnopf(); bogenBeimWort(text, g, key);
@@ -2030,11 +2097,12 @@ function infoZeilen(){                    // Stichpunkte zum aktuellen Schritt, 
   if(ph==='heim' && state.step===0) z.push(['Weiter', !manuell() ? 'Der Spiegel öffnet sich an der Tür von selbst' : 'An der Tür „Zu Hause angekommen“ tippen']);
   return z;
 }
-var infoOffen=false;
+var infoOffen=false, jetztLang=false;
 function infoZeigen(){
   var z=infoZeilen(), b=$('btn-info'), l=$('jetzt-info'); if(!b || !l) return;
   b.hidden=!z.length;
   var an=infoOffen && z.length>0;
+  $('jetzt').classList.toggle('lang', an || jetztLang);
   b.setAttribute('aria-expanded', String(an));
   l.hidden=!an;
   l.innerHTML = an ? z.map(function(r){ return '<li><b>'+esc(r[0])+':</b> '+esc(r[1])+'</li>'; }).join('') : '';
@@ -2103,6 +2171,13 @@ function zaehler(){
   meine.forEach(function(t,j){ if(t.key===k) nr=j+1; });
   return 'Station '+(state.idx+1)+' von '+N+' · Schritt '+nr+' von '+meine.length;
 }
+function kopfZeigen(found){             // Kopfzeile: kleiner Regenbogen und „Station X von N“
+  var z=zaehler().split(' · '), ph=state.phase, n=ARCS.filter(function(a){ return found[a]; }).length;
+  $('fortschritt').innerHTML=bogenSVG(found, null, 'bogen');
+  $('fortschritt').setAttribute('aria-label', 'Regenbogen: '+n+' von '+ARCS.length+' Bögen gefunden');
+  $('station-nr').textContent = ph==='start' ? 'Bereit' : z[0];
+  $('count').textContent = ph==='start' ? z[0] : (z[1]||'');
+}
 var letzterKey=null, gehoert={}, letzteFound={};
 var schwebTimer=null, schwebTimer2=null, neueBoegen={}, geschwebtBei=null;
 // Der Regenbogen schwebt einmal je Schritt ein, und zwar genau dann, wenn „Regenbogen“ oder „Bögen“ gesagt wird.
@@ -2141,7 +2216,7 @@ function render(keepPic){
   var inline = (ph==='scene' && st.kind==='finale') || ph==='end' || (ph==='heim' && state.step>=1);
   document.body.classList.toggle('bogen-inline', inline);
 
-  $('count').textContent=zaehler();
+  kopfZeigen(found);
 
   var title, pic='', tap=false;
   if(ph==='start'){ title='Der Spiegel schläft'; pic=PIC.horn(); }
@@ -2487,7 +2562,14 @@ $('foto-nochmal').addEventListener('click', function(){ fotoAuf(); });
 $('foto-teilen').addEventListener('click', fotoTeilen);
 $('btn-proto-reset').addEventListener('click', function(){ proto=[]; protoSave(); renderProtokoll(); toast('Protokoll gelöscht.'); });
 $('btn-linse').addEventListener('click', function(){ state.kamera=false; save(); kameraAus(); render(); toast('Kamera ist aus. Unter „Einrichten“ lässt sie sich wieder einschalten.'); });
-$('btn-ablauf').addEventListener('click', function(){ fadenZeigen(!fadenOffen); });
+$('btn-ablauf').addEventListener('click', function(){ erwMenu(false); fadenZeigen(!fadenOffen); });
+/* Menü für Erwachsene: Ablauf und Einrichten liegen dahinter, damit Kinder nicht versehentlich hineintippen */
+function erwMenu(an){ $('erw-menu').hidden=!an; $('btn-erw').setAttribute('aria-expanded', String(an)); if(an){ try{ $('btn-ablauf').focus({preventScroll:true}); }catch(e){} } }
+$('btn-erw').addEventListener('click', function(e){ e.stopPropagation(); erwMenu($('erw-menu').hidden); });
+$('tab-setup').addEventListener('click', function(){ erwMenu(false); });
+document.addEventListener('click', function(e){ if(!$('erw-menu').hidden && !(e.target.closest && e.target.closest('.erw-wrap'))){ e.preventDefault(); e.stopPropagation(); erwMenu(false); } }, true);   // Tipp daneben schließt nur das Menü, löst nichts darunter aus
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !$('erw-menu').hidden){ erwMenu(false); try{ $('btn-erw').focus(); }catch(x){} } });
+$('jetzt-zeile').addEventListener('click', function(){ jetztLang=!jetztLang; infoZeigen(); });
 $('faden-zu').addEventListener('click', function(){ fadenZeigen(false); });
 $('backdrop').addEventListener('click', function(){ fadenZeigen(false); });
 document.addEventListener('keydown', function(e){ if(e.key==='Escape' && fadenOffen) fadenZeigen(false); });

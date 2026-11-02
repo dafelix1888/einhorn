@@ -1,24 +1,33 @@
 // Tourplaner: Adresse, Richtung und Strecke rein, fertige Stationen raus.
 // Daten: Nominatim (Adresse), Overpass (Wege und Orte), Open-Meteo (Höhen) – alle frei und ohne Schlüssel.
+// Ansicht: erst die Eingabe, danach Karte über den ganzen Bildschirm mit Bereich „Euer Weg“ unten.
 (function(){
   'use strict';
   var NOMINATIM='https://nominatim.openstreetmap.org/search';
   var OVERPASS=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
   var ELEVATION='https://api.open-meteo.com/v1/elevation';
   var RICHTUNGEN=['NW','N','NO','W','egal','O','SW','S','SO'];
-  var PFEIL={N:'↑',NO:'↗',O:'→',SO:'↘',S:'↓',SW:'↙',W:'←',NW:'↖',egal:'egal'};
+  var WINKEL={N:0,NO:45,O:90,SO:135,S:180,SW:225,W:270,NW:315};
+  var FARBEN=['#9050C8','#E23A3F','#F28C1B','#B8860B','#C2410C','#3A9D4B','#2B6FE0','#DB2777','#0E9F9F'];
+  var HAUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" aria-hidden="true"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z"/></svg>';
 
   var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
   var PLAN_KEY='sj.plan.'+thema;
-  var tour=null, plan=null, osmCache=null, versuch=0, karte=null, ebenen=null;
+  var tour=null, plan=null, party=null, osmCache=null, versuch=0, karte=null, ebenen=null, netzLaedt=false, gewaehlt=0;
   var wahl={variante:'a', rundkurs:false, richtung:'egal', distanz:500, kinder:10, start:null, adresse:''};
 
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3500); }
-  function status(t, fehler){ var s=$('status'); s.textContent=t||''; s.className='status'+(fehler?' fehler':''); }
+  function kartenAnsicht(){ return !$('ergebnis').hidden; }
+  function status(t, fehler){
+    var s=kartenAnsicht() ? $('sheet-status') : $('status');
+    s.textContent=t||''; s.className=(kartenAnsicht()?'sheet-status':'status')+(fehler?' fehler':'');
+    if(kartenAnsicht()) s.hidden=!t;
+  }
   function draussen(){ return !!(tour.varianten[wahl.variante]||{}).draussen; }
-  function km(m){ return m>=1000 ? (m/1000).toFixed(1).replace('.',',')+' km' : m+' m'; }
+  function km(m){ m=Math.round(m||0); return m>=1000 ? (m/1000).toFixed(1).replace('.',',')+' km' : m+' m'; }
+  function zurueckZiel(){ return party ? 'party.html?thema='+encodeURIComponent(thema) : 'index.html'; }
 
   // ---------- Netz ----------
   function mitZeitlimit(p, ms, text){ return Promise.race([p, new Promise(function(_,nein){ setTimeout(function(){ nein(new Error(text)); }, ms); })]); }
@@ -43,21 +52,33 @@
     })).then(function(l){ return [].concat.apply([], l); });
   }
 
-  // ---------- Oberfläche ----------
+  // ---------- Eingabe ----------
+  function pfeil(r){
+    if(r==='egal') return 'egal';
+    return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate('+WINKEL[r]+'deg)"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
+  }
   function segZeichnen(){
     $('variante').innerHTML=Object.keys(tour.varianten).map(function(k){ var v=tour.varianten[k]; return '<button type="button" data-v="'+k+'" aria-pressed="'+(wahl.variante===k)+'">'+esc(v.name)+'</button>'; }).join('');
     $('variante-kurz').textContent=(tour.varianten[wahl.variante]||{}).kurz||'';
-    $('richtung').innerHTML=RICHTUNGEN.map(function(r){ return '<button type="button" data-r="'+r+'" aria-pressed="'+(wahl.richtung===r)+'" aria-label="'+(r==='egal'?'Richtung egal':'Richtung '+r)+'">'+PFEIL[r]+'</button>'; }).join('');
+    $('richtung').innerHTML=RICHTUNGEN.map(function(r){ return '<button type="button" data-r="'+r+'" aria-pressed="'+(wahl.richtung===r)+'" aria-label="'+(r==='egal'?'Richtung egal':'Richtung '+r)+'">'+pfeil(r)+'</button>'; }).join('');
     $('form').innerHTML=[[false,'Hin und zurück'],[true,'Rundkurs']].map(function(f){ return '<button type="button" data-f="'+f[0]+'" aria-pressed="'+(wahl.rundkurs===f[0])+'">'+f[1]+'</button>'; }).join('');
-    $('form-kurz').textContent=wahl.rundkurs ? 'Der Heimweg führt möglichst über andere Wege zurück.' : 'Nach dem Schatz geht es auf dem kürzesten Weg zurück, meist derselbe Weg.';
+    $('form-kurz').textContent=wahl.rundkurs ? 'Zurück möglichst über andere Wege.' : 'Zurück auf dem kürzesten Weg, meist derselbe.';
     var d=$('distanz'), f=wahl.rundkurs?2:1; d.min=tour.strecke.min*f; d.max=tour.strecke.max*f;
-    $('distanz-label').textContent=wahl.rundkurs ? 'Ganze Runde: ' : 'Strecke bis zum Ziel: ';
-    $('distanz-hinweis').textContent=wahl.rundkurs ? 'Hinweg und Heimweg zusammen. Kleine Kinder schaffen gut 1 km.' : 'Gehweg bis zur letzten Station. Kleine Kinder schaffen gut 500 m.';
+    $('distanz-label').textContent=wahl.rundkurs ? 'Ganze Runde' : 'Bis zum Ziel';
+    $('distanz-hinweis').textContent=wahl.rundkurs ? 'Kleine Kinder schaffen gut 1 km.' : 'Kleine Kinder schaffen gut 500 m.';
     d.value=wahl.distanz; $('distanz-wert').textContent=km(wahl.distanz);
     $('kinder').textContent=wahl.kinder;
-    $('draussen').hidden=!draussen(); $('drinnen').hidden=draussen();
-    $('planen').textContent=draussen() ? 'Tour planen' : 'Speichern und spielen';
+    var innen=!draussen() || (party && party.ort==='drinnen');
+    $('draussen').hidden=innen; $('drinnen').hidden=!innen;
+    $('planen').textContent=innen ? 'Speichern und spielen' : 'Route planen';
   }
+  function zeigeEingabe(){
+    $('ergebnis').hidden=true; $('eingabe').hidden=false; document.body.classList.remove('mit-karte');
+    $('zur-route').hidden=!(plan && plan.stationen && plan.stationen.length);
+    status(''); window.scrollTo(0,0);
+  }
+
+  // ---------- Speichern und Link ----------
   function planCode(p){                          // kompakt für den Link: ohne Route und Höhenprofil
     var k={format:1, thema:p.thema, stand:p.stand, variante:p.variante, kinder:p.kinder, stationen:(p.stationen||[]).map(function(s){ return {lat:s.lat, lng:s.lng, name:s.name, an:s.an, zu:s.zu}; })};
     var bytes=new TextEncoder().encode(JSON.stringify(k)), s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
@@ -69,15 +90,14 @@
     try{ localStorage.setItem(PLAN_KEY, JSON.stringify(plan)); }catch(e){}
   }
 
-  function markerIcon(i, s){ return L.divIcon({className:'nr-marker'+(i===0?' start':s.gefunden?'':' ersatz'), html:String(i===0?'⌂':i+1), iconSize:[38,38]}); }
-  var netz=null, marker=[], linie=null, heimLinie=null, rechenWunsch=null;
-
   // ---------- Kennzahlen: Strecke, Dauer, Heimweg ----------
+  var netz=null, marker=[], linie=null, heimLinie=null, rechenWunsch=null;
   function kennzahlenZeigen(strecke, heim, luftlinie){
     var d=PlanerKern.dauer(tour, strecke||0);
-    $('k-strecke').textContent=km(strecke||0)+(luftlinie?' (Luftlinie)':'');
+    $('k-kurz').textContent=km(strecke)+(luftlinie?' Luftlinie':'')+' · etwa '+d.gesamt+' Min.';
+    $('k-strecke').textContent=km(strecke)+(luftlinie?' (Luftlinie)':'');
     $('k-dauer').textContent='ca. '+d.gesamt+' min';
-    $('k-dauer-teile').textContent=d.gehen+' min gehen + '+d.stationen+' min Stationen';
+    $('k-dauer-teile').textContent=d.gehen+' gehen + '+d.stationen+' Stationen';
     $('k-heim-titel').textContent=plan && plan.rundkurs ? 'Heimweg (Runde)' : 'Heimweg';
     $('k-heim').textContent=heim!=null ? km(heim) : '–';
     var g=plan && plan.rundkurs && plan.heimGleich!=null && !luftlinie ? (plan.heimGleich<=10 ? ' · eigener Weg' : ' · '+plan.heimGleich+' % wie hin') : '';
@@ -89,7 +109,7 @@
     return {strecke:Math.round(m), nach:nach, heim:Math.round(PlanerKern.meter(st[st.length-1], st[0]))};
   }
   function neuRechnen(){                         // Route durch die aktuellen Stationen (auch die gerade gezogene)
-    var punkte=plan.stationen.map(function(s,i){ var m=marker[i]; if(m && m.dragging && m._ziehen){ var p=m.getLatLng(); return {lat:p.lat, lng:p.lng}; } return {lat:s.lat, lng:s.lng}; });
+    var punkte=plan.stationen.map(function(s,i){ var m=marker[i]; if(m && m._ziehen){ var p=m.getLatLng(); return {lat:p.lat, lng:p.lng}; } return {lat:s.lat, lng:s.lng}; });
     if(!netz){ var l=luftlinie(); return {strecke:l.strecke, nach:l.nach, heim:l.heim, luft:true}; }
     var r=PlanerKern.routeDurch(netz, punkte); if(!r) return null;
     var rw=PlanerKern.rueckweg(netz, r.ids, plan.rundkurs);
@@ -120,7 +140,7 @@
     }
     s.gefunden=true; s.hinweis='von Hand gesetzt'; s.verschoben=true;
     if(r) plan.stationen.forEach(function(x,j){ x.nachMeter=r.nach[j]; });
-    speichern(); listeZeichnen(); kartenZeichnen(false);
+    gewaehlt=i; speichern(); listeZeichnen(); kartenZeichnen(false);
     toast('Station '+(i+1)+' gespeichert · '+km(plan.strecke)+' · ca. '+PlanerKern.dauer(tour, plan.strecke).gesamt+' min');
     if(r && r.route) hoehenNeu();
   }
@@ -138,73 +158,117 @@
     })['catch'](function(){});
   }
 
+  // ---------- Station wählen ----------
+  function ersatz(i, s){ return i>0 && !s.gefunden; }
+  function farbe(i){ return FARBEN[i%FARBEN.length]; }
+  function stationTitel(i){ var t=tour.stationen[i]||{}; return t.title||(t.steps&&t.steps[0]&&t.steps[0].title)||t.name||'Station'; }
+  function stationZeigen(){
+    var st=plan.stationen; if(!st.length) return;
+    if(gewaehlt>=st.length) gewaehlt=0;
+    var s=st[gewaehlt], t=tour.stationen[gewaehlt]||{}, i=gewaehlt, text;
+    if(i===0) text='Start an der Haustür.';
+    else if(ersatz(i,s)) text='<span class="warn">Kein passender Ort gefunden.</span> Gesucht: '+esc(t.wo||'')+'. Auf eine passende Stelle ziehen.';
+    else text='<span class="ok">'+esc(s.hinweis||'passt')+'</span> · '+esc(s.name)+' · nach '+km(s.nachMeter)+(s.hoehe!=null?' · '+s.hoehe+' m hoch':'');
+    $('st-titel').textContent='Station '+(i+1)+': '+stationTitel(i);
+    $('st-text').innerHTML=text;
+    $('station').className='station'+(ersatz(i,s)?' ersatz':'');
+    marker.forEach(function(m,j){ var e=m.getElement(); if(e) e.classList.toggle('gewaehlt', j===i); m.setZIndexOffset(j===i?1000:0); });
+    Array.prototype.forEach.call($('liste').querySelectorAll('button[data-i]'), function(b){ b.setAttribute('aria-current', String(+b.getAttribute('data-i')===i)); });
+  }
+  function waehle(i, hinfahren){
+    gewaehlt=i; stationZeigen();
+    if(hinfahren && karte && marker[i]) karte.panInside(marker[i].getLatLng(), {paddingTopLeft:[30,90], paddingBottomRight:[30, $('sheet').offsetHeight+30]});
+  }
+
+  // ---------- Liste, Karte, Profil ----------
   function listeZeichnen(){
-    var st=plan.stationen, fehlt=st.filter(function(s){ return !s.gefunden; }).length;
-    $('zusammenfassung').textContent=(plan.rundkurs && plan.heimweg!=null ? 'Rundkurs, '+km(plan.strecke+plan.heimweg)+' insgesamt. ' : '')+st.length+' Stationen'+(fehlt?', '+fehlt+' davon mit Ersatzort':', alle Orte passen zur Geschichte')+'.';
+    var st=plan.stationen, fehlt=st.filter(function(s,i){ return ersatz(i,s); }).length;
+    $('zusammenfassung').textContent=(plan.rundkurs && plan.heimweg!=null ? 'Rundkurs, '+km(plan.strecke+plan.heimweg)+' insgesamt. ' : '')+st.length+' Stationen'+(fehlt?', '+fehlt+' davon mit Ersatzort (gestrichelt).':', alle Orte passen zur Geschichte.');
     $('liste').innerHTML=st.map(function(s,i){
-      var t=tour.stationen[i];
-      return '<li><span class="nr">'+(i+1)+'</span><div><b>'+esc(s.name)+'</b> · '+esc(t.title||(t.steps&&t.steps[0].title)||'')+
-        '<div class="h">'+(i===0?'Start':(s.gefunden?'<span class="ok">✓ '+esc(s.hinweis)+'</span>':'<span class="warn">Ersatz: '+esc(s.hinweis)+'</span>')+' · nach '+km(s.nachMeter||0))+(s.hoehe!=null?' · '+s.hoehe+' m ü. NN':'')+'</div>'+
-        '<div class="h">Geschichte: '+esc(t.wo)+'</div></div></li>';
+      var e=ersatz(i,s);
+      return '<li><button type="button" data-i="'+i+'" class="'+(e?'ersatz':'')+'"><i style="background:'+farbe(i)+'">'+(i===0?HAUS:i+1)+'</i><span><b>'+esc(stationTitel(i))+'</b>'+
+        '<small>'+(i===0?'Start':(e?'<span class="warn">Ersatzort, bitte verschieben</span>':esc(s.name))+' · nach '+km(s.nachMeter))+'</small></span></button></li>';
     }).join('');
     profilZeichnen();
     kennzahlenZeigen(plan.strecke, plan.heimweg, false);
+    stationZeigen();
   }
-  function kartenZeichnen(einpassen){
+  function markerIcon(i, s){
+    return L.divIcon({className:'pin'+(ersatz(i,s)?' ersatz':'')+(i===gewaehlt?' gewaehlt':''), html:'<span style="background:'+farbe(i)+'">'+(i===0?HAUS:i+1)+'</span>', iconSize:[44,44], iconAnchor:[22,22], tooltipAnchor:[0,-22]});
+  }
+  function einpassen(){
+    var st=plan.stationen; if(!karte || !st.length) return;
+    karte.invalidateSize();
+    var pkt=st.map(function(s){ return [s.lat,s.lng]; }).concat(plan.route||[]);
+    karte.fitBounds(L.latLngBounds(pkt), {paddingTopLeft:[30,90], paddingBottomRight:[30, $('sheet').offsetHeight+30], maxZoom:18});
+  }
+  function kartenZeichnen(neuEinpassen){
     var st=plan.stationen;
     if(!karte){
-      karte=L.map('karte',{scrollWheelZoom:false, tap:false});
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(karte);
+      karte=L.map('karte',{zoomControl:false, tap:false});
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, className:'kachel-dunkel', attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(karte);
+      karte.attributionControl.setPrefix(false);
       ebenen=L.layerGroup().addTo(karte);
     }
     ebenen.clearLayers(); marker=[];
-    heimLinie=plan.heimRoute ? L.polyline(plan.heimRoute,{color:'#1F7A45', weight:4, opacity:.75, dashArray:'2 9', lineCap:'round'}).addTo(ebenen) : null;
-    linie=L.polyline(plan.route||st.map(function(s){ return [s.lat,s.lng]; }),{color:'#6B35C9', weight:5, opacity:.8, dashArray:plan.route?null:'6 8'}).addTo(ebenen);
+    heimLinie=plan.heimRoute ? L.polyline(plan.heimRoute,{color:'#4ADE80', weight:4, opacity:.8, dashArray:'2 9', lineCap:'round'}).addTo(ebenen) : null;
+    linie=L.polyline(plan.route||st.map(function(s){ return [s.lat,s.lng]; }),{color:'#A78BFA', weight:5, opacity:.95, dashArray:plan.route?null:'6 8', lineCap:'round'}).addTo(ebenen);
     st.forEach(function(s,i){
-      var m=L.marker([s.lat,s.lng],{icon:markerIcon(i,s), draggable:i>0, autoPan:true, title:s.name}).addTo(ebenen);
-      m.bindTooltip((i+1)+' · '+s.name);
-      m.on('dragstart', function(){ m._ziehen=true; m.openTooltip(); $('kennzahlen').classList.add('zieht'); });
+      var m=L.marker([s.lat,s.lng],{icon:markerIcon(i,s), draggable:i>0, autoPan:true, title:'Station '+(i+1)+': '+stationTitel(i), keyboard:true, zIndexOffset:i===gewaehlt?1000:0}).addTo(ebenen);
+      m.bindTooltip((i+1)+' · '+s.name, {direction:'top'});
+      m.on('click', function(){ waehle(i, false); });
+      m.on('dragstart', function(){ m._ziehen=true; gewaehlt=i; stationZeigen(); m.openTooltip(); $('sheet-kopf').classList.add('zieht'); });
       m.on('drag', liveAktualisieren);
-      m.on('dragend', function(){ $('kennzahlen').classList.remove('zieht'); nachZiehen(i); m._ziehen=false; });
+      m.on('dragend', function(){ $('sheet-kopf').classList.remove('zieht'); nachZiehen(i); m._ziehen=false; });
       marker.push(m);
     });
-    if(einpassen) setTimeout(function(){ karte.invalidateSize(); karte.fitBounds(L.latLngBounds(st.map(function(s){ return [s.lat,s.lng]; })).pad(0.15)); }, 50);
-  }
-  function heimNachrechnen(){ var r=neuRechnen(); if(r && !r.luft){ plan.heimweg=r.heim; plan.heimRoute=r.heimRoute; plan.heimGleich=r.heimGleich; } }
-  function ergebnisZeigen(){
-    $('ergebnis').hidden=false;
-    if(plan.heimweg==null && netz) heimNachrechnen();
-    listeZeichnen(); kartenZeichnen(true);
-  }
-  function netzNachladen(){                      // gespeicherte Tour: Wegenetz im Hintergrund holen, damit Verschieben live rechnet
-    if(netz || !plan || !plan.start) return;
-    var radius=Math.min(2500, (plan.distanz||wahl.distanz)*(plan.rundkurs?0.6:1.15)+200);
-    overpass(PlanerKern.overpassAbfrage(plan.start.lat, plan.start.lng, radius)).then(function(osm){
-      osmCache={osm:osm, start:plan.start, distanz:plan.distanz||wahl.distanz}; wahl.start=plan.start;
-      netz=PlanerKern.netzBauen(osm);
-      if(plan.heimweg==null || (plan.rundkurs && !plan.heimRoute)){ heimNachrechnen(); speichern(); kartenZeichnen(false); }
-      kennzahlenZeigen(plan.strecke, plan.heimweg, false);
-    })['catch'](function(){});
+    stationZeigen();
+    if(neuEinpassen) setTimeout(einpassen, 50);
   }
   function profilZeichnen(){
     var svg=$('profil'), p=plan.hoehenProfil;
     if(!p || p.length<2){ svg.innerHTML=''; svg.style.display='none'; return; }
     svg.style.display='';
     var maxM=p[p.length-1].m||1, hs=p.map(function(x){ return x.h; }), lo=Math.min.apply(null,hs), hi=Math.max.apply(null,hs), sp=Math.max(6, hi-lo);
-    function x(m){ return m/maxM*600; } function y(h){ return 110-(h-lo)/sp*90; }
+    function x(m){ return m/maxM*600; } function y(h){ return 110-(h-lo)/sp*80; }
     var d='M0,120 '+p.map(function(e){ return 'L'+x(e.m).toFixed(1)+','+y(e.h).toFixed(1); }).join(' ')+' L600,120 Z';
-    var marken=plan.stationen.map(function(s,i){ if(s.nachMeter==null||s.hoehe==null) return ''; return '<circle cx="'+x(s.nachMeter).toFixed(1)+'" cy="'+y(s.hoehe).toFixed(1)+'" r="5" fill="#6B35C9"/>'; }).join('');
-    svg.innerHTML='<path d="'+d+'" fill="#E6DEF7" stroke="#6B35C9" stroke-width="2" vector-effect="non-scaling-stroke"/>'+marken+
-      '<text x="6" y="16" font-size="13" fill="#5A5073">'+Math.round(lo)+' bis '+Math.round(hi)+' m</text>';
+    var marken=plan.stationen.map(function(s,i){ if(s.nachMeter==null||s.hoehe==null) return ''; return '<circle cx="'+x(s.nachMeter).toFixed(1)+'" cy="'+y(s.hoehe).toFixed(1)+'" r="5" fill="'+farbe(i)+'" vector-effect="non-scaling-stroke"/>'; }).join('');
+    svg.innerHTML='<path d="'+d+'" fill="rgba(167,139,250,.18)" stroke="#A78BFA" stroke-width="2" vector-effect="non-scaling-stroke"/>'+marken+
+      '<text x="10" y="20" font-size="15" fill="#B3A9C4">Höhe '+Math.round(lo)+' bis '+Math.round(hi)+' m</text>';
+  }
+  function startTextZeigen(){
+    $('start-text').textContent='Ab: '+(plan.adresse||'eure Haustür')+' · '+(plan.rundkurs?'Rundkurs':'Hin und zurück');
+  }
+  function heimNachrechnen(){ var r=neuRechnen(); if(r && !r.luft){ plan.heimweg=r.heim; plan.heimRoute=r.heimRoute; plan.heimGleich=r.heimGleich; } }
+  function ergebnisZeigen(){
+    $('eingabe').hidden=true; $('ergebnis').hidden=false; document.body.classList.add('mit-karte');
+    if(plan.heimweg==null && netz) heimNachrechnen();
+    var erstesErsatz=-1; plan.stationen.forEach(function(s,i){ if(erstesErsatz<0 && ersatz(i,s)) erstesErsatz=i; });
+    if(gewaehlt>=plan.stationen.length) gewaehlt=0;
+    if(erstesErsatz>=0 && !ergebnisZeigen.schon) gewaehlt=erstesErsatz;
+    ergebnisZeigen.schon=true;
+    startTextZeigen(); listeZeichnen(); kartenZeichnen(true);
+  }
+  function netzNachladen(){                      // gespeicherte Tour: Wegenetz im Hintergrund holen, damit Verschieben live rechnet
+    if(netz || !plan || !plan.start) return;
+    var radius=Math.min(2500, (plan.distanz||wahl.distanz)*(plan.rundkurs?0.6:1.15)+200);
+    netzLaedt=true;
+    overpass(PlanerKern.overpassAbfrage(plan.start.lat, plan.start.lng, radius)).then(function(osm){
+      osmCache={osm:osm, start:plan.start, distanz:plan.distanz||wahl.distanz}; wahl.start=plan.start;
+      netz=PlanerKern.netzBauen(osm);
+      if(plan.heimweg==null || (plan.rundkurs && !plan.heimRoute)){ heimNachrechnen(); speichern(); kartenZeichnen(false); }
+      kennzahlenZeigen(plan.strecke, plan.heimweg, false);
+    })['catch'](function(){}).then(function(){ netzLaedt=false; });
   }
 
+  // ---------- Planen ----------
   function planenKlick(){
-    if(!draussen()){                             // drinnen: nur Variante und Kinder merken
+    if(!draussen() || (party && party.ort==='drinnen')){   // drinnen: nur Variante und Kinder merken
       plan={format:1, thema:thema, stationen:[], strecke:0};
-      speichern(); location.href='spiel.html?thema='+encodeURIComponent(thema); return;
+      speichern(); location.href=(party ? 'party.html' : 'spiel.html')+'?thema='+encodeURIComponent(thema); return;
     }
     var text=$('adresse').value.trim();
-    if(!wahl.start && !text){ status('Bitte eine Startadresse eingeben oder „Mein Standort“ tippen.', true); return; }
+    if(!wahl.start && !text){ status('Bitte eine Startadresse eingeben oder den Standort-Knopf tippen.', true); return; }
     $('planen').disabled=true; versuch=0;
     var startHolen = (wahl.start && (!text || text===wahl.adresse)) ? Promise.resolve(wahl.start) : (status('Adresse wird gesucht …'), adresseSuchen(text).then(function(a){ wahl.start={lat:a.lat,lng:a.lng}; wahl.adresse=text; $('start-info').textContent=a.name; return wahl.start; }));
     startHolen.then(function(start){
@@ -216,16 +280,17 @@
     .then(function(){ $('planen').disabled=false; });
   }
   function rechnen(){
-    status('Höhen werden geladen und die Route wird geplant …');
+    status('Die Route wird geplant …');
+    var vorher=gewaehlt;
     return PlanerKern.planen(osmCache.osm, {start:osmCache.start, richtung:wahl.richtung, distanz:wahl.distanz, rundkurs:wahl.rundkurs, stationen:tour.stationen, hoehen:hoehen, versuch:versuch})
       .then(function(r){
         netz=r.netz;
         plan={format:1, thema:thema, adresse:wahl.adresse, start:osmCache.start, richtung:wahl.richtung, distanz:wahl.distanz, rundkurs:wahl.rundkurs,
               strecke:r.strecke, stationen:r.stationen, route:r.route, hoehenProfil:r.hoehenProfil, varianten:r.varianten,
               heimweg:r.heimweg, heimRoute:r.heimRoute, heimGleich:r.heimGleich};
-        speichern(); ergebnisZeigen();
-        status('Fertig'+(r.varianten>1?' · Route '+(r.versuch+1)+' von '+r.varianten:'')+'. Gespeichert auf diesem Gerät.');
-        $('ergebnis').scrollIntoView({behavior:'smooth'});
+        speichern(); status('');
+        ergebnisZeigen.schon=false; gewaehlt=vorher; ergebnisZeigen();
+        toast((r.varianten>1?'Route '+(r.versuch+1)+' von '+r.varianten+'. ':'')+'Auf diesem Gerät gespeichert.');
       })['catch'](function(e){ status(String(e.message||e), true); });
   }
 
@@ -246,8 +311,17 @@
       }, function(){ status('Standort nicht erlaubt. Bitte die Adresse eintippen.', true); }, {enableHighAccuracy:true, timeout:15000});
     });
     $('planen').addEventListener('click', planenKlick);
-    $('anders').addEventListener('click', function(){ if(!osmCache){ toast('Bitte erst neu planen.'); return; } versuch++; rechnen(); });
-    $('speichern').addEventListener('click', function(){ speichern(); location.href=(window.Party && Party.lesen(thema) ? 'party.html' : 'spiel.html')+'?thema='+encodeURIComponent(thema); });
+    $('zur-route').addEventListener('click', ergebnisZeigen);
+    $('zurueck-eingabe').addEventListener('click', function(e){ if(plan && plan.stationen && plan.stationen.length){ e.preventDefault(); ergebnisZeigen(); } });
+    $('start-pille').addEventListener('click', zeigeEingabe);
+    $('aendern').addEventListener('click', zeigeEingabe);
+    $('liste').addEventListener('click', function(e){ var b=e.target.closest('button[data-i]'); if(b) waehle(+b.getAttribute('data-i'), true); });
+    $('anders').addEventListener('click', function(){
+      if(!osmCache){ if(netzLaedt) toast('Die Wege laden noch. Gleich nochmal tippen.'); else zeigeEingabe(); return; }
+      var b=this; b.disabled=true; b.textContent='Moment …'; versuch++;
+      rechnen().then(function(){ b.disabled=false; b.textContent='Andere Route'; });
+    });
+    $('speichern').addEventListener('click', function(){ speichern(); location.href=(party ? 'party.html' : 'spiel.html')+'?thema='+encodeURIComponent(thema); });
     $('teilen').addEventListener('click', function(){
       speichern(); var link=spielLink(plan);
       if(navigator.share){ navigator.share({title:tour.titel, text:'Unsere Schnitzeljagd', url:link})['catch'](function(){}); return; }
@@ -256,9 +330,9 @@
   }
 
   fetch('themen/'+thema+'/tour.json').then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }).then(function(t){
-    tour=t; document.title='Tour planen · '+t.titel;
-    $('titel').textContent=t.titel+': Tour planen'; $('untertitel').textContent=t.untertitel+' · '+t.alter+' · '+t.dauer.text;
-    var d=$('distanz'); wahl.distanz=t.strecke.standard; wahl.kinder=t.kinder.standard;
+    tour=t; document.title='Route planen · '+t.titel;
+    $('untertitel').textContent=t.titel;
+    wahl.distanz=t.strecke.standard; wahl.kinder=t.kinder.standard;
     try{ plan=JSON.parse(localStorage.getItem(PLAN_KEY)||'null'); }catch(e){ plan=null; }
     if(plan){
       wahl.variante=plan.variante||wahl.variante; wahl.kinder=plan.kinder||wahl.kinder;
@@ -267,17 +341,14 @@
       if(plan.richtung) wahl.richtung=plan.richtung;
       if(plan.start){ wahl.start=plan.start; wahl.adresse=plan.adresse||''; $('adresse').value=wahl.adresse; }
     }
-    var party=window.Party && Party.lesen(thema);
+    party=window.Party && Party.lesen(thema);
     if(party){                                   // Party gibt Variante und Kinder vor, der Planer kümmert sich nur um die Route
       wahl.variante=Party.variante(party); wahl.kinder=party.kinder;
       $('sek-variante').hidden=true; $('sek-kinder').hidden=true;
-      $('zurueck-link').href='party.html?thema='+thema; $('zurueck-link').textContent='← Zur Party';
-      $('speichern').textContent='Speichern, zurück zur Party';
-      $('titel').textContent=(party.kind && party.kind.name ? party.kind.name+': ' : '')+'Route planen';
-      if(party.ort==='drinnen'){ $('draussen').hidden=true; }
+      if(party.kind && party.kind.name) $('titel').firstChild.textContent='Route für '+party.kind.name;
     }
+    $('zurueck-eingabe').href=zurueckZiel(); $('zurueck-karte').href=zurueckZiel();
     segZeichnen(); verbinden();
-    if(party){ $('sek-variante').hidden=true; $('sek-kinder').hidden=true; if(party.ort!=='drinnen'){ $('draussen').hidden=false; $('drinnen').hidden=true; } }
-    if(plan && plan.stationen && plan.stationen.length){ ergebnisZeigen(); status('Gespeicherte Tour von diesem Gerät.'); netzNachladen(); }
+    if(plan && plan.stationen && plan.stationen.length){ ergebnisZeigen(); netzNachladen(); }
   })['catch'](function(e){ status('Thema „'+thema+'“ lässt sich nicht laden: '+e.message, true); });
 })();

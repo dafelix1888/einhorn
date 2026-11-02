@@ -1,58 +1,97 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0F0B17">
-<title>Bereit-Check · Zauberspiegel</title>
+<title>Startklar · Zauberspiegel</title>
 <link rel="stylesheet" href="dunkel.css">
 <style>
-.check{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start;background:var(--karte);border-radius:14px;padding:16px;margin-bottom:10px}
-.status{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--hover);color:var(--leise)}
-.status.ok{background:var(--gruen);color:#062B12}
-.status.warn{background:var(--gelb);color:#3A2A00}
-.check b{display:block;font-size:1.05rem}
-.check p{color:var(--leise);margin:4px 0 10px;font-size:.95rem}
-.balken{height:8px;border-radius:4px;background:var(--hover);overflow:hidden;margin:8px 0}
+.checks{background:var(--karte);border-radius:16px;padding:4px 14px}
+.check{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--linie)}
+.check:first-child{border-top:0}
+.check b{display:block}
+.check .text{color:var(--leise);font-size:.88rem;display:block}
+.check .mehr{grid-column:2 / 4}
+.check .knopf{font-size:.9rem;padding:8px 14px;white-space:nowrap}
+.balken{height:8px;border-radius:4px;background:var(--hover);overflow:hidden;margin:2px 0 4px}
 .balken i{display:block;height:100%;background:var(--akzent);width:0;transition:width .3s}
-.gesamt{text-align:center;margin:24px 0}
+.heute{display:flex;flex-direction:column;gap:10px}
+.termin{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:start;background:var(--karte);border-radius:14px;padding:12px 14px}
+.termin > b{color:var(--akzent)}
+.termin div b{display:block}
+.termin div span{color:var(--leise);font-size:.88rem}
+.start{margin-top:22px}
+.fazit{text-align:center;margin:10px 0 0;font-size:.92rem}
 </style></head><body>
 <main class="seite">
-  <div class="oben"><a href="#" id="zurueck">← Zur Party</a><span class="leise">auf dem Spiel-Gerät öffnen</span></div>
-  <h1>Bereit-Check</h1>
-  <p class="leise">Einmal am Vortag und kurz vor dem Start durchgehen. Alles grün, dann kann nichts schiefgehen.</p>
-  <div id="liste" style="margin-top:18px"></div>
-  <div class="gesamt"><p id="fazit" class="leise"></p><a class="knopf" id="los" href="#">Spiel starten</a></div>
+  <div class="oben"><a class="textknopf" href="#" id="zurueck">← Zur Party</a><span class="leise" style="font-size:.9rem">auf dem iPad öffnen</span></div>
+  <h1>Startklar</h1>
+  <p class="leise" id="intro">Das iPad prüft sich selbst, du bestätigst nur zwei Dinge.</p>
+  <div class="checks" id="liste" style="margin-top:16px"></div>
+  <section id="ablauf" hidden><h2 id="ablauf-titel">Heute</h2><div class="heute" id="heute"></div></section>
+  <div class="start"><a class="knopf breit still" id="los" href="#">Zauberspiegel starten</a><p id="fazit" class="fazit leise" aria-live="polite"></p></div>
 </main>
+<div class="toast" id="toast" hidden></div>
 <script src="party.js"></script>
 <script>
 (function(){
   'use strict';
   var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
-  var tour=null, zustand={ton:null, stimmen:null, gps:null, akku:null, sperre:null, offline:null}, details={};
+  var tour=null, zustand={stimmen:null, offline:null, gps:null, akku:null, ton:null, sperre:null}, details={};
+  var HAKEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var ACHTUNG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 6v8"/><path d="M12 18.5v.5"/></svg>';
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3200); }
   $('zurueck').href='party.html?thema='+thema; $('los').href='spiel.html?thema='+thema;
   var party=Party.lesen(thema), plan=Party.plan(thema);
   var draussen=party ? party.ort!=='drinnen' : !(plan && plan.variante==='c');
+  var gemeldet=false;
 
-  function zeile(id, titel, text, inhalt){
-    var s=zustand[id], cls=s===true?'ok':s===false?'warn':'';
-    return '<div class="check"><span class="status '+cls+'" aria-label="'+(s===true?'erledigt':s===false?'offen':'noch nicht geprüft')+'">'+(s===true?'✓':s===false?'!':'?')+'</span><div><b>'+titel+'</b><p>'+text+'</p>'+(inhalt||'')+'</div></div>';
+  function aktiv(k){ return k!=='gps' || draussen; }
+  function zeile(id, titel, text, knopf, mehr){
+    var s=zustand[id], cls=s===true?'ok':s===false?'warn':'ring';
+    return '<div class="check"><span class="punkt '+cls+'" role="img" aria-label="'+(s===true?'erledigt':s===false?'offen':'wird geprüft')+'">'+(s===true?HAKEN:s===false?ACHTUNG:'')+'</span>'+
+      '<div style="min-width:0"><b>'+titel+'</b><span class="text">'+text+'</span></div>'+(knopf||'<span></span>')+(mehr?'<div class="mehr">'+mehr+'</div>':'')+'</div>';
   }
   function zeichnen(){
     var h='';
-    h+=zeile('ton','Ton','Stummschalter aus, Lautstärke hoch. Ist der Klang deutlich zu hören?',
-      '<div class="reihe"><button class="knopf klein leer" id="klang">Testklang abspielen</button><button class="knopf klein" id="gehoert"'+(details.klang?'':' disabled')+'>Gut zu hören</button></div>');
-    h+=zeile('stimmen','Stimmen auf dem Gerät', details.stimmenText||'Wird geprüft …',
-      zustand.stimmen===true?'':'<div class="balken"><i id="stimm-balken" style="width:'+(details.anteil||0)+'%"></i></div><button class="knopf klein" id="laden"'+(details.laedt?' disabled':'')+'>'+(details.laedt?'Lädt …':'Jetzt laden')+'</button>');
-    if(draussen) h+=zeile('gps','GPS', details.gpsText||'Draußen mit dem Gerät prüfen, das den Spiegel spielt. Die Stationen öffnen sich ab etwa 15 m Abstand, gut ist eine Genauigkeit unter 25 m. Ist das Signal ungenau oder lauft ihr vorbei, fragt der Spiegel nach, statt selbst zu öffnen.',
-      '<button class="knopf klein leer" id="gps">'+(details.gpsLaeuft?'Misst …':'GPS prüfen')+'</button>');
-    h+=zeile('akku','Akku', details.akkuText||'Für eine Stunde Spiel mit GPS und Bildschirm: mindestens halb voll.',
-      details.akkuAuto?'':'<button class="knopf klein leer" id="akku">Ist mindestens halb voll</button>');
-    h+=zeile('sperre','Automatische Sperre aus','iPad: Einstellungen → Anzeige & Helligkeit → Automatische Sperre → Nie. Sonst geht der Bildschirm mitten im Spiel aus.',
-      '<button class="knopf klein leer" id="sperre">Ist eingestellt</button>');
+    // prüft das iPad selbst
+    var stimmenKnopf=zustand.stimmen===false && !details.keinNetz;
+    h+=zeile('stimmen','Stimmen geladen', details.stimmenText||'Wird geprüft …',
+      stimmenKnopf ? '<button type="button" class="knopf klein mittel" id="laden"'+(details.laedt?' disabled':'')+'>'+(details.laedt?'Lädt …':'Laden')+'</button>' : '',
+      stimmenKnopf ? '<div class="balken"><i id="stimm-balken" style="width:'+(details.anteil||0)+'%"></i></div>' : '');
     h+=zeile('offline','Ohne Netz spielbar', details.offlineText||'Wird geprüft …');
+    if(draussen) h+=zeile('gps','GPS', details.gpsText||'Misst die Genauigkeit … Mit dem Gerät prüfen, das den Spiegel spielt.',
+      zustand.gps!==true && !details.gpsLaeuft ? '<button type="button" class="knopf klein leer mittel" id="gps">Nochmal</button>' : '');
+    h+=zeile('akku','Akku', details.akkuText||'Mindestens halb voll für eine Stunde Spiel.',
+      details.akkuAuto || zustand.akku===true ? '' : '<button type="button" class="knopf klein mittel" id="akku">Ist halb voll</button>');
+    // bestätigt der Mensch
+    h+=zeile('ton','Ton', details.klang?'Gut zu hören? Sonst Stummschalter aus und lauter.':'Stummschalter aus, Lautstärke hoch.',
+      zustand.ton===true ? '' : details.klang ? '<button type="button" class="knopf klein mittel" id="gehoert">Gut zu hören</button>' : '<button type="button" class="knopf klein mittel" id="klang">Testklang</button>');
+    h+=zeile('sperre','Bildschirm bleibt an','Automatische Sperre auf „Nie“: Einstellungen, Anzeige & Helligkeit, Automatische Sperre.',
+      zustand.sperre===true ? '' : '<button type="button" class="knopf klein mittel" id="sperre">Ist so</button>');
     $('liste').innerHTML=h;
-    var offen=Object.keys(zustand).filter(function(k){ return (k!=='gps'||draussen) && zustand[k]!==true; }).length;
+    var offen=Object.keys(zustand).filter(function(k){ return aktiv(k) && zustand[k]!==true; }).length;
+    $('los').className='knopf breit'+(offen?' still':'');
     $('fazit').textContent=offen ? 'Noch '+offen+' Punkt'+(offen>1?'e':'')+' offen. Spielen geht trotzdem, aber besser alles grün.' : 'Alles bereit. Viel Spaß!';
+    if(!offen && party && !gemeldet){                       // Schritt „iPad startklar machen“ in der Party abhaken
+      gemeldet=true; var p=Party.lesen(thema)||party; p.erledigt=p.erledigt||{};
+      if(!p.erledigt.geraet){ p.erledigt.geraet=true; party=Party.speichern(p); }
+    }
+  }
+
+  // ---------- Ablauf am Partytag ----------
+  function ablauf(){
+    if(!party || !party.datum) return;
+    var t=Party.tageBis(party), v=Party.variante(party);
+    $('intro').textContent=(t===0?'Heute':t===1?'Morgen':'Am '+Party.datumText(Party.datum(party)))+' um '+party.start+' Uhr geht’s los. Das iPad prüft sich selbst, du bestätigst nur zwei Dinge.';
+    $('ablauf-titel').textContent=t===0?'Heute':'Am Partytag';
+    var l=[];
+    if(draussen && v!=='c') l.push([-60,'Kreidespur malen','Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.','']);
+    if(party.vorausgeher) l.push([-20,'Vorausgeher startet','Mit der Tasche vorgehen und die Stationen aufbauen. Den Link mit Karte und Packliste schickst du hier.','<div style="margin-top:8px"><button type="button" class="knopf klein leer mittel" id="vg-link">Link schicken</button></div>']);
+    l.push([0,draussen?'Alle an der Haustür':'Alle zusammen','Tattoos verteilen, dann den Zauberspiegel aufwecken.','']);
+    $('heute').innerHTML=l.map(function(x){ return '<div class="termin"><b>'+Party.uhr(party,x[0])+'</b><div><b>'+esc(x[1])+'</b><span>'+esc(x[2])+'</span>'+x[3]+'</div></div>'; }).join('')+
+      (draussen && party.planB ? '<p class="leise" style="font-size:.88rem;margin:4px 0 0">Regen? Auf der Party-Seite mit einem Tipp auf drinnen umschalten.</p>' : '');
+    $('ablauf').hidden=false;
   }
 
   // ---------- Stimmen: Pakete wie im Spiel in IndexedDB ----------
@@ -69,12 +108,12 @@
         var pakete=benoetigt(), noetig=[]; pakete.forEach(function(p){ noetig=noetig.concat(Object.keys(ix[p]||{})); });
         var fehlt=noetig.filter(function(k){ return !da[k]; });
         details.fehlendePakete=pakete.filter(function(p){ return Object.keys(ix[p]||{}).some(function(k){ return !da[k]; }); });
-        zustand.stimmen=fehlt.length===0;
+        zustand.stimmen=fehlt.length===0; details.keinNetz=false;
         details.anteil=Math.round((noetig.length-fehlt.length)/Math.max(1,noetig.length)*100);
-        details.stimmenText=fehlt.length ? (noetig.length-fehlt.length)+' von '+noetig.length+' Sätzen sind auf dem Gerät. Im WLAN laden, das sind einige Megabyte.' : 'Alle '+noetig.length+' Sätze sind auf dem Gerät, auch ohne Netz.';
+        details.stimmenText=fehlt.length ? (noetig.length-fehlt.length)+' von '+noetig.length+' Sätzen sind da. Im WLAN laden, das sind einige Megabyte.' : 'Alle '+noetig.length+' Sätze sind auf dem iPad, auch ohne Netz.';
         zeichnen();
       });
-    })['catch'](function(){ details.stimmenText='Prüfung braucht einmal Netz.'; zustand.stimmen=false; zeichnen(); });
+    })['catch'](function(){ details.stimmenText='Prüfung braucht einmal Netz.'; details.keinNetz=true; zustand.stimmen=false; zeichnen(); });
   }
   function b64zu(s){ var r=atob(s), a=new Uint8Array(r.length); for(var i=0;i<r.length;i++) a[i]=r.charCodeAt(i); return a.buffer; }
   function stimmenLaden(){
@@ -97,24 +136,24 @@
     if(location.protocol==='https:') try{ navigator.serviceWorker.register('sw.js'); }catch(e){}
     caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return caches.open(k).then(function(c){ return c.match('spiel.html',{ignoreSearch:true}); }); })); }).then(function(l){
       zustand.offline=l.some(Boolean);
-      details.offlineText=zustand.offline ? 'Spiel ist auf dem Gerät gespeichert und läuft auch ohne Empfang.' : 'Einmal das Spiel öffnen, solange Netz da ist, dann hier neu prüfen.';
+      details.offlineText=zustand.offline ? 'Das Spiel ist auf dem iPad gespeichert und läuft auch ohne Empfang.' : 'Einmal das Spiel öffnen, solange Netz da ist, dann hier neu laden.';
       zeichnen();
     })['catch'](function(){ zustand.offline=false; zeichnen(); });
   }
   function akkuPruefen(){
     if(!navigator.getBattery) return;
-    navigator.getBattery().then(function(b){ details.akkuAuto=true; zustand.akku=b.level>=0.5||b.charging; details.akkuText=Math.round(b.level*100)+' %'+(b.charging?', lädt':'')+(zustand.akku?'. Reicht.':'. Bitte vorher laden.'); zeichnen(); })['catch'](function(){});
+    navigator.getBattery().then(function(b){ details.akkuAuto=true; zustand.akku=b.level>=0.5||b.charging; details.akkuText=Math.round(b.level*100)+' %'+(b.charging?', lädt':'')+(zustand.akku?', reicht für die Tour.':'. Bitte vorher laden.'); zeichnen(); })['catch'](function(){});
   }
   var klangCtx=null;
   function klang(){
     try{ klangCtx=klangCtx||new (window.AudioContext||window.webkitAudioContext)(); klangCtx.resume();
       [523,659,784,1047].forEach(function(f,i){ var o=klangCtx.createOscillator(), g=klangCtx.createGain(), t=klangCtx.currentTime+i*.18; o.frequency.value=f; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.4,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+.35); o.connect(g); g.connect(klangCtx.destination); o.start(t); o.stop(t+.4); });
     }catch(e){}
-    details.klang=true; zeichnen();
+    details.klang=true; zeichnen(); var g=$('gehoert'); if(g) g.focus();
   }
   function gps(){
     if(!navigator.geolocation){ zustand.gps=false; details.gpsText='Dieses Gerät hat kein GPS.'; zeichnen(); return; }
-    details.gpsLaeuft=true; zeichnen(); var best=Infinity, n=0;
+    details.gpsLaeuft=true; details.gpsText='Misst die Genauigkeit …'; zeichnen(); var best=Infinity, n=0;
     var w=navigator.geolocation.watchPosition(function(p){
       best=Math.min(best, p.coords.accuracy); n++;
       zustand.gps=best<=25;
@@ -122,8 +161,12 @@
         '. Das ist zu ungenau für die Stationen. Ein iPad ohne Mobilfunk hat kein GPS und schätzt den Ort nur über WLAN. Besser ein Handy oder ein iPad mit Mobilfunk als Spiegel nehmen. Sonst die Stationen von Hand öffnen.');
       if(n>=4 || best<=10){ navigator.geolocation.clearWatch(w); details.gpsLaeuft=false; }
       zeichnen();
-    }, function(){ details.gpsLaeuft=false; zustand.gps=false; details.gpsText='Standort nicht erlaubt. In den Einstellungen für Safari freigeben.'; zeichnen(); }, {enableHighAccuracy:true, maximumAge:0, timeout:20000});
-    setTimeout(function(){ navigator.geolocation.clearWatch(w); if(details.gpsLaeuft){ details.gpsLaeuft=false; zeichnen(); } }, 25000);
+    }, function(){ navigator.geolocation.clearWatch(w); details.gpsLaeuft=false; zustand.gps=false; details.gpsText='Standort nicht erlaubt. In den Einstellungen für Safari freigeben.'; zeichnen(); }, {enableHighAccuracy:true, maximumAge:0, timeout:20000});
+    setTimeout(function(){ navigator.geolocation.clearWatch(w); if(details.gpsLaeuft){ details.gpsLaeuft=false; if(zustand.gps==null){ zustand.gps=false; details.gpsText='Kein Signal. Draußen nochmal messen.'; } zeichnen(); } }, 25000);
+  }
+  function teilen(link, titel, ok){
+    if(navigator.share){ navigator.share({title:titel, url:link})['catch'](function(){}); return; }
+    try{ navigator.clipboard.writeText(link).then(function(){ toast(ok); }, function(){ prompt('Link kopieren:', link); }); }catch(x){ prompt('Link kopieren:', link); }
   }
   document.addEventListener('click', function(e){
     var t=e.target;
@@ -133,10 +176,12 @@
     else if(t.closest('#gps')) gps();
     else if(t.closest('#akku')){ zustand.akku=true; zeichnen(); }
     else if(t.closest('#sperre')){ zustand.sperre=true; zeichnen(); }
+    else if(t.closest('#vg-link')){ var name=party.kind&&party.kind.name?party.kind.name:'Party'; teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+name, 'Link kopiert. An den Vorausgeher schicken.'); }
   });
+  ablauf();
   fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }).then(function(t){
-    tour=t; zeichnen(); stimmenPruefen(); offlinePruefen(); akkuPruefen();
-  })['catch'](function(){ $('liste').innerHTML='<p>Thema lässt sich nicht laden. Einmal mit Netz öffnen.</p>'; });
+    tour=t; zeichnen(); stimmenPruefen(); offlinePruefen(); akkuPruefen(); if(draussen) gps();
+  })['catch'](function(){ $('liste').innerHTML='<p style="padding:12px 0">Thema lässt sich nicht laden. Einmal mit Netz öffnen.</p>'; });
 })();
 </script>
 </body></html>
