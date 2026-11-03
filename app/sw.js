@@ -1,5 +1,5 @@
 // Schnitzeljagd: hält Spiel, Thema, Stimmen und Funkel in 3D für unterwegs ohne Empfang bereit.
-var CACHE='schnitzeljagd-v7';
+var CACHE='schnitzeljagd-v8';
 var DATEIEN=['./','./index.html','./spiel.html','./tour-laden.js','./config.json','./themen/index.json','./themen/einhorn/tour.json','./themen/einhorn/cover.svg','./themen/einhorn/figuren/funkel.svg','./themen/einhorn/figuren/kakapups.svg','./stil.css','./planer.html','./planer.js','./planer-kern.js','../stimmen/pakete/einhorn-basis.json','../stimmen/pakete/einhorn-kakapups.json','./party.html','./party.js','./bereit.html','./vorausgeher.html','./einladung.html','./druck.html','./dunkel.css','../funkel3d.js','../three.module.min.js'];
 self.addEventListener('install', function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){
@@ -12,7 +12,7 @@ self.addEventListener('activate', function(e){
 self.addEventListener('fetch', function(e){
   var url=new URL(e.request.url);
   if(e.request.method!=='GET' || url.origin!==location.origin) return;     // Karten, OSM und Worker gehen immer direkt ins Netz
-  var frisch = /\.(html|json|js)$/.test(url.pathname) || url.pathname.endsWith('/');
+  var frisch = /\.(html|json|js|css)$/.test(url.pathname) || url.pathname.endsWith('/');   // Seiten, Daten, Skripte und Stile immer zusammen aktuell, sonst passt neues HTML nicht zum alten Stil
   if(frisch){                                  // erst Netz (neue Fassung), nach 4 s oder ohne Empfang Vorrat
     e.respondWith(caches.open(CACHE).then(function(c){
       var netz=fetch(e.request).then(function(r){ if(r.ok) c.put(e.request, r.clone()); return r; });
