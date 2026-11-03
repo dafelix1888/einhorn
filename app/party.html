@@ -62,9 +62,15 @@
 .summe div:first-child{border-top:0}
 .summe span{color:var(--leise)}
 .summe b{text-align:right}
+.route-karte{display:flex;gap:16px;align-items:center;background:var(--karte);border-radius:16px;padding:14px;margin:14px 0 4px}
+.route-karte svg{width:150px;height:100px;flex:0 0 auto;background:#120E1A;border-radius:10px}
+.route-karte b{font-size:1.1rem}
+.route-karte p{margin:4px 0 10px;font-size:.92rem}
+@media (max-width:420px){ .route-karte svg{width:110px;height:76px} }
 </style></head><body>
 <main class="seite" id="seite"><p class="leise">Lädt …</p></main>
 <div class="toast" id="toast" hidden></div>
+<script src="planer-kern.js"></script>
 <script src="party.js"></script>
 <script>
 (function(){
@@ -153,6 +159,24 @@
     if(a.aktion) return '<button type="button" class="knopf mittel" data-aktion="'+a.aktion+'">'+esc(a.knopf)+'</button>';
     return a.link ? '<a class="knopf mittel" href="'+esc(a.link)+'">'+esc(a.knopf)+'</a>' : '';
   }
+  // Eure Route: immer sichtbar, mit kleiner Vorschau und direktem Weg in den Planer
+  function routeKarte(p, pl){
+    if(p.ort==='drinnen') return '';
+    var st=(pl&&pl.stationen)||[], pts=(pl&&pl.route&&pl.route.length>1) ? pl.route : st.map(function(s){ return [s.lat,s.lng]; });
+    if(!st.length) return '<section class="route-karte"><div><b>Eure Route</b><p class="leise">Noch nicht geplant. Adresse eingeben, Richtung wählen, der Planer sucht die Stationen.</p></div><a class="knopf mittel" href="planer.html?thema='+thema+'">Route planen</a></section>';
+    var la=pts.map(function(x){ return x[0]; }), ln=pts.map(function(x){ return x[1]; });
+    var minLa=Math.min.apply(null,la), maxLa=Math.max.apply(null,la), minLn=Math.min.apply(null,ln), maxLn=Math.max.apply(null,ln);
+    var k=Math.cos(minLa*Math.PI/180), w=Math.max(1e-6,(maxLn-minLn)*k), hh=Math.max(1e-6,maxLa-minLa), s=Math.min(160/w, 100/hh);
+    function X(x){ return 12+((x[1]-minLn)*k)*s+(160-w*s)/2; } function Y(x){ return 12+(maxLa-x[0])*s+(100-hh*s)/2; }
+    var linie=pts.map(function(x,i){ return (i?'L':'M')+X(x).toFixed(1)+' '+Y(x).toFixed(1); }).join(' ');
+    var heim=pl.heimRoute&&pl.heimRoute.length>1 ? '<path d="'+pl.heimRoute.map(function(x,i){ return (i?'L':'M')+X(x).toFixed(1)+' '+Y(x).toFixed(1); }).join(' ')+'" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-dasharray="2 5" stroke-linecap="round"/>' : '';
+    var punkte=st.map(function(x,i){ var q=[x.lat,x.lng]; return '<circle cx="'+X(q).toFixed(1)+'" cy="'+Y(q).toFixed(1)+'" r="'+(i===0?5:4)+'" fill="'+(i===0?'#F5F2FA':'#A78BFA')+'"/>'; }).join('');
+    var km=pl.strecke>=1000?(pl.strecke/1000).toFixed(1).replace('.',',')+' km':Math.round(pl.strecke||0)+' m';
+    var dauer=window.PlanerKern&&PlanerKern.dauer ? PlanerKern.dauer(tour, pl.strecke||0).gesamt : null;
+    return '<section class="route-karte"><svg viewBox="0 0 184 124" aria-hidden="true"><path d="'+linie+'" fill="none" stroke="#A78BFA" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>'+heim+punkte+'</svg>'+
+      '<div><b>Eure Route</b><p class="leise">'+km+' bis zum Ziel'+(pl.rundkurs?', Rundkurs':'')+(dauer?' · ca. '+dauer+' min':'')+(pl.adresse?'<br>ab '+esc(pl.adresse):'')+'</p>'+
+      '<a class="knopf mittel" href="planer.html?thema='+thema+'">Route ändern</a></div></section>';
+  }
   function uebersicht(){
     var p=party, pl=Party.plan(thema), l=Party.aufgaben(p, tour, pl), n=Party.naechste(l), tage=Party.tageBis(p);
     var fertig=l.filter(function(a){ return a.fertig; }).length;
@@ -172,7 +196,7 @@
     } else {
       h+='<section class="fertig-karte"><b style="font-size:1.2rem">Alles vorbereitet!</b><p>Am Partytag öffnest du nur noch „Startklar“.</p><div style="margin-top:12px"><a class="knopf mittel" href="bereit.html?thema='+thema+'">Startklar öffnen</a></div></section>';
     }
-    h+='</div><h2>Dein Plan</h2><ol class="plan">'+l.map(function(a, i){
+    h+='</div>'+routeKarte(p, pl)+'<h2>Dein Plan</h2><ol class="plan">'+l.map(function(a, i){
       var ist=a===n, w=wann(a);
       return '<li class="'+(a.fertig?'fertig':'')+'"><button type="button" class="haken" data-umschalten="'+a.id+'" aria-pressed="'+a.fertig+'" aria-label="'+esc(a.titel)+(a.fertig?': erledigt, wieder öffnen':': als erledigt markieren')+'"><span class="punkt '+(a.fertig?'ok':ist?'dran':'')+'">'+(a.fertig?HAKEN:(i+1))+'</span></button>'+
         '<div style="min-width:0"><b>'+(a.link&&!a.aktion?'<a href="'+esc(a.link)+'">'+esc(a.titel)+'</a>':esc(a.titel))+'</b><span class="kurz">'+esc(a.kurz)+'</span></div>'+
@@ -191,6 +215,7 @@
       '<a class="knopf leer mittel" href="einladung.html?e='+Party.einladungsLink(party, pl).split('?e=')[1]+'">Einladung ansehen</a>'+
       (party.vorausgeher?'<button type="button" class="knopf leer mittel" id="vg-link">Link für den Vorausgeher</button>':'')+
       '<button type="button" class="knopf leer mittel" id="teilen">Link fürs iPad</button>'+
+      (party.ort!=='drinnen'?'<a class="knopf leer mittel" href="planer.html?thema='+thema+'">Route ändern</a>':'')+
       '<a class="knopf leer mittel" href="bereit.html?thema='+thema+'">Startklar</a>'+
       '<a class="knopf leer mittel" href="druck.html?thema='+thema+'">Druckvorlagen</a>'+
       '<button type="button" class="knopf leer mittel" id="kalender">In den Kalender</button>'+
