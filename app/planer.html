@@ -22,8 +22,9 @@
   <div id="draussen" class="stapel">
     <section class="feld">
       <label class="titel" for="adresse">Start (eure Haustür)</label>
-      <div class="zeile">
-        <input id="adresse" type="text" autocomplete="street-address" placeholder="Straße Hausnummer, Ort">
+      <div class="zeile vorschlag-huelle">
+        <input id="adresse" type="text" autocomplete="off" placeholder="Straße Hausnummer, Ort" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="vorschlaege">
+        <ul class="vorschlaege" id="vorschlaege" role="listbox" aria-label="Adressvorschläge" hidden></ul>
         <button type="button" class="standort" id="hier" aria-label="Mein Standort"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
       </div>
       <p class="hinweis" id="start-info"></p>

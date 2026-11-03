@@ -4,6 +4,7 @@
 (function(){
   'use strict';
   var NOMINATIM='https://nominatim.openstreetmap.org/search';
+  var PHOTON='https://photon.komoot.io/api/';      // Suche beim Tippen (OpenStreetMap-Daten); Nominatim erlaubt keine Vorschläge beim Tippen
   var OVERPASS=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
   var ELEVATION='https://api.open-meteo.com/v1/elevation';
   var RICHTUNGEN=['NW','N','NO','W','egal','O','SW','S','SO'];
@@ -31,6 +32,47 @@
 
   // ---------- Netz ----------
   function mitZeitlimit(p, ms, text){ return Promise.race([p, new Promise(function(_,nein){ setTimeout(function(){ nein(new Error(text)); }, ms); })]); }
+  // ---------- Vorschläge beim Tippen ----------
+  var vorschlagListe=[], vorschlagAktiv=-1, vorschlagTimer=null, vorschlagNr=0;
+  function vorschlagText(p){
+    var strasse=p.street ? p.street+(p.housenumber?' '+p.housenumber:'') : '';
+    var titel=p.name && p.name!==p.street ? p.name+(strasse?', '+strasse:'') : (strasse||p.name||'');
+    var ort=[p.postcode, p.city||p.town||p.village||p.district||p.locality].filter(Boolean).join(' ');
+    var zusatz=[p.city&&p.district&&p.district!==p.city?p.district:null, ort, p.country&&p.countrycode!=='DE'?p.country:null].filter(Boolean).join(', ');
+    return {titel:titel||ort, zusatz:titel?zusatz:(p.state||''), voll:[titel, ort].filter(Boolean).join(', ')};
+  }
+  function vorschlagen(text){
+    clearTimeout(vorschlagTimer); text=text.trim();
+    if(text.length<3 || text==='Mein Standort'){ vorschlaegeZu(); return; }
+    vorschlagTimer=setTimeout(function(){
+      var nr=++vorschlagNr, nah=wahl.start || (plan && plan.start) || {lat:51.2, lng:10.4};   // Vorschläge in der Nähe zuerst, sonst Mitte Deutschlands
+      fetch(PHOTON+'?q='+encodeURIComponent(text)+'&lang=de&limit=6&lat='+nah.lat.toFixed(3)+'&lon='+nah.lng.toFixed(3))
+        .then(function(r){ if(!r.ok) throw new Error(); return r.json(); })
+        .then(function(j){
+          if(nr!==vorschlagNr) return;                 // eine spätere Eingabe war schneller
+          var gesehen={};
+          vorschlagListe=(j.features||[]).map(function(f){ var t=vorschlagText(f.properties||{}); t.lat=f.geometry.coordinates[1]; t.lng=f.geometry.coordinates[0]; return t; })
+            .filter(function(t){ if(!t.titel || gesehen[t.voll]) return false; gesehen[t.voll]=1; return true; }).slice(0,5);
+          vorschlagAktiv=-1; vorschlaegeZeichnen();
+        })['catch'](function(){ vorschlaegeZu(); });   // ohne Vorschläge geht es wie bisher mit „Route planen“
+    }, 250);
+  }
+  function vorschlaegeZeichnen(){
+    var ul=$('vorschlaege');
+    if(!vorschlagListe.length){ vorschlaegeZu(); return; }
+    ul.innerHTML=vorschlagListe.map(function(v,i){ return '<li role="option" id="vs-'+i+'" data-i="'+i+'" aria-selected="'+(i===vorschlagAktiv)+'"><b>'+esc(v.titel)+'</b>'+(v.zusatz?'<span>'+esc(v.zusatz)+'</span>':'')+'</li>'; }).join('')+
+      '<li class="quelle" aria-hidden="true">Vorschläge: Photon, Daten © OpenStreetMap</li>';
+    ul.hidden=false; $('adresse').setAttribute('aria-expanded','true');
+    if(vorschlagAktiv>=0) $('adresse').setAttribute('aria-activedescendant','vs-'+vorschlagAktiv); else $('adresse').removeAttribute('aria-activedescendant');
+  }
+  function vorschlaegeZu(){ var ul=$('vorschlaege'); if(ul){ ul.hidden=true; ul.innerHTML=''; } vorschlagListe=[]; vorschlagAktiv=-1; $('adresse').setAttribute('aria-expanded','false'); $('adresse').removeAttribute('aria-activedescendant'); }
+  function vorschlagWaehlen(i){
+    var v=vorschlagListe[i]; if(!v) return;
+    wahl.start={lat:v.lat, lng:v.lng}; wahl.adresse=v.voll; $('adresse').value=v.voll;
+    $('start-info').textContent='Startpunkt gesetzt: '+v.voll;
+    vorschlaegeZu(); status('');
+  }
+
   function adresseSuchen(text){
     return fetch(NOMINATIM+'?format=jsonv2&limit=1&accept-language=de&q='+encodeURIComponent(text)).then(function(r){ if(!r.ok) throw new Error('Adresssuche: HTTP '+r.status); return r.json(); })
       .then(function(l){ if(!l.length) throw new Error('Diese Adresse kenne ich nicht. Mit Ort versuchen, z. B. „Musterweg 3, Hamburg“.'); return {lat:+l[0].lat, lng:+l[0].lon, name:l[0].display_name}; });
@@ -301,7 +343,16 @@
     $('distanz').addEventListener('input', function(){ wahl.distanz=+this.value; $('distanz-wert').textContent=km(wahl.distanz); });
     $('k-minus').addEventListener('click', function(){ wahl.kinder=Math.max(tour.kinder.min, wahl.kinder-1); segZeichnen(); });
     $('k-plus').addEventListener('click', function(){ wahl.kinder=Math.min(tour.kinder.max, wahl.kinder+1); segZeichnen(); });
-    $('adresse').addEventListener('input', function(){ if(this.value.trim()!==wahl.adresse){ wahl.start=null; $('start-info').textContent=''; } });
+    $('adresse').addEventListener('input', function(){ if(this.value.trim()!==wahl.adresse){ wahl.start=null; $('start-info').textContent=''; } vorschlagen(this.value); });
+    $('adresse').addEventListener('keydown', function(e){
+      var l=vorschlagListe; if($('vorschlaege').hidden || !l.length) return;
+      if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); vorschlagAktiv=(vorschlagAktiv+(e.key==='ArrowDown'?1:-1)+l.length)%l.length; vorschlaegeZeichnen(); }
+      else if(e.key==='Enter' && vorschlagAktiv>=0){ e.preventDefault(); vorschlagWaehlen(vorschlagAktiv); }
+      else if(e.key==='Escape'){ vorschlaegeZu(); }
+    });
+    $('adresse').addEventListener('blur', function(){ setTimeout(vorschlaegeZu, 200); });
+    $('vorschlaege').addEventListener('mousedown', function(e){ e.preventDefault(); });   // Tippen auf einen Vorschlag schließt die Liste nicht vorher
+    $('vorschlaege').addEventListener('click', function(e){ var li=e.target.closest('li[data-i]'); if(li) vorschlagWaehlen(+li.getAttribute('data-i')); });
     $('hier').addEventListener('click', function(){
       if(!navigator.geolocation){ toast('Dieses Gerät kann den Standort nicht bestimmen.'); return; }
       status('Standort wird bestimmt …');

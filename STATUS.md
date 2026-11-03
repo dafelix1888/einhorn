@@ -28,7 +28,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 
 ## Entscheidungen
 
-- Kartendaten von OpenStreetMap (Overpass, Nominatim), Höhen von Open-Meteo, beides ohne Schlüssel.
+- Kartendaten von OpenStreetMap (Overpass, Nominatim), Höhen von Open-Meteo, Adressvorschläge beim Tippen über Photon (komoot), alles ohne Schlüssel. Nominatim erlaubt keine Vorschläge beim Tippen, deshalb Photon dafür.
 - Architektur vorerst statisch: Jedes Abenteuer ist eine `tour.json`, Daten der Eltern liegen im Gerät (`localStorage`: `sj.party.<thema>`, `sj.plan.<thema>`), Teilen läuft über Links mit eingebetteten Daten.
 - Server kommt später. Offen ist, ob Cloudflare oder Supabase.
 - Anpassen kostet künftig Geld: Paket mit 3 Neuerzeugungen, ein Prompt zählt als eine Neuerzeugung. Grenze je Prompt: so lang wie eine WhatsApp-Nachricht, höchstens 3 Stationen oder 2 Figuren, höchstens 2.000 gesprochene Zeichen. Höchstens 2 Bonus-Stationen je Party. Fest bleiben Reihenfolge, Rätsel, Utensilien und Sicherheit.
