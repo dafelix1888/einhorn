@@ -42,55 +42,64 @@
    "id": "funkel",
    "name": "Funkel",
    "rolle": "Hauptfigur",
-   "text": "Das Einhorn, dessen Regenbogen verschwunden ist. Spricht aus dem Zauberspiegel."
+   "text": "Das Einhorn, dessen Regenbogen verschwunden ist. Spricht aus dem Zauberspiegel.",
+   "bild": "themen/einhorn/figuren/funkel.svg"
   },
   {
    "id": "fridolin",
    "name": "Fridolin",
    "rolle": "Der „Dieb“",
-   "text": "Ein kleiner Fuchs, der so bunt sein wollte wie ein Einhorn. Am Ende ein Freund."
+   "text": "Ein kleiner Fuchs, der so bunt sein wollte wie ein Einhorn. Am Ende ein Freund.",
+   "bild": "themen/einhorn/figuren/fridolin.svg"
   },
   {
    "id": "spiegel",
    "name": "Der Zauberspiegel",
    "rolle": "Erzähler",
-   "text": "Führt die Kinder von Station zu Station."
+   "text": "Führt die Kinder von Station zu Station.",
+   "bild": "themen/einhorn/figuren/spiegel.svg"
   },
   {
    "id": "kakapups",
    "name": "Professor Kakapups",
    "rolle": "Aufgaben-Vorleser (wählbar)",
-   "text": "pupst und legt ein Häufchen"
+   "text": "pupst und legt ein Häufchen",
+   "bild": "themen/einhorn/figuren/kakapups.svg"
   },
   {
    "id": "rudi",
    "name": "Rudi, die ratlose Ratte",
    "rolle": "Aufgaben-Vorleser (wählbar)",
-   "text": "total verplant, sucht ständig seinen Zettel"
+   "text": "total verplant, sucht ständig seinen Zettel",
+   "bild": "themen/einhorn/figuren/rudi.svg"
   },
   {
    "id": "alfonso",
    "name": "Alfonso, die alberne Ameise",
    "rolle": "Aufgaben-Vorleser (wählbar)",
-   "text": "kichert und albert herum"
+   "text": "kichert und albert herum",
+   "bild": "themen/einhorn/figuren/alfonso.svg"
   },
   {
    "id": "bruno",
    "name": "Bruno, der brummige Bär",
    "rolle": "Aufgaben-Vorleser (wählbar)",
-   "text": "brummt, ist aber eigentlich lieb"
+   "text": "brummt, ist aber eigentlich lieb",
+   "bild": "themen/einhorn/figuren/bruno.svg"
   },
   {
    "id": "charly",
    "name": "Charly, der coole Clown",
    "rolle": "Aufgaben-Vorleser (wählbar)",
-   "text": "supercool, hupt mit seiner Tröte"
+   "text": "supercool, hupt mit seiner Tröte",
+   "bild": "themen/einhorn/figuren/charly.svg"
   },
   {
    "id": "dagobert",
    "name": "Dagobert, der dusslige Dachs",
    "rolle": "Aufgaben-Vorleser (wählbar)",
-   "text": "stolpert und bringt alles durcheinander"
+   "text": "stolpert und bringt alles durcheinander",
+   "bild": "themen/einhorn/figuren/dagobert.svg"
   }
  ],
  "varianten": {

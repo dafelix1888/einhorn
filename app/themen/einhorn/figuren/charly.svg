@@ -1,0 +1,19 @@
+<svg viewBox="0 0 240 300" data-figur="charly" xmlns="http://www.w3.org/2000/svg">
+          <g class="kk-koerper">
+            <path d="M48 300 C50 252 78 226 120 224 C162 226 190 252 192 300 Z" fill="#3B82F6" stroke="#1E3A8A" stroke-width="4"></path>
+            <g fill="#FACC15"><circle cx="86" cy="270" r="9"></circle><circle cx="154" cy="262" r="9"></circle><circle cx="120" cy="290" r="9"></circle></g>
+            <path d="M96 228 l24 14 l24 -14 v26 l-24 -12 l-24 12 Z" fill="#E11D48" stroke="#881337" stroke-width="3" stroke-linejoin="round"></path>
+          </g>
+          <g class="kk-kopf">
+            <g fill="#22C55E" stroke="#14532D" stroke-width="3"><circle cx="54" cy="132" r="22"></circle><circle cx="46" cy="160" r="20"></circle><circle cx="58" cy="106" r="18"></circle><circle cx="186" cy="132" r="22"></circle><circle cx="194" cy="160" r="20"></circle><circle cx="182" cy="106" r="18"></circle></g>
+            <ellipse cx="120" cy="152" rx="66" ry="70" fill="#FFF7ED" stroke="#7C2D12" stroke-width="4"></ellipse>
+            <g transform="translate(120 96)"><path d="M-62 4 C-56 -14 56 -14 62 4 C40 -2 -40 -2 -62 4 Z" fill="#111827"></path><rect x="-50" y="-8" width="40" height="22" rx="10" fill="#111827"></rect><rect x="10" y="-8" width="40" height="22" rx="10" fill="#111827"></rect><path d="M-40 -2 l10 0" stroke="#fff" stroke-width="3" stroke-linecap="round"></path></g>
+            <g class="kk-brauen" fill="none" stroke="#7C2D12" stroke-width="4" stroke-linecap="round"><path d="M80 126 q14 -6 28 0"></path><path d="M132 126 q14 -6 28 0"></path></g>
+            <g class="kk-auge" data-x="96" data-y="146" transform="translate(96 146)"><ellipse rx="13" ry="14" fill="#fff" stroke="#1F2937" stroke-width="3"></ellipse><circle cx="2" cy="3" r="6.5" fill="#1F2937"></circle><path d="M-14 -3 h28 v-12 h-28 Z" fill="#FFF7ED"></path><path d="M-14 -3 h28" stroke="#7C2D12" stroke-width="3"></path></g>
+            <g class="kk-auge" data-x="144" data-y="146" transform="translate(144 146)"><ellipse rx="13" ry="14" fill="#fff" stroke="#1F2937" stroke-width="3"></ellipse><circle cx="-2" cy="3" r="6.5" fill="#1F2937"></circle><path d="M-14 -3 h28 v-12 h-28 Z" fill="#FFF7ED"></path><path d="M-14 -3 h28" stroke="#7C2D12" stroke-width="3"></path></g>
+            <path d="M80 190 C96 214 144 214 160 190" fill="#FCA5A5" stroke="#B91C1C" stroke-width="3" opacity=".7"></path>
+            <g class="kk-mund" transform="translate(120 200)"><ellipse class="kk-mund-innen" rx="22" ry="5" fill="#7F1D1D" stroke="#B91C1C" stroke-width="3"></ellipse><ellipse class="kk-zunge" cx="0" cy="3" rx="10" ry="3" fill="#FB7185"></ellipse></g>
+            <circle cx="120" cy="172" r="15" fill="#EF4444" stroke="#991B1B" stroke-width="3"></circle><circle cx="115" cy="167" r="4" fill="#fff" opacity=".8"></circle>
+          </g>
+          
+        </svg>
