@@ -1,6 +1,6 @@
-// Funkels Zauberspiegel: hält Seite, Stimmen-Datei und Funkel in 3D für unterwegs ohne Empfang bereit.
-var CACHE='zauberspiegel-v1';
-var DATEIEN=['./','./index.html','./funkel-stimme.json','./funkel3d.js','./three.module.min.js'];
+// Funkels Zauberspiegel (Original, original.html): hält Seite, Stimmen-Datei und Funkel in 3D für unterwegs ohne Empfang bereit.
+var CACHE='zauberspiegel-v2';
+var DATEIEN=['./','./index.html','./original.html','./funkel-stimme.json','./funkel3d.js','./three.module.min.js'];
 self.addEventListener('install', function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){
     return Promise.all(DATEIEN.map(function(u){ return c.add(u)['catch'](function(){}); }));
@@ -12,9 +12,9 @@ self.addEventListener('activate', function(e){
 self.addEventListener('fetch', function(e){
   var url=new URL(e.request.url);
   if(e.request.method!=='GET' || url.origin!==location.origin) return;
-  var seite = url.pathname.endsWith('/') || url.pathname.endsWith('index.html');
+  var seite = url.pathname.endsWith('/') || url.pathname.endsWith('index.html') || url.pathname.endsWith('original.html');
   if(seite){                                   // Seite: erst Netz (neue Fassung), sonst Vorrat
-    e.respondWith(fetch(e.request).then(function(r){ var k=r.clone(); caches.open(CACHE).then(function(c){ c.put('./index.html', k); }); return r; })['catch'](function(){ return caches.match('./index.html'); }));
+    e.respondWith(fetch(e.request).then(function(r){ var k=r.clone(); caches.open(CACHE).then(function(c){ c.put(e.request, k); }); return r; })['catch'](function(){ return caches.match(e.request, {ignoreSearch:true}); }));
   } else if(url.pathname.endsWith('funkel-stimme.json')){   // Stimmen: erst Netz (neue Stimmen), nach 5 s oder ohne Empfang Vorrat
     e.respondWith(caches.open(CACHE).then(function(c){
       var netz=fetch(e.request).then(function(r){ if(r.ok) c.put('./funkel-stimme.json', r.clone()); return r; });

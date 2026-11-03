@@ -7,7 +7,8 @@ Stand: 2. November 2026 (nach PR #42). Das Konzept zum Ablauf für Eltern liegt 
 Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzeljagden mit sprechendem Zauberspiegel (Tablet). Zielgruppe sind Eltern, die einen Kindergeburtstag organisieren. Später sollen Abenteuer verkauft werden, Utensilien laufen über Partnerlinks und Boxen.
 
 - Live: <https://dafelix1888.github.io/einhorn/app/> (GitHub Pages, Repo `dafelix1888/einhorn`, öffentlich)
-- Original vom Geburtstag: `/index.html`, verschlüsselt mit dem Zauberwort (GitHub-Secret `ZAUBERWORT`). Es bleibt unverändert.
+- Die Startadresse <https://dafelix1888.github.io/einhorn/> leitet zur App weiter; alte Links auf `#tour` landen direkt im Spiel.
+- Original vom Geburtstag: `/original.html`, verschlüsselt mit dem Zauberwort (GitHub-Secret `ZAUBERWORT`). Inhalt unverändert, nur umbenannt.
 
 ## Was fertig ist (PR #31 bis #42)
 
@@ -67,5 +68,5 @@ Punkte mit dem Handy gesetzt, gespielt mit dem iPad: Stationen öffneten mal zu 
 - Texte in der App auf Deutsch, kurz und ohne Fachwörter. Kein echter Ort oder Name aus Felix' Umfeld im öffentlichen Repo.
 - Änderungen per Branch und Pull Request, Felix möchte, dass PRs direkt in `main` gemergt werden.
 - `app/spiel.html` wurde einmalig aus dem entschlüsselten Original erzeugt und wird jetzt direkt bearbeitet.
-- Die Stimmen-Action läuft bei Änderungen an `index.html` oder `stimmen/**` und teilt danach die Pakete neu auf. Geänderte Story-Texte kosten ElevenLabs-Credits.
+- Die Stimmen-Action läuft bei Änderungen an `original.html` oder `stimmen/**` und teilt danach die Pakete neu auf. Geänderte Story-Texte kosten ElevenLabs-Credits.
 - Testen: lokal `python3 -m http.server` im Repo, dann Playwright. Für den Planer liefern nachgebaute Overpass-, Nominatim- und Open-Meteo-Antworten die Daten, weil diese Dienste aus der Testumgebung oft nicht erreichbar sind.
