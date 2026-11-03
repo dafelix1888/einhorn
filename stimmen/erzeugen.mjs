@@ -1,5 +1,5 @@
 // Erzeugt funkel-stimme.json mit ElevenLabs-Stimmen.
-// Liest die Sätze direkt aus der verschlüsselten index.html (Zauberwort als Umgebungsvariable),
+// Liest die Sätze direkt aus der verschlüsselten original.html (Zauberwort als Umgebungsvariable),
 // verteilt sie nach stimmen/rollen.json auf die Figuren und erzeugt nur geänderte Sätze neu.
 //
 //   ZAUBERWORT=… ELEVENLABS_API_KEY=… node stimmen/erzeugen.mjs
@@ -21,16 +21,16 @@ function fehler(t) { console.error('Fehler: ' + t); if (process.env.GITHUB_ACTIO
 const b = (s) => Buffer.from(s, 'base64');
 
 // 1) App entschlüsseln
-const huelle = readFileSync(WURZEL + 'index.html', 'utf8');
+const huelle = readFileSync(WURZEL + 'original.html', 'utf8');
 const zeile = huelle.split('\n').find((z) => z.includes('var D={'));
-if (!zeile) fehler('Verschlüsselter Block in index.html nicht gefunden.');
+if (!zeile) fehler('Verschlüsselter Block in original.html nicht gefunden.');
 const D = JSON.parse(zeile.slice(zeile.indexOf('{'), zeile.lastIndexOf('}') + 1));
 const { subtle } = webcrypto;
 const roh = await subtle.importKey('raw', new TextEncoder().encode(zauberwort), 'PBKDF2', false, ['deriveKey']);
 const key = await subtle.deriveKey({ name: 'PBKDF2', salt: b(D.s), iterations: D.n, hash: 'SHA-256' }, roh, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
 let app;
 try { app = new TextDecoder().decode(await subtle.decrypt({ name: 'AES-GCM', iv: b(D.i) }, key, b(D.c))); }
-catch { fehler('Das Zauberwort passt nicht zu index.html.'); }
+catch { fehler('Das Zauberwort passt nicht zu original.html.'); }
 
 // 2) Sätze genau so ermitteln wie die App selbst (STATIONS, T_…, texte())
 function stueck(von, bis) {

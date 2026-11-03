@@ -2,7 +2,7 @@
 
 Das Repo enthält zwei Fassungen:
 
-- **`/` (index.html)**: das Original, „Funkels Zauberspiegel“ für den Geburtstag. Es ist verschlüsselt und bleibt unverändert.
+- **`/original.html`**: das Original, „Funkels Zauberspiegel“ für den Geburtstag. Es ist verschlüsselt und bleibt unverändert. `/index.html` leitet zur neuen App weiter.
 - **`/app/`**: die generische Fassung für jeden Ort: <https://dafelix1888.github.io/einhorn/app/>
 
 ## Aufbau von `/app/`

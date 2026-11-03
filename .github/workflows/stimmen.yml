@@ -4,7 +4,7 @@ name: Stimmen erzeugen
 on:
   push:
     branches: [main]
-    paths: ['index.html', 'stimmen/**', '.github/workflows/stimmen.yml']
+    paths: ['original.html', 'stimmen/**', '.github/workflows/stimmen.yml']
   workflow_dispatch:
 
 permissions:
