@@ -22,7 +22,8 @@
    "farbe": "#7C5BD6",
    "hoerprobe": "themen/einhorn/hoerprobe.mp3",
    "preis": "Kostenlos",
-   "tour": "themen/einhorn/tour.json"
+   "tour": "themen/einhorn/tour.json",
+   "heldBild": "themen/einhorn/figuren/funkel.svg"
   },
   {
    "id": "piraten",
@@ -43,7 +44,8 @@
    "minuten": 60,
    "stationen": 7,
    "cover": "themen/bald/piraten.svg",
-   "farbe": "#0E7490"
+   "farbe": "#0E7490",
+   "heldBild": "themen/bald/figuren/kapitaen.svg"
   },
   {
    "id": "dino",
@@ -63,7 +65,8 @@
    "minuten": 50,
    "stationen": 7,
    "cover": "themen/bald/dino.svg",
-   "farbe": "#4D7C0F"
+   "farbe": "#4D7C0F",
+   "heldBild": "themen/bald/figuren/professorin.svg"
   },
   {
    "id": "weltraum",
@@ -83,7 +86,8 @@
    "minuten": 60,
    "stationen": 6,
    "cover": "themen/bald/weltraum.svg",
-   "farbe": "#3730A3"
+   "farbe": "#3730A3",
+   "heldBild": "themen/bald/figuren/robo.svg"
   },
   {
    "id": "detektiv",
@@ -103,7 +107,8 @@
    "minuten": 55,
    "stationen": 7,
    "cover": "themen/bald/detektiv.svg",
-   "farbe": "#B45309"
+   "farbe": "#B45309",
+   "heldBild": "themen/bald/figuren/kommissarin.svg"
   },
   {
    "id": "feen",
@@ -122,7 +127,8 @@
    "minuten": 40,
    "stationen": 6,
    "cover": "themen/bald/feen.svg",
-   "farbe": "#0F766E"
+   "farbe": "#0F766E",
+   "heldBild": "themen/bald/figuren/fee.svg"
   },
   {
    "id": "ritter",
@@ -143,7 +149,8 @@
    "minuten": 55,
    "stationen": 7,
    "cover": "themen/bald/ritter.svg",
-   "farbe": "#9F1239"
+   "farbe": "#9F1239",
+   "heldBild": "themen/bald/figuren/drache.svg"
   }
  ]
 }

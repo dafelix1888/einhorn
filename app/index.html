@@ -103,7 +103,9 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
 .folgen .zeit{color:var(--leise);font-size:.88rem;white-space:nowrap}
 .figuren{display:flex;gap:18px;overflow-x:auto;padding-bottom:8px}
 .figur{flex:0 0 150px;text-align:center}
-.figur .kreis{width:130px;height:130px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;font-size:3rem;font-weight:800;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.figur .kreis{width:130px;height:130px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;font-size:3rem;font-weight:800;box-shadow:0 8px 24px rgba(0,0,0,.4);background:radial-gradient(circle at 50% 35%,#3A2F4F,#231C30);overflow:hidden;transition:transform .2s}
+.figur .kreis img{width:100%;height:100%;object-fit:cover;display:block}
+.figur:hover .kreis{transform:scale(1.04)}
 .figur b{display:block;font-size:.98rem}
 .figur span{color:var(--leise);font-size:.85rem}
 /* Charaktere */
@@ -111,7 +113,9 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
 .fig-link{flex:0 0 100px;text-align:center;text-decoration:none;border-radius:12px;padding:6px 2px}
 .fig-link:hover{background:var(--karte)}
 .fig-bild{width:84px;height:84px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-size:2rem;font-weight:800;color:#fff;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.4)}
-.fig-bild img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.4);transform-origin:50% 72%}   /* Cover ohne Titel: auf die Figur zoomen */
+.fig-bild{background:radial-gradient(circle at 50% 35%,#3A2F4F,#231C30)!important}
+.fig-bild img{width:100%;height:100%;object-fit:cover;display:block}
+.fig-bild img.cover{transform:scale(1.4);transform-origin:50% 72%}   /* nur Cover ohne eigenes Bild: auf die Figur zoomen */
 .fig-link b{display:block;font-size:.9rem;font-weight:600;line-height:1.2}
 .fig-link span{display:block;color:var(--leise);font-size:.78rem}
 .zeile .fig-bild{display:grid;width:48px;height:48px;margin:0;font-size:1.2rem;flex:0 0 auto;box-shadow:none}
@@ -238,18 +242,18 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   function figuren(){
     var m={}, l=[];
     THEMEN.forEach(function(t){
-      var fl=TOUR[t.id] ? TOUR[t.id].figuren : [{id:slug(t.held), name:t.held, rolle:'Hauptfigur'}];
+      var fl=TOUR[t.id] ? TOUR[t.id].figuren : [{id:slug(t.held), name:t.held, rolle:'Hauptfigur', bild:t.heldBild}];
       fl.forEach(function(f, i){
         var id=f.id||slug(f.name), x=m[id];
-        if(!x){ x=m[id]={id:id, name:f.name, rolle:f.rolle, text:f.text||'', themen:[], haupt:false, farbe:FIG_FARBEN[l.length%FIG_FARBEN.length]}; l.push(x); }
+        if(!x){ x=m[id]={id:id, name:f.name, rolle:f.rolle, text:f.text||'', themen:[], haupt:false, farbe:FIG_FARBEN[l.length%FIG_FARBEN.length], bild:f.bild||null}; l.push(x); }
         if(x.themen.indexOf(t)<0) x.themen.push(t);
-        if(f.rolle==='Hauptfigur' || i===0 && !TOUR[t.id]){ x.haupt=true; x.bild=t.cover; }
+        if(f.rolle==='Hauptfigur' || i===0 && !TOUR[t.id]){ x.haupt=true; if(!x.bild){ x.bild=t.cover; x.cover=true; } }
       });
     });
     return l.sort(function(a,b){ return (b.haupt-a.haupt) || (verfuegbar(b.themen[0])-verfuegbar(a.themen[0])); });
   }
   function figur(id){ return figuren().filter(function(f){ return f.id===id; })[0]; }
-  function figBild(f){ return '<span class="fig-bild" style="background:'+f.farbe+'">'+(f.bild?'<img src="'+f.bild+'" alt="">':'<span aria-hidden="true">'+esc(f.name.replace(/^(Professor|Der|Die)\s+/,'').charAt(0))+'</span>')+'</span>'; }
+  function figBild(f){ return '<span class="fig-bild" style="background:'+f.farbe+'">'+(f.bild?'<img src="'+f.bild+'" alt=""'+(f.cover?' class="cover"':'')+'>':'<span aria-hidden="true">'+esc(f.name.replace(/^(Professor|Der|Die)\s+/,'').charAt(0))+'</span>')+'</span>'; }
   function figurReihe(l){ return '<div class="figurreihe">'+l.map(function(f){ return '<a class="fig-link" href="#/figur/'+f.id+'">'+figBild(f)+'<b>'+esc(f.name.replace(/,.*$/,''))+'</b><span>'+esc(f.haupt?'Hauptfigur':f.rolle.replace(/\s*\(.*\)$/,''))+'</span></a>'; }).join('')+'</div>'; }
 
   // ---------- Bibliothek links ----------
@@ -398,8 +402,8 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
         return '<li><span class="nr" style="background:'+FIG_FARBEN[i%FIG_FARBEN.length]+'">'+(i+1)+'</span><div><b>'+esc(titel)+'</b><span>'+esc(ort)+'</span></div><span class="zeit">ab Min. '+plan0[i]+'</span></li>';
       }).join('')+'</ol></section>';
       h+='<section class="abschnitt-d"><h2>Figuren</h2><div class="figuren">'+tour.figuren.map(function(f,i){
-        var bild=f.id==='funkel'?'<img src="'+t.cover+'" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">':esc(f.name.replace(/^(Professor|Der|Die)\s+/,'').charAt(0));
-        return '<a class="figur" style="text-decoration:none" href="#/figur/'+(f.id||slug(f.name))+'"><div class="kreis" style="background:'+FIG_FARBEN[i%FIG_FARBEN.length]+';overflow:hidden">'+bild+'</div><b>'+esc(f.name)+'</b><span>'+esc(f.rolle)+'</span></a>';
+        var bild=f.bild?'<img src="'+esc(f.bild)+'" alt="">':esc(f.name.replace(/^(Professor|Der|Die)\s+/,'').charAt(0));
+        return '<a class="figur" style="text-decoration:none" href="#/figur/'+(f.id||slug(f.name))+'"><div class="kreis">'+bild+'</div><b>'+esc(f.name)+'</b><span>'+esc(f.rolle)+'</span></a>';
       }).join('')+'</div></section>';
       h+='<section class="abschnitt-d"><h2>Was die Kinder bekommen</h2><div class="ausruestung">'+tour.gaben.map(function(g){
         return '<div class="ding"><div><b>'+esc(g.was)+'</b><span>'+esc(g.art)+' · '+esc(g.i==='start'?'beim Ankommen':g.i==='ende'?'am Ende':'Station '+(g.i+1))+'</span></div></div>';

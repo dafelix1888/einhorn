@@ -1,0 +1,19 @@
+<svg viewBox="0 0 240 300" data-figur="dagobert" xmlns="http://www.w3.org/2000/svg">
+          <g class="kk-koerper">
+            <path d="M46 300 C48 250 78 224 120 222 C162 224 192 250 194 300 Z" fill="#6B7280" stroke="#1F2937" stroke-width="4"></path>
+            <ellipse cx="120" cy="284" rx="40" ry="30" fill="#E5E7EB"></ellipse>
+          </g>
+          <g class="kk-kopf">
+            <g fill="#6B7280" stroke="#1F2937" stroke-width="4"><circle cx="64" cy="98" r="20"></circle><circle cx="176" cy="98" r="20"></circle></g>
+            <path d="M120 82 C170 82 196 120 192 156 C188 196 152 226 120 226 C88 226 52 196 48 156 C44 120 70 82 120 82 Z" fill="#9CA3AF" stroke="#1F2937" stroke-width="4"></path>
+            <path d="M120 84 C134 84 142 120 140 150 L138 200 C134 212 106 212 102 200 L100 150 C98 120 106 84 120 84 Z" fill="#F9FAFB"></path>
+            <path d="M84 96 C70 120 72 150 88 176 L104 168 C100 140 100 116 104 94 Z" fill="#111827"></path><path d="M156 96 C170 120 168 150 152 176 L136 168 C140 140 140 116 136 94 Z" fill="#111827"></path>
+            <ellipse cx="146" cy="84" rx="14" ry="9" fill="#F9A8D4" stroke="#BE185D" stroke-width="2.5" class="kk-beule"></ellipse>
+            <g class="kk-brauen" fill="none" stroke="#F9FAFB" stroke-width="4" stroke-linecap="round"><path d="M80 122 q12 -10 24 -2"></path><path d="M160 120 q-12 -6 -24 4"></path></g>
+            <g class="kk-auge" data-x="98" data-y="146" transform="translate(98 146)"><ellipse rx="14" ry="16" fill="#fff" stroke="#1F2937" stroke-width="3"></ellipse><circle cx="6" cy="4" r="7" fill="#1F2937"></circle><circle cx="4" cy="1" r="2.5" fill="#fff"></circle></g>
+            <g class="kk-auge" data-x="142" data-y="146" transform="translate(142 146)"><ellipse rx="14" ry="16" fill="#fff" stroke="#1F2937" stroke-width="3"></ellipse><circle cx="-6" cy="4" r="7" fill="#1F2937"></circle><circle cx="-8" cy="1" r="2.5" fill="#fff"></circle></g>
+            <ellipse cx="120" cy="180" rx="13" ry="9" fill="#1F2937"></ellipse><ellipse cx="115" cy="177" rx="4" ry="2.5" fill="#fff" opacity=".6"></ellipse>
+            <g class="kk-mund" transform="translate(120 202)"><ellipse class="kk-mund-innen" rx="16" ry="4" fill="#4A1D2A" stroke="#1F2937" stroke-width="2.5"></ellipse><ellipse class="kk-zunge" cx="6" cy="6" rx="8" ry="5" fill="#FB7185" stroke="#BE185D" stroke-width="2"></ellipse></g>
+          </g>
+          
+        </svg>

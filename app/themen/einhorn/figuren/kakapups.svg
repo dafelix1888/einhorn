@@ -1,0 +1,54 @@
+<svg viewBox="0 0 240 300" data-figur="kakapups" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="kk-braun" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#C07A3E"></stop><stop offset=".55" stop-color="#9A5B2C"></stop><stop offset="1" stop-color="#7A4420"></stop></radialGradient>
+            <linearGradient id="kk-kittel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#E6E1F0"></stop></linearGradient>
+            <radialGradient id="kk-wolke" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#C9E36B" stop-opacity=".95"></stop><stop offset="1" stop-color="#9BC23A" stop-opacity=".55"></stop></radialGradient>
+          </defs>
+          
+          <g class="kk-koerper">
+            <path d="M48 300 C50 252 70 222 120 218 C170 222 190 252 192 300 Z" fill="url(#kk-kittel)" stroke="#4E22A0" stroke-width="4" stroke-linejoin="round"></path>
+            <path d="M96 222 L120 268 L144 222" fill="none" stroke="#4E22A0" stroke-width="3.5" stroke-linejoin="round"></path>
+            <path d="M108 226 L120 250 L132 226 Z" fill="#7C5CC4"></path>
+            <circle cx="120" cy="278" r="4" fill="#4E22A0"></circle><circle cx="120" cy="294" r="4" fill="#4E22A0"></circle>
+            <rect x="146" y="258" width="26" height="22" rx="4" fill="#fff" stroke="#4E22A0" stroke-width="3"></rect>
+            <rect x="151" y="244" width="5" height="20" rx="2" fill="#3B82F6"></rect><rect x="160" y="248" width="5" height="16" rx="2" fill="#E5484D"></rect>
+          </g>
+          <g class="kk-kopf">
+            <g class="kk-haare" fill="#D5D8DE" stroke="#8A8F98" stroke-width="3" stroke-linejoin="round">
+              <path d="M62 150 l-26 -18 l18 -2 l-22 -22 l24 6 l-10 -24 l26 20 Z"></path>
+              <path d="M178 150 l26 -18 l-18 -2 l22 -22 l-24 6 l10 -24 l-26 20 Z"></path>
+              <path d="M84 112 l-14 -26 l16 8 l-2 -24 l16 22 Z"></path>
+              <path d="M156 112 l14 -26 l-16 8 l2 -24 l-16 22 Z"></path>
+            </g>
+            <g class="kk-haufen-kopf" stroke="#5A3215" stroke-width="4" stroke-linejoin="round">
+              <path d="M120 66 C128 70 140 74 138 88 C150 92 162 100 160 116 L80 116 C78 100 92 92 104 90 C102 78 110 70 120 66 Z" fill="url(#kk-braun)"></path>
+              <path d="M74 114 C64 120 58 134 62 148 L178 148 C182 134 176 120 166 114 C150 108 90 108 74 114 Z" fill="url(#kk-braun)"></path>
+              <path d="M58 146 C40 152 34 172 42 190 C52 214 90 222 120 222 C150 222 188 214 198 190 C206 172 200 152 182 146 C160 140 80 140 58 146 Z" fill="url(#kk-braun)"></path>
+              <path d="M92 84 q10 -8 22 -4 M86 124 q16 -8 34 -6 M70 160 q20 -8 40 -6" fill="none" stroke="#D99A5E" stroke-width="5" stroke-linecap="round" opacity=".7"></path>
+            </g>
+            <g class="kk-brauen" fill="#E2E4E8" stroke="#8A8F98" stroke-width="2.5">
+              <path class="kk-braue-l" d="M74 124 q12 -14 34 -6 q-4 8 -12 6 q-10 -4 -22 0 Z"></path>
+              <path class="kk-braue-r" d="M166 124 q-12 -14 -34 -6 q4 8 12 6 q10 -4 22 0 Z"></path>
+            </g>
+            <g class="kk-augen">
+              <g class="kk-auge" data-x="96" data-y="152" transform="translate(96 152)"><ellipse rx="17" ry="20" fill="#fff" stroke="#2A1B4D" stroke-width="3"></ellipse><ellipse class="kk-pupille" cx="3" cy="3" rx="8" ry="10" fill="#2A1B4D"></ellipse><circle cx="0" cy="-2" r="3.2" fill="#fff"></circle></g>
+              <g class="kk-auge" data-x="144" data-y="152" transform="translate(144 152)"><ellipse rx="17" ry="20" fill="#fff" stroke="#2A1B4D" stroke-width="3"></ellipse><ellipse class="kk-pupille" cx="-3" cy="3" rx="8" ry="10" fill="#2A1B4D"></ellipse><circle cx="-6" cy="-2" r="3.2" fill="#fff"></circle></g>
+            </g>
+            <g class="kk-brille" fill="none" stroke="#6B7280" stroke-width="3.5">
+              <circle cx="96" cy="152" r="24"></circle><circle cx="144" cy="152" r="24"></circle><path d="M120 150 q0 -6 0 0"></path><path d="M118 148 q2 -5 4 0" stroke-width="4"></path>
+              <path d="M72 148 l-12 -4 M168 148 l12 -4"></path>
+              <path d="M84 138 q6 -6 12 -6" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"></path>
+            </g>
+            <g class="kk-bart" fill="#E9EBEF" stroke="#8A8F98" stroke-width="3" stroke-linejoin="round">
+              <path d="M70 196 C66 218 80 232 92 234 C94 248 108 256 120 252 C132 256 146 248 148 234 C160 232 174 218 170 196 C150 210 90 210 70 196 Z"></path>
+            </g>
+            <g class="kk-mund" transform="translate(120 198)">
+              <ellipse class="kk-mund-innen" rx="17" ry="4" fill="#3B1A0A" stroke="#5A3215" stroke-width="2.5"></ellipse>
+              <ellipse class="kk-zunge" cx="0" cy="3" rx="9" ry="3" fill="#FF7AA8"></ellipse>
+            </g>
+            <g class="kk-schnurrbart" fill="#E9EBEF" stroke="#8A8F98" stroke-width="3" stroke-linejoin="round">
+              <path d="M120 186 C110 178 92 178 84 188 C80 194 86 200 92 196 C100 190 110 192 120 194 C130 192 140 190 148 196 C154 200 160 194 156 188 C148 178 130 178 120 186 Z"></path>
+            </g>
+          </g>
+          
+        </svg>
