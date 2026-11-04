@@ -44,7 +44,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 5. **Anpassen mit Leitplanken:** Prompt-Eingabe, KI schätzt Umfang und ändert Sätze, Eltern prüfen die Änderungen, dann Vertonung. Braucht Server und Bezahlung.
 6. ~~Planer und Spiel im dunklen Stil~~ erledigt in PR #41. Offen: echter Test auf iPad und Handy (dunkle OSM-Karte mit echten Kacheln, Ziehen per Touch).
 7. **Zweites Thema**, damit die Engine wirklich generisch ist: Bilder (`PIC`), Regenbogen-Fortschritt und Farben stecken noch in `spiel.html` und müssen ins Thema wandern.
-8. **Partnerlinks** in `tour.json` → `utensilien[].link` eintragen (Partner-ID von Felix nötig).
+8. **Partnerlinks:** 8 von 12 Utensilien haben Amazon-Links (`utensilien[].link`, noch ohne Partner-ID). Offen: Partner-ID anhängen (`?tag=…`), Links für Zeichenschablonen, Fuchs-Kuscheltier, Straßenkreide (Schuhkarton braucht keinen).
 
 ## Erfahrung vom Geburtstag: GPS
 
