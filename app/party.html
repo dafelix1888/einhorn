@@ -29,6 +29,10 @@
 .ding input{width:24px;height:24px;accent-color:var(--gruen)}
 .ding .menge{font-weight:800;color:var(--akzent)}
 .ding span{color:var(--leise);font-size:.88rem}
+.ding.fertig label{opacity:.6}
+.punkt-ok{width:22px;height:22px;border-radius:50%;background:var(--gruen);display:block}
+.erledigt-liste{margin-top:8px}
+.erledigt-liste summary{cursor:pointer;color:var(--leise);font-weight:700;padding:10px 0;min-height:44px;display:flex;align-items:center}
 .planb{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .werkzeuge{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .werkzeuge .knopf{width:100%}
@@ -155,20 +159,42 @@
   }
 
   // ---------- Einkauf: Preis je Artikel und Summe ----------
+  function einkaufZeile(x){
+    var box = x.fertig ? '<span class="punkt-ok" aria-hidden="true"></span>'
+      : x.lieferbar && Party.imKorb ? '<input type="checkbox" id="k-'+x.id+'" data-waehle="'+x.id+'"'+(x.gewaehlt?' checked':'')+' aria-label="'+esc(x.name)+' für den Warenkorb auswählen">'
+      : '<span></span>';
+    var knopf = x.fertig ? '<button type="button" class="textknopf" data-kauf-zurueck="'+x.id+'">Wieder offen</button>'
+      : '<span style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'+(x.link?'<a class="knopf klein leer" href="'+esc(x.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'')+'<button type="button" class="textknopf" data-kauf="'+x.id+'">'+(x.zuHause?'Hab ich':'Hab ich schon')+'</button></span>';
+    return '<div class="ding'+(x.fertig?' fertig':'')+'">'+box+'<label'+(x.lieferbar&&!x.fertig?' for="k-'+x.id+'"':'')+' style="margin:0;font-weight:400"><span class="menge">'+x.menge+'×</span> '+esc(x.name)+'<br><span>'+esc(x.wann)+(x.hinweis?' · '+esc(x.hinweis):'')+'</span><br><span>'+preisText(x)+'</span></label>'+knopf+'</div>';
+  }
   function preisText(x){
     if(x.zuHause) return 'Hat man meist zu Hause';
     if(!x.asin) return '';
-    if(x.preis==null || x.summe==null) return x.preis==null ? 'Gerade nicht lieferbar' : '';
+    if(x.preis==null || x.summe==null) return x.preis==null ? '<b style="color:#F59E0B">Nicht gefunden: gerade nicht lieferbar</b>' : '';
     return (x.packungen>1?x.packungen+' Packungen':'1 Packung')+(x.packung>1?' à '+x.packung+' Stück':'')+' · <b class="preis">'+Party.euro(x.summe)+'</b>';
   }
+  function suchLink(x){ return 'https://www.amazon.de/s?k='+encodeURIComponent(x.name.replace(/\s*\(.*\)/,'')); }
   function einkaufKopf(ek){
-    if(!Party.einkaufSumme) return '';   // ältere party.js aus dem Zwischenspeicher: Liste ohne Summe zeigen
-    var summe=Party.einkaufSumme(ek), link=Party.warenkorbLink(ek), weg=ek.filter(function(x){ return !x.fertig && x.asin && x.preis==null; });
-    if(!link) return '';
-    return '<div class="summe-box"><div><span class="leise" style="font-size:.85rem">Noch zu kaufen, ca.</span><span class="betrag">'+Party.euro(summe)+'</span>'+
-      '<small>Amazon-Preise vom '+new Date(tour.preisStand).toLocaleDateString('de-DE')+', ohne Versand. Können sich ändern.'+(weg.length?' Nicht dabei: '+esc(weg.map(function(x){ return x.name; }).join(', '))+' (gerade nicht lieferbar).':'')+'</small></div>'+
-      '<a class="knopf mittel" href="'+esc(link)+'" target="_blank" rel="sponsored noopener">Alles in den Warenkorb</a></div>';
+    if(!Party.imKorb) return '';   // ältere party.js aus dem Zwischenspeicher: Liste ohne Summe zeigen
+    var w=ek.filter(Party.imKorb), waehlbar=ek.filter(function(x){ return !x.fertig && x.lieferbar; }), link=Party.warenkorbLink(ek),
+        weg=ek.filter(function(x){ return !x.fertig && x.asin && !x.lieferbar; }), h='';
+    if(party.korbGeoeffnet && party.korbGeoeffnet.length){   // zurück von Amazon: bestellt?
+      h+='<div class="karte" style="margin-bottom:10px"><b>Bei Amazon bestellt?</b><br><span class="leise">'+party.korbGeoeffnet.length+' Artikel waren im Warenkorb.</span><div class="reihe" style="margin-top:10px"><button type="button" class="knopf mittel" id="korb-ja">Ja, abhaken</button><button type="button" class="knopf mittel leer" id="korb-nein">Noch nicht</button></div></div>';
+    }
+    if(waehlbar.length){
+      h+='<div class="summe-box"><div><span class="leise" style="font-size:.85rem">'+w.length+' von '+waehlbar.length+' Artikeln ausgewählt, ca.</span><span class="betrag">'+Party.euro(Party.einkaufSumme(ek))+'</span>'+
+        '<small>Amazon-Preise vom '+new Date(tour.preisStand).toLocaleDateString('de-DE')+', ohne Versand. Amazon fragt nach der Anmeldung und zeigt die Artikel noch einmal zum Bestätigen.</small></div>'+
+        '<div class="reihe"><button type="button" class="knopf mittel leer" id="alle-waehlen">'+(w.length===waehlbar.length?'Keine auswählen':'Alle auswählen')+'</button>'+
+        (link?'<a class="knopf mittel" id="in-korb" href="'+esc(link)+'" target="_blank" rel="sponsored noopener">'+w.length+' Artikel in den Warenkorb</a>':'<span class="knopf mittel still" aria-disabled="true">Nichts ausgewählt</span>')+'</div></div>';
+    }
+    if(weg.length){
+      h+='<div class="karte" style="border:2px solid #B45309;margin-bottom:10px"><b>Nicht gefunden</b><br><span class="leise">'+esc(weg.map(function(x){ return x.name; }).join(', '))+' '+(weg.length>1?'sind':'ist')+' bei Amazon gerade nicht lieferbar und kommt nicht in den Warenkorb.</span>'+
+        '<div class="reihe" style="margin-top:10px">'+weg.map(function(x){ return '<a class="knopf klein leer" href="'+esc(suchLink(x))+'" target="_blank" rel="noopener">Ähnliche suchen: '+esc(x.name.replace(/\s*\(.*\)/,''))+'</a>'; }).join('')+'</div></div>';
+    }
+    return h;
   }
+
+  function einkaufNeu(){ party=Party.speichern(party); var y=window.scrollY; uebersicht(); window.scrollTo(0,y); }
 
   // ---------- Party-Übersicht ----------
   function hauptKnopf(a){
@@ -224,7 +250,8 @@
     }
     var ek=Party.einkauf(p, tour), offen=ek.filter(function(x){ return !x.fertig; }).length;
     h+='<h2 id="einkauf">Einkaufsliste <span class="leise" style="font-size:1rem">· '+(offen?offen+' offen':'alles da')+'</span></h2>'+einkaufKopf(ek)+
-      ek.map(function(x){ return '<div class="ding"><input type="checkbox" id="k-'+x.id+'" data-kauf="'+x.id+'"'+(x.fertig?' checked':'')+'><label for="k-'+x.id+'" style="margin:0;font-weight:400"><span class="menge">'+x.menge+'×</span> '+esc(x.name)+'<br><span>'+esc(x.wann)+(x.hinweis?' · '+esc(x.hinweis):'')+'</span><br><span>'+preisText(x)+'</span></label>'+(x.link?'<a class="knopf klein leer" href="'+esc(x.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'')+'</div>'; }).join('');
+      ek.filter(function(x){ return !x.fertig; }).map(einkaufZeile).join('')+
+      (ek.some(function(x){ return x.fertig; }) ? '<details class="erledigt-liste"><summary>Schon da oder bestellt ('+ek.filter(function(x){ return x.fertig; }).length+')</summary>'+ek.filter(function(x){ return x.fertig; }).map(einkaufZeile).join('')+'</details>' : '');
     h+='<h2>Teilen und Geräte</h2><div class="werkzeuge">'+
       '<button type="button" class="knopf mittel" id="gast-link">Einladungslink teilen</button>'+
       '<a class="knopf leer mittel" href="einladung.html?e='+Party.einladungsLink(party, pl).split('?e=')[1]+'">Einladung ansehen</a>'+
@@ -280,6 +307,16 @@
     if(t.closest('#teilen')){ teilen(linkFuersIpad(), partyTitel(party), 'Link kopiert. Auf dem iPad öffnen.'); return; }
     if(t.closest('#vg-link')){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+partyTitel(party), 'Link kopiert. An den Vorausgeher schicken.'); return; }
     if(t.closest('#gast-link')){ gastLink(); return; }
+    var k=t.closest('[data-kauf],[data-kauf-zurueck]');
+    if(k){ party.einkauf=party.einkauf||{}; if(k.hasAttribute('data-kauf')) party.einkauf[k.getAttribute('data-kauf')]=true; else delete party.einkauf[k.getAttribute('data-kauf-zurueck')]; einkaufNeu(); return; }
+    if(t.closest('#alle-waehlen')){
+      var ek=Party.einkauf(party, tour), alle=ek.filter(Party.imKorb).length===ek.filter(function(x){ return !x.fertig && x.lieferbar; }).length;
+      party.einkaufAus={}; if(alle) ek.forEach(function(x){ if(!x.fertig && x.lieferbar) party.einkaufAus[x.id]=true; });
+      einkaufNeu(); return;
+    }
+    if(t.closest('#in-korb')){ party.korbGeoeffnet=Party.einkauf(party, tour).filter(Party.imKorb).map(function(x){ return x.id; }); party=Party.speichern(party); setTimeout(einkaufNeu, 300); return; }
+    if(t.closest('#korb-ja')){ party.einkauf=party.einkauf||{}; party.korbGeoeffnet.forEach(function(id){ party.einkauf[id]=true; }); party.korbGeoeffnet=null; einkaufNeu(); toast('Abgehakt. Die Artikel stehen unter „Schon da oder bestellt“.'); return; }
+    if(t.closest('#korb-nein')){ party.korbGeoeffnet=null; einkaufNeu(); return; }
     if(t.closest('#loeschen')){ if(confirm('Party wirklich löschen? Route und Checkliste bleiben erhalten.')){ Party.loeschen(thema); party=null; neu(); } return; }
   });
   document.addEventListener('change', function(ev){
@@ -292,7 +329,7 @@
       var s=$('vorein'); if(s) s.querySelector('summary span').textContent=voreinText(entwurf)+'. Alles später änderbar.';
       return;
     }
-    if(t.hasAttribute('data-kauf')){ party.einkauf=party.einkauf||{}; party.einkauf[t.getAttribute('data-kauf')]=t.checked; party=Party.speichern(party); var y=window.scrollY; uebersicht(); window.scrollTo(0,y); }
+    if(t.hasAttribute('data-waehle')){ party.einkaufAus=party.einkaufAus||{}; party.einkaufAus[t.getAttribute('data-waehle')]=!t.checked; einkaufNeu(); }
   });
   document.addEventListener('toggle', function(ev){
     if(ev.target.id!=='vorein') return;
