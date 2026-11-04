@@ -95,15 +95,17 @@
       var m=String(u.menge), n=/je Kind \+ ?(\d+)/.test(m) ? p.kinder+(+RegExp.$1) : /je Kind/.test(m) ? p.kinder : +m||1;
       var id=u.id||'u'+i, packungen=u.asin ? Math.max(1, Math.ceil(n/(u.packung||n))) : 0;
       return {id:id, name:u.name, menge:n, wann:u.wann, link:u.link, asin:u.asin, packung:u.packung, packungen:packungen,
-        preis:u.preis, summe:u.preis!=null ? u.preis*packungen : null, zuHause:!!u.zuHause, hinweis:u.hinweis, fertig:!!(p.einkauf||{})[id]};
+        preis:u.preis, summe:u.preis!=null ? u.preis*packungen : null, zuHause:!!u.zuHause, hinweis:u.hinweis, fertig:!!(p.einkauf||{})[id],
+        lieferbar:!!u.asin && u.preis!=null, gewaehlt:!(p.einkaufAus||{})[id]};
     });
   }
   // Summe der noch offenen Artikel mit bekanntem Preis
-  function einkaufSumme(l){ return l.filter(function(x){ return !x.fertig && x.summe!=null; }).reduce(function(s, x){ return s+x.summe; }, 0); }
+  function imKorb(x){ return !x.fertig && x.lieferbar && x.gewaehlt!==false; }   // offen, lieferbar und ausgewählt
+  function einkaufSumme(l){ return l.filter(imKorb).reduce(function(s, x){ return s+x.summe; }, 0); }
   function euro(b){ return b.toFixed(2).replace('.', ',')+' €'; }
   // Amazon-Formular „In den Einkaufswagen“: alle offenen, lieferbaren Artikel in einem Schritt
   function warenkorbLink(l, tag){
-    var w=l.filter(function(x){ return !x.fertig && x.asin && x.preis!=null; });
+    var w=l.filter(imKorb);
     if(!w.length) return null;
     return 'https://www.amazon.de/gp/aws/cart/add.html?'+w.map(function(x, i){ return 'ASIN.'+(i+1)+'='+x.asin+'&Quantity.'+(i+1)+'='+x.packungen; }).join('&')+(tag?'&AssociateTag='+encodeURIComponent(tag):'');
   }
@@ -157,5 +159,5 @@
     delete o.party; schreib('sj.plan.'+thema, o); return o;
   }
 
-  root.Party={einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, ausLinkUebernehmen:ausLinkUebernehmen};
+  root.Party={imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, ausLinkUebernehmen:ausLinkUebernehmen};
 })(this);
