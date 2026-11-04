@@ -108,6 +108,11 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
 .figur:hover .kreis{transform:scale(1.04)}
 .figur b{display:block;font-size:.98rem}
 .figur span{color:var(--leise);font-size:.85rem}
+/* Einkauf: Summe und Warenkorb */
+.summe-box{background:linear-gradient(130deg,#3B2A64,#1F1929);border-radius:16px;padding:16px;margin:0 0 12px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.summe-box .leise{color:var(--leise)}
+.summe-box .betrag{font-size:1.6rem;font-weight:800;display:block;line-height:1.1}
+.summe-box small{display:block;color:var(--leise);font-size:.82rem;margin-top:4px}
 /* Charaktere */
 .figurreihe{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px}
 .fig-link{flex:0 0 100px;text-align:center;text-decoration:none;border-radius:12px;padding:6px 2px}
@@ -408,9 +413,12 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       h+='<section class="abschnitt-d"><h2>Was die Kinder bekommen</h2><div class="ausruestung">'+tour.gaben.map(function(g){
         return '<div class="ding"><div><b>'+esc(g.was)+'</b><span>'+esc(g.art)+' · '+esc(g.i==='start'?'beim Ankommen':g.i==='ende'?'am Ende':'Station '+(g.i+1))+'</span></div></div>';
       }).join('')+'</div></section>';
-      h+='<section class="abschnitt-d"><h2>Ausrüstung</h2><div class="ausruestung">'+tour.utensilien.map(function(u){
-        var menge=/Kind/.test(String(u.menge))?u.menge:u.menge+'×';
-        return '<div class="ding"><div><b>'+esc(u.name)+'</b><span>'+esc(menge)+' · '+esc(u.wann)+'</span></div>'+(u.link?'<a class="pille" href="'+esc(u.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'<em>Link folgt</em>')+'</div>';
+      var kinderN=(party(id)&&party(id).kinder)||tour.kinder.standard, ek=Party.einkauf({kinder:kinderN, einkauf:{}}, tour), korb=Party.warenkorbLink(ek);
+      h+='<section class="abschnitt-d"><h2>Ausrüstung</h2>'+
+      (korb?'<div class="summe-box" style="max-width:60rem"><div><span class="leise" style="font-size:.85rem">Alles für '+kinderN+' Kinder, ca.</span><span class="betrag">'+Party.euro(Party.einkaufSumme(ek))+'</span><small>Amazon-Preise vom '+new Date(tour.preisStand).toLocaleDateString('de-DE')+', ohne Versand. Können sich ändern.</small></div><a class="voll" href="'+esc(korb)+'" target="_blank" rel="sponsored noopener">Alles in den Warenkorb</a></div>':'')+
+      '<div class="ausruestung">'+ek.map(function(x){
+        var info=x.zuHause?'hat man meist zu Hause':!x.asin?'':x.preis==null?'gerade nicht lieferbar':(x.packungen>1?x.packungen+' Packungen':'1 Packung')+(x.packung>1?' à '+x.packung:'')+' · '+Party.euro(x.summe);
+        return '<div class="ding"><div><b>'+esc(x.name)+'</b><span>'+esc(x.menge+'× · '+x.wann)+(info?' · '+esc(info):'')+'</span></div>'+(x.link?'<a class="pille" href="'+esc(x.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'')+'</div>';
       }).join('')+'</div>'+
       '<div class="paket"><div><b>Alles in einer Box</b><span>Haarreifen, Holz-Regenbogen, Glückssteine, Zaubertafeln und Sticker für '+tour.kinder.standard+' Kinder.</span></div><button class="pille" disabled>Bald im Shop</button></div>'+
       '<p class="hinweis-klein">Links zu Händlern können Partnerlinks sein. Für euch ändert sich am Preis nichts.</p></section>';

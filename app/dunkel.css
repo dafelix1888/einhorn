@@ -65,3 +65,8 @@ input:focus{border-color:var(--akzent);outline:none}
 .heim-link{width:44px;height:44px;border-radius:50%;background:var(--karte);color:var(--text)!important;display:grid;place-items:center;flex:0 0 auto}
 .heim-link:hover{background:var(--hover)}
 .heim-link svg{width:20px;height:20px}
+/* Einkauf: Preise, Summe, Warenkorb */
+.preis{white-space:nowrap;font-weight:700;color:var(--text)}
+.summe-box{background:linear-gradient(130deg,#3B2A64,#1F1929);border-radius:16px;padding:16px;margin:4px 0 10px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.summe-box .betrag{font-size:1.6rem;font-weight:800;display:block;line-height:1.1}
+.summe-box small{display:block;color:var(--leise);font-size:.82rem;margin-top:4px}
