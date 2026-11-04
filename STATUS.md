@@ -44,7 +44,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 5. **Anpassen mit Leitplanken:** Prompt-Eingabe, KI schätzt Umfang und ändert Sätze, Eltern prüfen die Änderungen, dann Vertonung. Braucht Server und Bezahlung.
 6. ~~Planer und Spiel im dunklen Stil~~ erledigt in PR #41. Offen: echter Test auf iPad und Handy (dunkle OSM-Karte mit echten Kacheln, Ziehen per Touch).
 7. **Zweites Thema**, damit die Engine wirklich generisch ist: Bilder (`PIC`), Regenbogen-Fortschritt und Farben stecken noch in `spiel.html` und müssen ins Thema wandern.
-8. **Partnerlinks:** 8 von 12 Utensilien haben Amazon-Links (`utensilien[].link`, noch ohne Partner-ID). Offen: Partner-ID anhängen (`?tag=…`), Links für Zeichenschablonen, Fuchs-Kuscheltier, Straßenkreide (Schuhkarton braucht keinen).
+8. **Partnerlinks und Einkauf:** Alle Utensilien außer dem Schuhkarton (hat man zu Hause) haben Amazon-Links mit `asin`, `packung` und `preis` in `tour.json` (Preise von Hand, Stand `preisStand`). Detailseite und Einkaufsliste zeigen Preis je Artikel, die Summe und „Alles in den Warenkorb“ (Amazon-Formular `gp/aws/cart/add.html`, nur offene und lieferbare Artikel, Packungen nach Kinderzahl). Offen: Partner-ID (`AssociateTag` in `Party.warenkorbLink`, `?tag=` an den Einzellinks), Hinweis „Als Amazon-Partner …“ auf beiden Seiten. Achtung: Mit Partner-ID erlaubt Amazon feste Preise nur aus der Product Advertising API mit Aktualisierung alle 24 Stunden; dafür braucht es dann den Server bzw. Worker.
 
 ## Erfahrung vom Geburtstag: GPS
 

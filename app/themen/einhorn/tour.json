@@ -384,8 +384,8 @@
      "Buntes Band oder Tuch als Markierung für Fridolins Versteck",
      "Sticker in {kinder} Stücke schneiden",
      "Fridolin (Kuscheltier) mit Haarreif aus der Reserve",
-     "Schatzkiste füllen: {kinder} Kratzbilder, {kinder} Zaubertafeln, {kinder} Zeichenschablonen",
-     "Eine Zaubertafel extra für Station 5 (zum gemeinsamen Abmalen)",
+     "Schatzkiste füllen: {kinder} Kratzbilder mit Zeichenschablonen und {kinder} Zaubertafeln",
+     "Eine der Zaubertafeln für Station 5 beiseitelegen (zum gemeinsamen Abmalen), danach einsammeln und am Ende einem Kind in die Tüte legen",
      "{kinder} Glückssteine in eine kleine Tüte, getrennt von den Geschenken"
     ]
    },
@@ -526,7 +526,7 @@
   {
    "i": 4,
    "was": "Eine Zaubertafel für alle",
-   "wie": "Reihum malen sie die Fuchspfote ab, danach kommt die Tafel weg.",
+   "wie": "Reihum malen sie die Fuchspfote ab. Danach einsammeln, am Ende kommt sie einem Kind in die Tüte.",
    "art": "Nur ausleihen"
   },
   {
@@ -538,81 +538,119 @@
   {
    "i": "ende",
    "was": "Schatzkiste",
-   "wie": "Je Kind ein Kratzbild, eine Zaubertafel und eine Zeichenschablone. Verteilt wird nach dem Essen.",
+   "wie": "Je Kind ein Kratzbild mit Zeichenschablone und eine Zaubertafel. Verteilt wird nach dem Essen.",
    "art": "Schatz"
   }
  ],
+ "preisStand": "2026-11-04",
  "utensilien": [
   {
+   "id": "u0",
    "name": "Haarreif mit Einhorn-Horn",
    "menge": "je Kind",
    "wann": "Station 1",
+   "asin": "B0H9Y2JQL3",
+   "packung": 12,
+   "preis": 10.99,
    "link": "https://www.amazon.de/dp/B0H9Y2JQL3"
   },
   {
+   "id": "u1",
    "name": "Kindertattoos (Einhorn)",
    "menge": "je Kind",
    "wann": "Ankommen",
+   "asin": "B09N72FXFG",
+   "packung": 100,
+   "preis": 8.99,
    "link": "https://www.amazon.de/dp/B09N72FXFG"
   },
   {
+   "id": "u2",
    "name": "Holz-Regenbogen mit 10 Bögen (Stapelspielzeug)",
    "menge": 1,
    "wann": "Stationen 1 bis 7",
+   "asin": "B0FCDZ971Q",
+   "packung": 1,
+   "preis": null,
    "link": "https://www.amazon.de/dp/B0FCDZ971Q"
   },
   {
-   "name": "Glückssteine (Halbedelsteine)",
+   "id": "u3",
+   "name": "Glückssteine",
    "menge": "je Kind",
    "wann": "Station 4",
+   "asin": "B0GFGWYRSY",
+   "packung": 12,
+   "preis": 9.99,
    "link": "https://www.amazon.de/dp/B0GFGWYRSY"
   },
   {
+   "id": "u4",
    "name": "Zaubertafel (Magnet-Maltafel)",
-   "menge": "je Kind + 1",
+   "menge": "je Kind",
    "wann": "Station 5 und Schatz",
+   "asin": "B0D7CMTSMQ",
+   "packung": 12,
+   "preis": 13.99,
+   "hinweis": "Eine davon an Station 5 ausleihen, danach einsammeln und am Ende einem Kind in die Tüte legen.",
    "link": "https://www.amazon.de/dp/B0D7CMTSMQ"
   },
   {
-   "name": "Kratzbilder",
+   "id": "u5",
+   "name": "Kratzbilder mit Zeichenschablonen",
    "menge": "je Kind",
    "wann": "Schatz",
+   "asin": "B0HCPT4PGL",
+   "packung": 12,
+   "preis": 14.99,
    "link": "https://www.amazon.de/dp/B0HCPT4PGL"
   },
   {
-   "name": "Zeichenschablonen",
-   "menge": "je Kind",
-   "wann": "Schatz",
-   "link": null
-  },
-  {
-   "name": "Sticker-Bogen",
+   "id": "u7",
+   "name": "Sticker",
    "menge": 1,
    "wann": "Station 7",
+   "asin": "B0G6JQLVK8",
+   "packung": 1000,
+   "preis": 4.99,
    "link": "https://www.amazon.de/dp/B0G6JQLVK8"
   },
   {
+   "id": "u8",
    "name": "Fuchs-Kuscheltier",
    "menge": 1,
    "wann": "Station 7",
-   "link": null
+   "asin": "B0D1G4K9D9",
+   "packung": 1,
+   "preis": 11.99,
+   "link": "https://www.amazon.de/dp/B0D1G4K9D9"
   },
   {
+   "id": "u9",
    "name": "Seil",
    "menge": 1,
    "wann": "Station 3",
+   "asin": "B0C17QJRY8",
+   "packung": 1,
+   "preis": 7.99,
    "link": "https://www.amazon.de/dp/B0C17QJRY8"
   },
   {
+   "id": "u10",
    "name": "Straßenkreide",
    "menge": 1,
    "wann": "Kreidespur",
-   "link": null
+   "asin": "B09RSTN3PR",
+   "packung": 20,
+   "preis": 3.99,
+   "link": "https://www.amazon.de/dp/B09RSTN3PR"
   },
   {
+   "id": "u11",
    "name": "Schuhkarton als Schatzkiste, grauer Karton als Fuchsbau",
    "menge": 2,
    "wann": "Station 7",
+   "zuHause": true,
    "link": null
   }
  ],
@@ -1580,7 +1618,7 @@
     ],
     [
      "Finden",
-     "Schatzkiste mit Kratzbildern, Zaubertafeln und Zeichenschablonen"
+     "Schatzkiste mit Kratzbildern, Zeichenschablonen und Zaubertafeln"
     ],
     [
      "Weiter",
