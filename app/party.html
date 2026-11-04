@@ -158,10 +158,11 @@
   function preisText(x){
     if(x.zuHause) return 'Hat man meist zu Hause';
     if(!x.asin) return '';
-    if(x.preis==null) return 'Gerade nicht lieferbar';
+    if(x.preis==null || x.summe==null) return x.preis==null ? 'Gerade nicht lieferbar' : '';
     return (x.packungen>1?x.packungen+' Packungen':'1 Packung')+(x.packung>1?' à '+x.packung+' Stück':'')+' · <b class="preis">'+Party.euro(x.summe)+'</b>';
   }
   function einkaufKopf(ek){
+    if(!Party.einkaufSumme) return '';   // ältere party.js aus dem Zwischenspeicher: Liste ohne Summe zeigen
     var summe=Party.einkaufSumme(ek), link=Party.warenkorbLink(ek), weg=ek.filter(function(x){ return !x.fertig && x.asin && x.preis==null; });
     if(!link) return '';
     return '<div class="summe-box"><div><span class="leise" style="font-size:.85rem">Noch zu kaufen, ca.</span><span class="betrag">'+Party.euro(summe)+'</span>'+

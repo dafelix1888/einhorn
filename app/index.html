@@ -413,11 +413,11 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       h+='<section class="abschnitt-d"><h2>Was die Kinder bekommen</h2><div class="ausruestung">'+tour.gaben.map(function(g){
         return '<div class="ding"><div><b>'+esc(g.was)+'</b><span>'+esc(g.art)+' · '+esc(g.i==='start'?'beim Ankommen':g.i==='ende'?'am Ende':'Station '+(g.i+1))+'</span></div></div>';
       }).join('')+'</div></section>';
-      var kinderN=(party(id)&&party(id).kinder)||tour.kinder.standard, ek=Party.einkauf({kinder:kinderN, einkauf:{}}, tour), korb=Party.warenkorbLink(ek);
+      var kinderN=(party(id)&&party(id).kinder)||tour.kinder.standard, ek=Party.einkauf({kinder:kinderN, einkauf:{}}, tour), korb=Party.warenkorbLink ? Party.warenkorbLink(ek) : null;
       h+='<section class="abschnitt-d"><h2>Ausrüstung</h2>'+
       (korb?'<div class="summe-box" style="max-width:60rem"><div><span class="leise" style="font-size:.85rem">Alles für '+kinderN+' Kinder, ca.</span><span class="betrag">'+Party.euro(Party.einkaufSumme(ek))+'</span><small>Amazon-Preise vom '+new Date(tour.preisStand).toLocaleDateString('de-DE')+', ohne Versand. Können sich ändern.</small></div><a class="voll" href="'+esc(korb)+'" target="_blank" rel="sponsored noopener">Alles in den Warenkorb</a></div>':'')+
       '<div class="ausruestung">'+ek.map(function(x){
-        var info=x.zuHause?'hat man meist zu Hause':!x.asin?'':x.preis==null?'gerade nicht lieferbar':(x.packungen>1?x.packungen+' Packungen':'1 Packung')+(x.packung>1?' à '+x.packung:'')+' · '+Party.euro(x.summe);
+        var info=x.zuHause?'hat man meist zu Hause':!x.asin?'':x.preis==null?'gerade nicht lieferbar':x.summe==null?'':(x.packungen>1?x.packungen+' Packungen':'1 Packung')+(x.packung>1?' à '+x.packung:'')+' · '+Party.euro(x.summe);
         return '<div class="ding"><div><b>'+esc(x.name)+'</b><span>'+esc(x.menge+'× · '+x.wann)+(info?' · '+esc(info):'')+'</span></div>'+(x.link?'<a class="pille" href="'+esc(x.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'')+'</div>';
       }).join('')+'</div>'+
       '<div class="paket"><div><b>Alles in einer Box</b><span>Haarreifen, Holz-Regenbogen, Glückssteine, Zaubertafeln und Sticker für '+tour.kinder.standard+' Kinder.</span></div><button class="pille" disabled>Bald im Shop</button></div>'+
