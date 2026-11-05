@@ -28,7 +28,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 
 ## Entscheidungen
 
-- Holz-Regenbogen: Die Geschichte braucht je zwei Bögen in Rot, Gelb mit Orange, Grün und Blau plus die zwei kleinsten innen. Steht als Hinweis beim Utensil (`tour.json` → `utensilien[].hinweis`), auch dort, wo er als nicht lieferbar gemeldet wird.
+- Holz-Regenbogen: Grundsatz ist, dass ein ähnliches Produkt ohne Änderung an der Geschichte passt. Nötig sind nur Rot, Gelb, Grün und Blau, die Anzahl der Bögen ist egal. Packlisten nennen nur Farben, keine Stückzahlen oder Zwischentöne. Gesprochene Texte bleiben unverändert (Stimmen kosten Credits).
 
 - Kartendaten von OpenStreetMap (Overpass, Nominatim), Höhen von Open-Meteo, Adressvorschläge beim Tippen über Photon (komoot), alles ohne Schlüssel. Nominatim erlaubt keine Vorschläge beim Tippen, deshalb Photon dafür.
 - Architektur vorerst statisch: Jedes Abenteuer ist eine `tour.json`, Daten der Eltern liegen im Gerät (`localStorage`: `sj.party.<thema>`, `sj.plan.<thema>`), Teilen läuft über Links mit eingebetteten Daten.

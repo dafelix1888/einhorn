@@ -328,7 +328,7 @@
    "title": "Der lila Frosch",
    "say": "Psst, die Wolke schläft. Schaut leise in den Spiegel. Was stimmt hier nicht?",
    "after": "Richtig, Frösche sind grün! Schleicht zur Wolke und sucht etwas Grünes. Aber weckt sie nicht!",
-   "dann": "Leise zur Wolke schleichen und die zwei grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen.",
+   "dann": "Leise zur Wolke schleichen und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen.",
    "ort": {
     "typ": "huegel_unten",
     "anteil": 0.8
@@ -362,7 +362,7 @@
      "say": "Das ist Fridolin, der Fuchs. In seinem Bau ist alles grau, und er wollte auch so bunt sein wie ein Einhorn. Beim Wegrennen sind ihm die Bögen heruntergefallen. Legt die zwei blauen Bögen zu den anderen!",
      "go": "Der Regenbogen ist ganz",
      "pic": "fuchs",
-     "dann": "Die zwei blauen Bögen zu den anderen legen. Dann „Der Regenbogen ist ganz“ tippen."
+     "dann": "Die blauen Bögen zu den anderen legen. Dann „Der Regenbogen ist ganz“ tippen."
     }
    ],
    "ort": {
@@ -434,11 +434,11 @@
     {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
-      "Bögen Rot und Rotorange (Station 2)",
-      "Bögen Orange und Gelb und die Tüte mit {kinder} Glückssteinen, irgendwo am Zaun verstecken (Station 4)",
+      "Rote Bögen (Station 2)",
+      "Gelbe und orange Bögen und die Tüte mit {kinder} Glückssteinen, irgendwo am Zaun verstecken (Station 4)",
       "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
-      "Wolken-Ausdruck, Bögen Hellgrün und Grün (Station 6)",
-      "Grauer Karton mit Fridolin, Bögen Türkis und Blau, Plastiktüte, buntes Band (Station 7)",
+      "Wolken-Ausdruck, grüne Bögen (Station 6)",
+      "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
       "Schatzkiste (Station 7)"
      ]
     },
@@ -460,11 +460,11 @@
     {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
-      "Bögen Rot und Rotorange, rote Kreide für den Kreidekreis (Station 2)",
-      "Vier Schleifen aus Krepp- oder Geschenkband (Blau, Pink, Grün, Rot-Weiß), Bögen Orange und Gelb, Tüte mit {kinder} Glückssteinen (Station 4)",
+      "Rote Bögen, rote Kreide für den Kreidekreis (Station 2)",
+      "Vier Schleifen aus Krepp- oder Geschenkband (Blau, Pink, Grün, Rot-Weiß), gelbe und orange Bögen, Tüte mit {kinder} Glückssteinen (Station 4)",
       "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
-      "Weißes Bettlaken oder weißer Schirm als Wolke, Bögen Hellgrün und Grün (Station 6)",
-      "Grauer Karton mit Fridolin, Bögen Türkis und Blau, Plastiktüte, buntes Band (Station 7)",
+      "Weißes Bettlaken oder weißer Schirm als Wolke, grüne Bögen (Station 6)",
+      "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
       "Schatzkiste (Station 7)"
      ]
     },
@@ -486,12 +486,12 @@
     {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
-      "Bögen Rot und Rotorange (Küche)",
+      "Rote Bögen (Küche)",
       "Blaues Handtuch als Fluss (Flur)",
-      "Vier Bänder (Blau, Pink, Grün, Rot-Weiß), Schüssel mit Bögen Orange und Gelb und {kinder} Glückssteinen (Treppe)",
+      "Vier Bänder (Blau, Pink, Grün, Rot-Weiß), Schüssel mit den gelben und orangen Bögen und {kinder} Glückssteinen (Treppe)",
       "Drei Zettel mit gemalten Spuren (Hase, Ente, Fuchs), die eine Zaubertafel (Türen)",
-      "Weißes Kissen oder Laken als Wolke, Bögen Hellgrün und Grün (Kissenberg)",
-      "Grauer Karton mit Fridolin, Bögen Türkis und Blau, buntes Band (Sofa)",
+      "Weißes Kissen oder Laken als Wolke, grüne Bögen (Kissenberg)",
+      "Grauer Karton mit Fridolin, blaue Bögen, buntes Band (Sofa)",
       "Schatzkiste"
      ]
     },
@@ -566,21 +566,14 @@
   },
   {
    "id": "u2",
-   "name": "Holz-Regenbogen mit 10 Bögen (Stapelspielzeug)",
+   "name": "Holz-Regenbogen (Stapelspielzeug)",
    "menge": 1,
    "wann": "Stationen 1 bis 7",
    "asin": "B0FCDZ971Q",
    "packung": 1,
    "preis": null,
    "link": "https://www.amazon.de/dp/B0FCDZ971Q",
-   "hinweis": "Wichtig für die Geschichte: je zwei Bögen in Rot, Gelb mit Orange, Grün und Blau, dazu die zwei kleinsten innen in beliebiger Farbe. Die Rätsel fragen nach Rot, Gelb, Grün und Blau. Bei 12 Bögen die übrigen einfach weglassen.",
-   "farben": [
-    "Rot",
-    "Orange",
-    "Gelb",
-    "Grün",
-    "Blau"
-   ]
+   "hinweis": "Passt jeder Holz-Regenbogen mit Rot, Gelb, Grün und Blau, egal wie viele Bögen. Die zwei kleinsten gibt es an der Haustür, die anderen kommen nach Farbe an die Stationen."
   },
   {
    "id": "u3",
@@ -1094,7 +1087,7 @@
    "a": [
     [
      "Finden",
-     "Die zwei roten Bögen, bei etwas Rotem"
+     "Die roten Bögen, bei etwas Rotem"
     ],
     [
      "Tun",
@@ -1108,7 +1101,7 @@
    "b": [
     [
      "Finden",
-     "Die zwei roten Bögen am roten Kreidekreis"
+     "Die roten Bögen am roten Kreidekreis"
     ],
     [
      "Tun",
@@ -1122,7 +1115,7 @@
    "c": [
     [
      "Finden",
-     "Die zwei roten Bögen hinter der Küchentür"
+     "Die roten Bögen hinter der Küchentür"
     ],
     [
      "Tun",
@@ -1490,7 +1483,7 @@
     ],
     [
      "Finden",
-     "Die zwei grünen Bögen"
+     "Die grünen Bögen"
     ],
     [
      "Weiter",
@@ -1504,7 +1497,7 @@
     ],
     [
      "Finden",
-     "Die zwei grünen Bögen"
+     "Die grünen Bögen"
     ],
     [
      "Weiter",
@@ -1518,7 +1511,7 @@
     ],
     [
      "Finden",
-     "Die zwei grünen Bögen"
+     "Die grünen Bögen"
     ],
     [
      "Weiter",
@@ -1606,7 +1599,7 @@
    "a": [
     [
      "Tun",
-     "Die zwei blauen Bögen zu den anderen legen"
+     "Die blauen Bögen zu den anderen legen"
     ],
     [
      "Weiter",
