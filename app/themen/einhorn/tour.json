@@ -572,7 +572,15 @@
    "asin": "B0FCDZ971Q",
    "packung": 1,
    "preis": null,
-   "link": "https://www.amazon.de/dp/B0FCDZ971Q"
+   "link": "https://www.amazon.de/dp/B0FCDZ971Q",
+   "hinweis": "Wichtig für die Geschichte: je zwei Bögen in Rot, Gelb mit Orange, Grün und Blau, dazu die zwei kleinsten innen in beliebiger Farbe. Die Rätsel fragen nach Rot, Gelb, Grün und Blau. Bei 12 Bögen die übrigen einfach weglassen.",
+   "farben": [
+    "Rot",
+    "Orange",
+    "Gelb",
+    "Grün",
+    "Blau"
+   ]
   },
   {
    "id": "u3",

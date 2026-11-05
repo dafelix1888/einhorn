@@ -197,6 +197,8 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
 .reihe-bald img{width:130px;height:130px;border-radius:10px;display:block;filter:saturate(.6) brightness(.75)}
 .reihe-bald b{display:block;font-size:.9rem;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .reihe-bald span{color:var(--leise);font-size:.8rem}
+.ding-hinweis{display:block;margin-top:6px;font-size:.85rem;color:var(--text);opacity:.85}
+.ding-hinweis.warn{padding:8px 10px;border-radius:8px;background:rgba(245,158,11,.14);opacity:1}
 </style></head><body>
 <header class="kopf">
   <a class="marke" href="#/"><span class="logo"><i></i></span><span>Zauberspiegel</span></a>
@@ -418,7 +420,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       (korb?'<div class="summe-box" style="max-width:60rem"><div><span class="leise" style="font-size:.85rem">Alles für '+kinderN+' Kinder, ca.</span><span class="betrag">'+Party.euro(Party.einkaufSumme(ek))+'</span><small>Amazon-Preise vom '+new Date(tour.preisStand).toLocaleDateString('de-DE')+', ohne Versand. Können sich ändern.'+(ek.some(function(x){ return x.asin && !x.lieferbar; })?' Nicht gefunden: '+esc(ek.filter(function(x){ return x.asin && !x.lieferbar; }).map(function(x){ return x.name; }).join(', '))+' (gerade nicht lieferbar, nicht im Warenkorb).':'')+'</small></div><a class="voll" href="'+esc(korb)+'" target="_blank" rel="sponsored noopener">Alles in den Warenkorb</a></div>':'')+
       '<div class="ausruestung">'+ek.map(function(x){
         var info=x.zuHause?'hat man meist zu Hause':!x.asin?'':x.preis==null?'gerade nicht lieferbar':x.summe==null?'':(x.packungen>1?x.packungen+' Packungen':'1 Packung')+(x.packung>1?' à '+x.packung:'')+' · '+Party.euro(x.summe);
-        return '<div class="ding"><div><b>'+esc(x.name)+'</b><span>'+esc(x.menge+'× · '+x.wann)+(info?' · '+esc(info):'')+'</span></div>'+(x.link?'<a class="pille" href="'+esc(x.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'')+'</div>';
+        return '<div class="ding"><div><b>'+esc(x.name)+'</b><span>'+esc(x.menge+'× · '+x.wann)+(info?' · '+esc(info):'')+'</span>'+(x.hinweis?'<span class="ding-hinweis'+(x.asin&&!x.lieferbar?' warn':'')+'">'+esc(x.hinweis)+'</span>':'')+'</div>'+(x.link?'<a class="pille" href="'+esc(x.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'')+'</div>';
       }).join('')+'</div>'+
       '<div class="paket"><div><b>Alles in einer Box</b><span>Haarreifen, Holz-Regenbogen, Glückssteine, Zaubertafeln und Sticker für '+tour.kinder.standard+' Kinder.</span></div><button class="pille" disabled>Bald im Shop</button></div>'+
       '<p class="hinweis-klein">Links zu Händlern können Partnerlinks sein. Für euch ändert sich am Preis nichts.</p></section>';

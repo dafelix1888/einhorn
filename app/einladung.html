@@ -56,6 +56,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
   var datumKurz=start.toLocaleDateString('de-DE',{weekday:'short', day:'numeric', month:'numeric'});
   var bis=e.r ? new Date(e.r+'T12:00:00').toLocaleDateString('de-DE',{weekday:'short', day:'numeric', month:'numeric'}) : '';
   var draussen=e.o!=='drinnen';
+  var hinweis=typeof e.h==='string' ? e.h : (draussen?'Feste Schuhe und Kleidung für draußen.':'');   // ältere Links ohne Hinweisfeld
   document.title=name+' wird '+alter+'! · Einladung';
 
   function antwortText(ja){ return ja ? 'Hallo! Wir kommen gern zu '+name+'s Einhorn-Party am '+datumLang+'. 🦄' : 'Hallo! Leider können wir am '+datumLang+' nicht zu '+name+'s Party kommen. Ganz liebe Grüße!'; }
@@ -68,7 +69,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
     function z(n){ return ('0'+n).slice(-2); } function f(d){ return d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'T'+z(d.getHours())+z(d.getMinutes())+'00'; }
     var ende=e.b ? new Date(e.d+'T'+e.b+':00') : new Date(start.getTime()+150*60000);
     return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Zauberspiegel//Einladung//DE','BEGIN:VEVENT','UID:einladung-'+e.d+'-'+encodeURIComponent(name)+'@zauberspiegel','DTSTAMP:'+f(new Date()),
-      'DTSTART:'+f(start),'DTEND:'+f(ende),'SUMMARY:'+name+'s Einhorn-Party','LOCATION:'+String(e.w||'').replace(/[,;]/g,'\\$&'),'DESCRIPTION:Abholen um '+(e.b||'')+' Uhr'+(draussen?'. Feste Schuhe und Kleidung für draußen.':''),'END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';
+      'DTSTART:'+f(start),'DTEND:'+f(ende),'SUMMARY:'+name+'s Einhorn-Party','LOCATION:'+String(e.w||'').replace(/[,;]/g,'\\$&'),'DESCRIPTION:Abholen um '+(e.b||'')+' Uhr'+(hinweis?'. Bitte beachten: '+hinweis.replace(/[,;]/g,'\\$&'):''),'END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';
   }
   var ja=antwortLink(true), nein=antwortLink(false);
 
@@ -94,7 +95,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
     '<div class="spiegel"><div class="ring"><div><img src="themen/'+thema+'/cover.svg" alt="Funkel, das Einhorn"></div></div><button type="button" id="probe" aria-label="Funkels Gruß anhören">'+PLAY+'</button></div>'+
     '<div class="titel"><div class="von">Funkel lädt ein</div><h1>'+esc(name)+' wird '+esc(alter)+'!</h1><p>Eine Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.</p></div>'+
     '<div class="kacheln"><div><span>Wann</span><b>'+esc(datumKurz)+'</b><small>'+esc(e.s)+' Uhr</small></div><div><span>Wo</span><b>'+esc(e.w)+'</b></div><div><span>Abholen</span><b>'+esc(e.b)+'</b><small>Uhr</small></div></div>'+
-    (draussen?'<p class="mit">Bitte feste Schuhe und Kleidung für draußen.</p>':'')+
+    (hinweis?'<div class="mit"><b>Bitte mitbringen und beachten</b><br>'+esc(hinweis)+'</div>':'')+
     '<div id="antwort"></div>'+
     '<div class="fuss"><p class="leise">Selbst bald eine Party? Funkels Regenbogen plant die Schnitzeljagd für jeden Park und jede Wohnung.</p><a href="index.html#/abenteuer/einhorn">So funktioniert der Zauberspiegel</a></div>';
   antwortZeichnen('');

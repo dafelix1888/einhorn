@@ -43,6 +43,7 @@
   .aus{display:none!important}
 }
 @page quer{size:A4 landscape;margin:0}
+.steuer textarea{font:inherit;color:var(--text);background:var(--panel);border:2px solid var(--linie);border-radius:12px;padding:10px 12px;width:100%;resize:vertical}
 </style></head><body>
 <div class="steuer">
   <div class="oben"><a href="#" id="zurueck">← Zur Party</a><span style="display:flex;gap:10px;align-items:center"><button class="knopf" id="drucken">Drucken oder als PDF sichern</button><a class="heim-link" href="index.html" aria-label="Zur Übersicht"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></a></span></div>
@@ -52,6 +53,7 @@
     <div><label for="treff">Treffpunkt</label><input id="treff" type="text"></div>
     <div><label for="abholen">Abholen um</label><input id="abholen" type="time" step="900"></div>
   </div>
+  <label for="hinweis-gaeste">Bitte mitbringen und beachten</label><textarea id="hinweis-gaeste" rows="2" maxlength="200" placeholder="z. B. Regenhose, warme Mütze, Wechselsocken"></textarea>
   <label for="tel">Handynummer für Zusagen (freiwillig)</label><input id="tel" type="text" inputmode="tel" autocomplete="tel" placeholder="z. B. 0170 1234567">
   <p class="leise" style="font-size:.88rem;margin-top:6px">Steht nur im Einladungslink, damit Gast-Eltern per WhatsApp zusagen können.</p>
   <div class="auswahl" id="auswahl"></div>
@@ -77,6 +79,7 @@
   $('treff').value=party.treffpunkt || (party.ort==='drinnen' || !plan || !plan.adresse || plan.adresse==='Mein Standort' ? 'bei uns zu Hause' : plan.adresse);
   $('abholen').value=party.abholen || Party.uhr(party, 150);
   $('tel').value=party.telefon || '';
+  $('hinweis-gaeste').value=Party.gaesteHinweis(party);
 
   var WOLKE="<svg viewBox='0 0 1000 620' xmlns='http://www.w3.org/2000/svg'><path d='M220 520 Q90 520 90 420 Q90 320 200 310 Q200 180 340 170 Q400 70 520 90 Q640 60 700 170 Q840 160 860 290 Q960 310 950 410 Q940 520 820 520 Z' fill='#fff' stroke='#7A8CA8' stroke-width='14' stroke-linejoin='round'/><path d='M370 360 q40 30 80 0 M560 360 q40 30 80 0' fill='none' stroke='#241A3D' stroke-width='14' stroke-linecap='round'/><ellipse cx='330' cy='420' rx='34' ry='18' fill='#F4B6D2'/><ellipse cx='680' cy='420' rx='34' ry='18' fill='#F4B6D2'/><path d='M470 450 q35 22 70 0' fill='none' stroke='#241A3D' stroke-width='12' stroke-linecap='round'/><text x='790' y='150' font-family='Trebuchet MS, Arial' font-weight='800' font-size='70' fill='#7A8CA8'>z</text><text x='850' y='90' font-family='Trebuchet MS, Arial' font-weight='800' font-size='96' fill='#7A8CA8'>Z</text><text x='920' y='40' font-family='Trebuchet MS, Arial' font-weight='800' font-size='56' fill='#7A8CA8'>z</text></svg>";
 
@@ -84,7 +87,7 @@
     var draussen=party.ort!=='drinnen';
     var karte='<div class="einladung"><img src="'+info.cover+'" alt=""><div><h2>'+esc(name)+' wird '+esc(alter)+'!</h2><p class="unter">Komm mit auf Funkels Regenbogen-Abenteuer, einer Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.</p>'+
       '<dl><dt>Wann</dt><dd>'+esc(datumLang)+', '+esc(party.start)+' Uhr</dd><dt>Wo</dt><dd>'+esc($('treff').value)+'</dd><dt>Abholen</dt><dd>'+esc($('abholen').value)+' Uhr</dd>'+
-      (draussen?'<dt>Mitbringen</dt><dd>Feste Schuhe und Kleidung für draußen</dd>':'')+'</dl>'+
+      (Party.gaesteHinweis(party)?'<dt>Bitte</dt><dd>'+esc(Party.gaesteHinweis(party))+'</dd>':'')+'</dl>'+
       '<p class="klein">Bitte sagt bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.</p></div></div>';
     return '<section class="blatt" id="einladung">'+karte+karte+'</section>';
   }
@@ -105,13 +108,13 @@
   }
   function textFuerChat(){
     return name+' wird '+alter+'! 🦄\n\nWir laden zu Funkels Regenbogen-Abenteuer ein, einer Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.\n\n'+
-      'Wann: '+datumLang+', '+party.start+' Uhr\nWo: '+$('treff').value+'\nAbholen: '+$('abholen').value+' Uhr\n'+(party.ort!=='drinnen'?'Bitte feste Schuhe und Kleidung für draußen.\n':'')+
+      'Wann: '+datumLang+', '+party.start+' Uhr\nWo: '+$('treff').value+'\nAbholen: '+$('abholen').value+' Uhr\n'+(Party.gaesteHinweis(party)?'Bitte mitbringen und beachten: '+Party.gaesteHinweis(party)+'\n':'')+
       '\nGebt bitte bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.';
   }
   document.addEventListener('change', function(e){
     var t=e.target;
     if(t.hasAttribute('data-teil')){ an[t.getAttribute('data-teil')]=t.checked; zeichnen(); }
-    if(t.id==='treff' || t.id==='abholen' || t.id==='tel'){ party.treffpunkt=$('treff').value; party.abholen=$('abholen').value; party.telefon=$('tel').value.replace(/[^0-9+]/g,''); Party.speichern(party); zeichnen(); }
+    if(t.id==='treff' || t.id==='abholen' || t.id==='tel' || t.id==='hinweis-gaeste'){ party.gaesteHinweis=$('hinweis-gaeste').value.trim().slice(0,200); party.treffpunkt=$('treff').value; party.abholen=$('abholen').value; party.telefon=$('tel').value.replace(/[^0-9+]/g,''); Party.speichern(party); zeichnen(); }
   });
   $('drucken').addEventListener('click', function(){ window.print(); });
   $('link').addEventListener('click', function(){
