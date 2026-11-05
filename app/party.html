@@ -71,6 +71,8 @@
 .route-karte b{font-size:1.1rem}
 .route-karte p{margin:4px 0 10px;font-size:.92rem}
 @media (max-width:420px){ .route-karte svg{width:110px;height:76px} }
+.einladung-felder textarea{font:inherit;color:var(--text);background:var(--panel);border:2px solid var(--linie);border-radius:12px;padding:10px 12px;width:100%;resize:vertical}
+.ersatz-hinweis{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:rgba(245,158,11,.12);font-size:.92rem}
 </style></head><body>
 <main class="seite" id="seite"><p class="leise">Lädt …</p></main>
 <div class="toast" id="toast" hidden></div>
@@ -189,7 +191,8 @@
     }
     if(weg.length){
       h+='<div class="karte" style="border:2px solid #B45309;margin-bottom:10px"><b>Nicht gefunden</b><br><span class="leise">'+esc(weg.map(function(x){ return x.name; }).join(', '))+' '+(weg.length>1?'sind':'ist')+' bei Amazon gerade nicht lieferbar und kommt nicht in den Warenkorb.</span>'+
-        '<div class="reihe" style="margin-top:10px">'+weg.map(function(x){ return '<a class="knopf klein leer" href="'+esc(suchLink(x))+'" target="_blank" rel="noopener">Ähnliche suchen: '+esc(x.name.replace(/\s*\(.*\)/,''))+'</a>'; }).join('')+'</div></div>';
+        '<div class="reihe" style="margin-top:10px">'+weg.map(function(x){ return '<a class="knopf klein leer" href="'+esc(suchLink(x))+'" target="_blank" rel="noopener">Ähnliche suchen: '+esc(x.name.replace(/\s*\(.*\)/,''))+'</a>'; }).join('')+'</div>'+
+        weg.filter(function(x){ return x.hinweis; }).map(function(x){ return '<p class="ersatz-hinweis"><b>'+esc(x.name.replace(/\s*\(.*\)/,''))+':</b> '+esc(x.hinweis)+'</p>'; }).join('')+'</div>';
     }
     return h;
   }
@@ -252,6 +255,10 @@
     h+='<h2 id="einkauf">Einkaufsliste <span class="leise" style="font-size:1rem">· '+(offen?offen+' offen':'alles da')+'</span></h2>'+einkaufKopf(ek)+
       ek.filter(function(x){ return !x.fertig; }).map(einkaufZeile).join('')+
       (ek.some(function(x){ return x.fertig; }) ? '<details class="erledigt-liste"><summary>Schon da oder bestellt ('+ek.filter(function(x){ return x.fertig; }).length+')</summary>'+ek.filter(function(x){ return x.fertig; }).map(einkaufZeile).join('')+'</details>' : '');
+    h+='<h2 id="einladung">Einladung</h2><div class="karte einladung-felder">'+
+      '<label for="gh">Bitte mitbringen und beachten</label><textarea id="gh" rows="2" maxlength="200" placeholder="z. B. Regenhose, warme Mütze, Wechselsocken">'+esc(Party.gaesteHinweis(party))+'</textarea>'+
+      '<p class="leise" style="font-size:.85rem;margin:6px 0 12px">Steht auf der Einladung für die Gast-Eltern, im Link und auf dem Ausdruck.</p>'+
+      '<div class="reihe"><button type="button" class="knopf mittel" id="gast-link-2">Einladungslink teilen</button><a class="knopf leer mittel" href="druck.html?thema='+thema+'#einladung">Treffpunkt und Abholzeit</a></div></div>';
     h+='<h2>Teilen und Geräte</h2><div class="werkzeuge">'+
       '<button type="button" class="knopf mittel" id="gast-link">Einladungslink teilen</button>'+
       '<a class="knopf leer mittel" href="einladung.html?e='+Party.einladungsLink(party, pl).split('?e=')[1]+'">Einladung ansehen</a>'+
@@ -295,6 +302,7 @@
       }
       return;
     }
+    if(t.closest('#gast-link-2')){ var gh=$('gh'); if(gh){ party.gaesteHinweis=gh.value.trim().slice(0,200); party=Party.speichern(party); } gastLink(); return; }
     if(t.closest('#aendern')){ ev.preventDefault(); entwurf=JSON.parse(JSON.stringify(party)); schritt=0; vgVonHand=true; voreinOffen=false; assistent(); window.scrollTo(0,0); return; }
     if((b=t.closest('[data-fertig]'))){ party=Party.speichern(Party.abhaken(party, schritt_(b.getAttribute('data-fertig')), true)); uebersicht(); toast('Erledigt.'); return; }
     if((b=t.closest('[data-umschalten]'))){ var a=schritt_(b.getAttribute('data-umschalten')), y=window.scrollY; party=Party.speichern(Party.abhaken(party, a, !a.fertig)); uebersicht(); window.scrollTo(0,y); var nb=$('seite').querySelector('[data-umschalten="'+a.id+'"]'); if(nb) nb.focus({preventScroll:true}); return; }
@@ -321,6 +329,7 @@
   });
   document.addEventListener('change', function(ev){
     var t=ev.target;
+    if(!entwurf && t.id==='gh'){ party.gaesteHinweis=t.value.trim().slice(0,200); party=Party.speichern(party); toast('Hinweis für die Einladung gespeichert.'); return; }
     if(entwurf){
       if(t.id==='planb') entwurf.planB=t.checked;
       else if(t.id==='ausdrucke') entwurf.ausdrucke=t.checked;

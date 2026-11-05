@@ -20,13 +20,15 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 | Spiel | `app/spiel.html`, `tour-laden.js` | Zauberspiegel mit allen Funktionen des Originals, jetzt im dunklen Nachthimmel-Stil (Spiegelinneres bleibt hell). Kopfzeile mit Regenbogen und „Station X von 7“, Ablauf, Einrichten und „Zur Übersicht“ hinter dem Knopf „Erwachsene“ (Tour bleibt gespeichert), nach der Tour Knopf „Zur Übersicht“, großer Hauptknopf, Hinweise als Zeile „Für Erwachsene“. Funkel in 3D (`funkel3d.js`), Inhalte aus `tour.json`, Ortsansagen live über den Worker (sobald eingerichtet) |
 | Figuren | `app/themen/*/figuren/` | Profilbilder als SVG: Einhorn-Figuren aus dem Spiel übernommen (Funkel, Fridolin, Kakapups, Rudi, Alfonso, Bruno, Charly, Dagobert), neu gezeichnet: Zauberspiegel und die sechs Hauptfiguren der kommenden Abenteuer. Eingetragen in `tour.json` (`figuren[].bild`) und `themen/index.json` (`heldBild`) |
 | Druck | `app/druck.html` | Einladung (2 pro Blatt und als Text), Urkunde je Kind, schlafende Wolke |
-| Einladung | `app/einladung.html` | Seite für Gast-Eltern: Funkel im Goldrand mit Hörprobe, Wann/Wo/Abholen als Kacheln, „Wir kommen!“ (WhatsApp oder Text kopieren), danach Bestätigung mit Kalender. Daten stecken im Link |
+| Einladung | `app/einladung.html` | Feld „Bitte mitbringen und beachten“ (z. B. Regenhose, Mütze) in der Party-Übersicht und den Druckvorlagen, draußen mit Vorschlag vorbelegt; steht auf Link, Ausdruck und WhatsApp-Text. Seite für Gast-Eltern: Funkel im Goldrand mit Hörprobe, Wann/Wo/Abholen als Kacheln, „Wir kommen!“ (WhatsApp oder Text kopieren), danach Bestätigung mit Kalender. Daten stecken im Link |
 | Vorausgeher | `app/vorausgeher.html` | Fokus auf die nächste Station: Entfernung, „Hier hinlegen“ zum Abhaken, „Station steht, weiter“; Countdown bis zum Gruppenstart; Karte und alle Stationen aufklappbar. Haken nur auf dem eigenen Handy |
 | Startklar | `app/bereit.html` | Bereit-Check und Partytag auf einer Seite: Stimmen, Offline, GPS, Akku prüfen sich selbst, Ton und Sperre bestätigt man; darunter Uhrzeiten für Kreidespur, Vorausgeher (mit Link) und Start |
 | Stimmen | `stimmen/`, `stimmen/pakete/` | Feste Sätze per GitHub Action bei ElevenLabs; `aufteilen.mjs` teilt in Pakete (Geschichte 2,4 MB, je Erzähler etwa 5 MB); das Spiel lädt nur, was fehlt |
 | Live-Stimmen | `worker/` | Cloudflare Worker für Ortsansagen, nur Vorlagen-Sätze, mit Cache. **Noch nicht eingerichtet** (siehe unten) |
 
 ## Entscheidungen
+
+- Holz-Regenbogen: Die Geschichte braucht je zwei Bögen in Rot, Gelb mit Orange, Grün und Blau plus die zwei kleinsten innen. Steht als Hinweis beim Utensil (`tour.json` → `utensilien[].hinweis`), auch dort, wo er als nicht lieferbar gemeldet wird.
 
 - Kartendaten von OpenStreetMap (Overpass, Nominatim), Höhen von Open-Meteo, Adressvorschläge beim Tippen über Photon (komoot), alles ohne Schlüssel. Nominatim erlaubt keine Vorschläge beim Tippen, deshalb Photon dafür.
 - Architektur vorerst statisch: Jedes Abenteuer ist eine `tour.json`, Daten der Eltern liegen im Gerät (`localStorage`: `sj.party.<thema>`, `sj.plan.<thema>`), Teilen läuft über Links mit eingebetteten Daten.
