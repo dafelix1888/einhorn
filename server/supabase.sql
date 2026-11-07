@@ -169,3 +169,53 @@ create table if not exists public.namen (
 );
 alter table public.namen enable row level security;
 revoke all on public.namen from anon, authenticated;
+
+-- Fehlermeldungen aus der App (anonym, technisch). Schreiben über fehler_melden, lesen nur der Server/Dashboard.
+-- Gleiche Meldung wird gezählt statt neu angelegt (kennung = md5 aus Seite, Meldung, Datei, Zeile). Löschen nach 90 Tagen.
+create table if not exists public.fehler (
+  id           bigint generated always as identity primary key,
+  kennung      text not null unique,
+  seite        text not null,
+  meldung      text not null,
+  quelle       text,
+  zeile        int,
+  stapel       text,
+  version      text,
+  geraet       text,
+  anzahl       int not null default 1,
+  erstmals     timestamptz not null default now(),
+  zuletzt      timestamptz not null default now(),
+  ticket       text
+);
+alter table public.fehler enable row level security;
+revoke all on public.fehler from anon, authenticated;
+
+create or replace function public.fehler_melden(seite text, meldung text, quelle text, zeile int, stapel text, version text, geraet text)
+returns boolean language plpgsql security definer set search_path = public as $$
+declare k text;
+begin
+  if meldung is null or length(meldung) = 0 then return false; end if;
+  seite := left(regexp_replace(coalesce(seite,''), '[?#].*$', ''), 200);
+  meldung := left(regexp_replace(meldung, '\?[^\s):''"]*', '', 'g'), 500);
+  quelle := left(regexp_replace(coalesce(quelle,''), '[?#].*$', ''), 300);
+  stapel := left(regexp_replace(coalesce(stapel,''), '\?[^\s):]*', '', 'g'), 2000);
+  version := left(version, 40);
+  geraet := left(geraet, 160);
+  k := md5(seite || '|' || meldung || '|' || quelle || '|' || coalesce(zeile, 0));
+  if (select count(*) from public.fehler) >= 5000 and not exists (select 1 from public.fehler where kennung = k) then return false; end if;
+  insert into public.fehler(kennung, seite, meldung, quelle, zeile, stapel, version, geraet)
+    values (k, seite, meldung, quelle, zeile, stapel, version, geraet)
+  on conflict (kennung) do update set anzahl = public.fehler.anzahl + 1, zuletzt = now(),
+    version = excluded.version, geraet = excluded.geraet;
+  return true;
+end $$;
+revoke all on function public.fehler_melden(text, text, text, int, text, text, text) from public;
+grant execute on function public.fehler_melden(text, text, text, int, text, text, text) to anon, authenticated;
+
+do $$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    perform cron.unschedule(jobid) from cron.job where jobname = 'alte-fehler';
+    perform cron.schedule('alte-fehler', '27 3 * * *', $c$delete from public.fehler where zuletzt < now() - interval '90 days'$c$);
+  end if;
+end $$;

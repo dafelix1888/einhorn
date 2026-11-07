@@ -21,3 +21,4 @@
 - Neuer Incident: Task mit Label `incident`, Komponente/Bereich im Titel (z. B. „Planer: Karte lädt nicht“). Beschreibung: Was ist passiert, wo, seit wann, Ursache, Lösung, PR-Link.
 - Deuten mehrere Incidents auf dieselbe Ursache, ist das ein Problem: Epic mit Label `problem`, die Incidents als Kinder darunter hängen. Im Epic die gemeinsame Ursache und die dauerhafte Lösung festhalten.
 - Behobene Incidents auf erledigt setzen; die Lösung muss im Ticket stehen, damit man sie beim nächsten Mal findet.
+- Fehler aus der App landen anonym in der Supabase-Tabelle `fehler` (Projekt `zauberspiegel`). Zu Beginn einer Sitzung und auf Nachfrage neue Einträge ansehen (`select * from fehler where ticket is null order by zuletzt desc`), zuerst in PBIM nach der Meldung suchen, sonst einen Incident anlegen und den Schlüssel (z. B. `PBIM-13`) in `fehler.ticket` eintragen. Gleiche Ursache in mehreren Einträgen: Problem anlegen.
