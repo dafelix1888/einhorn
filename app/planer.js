@@ -7,6 +7,15 @@
   var PHOTON='https://photon.komoot.io/api/';      // Suche beim Tippen (OpenStreetMap-Daten); Nominatim erlaubt keine Vorschläge beim Tippen
   var OVERPASS=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
   var ELEVATION='https://api.open-meteo.com/v1/elevation';
+  // Karten-Worker (config.json „kartenUrl“): merkt sich Antworten und probiert mehrere Server. Fällt er aus, direkt wie bisher.
+  var KARTE=null, kartenBereit=fetch('config.json').then(function(r){ return r.json(); }).then(function(c){ if(c && c.kartenUrl) KARTE=c.kartenUrl.replace(/\/$/,''); })['catch'](function(){});
+  function alsJson(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+  function ueberKarte(pfad, init, direkt, ms){
+    return kartenBereit.then(function(){
+      if(!KARTE) return direkt();
+      return mitZeitlimit(fetch(KARTE+pfad, init||{}), ms||20000, 'Karte').then(alsJson)['catch'](function(){ return direkt(); });
+    });
+  }
   var RICHTUNGEN=['NW','N','NO','W','egal','O','SW','S','SO'];
   var WINKEL={N:0,NO:45,O:90,SO:135,S:180,SW:225,W:270,NW:315};
   var FARBEN=['#9050C8','#E23A3F','#F28C1B','#B8860B','#C2410C','#3A9D4B','#2B6FE0','#DB2777','#0E9F9F'];
@@ -46,8 +55,8 @@
     if(text.length<3 || text==='Mein Standort'){ vorschlaegeZu(); return; }
     vorschlagTimer=setTimeout(function(){
       var nr=++vorschlagNr, nah=wahl.start || (plan && plan.start) || {lat:51.2, lng:10.4};   // Vorschläge in der Nähe zuerst, sonst Mitte Deutschlands
-      fetch(PHOTON+'?q='+encodeURIComponent(text)+'&lang=de&limit=6&lat='+nah.lat.toFixed(3)+'&lon='+nah.lng.toFixed(3))
-        .then(function(r){ if(!r.ok) throw new Error(); return r.json(); })
+      ueberKarte('/suche?q='+encodeURIComponent(text)+'&lat='+nah.lat.toFixed(2)+'&lon='+nah.lng.toFixed(2), null, function(){
+        return fetch(PHOTON+'?q='+encodeURIComponent(text)+'&lang=de&limit=6&lat='+nah.lat.toFixed(3)+'&lon='+nah.lng.toFixed(3)).then(alsJson); }, 6000)
         .then(function(j){
           if(nr!==vorschlagNr) return;                 // eine spätere Eingabe war schneller
           var gesehen={};
@@ -74,7 +83,8 @@
   }
 
   function adresseSuchen(text){
-    return fetch(NOMINATIM+'?format=jsonv2&limit=1&accept-language=de&q='+encodeURIComponent(text)).then(function(r){ if(!r.ok) throw new Error('Adresssuche: HTTP '+r.status); return r.json(); })
+    return ueberKarte('/adresse?q='+encodeURIComponent(text), null, function(){
+        return fetch(NOMINATIM+'?format=jsonv2&limit=1&accept-language=de&q='+encodeURIComponent(text)).then(function(r){ if(!r.ok) throw new Error('Adresssuche: HTTP '+r.status); return r.json(); }); })
       .then(function(l){ if(!l.length) throw new Error('Diese Adresse kenne ich nicht. Mit Ort versuchen, z. B. „Musterweg 3, Hamburg“.'); return {lat:+l[0].lat, lng:+l[0].lon, name:l[0].display_name}; });
   }
   function overpass(abfrage){
@@ -84,13 +94,13 @@
         .then(function(r){ if(!r.ok) throw new Error('Kartendienst: HTTP '+r.status); return r.json(); })
         ['catch'](function(e){ if(++i<OVERPASS.length) return versuchen(); throw e; });
     }
-    return versuchen();
+    return ueberKarte('/overpass', {method:'POST', body:'data='+encodeURIComponent(abfrage), headers:{'Content-Type':'application/x-www-form-urlencoded'}}, versuchen, 60000);
   }
   function hoehen(punkte){                       // Open-Meteo: bis zu 100 Punkte je Anfrage
     var teile=[]; for(var i=0;i<punkte.length;i+=100) teile.push(punkte.slice(i,i+100));
     return Promise.all(teile.map(function(t){
-      return fetch(ELEVATION+'?latitude='+t.map(function(p){ return p.lat.toFixed(5); }).join(',')+'&longitude='+t.map(function(p){ return p.lng.toFixed(5); }).join(','))
-        .then(function(r){ if(!r.ok) throw new Error('Höhen: HTTP '+r.status); return r.json(); }).then(function(j){ return j.elevation; });
+      var q='?latitude='+t.map(function(p){ return p.lat.toFixed(5); }).join(',')+'&longitude='+t.map(function(p){ return p.lng.toFixed(5); }).join(',');
+      return ueberKarte('/hoehe'+q, null, function(){ return fetch(ELEVATION+q).then(function(r){ if(!r.ok) throw new Error('Höhen: HTTP '+r.status); return r.json(); }); }).then(function(j){ return j.elevation; });
     })).then(function(l){ return [].concat.apply([], l); });
   }
 

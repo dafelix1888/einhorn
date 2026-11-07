@@ -1,3 +1,4 @@
 {
- "liveUrl": "https://schnitzeljagd-stimmen.schatzsuche-app.workers.dev"
+ "liveUrl": "https://schnitzeljagd-stimmen.schatzsuche-app.workers.dev",
+ "kartenUrl": "https://schnitzeljagd-karte.schatzsuche-app.workers.dev"
 }

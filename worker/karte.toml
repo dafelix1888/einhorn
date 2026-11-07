@@ -1,0 +1,9 @@
+# Karte: Zwischenstation für Photon, Nominatim, Overpass und Open-Meteo (siehe karte.js).
+# Bereitgestellt von .github/workflows/cloudflare.yml; Adresse steht in app/config.json bei "kartenUrl".
+name = "schnitzeljagd-karte"
+main = "karte.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[vars]
+ERLAUBTE_URSPRUENGE = "https://dafelix1888.github.io,https://schnitzeljagd-app.schatzsuche-app.workers.dev,http://localhost:8765"
