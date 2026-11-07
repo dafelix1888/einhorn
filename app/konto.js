@@ -60,8 +60,19 @@
     return anfrage('/auth/v1/otp?redirect_to='+encodeURIComponent(location.href.replace(/#.*$/,'')), {method:'POST', body:{email:email, create_user:true}});
   }
   function codePruefen(email, code){
-    return anfrage('/auth/v1/verify', {method:'POST', body:{type:'email', email:email, token:code}}).then(function(j){ return sitzungMerken(j, email); });
+    return anfrage('/auth/v1/verify', {method:'POST', body:{type:'email', email:email, token:code}}).then(function(j){
+      var neu=j.user && j.user.created_at && Date.now()-Date.parse(j.user.created_at)<30*60000;
+      if(neu) mkMelden('signup');                      // Marketer: Stufe „Anmeldung“ (nur das Ereignis, keine E-Mail)
+      return sitzungMerken(j, email);
+    });
   }
+  // Ereignis an Marketer; fehlt das Skript auf dieser Seite (Spiel), beim nächsten Seitenaufruf mit Skript nachholen
+  function mkMelden(name){
+    if(root.marketer && root.marketer.track){ try{ root.marketer.track(name); }catch(e){} return; }
+    schreib('sj.mk.offen', name);
+  }
+  function mkNachholen(){ var n=lies('sj.mk.offen'); if(n && root.marketer && root.marketer.track){ schreib('sj.mk.offen', null); try{ root.marketer.track(n); }catch(e){} } }
+  if(root.addEventListener) root.addEventListener('load', function(){ setTimeout(mkNachholen, 500); });
   function abmelden(){
     var s=sitzung(); schreib(SITZUNG, null);
     if(s) anfrage('/auth/v1/logout', {method:'POST', token:s.access_token})['catch'](function(){});
@@ -220,7 +231,10 @@
   }
 
   // ---------- Oberfläche: Karte in der Party-Übersicht und Anmelde-Fenster ----------
-  var STIL='.konto{background:var(--karte,#1F1929);border:1px solid var(--linie,#2F2740);border-radius:16px;padding:16px 18px;margin:0 0 14px}'+
+  var STIL='.konto-dlg button{font:inherit;font-weight:700;border-radius:999px;padding:11px 18px;min-height:44px;cursor:pointer;border:0;background:var(--akzent,#7C5BD6);color:#fff}'+
+    '.konto-dlg button.leer{background:transparent;color:inherit;border:1px solid var(--linie,#2F2740)}'+
+    '.konto-dlg button:disabled{opacity:.6}'+
+    '.konto{background:var(--karte,#1F1929);border:1px solid var(--linie,#2F2740);border-radius:16px;padding:16px 18px;margin:0 0 14px}'+
     '.konto p{margin:6px 0 12px;color:var(--leise,#B3A9C4);font-size:.95rem}.konto .zeile{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--linie,#2F2740)}'+
     '.konto .stand{font-size:.85rem;color:var(--leise,#B3A9C4)}.konto .stand.gut{color:var(--gruen,#4ADE80)}.konto .stand.schlecht{color:var(--rot,#F87171)}.konto summary{cursor:pointer;color:var(--akzent,#A78BFA);font-weight:700;margin-top:6px}'+
     'dialog.konto-dlg{border:0;border-radius:20px;padding:22px;max-width:26rem;width:calc(100% - 32px);background:var(--panel,#17121F);color:var(--text,#F5F2FA)}dialog.konto-dlg::backdrop{background:rgba(0,0,0,.6)}'+
@@ -247,13 +261,14 @@
   function melden(t){ try{ root.dispatchEvent(new CustomEvent('konto', {detail:t})); }catch(e){} }
 
   var dlg=null;
-  function fenster(thema){
+  function fenster(thema, opt){
+    opt=opt||{};
     stilEinmal(); aktuellesThema=thema;
     if(!dlg){ dlg=document.createElement('dialog'); dlg.className='konto-dlg'; document.body.appendChild(dlg); }
     var email=(sitzung()&&sitzung().email)||lies('sj.konto.email')||'';
     function schritt1(fehler){
-      dlg.innerHTML='<form method="dialog" id="kd1"><h2>Party speichern und teilen</h2>'+
-        '<p>Wir schicken dir einen Code per E-Mail. Kein Passwort. Deine Gäste brauchen kein Konto.</p>'+
+      dlg.innerHTML='<form method="dialog" id="kd1"><h2>'+esc(opt.titel||'Party speichern und teilen')+'</h2>'+
+        '<p>'+esc(opt.text||'Wir schicken dir einen Code per E-Mail. Kein Passwort. Deine Gäste brauchen kein Konto.')+'</p>'+
         '<input type="email" id="kd-mail" autocomplete="email" inputmode="email" placeholder="deine@email.de" required value="'+esc(email)+'">'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+
         '<div class="reihe"><button class="knopf mittel" id="kd-los" type="submit">Code schicken</button><button class="knopf leer mittel" type="button" id="kd-zu">Später</button></div></form>';

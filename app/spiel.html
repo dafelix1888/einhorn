@@ -1977,9 +1977,18 @@ function verzaubern(){
   if(svg){ var m=svg.querySelector('.main'); if(m) m.style.fill=css(st.richtig); svg.classList.add('pop'); }
   render(true); konfetti(50, .5, .4);
 }
+// Vor dem ersten Aufwecken: Eltern melden sich einmal an (Tour gesichert, iPad-Link möglich).
+// Mit geheimem Link (iPad, Vorausgeher) oder ohne Server geht es sofort los.
+function startPruefen(weiter){
+  var K=window.Konto, th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
+  if(!K || !K.aktiv() || K.linkRolle(th) || K.angemeldet()){ weiter(); return; }
+  var f=function(e){ if(e.detail && e.detail.art==='angemeldet'){ window.removeEventListener('konto', f); toast('Angemeldet. Jetzt „Spiegel aufwecken“ tippen.'); } };
+  window.addEventListener('konto', f);
+  K.fenster(th, {titel:'Bevor Funkel loslegt', text:'Einmal kurz anmelden, dann ist eure Tour gesichert. Wir schicken dir einen Code per E-Mail, kein Passwort. Gäste und das iPad mit dem geheimen Link brauchen kein Konto.'});
+}
 function haupt(){
   tonAn();
-  if(state.phase==='start'){ aufwecken(); return; }
+  if(state.phase==='start'){ startPruefen(aufwecken); return; }
   if(state.phase==='seek'){ if(wartet) stationOeffnen(); else ankommen('hand'); return; }
   if(state.phase==='end'){ heimStart(); return; }
   if(state.phase==='heim'){ if(state.step===0) heimAngekommen(); else vonVorn(); return; }

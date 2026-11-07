@@ -122,7 +122,8 @@
     var h='<div class="oben">'+zurueck+'<span class="leise">Schritt '+(schritt+1)+' von '+SCHRITTE+'</span></div>'+
       '<div class="fortschritt">'+[0,1,2].map(function(i){ return '<i class="'+(i<=schritt?'an':'')+'"></i>'; }).join('')+'</div><div class="stapel">';
     if(schritt===0){
-      h+='<h1>Für wen und wann?</h1>'+
+      var pl0=Party.plan(thema), mitRoute=!party && pl0 && pl0.stationen && pl0.stationen.length;
+      h+=(mitRoute?'<p class="leise" style="margin:0 0 8px">✓ Eure Route ist gespeichert. Jetzt noch kurz zur Party.</p>':'')+'<h1>Für wen und wann?</h1>'+
         '<label class="feld"><span>Vorname</span><input id="name" type="text" autocomplete="off" value="'+esc(e.kind.name)+'" placeholder="z. B. Emma"></label>'+
         '<div class="zwei"><label class="feld"><span>Wird</span><input id="alter" type="number" min="2" max="12" inputmode="numeric" value="'+esc(e.kind.alter||'')+'" placeholder="5"></label>'+
         '<label class="feld"><span>Start</span><input id="start" type="time" step="900" value="'+esc(e.start||'15:00')+'"></label></div>'+
