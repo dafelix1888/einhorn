@@ -308,7 +308,7 @@
   function planenKlick(){
     if(!draussen() || (party && party.ort==='drinnen')){   // drinnen: nur Variante und Kinder merken
       plan={format:1, thema:thema, stationen:[], strecke:0};
-      speichern(); location.href=(party ? 'party.html' : 'spiel.html')+'?thema='+encodeURIComponent(thema); return;
+      speichern(); location.href='party.html?thema='+encodeURIComponent(thema); return;
     }
     var text=$('adresse').value.trim();
     if(!wahl.start && !text){ status('Bitte eine Startadresse eingeben oder den Standort-Knopf tippen.', true); return; }
@@ -373,7 +373,7 @@
       var b=this; b.disabled=true; b.textContent='Moment …'; versuch++;
       rechnen().then(function(){ b.disabled=false; b.textContent='Andere Route'; });
     });
-    $('speichern').addEventListener('click', function(){ speichern(); if(window.marketer) window.marketer.track('route_planned'); location.href=(party ? 'party.html' : 'spiel.html')+'?thema='+encodeURIComponent(thema); });
+    $('speichern').addEventListener('click', function(){ speichern(); if(window.marketer) window.marketer.track('route_planned'); location.href='party.html?thema='+encodeURIComponent(thema); });
     if(window.Konto && Konto.aktiv()) $('teilen').hidden=true;   // geteilt wird geschützt über die Party-Seite
     $('teilen').addEventListener('click', function(){
       speichern(); var link=spielLink(plan);
