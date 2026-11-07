@@ -13,8 +13,8 @@
 // über die Zugriffsregeln in server/supabase.sql.
 (function(root){
   'use strict';
-  var SUPABASE_URL='';
-  var SUPABASE_KEY='';
+  var SUPABASE_URL='https://fsqnzmwuojngopffcxso.supabase.co';
+  var SUPABASE_KEY='sb_publishable_mD1QtSgNGkljx0XrBMfvgQ_tL0vOGku';
   try{ if(root.KONTO_TEST){ SUPABASE_URL=root.KONTO_TEST.url; SUPABASE_KEY=root.KONTO_TEST.key; } }catch(e){}
 
   var SITZUNG='sj.konto', ROLLEN=['gast','vorausgeher','spiel'];
