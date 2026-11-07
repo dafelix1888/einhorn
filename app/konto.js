@@ -35,7 +35,7 @@
     if(opt.prefer) h.Prefer=opt.prefer;
     return fetch(SUPABASE_URL.replace(/\/$/,'')+pfad, {method:opt.method||'GET', headers:h, body:opt.body!=null?JSON.stringify(opt.body):undefined}).then(function(r){
       return r.text().then(function(t){ var j=null; try{ j=t?JSON.parse(t):null; }catch(e){}
-        if(!r.ok){ var f=new Error((j&&(j.msg||j.message||j.error_description||j.error))||('HTTP '+r.status)); f.status=r.status; f.code=j&&(j.error_code||j.code); throw f; }
+        if(!r.ok){ var f=new Error((j&&(j.fehler||j.msg||j.message||j.error_description||j.error))||('HTTP '+r.status)); f.status=r.status; f.daten=j; f.code=j&&(j.error_code||j.code); throw f; }
         return j; });
     });
   }
@@ -190,6 +190,28 @@
     return function(){ aus=true; clearTimeout(uhr); };
   }
 
+  // ---------- Funkel kennt das Kind: Namens-Sätze (Edge Function „namen“) ----------
+  function namenAnfrage(body, mitAnmeldung){
+    var los=function(t){ return anfrage('/functions/v1/namen', {method:'POST', token:t, body:body}); };
+    return mitAnmeldung ? token().then(los) : los(null);
+  }
+  function partyId(thema){ var p=root.Party && Party.lesen(thema); return p && p.server && p.server.id; }
+  function namenStand(thema){
+    var id=partyId(thema); if(!angemeldet() || !id) return Promise.resolve(null);
+    return sync(thema)['catch'](function(){}).then(function(){ return namenAnfrage({aktion:'stand', party_id:id}, true); });
+  }
+  function namenErzeugen(thema, name, aussprache, alter){
+    var id=partyId(thema); if(!angemeldet() || !id) return Promise.reject(new Error('Bitte zuerst speichern.'));
+    return sync(thema)['catch'](function(){}).then(function(){ return namenAnfrage({aktion:'erzeugen', party_id:id, name:name, aussprache:aussprache, alter:alter}, true); });
+  }
+  // Fürs Spiel: Sätze mit dem iPad-Schlüssel holen (eigener Link oder der Schlüssel der eigenen Party)
+  function namenHolen(thema, hash){
+    var l=lies('sj.link.'+thema), p=root.Party && Party.lesen(thema);
+    var t=(l && l.k && l.rolle==='spiel') ? l.k : (p && p.server && p.server.k && p.server.k.spiel);
+    if(!aktiv() || !t) return Promise.resolve(null);
+    return namenAnfrage({aktion:'holen', t:t, hash:hash||undefined}, false);
+  }
+
   // ---------- Oberfläche: Karte in der Party-Übersicht und Anmelde-Fenster ----------
   var STIL='.konto{background:var(--karte,#1F1929);border:1px solid var(--linie,#2F2740);border-radius:16px;padding:16px 18px;margin:0 0 14px}'+
     '.konto p{margin:6px 0 12px;color:var(--leise,#B3A9C4);font-size:.95rem}.konto .zeile{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--linie,#2F2740)}'+
@@ -288,6 +310,7 @@
 
   root.Konto={aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
+    namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,
     linkRolle:linkRolle, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
     codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};
 })(this);
