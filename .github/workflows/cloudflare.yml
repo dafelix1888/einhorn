@@ -58,6 +58,9 @@ jobs:
               for k,v in w.items(): s=s.replace(k, html.escape(v).replace('\n','<br>'))
               open(f,'w',encoding='utf-8').write(s)
           PY
+      - name: Version in die Fehlermeldungen schreiben
+        if: env.HAT_TOKEN == 'true'
+        run: sed -i "s/__VERSION__/${GITHUB_SHA::7}/" app/fehler.js
       - name: App veröffentlichen
         if: env.HAT_TOKEN == 'true'
         uses: cloudflare/wrangler-action@v4
