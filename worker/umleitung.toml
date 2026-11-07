@@ -1,0 +1,18 @@
+# Umleitung aller Nebenadressen auf https://schatzweg.de (siehe umleitung.js).
+# Bereitgestellt von .github/workflows/cloudflare.yml. Token braucht Zone → Workers Routes → Edit für beide Domains.
+name = "schatzweg-umleitung"
+main = "umleitung.js"
+compatibility_date = "2026-10-01"
+workers_dev = false
+
+[[routes]]
+pattern = "www.schatzweg.de"
+custom_domain = true
+
+[[routes]]
+pattern = "schatzsweg.de"
+custom_domain = true
+
+[[routes]]
+pattern = "www.schatzsweg.de"
+custom_domain = true

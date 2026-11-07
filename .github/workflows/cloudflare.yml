@@ -79,6 +79,7 @@ jobs:
           [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || export CLOUDFLARE_ACCOUNT_ID=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" https://api.cloudflare.com/client/v4/accounts | jq -r '.result[0].id')
           $W deploy --config worker/wrangler.toml
           $W deploy --config worker/karte.toml
+          $W deploy --config worker/umleitung.toml
           if [ -n "$ELEVENLABS_API_KEY" ]; then printf '%s' "$ELEVENLABS_API_KEY" | $W secret put ELEVENLABS_API_KEY --config worker/wrangler.toml; fi
           # Aufräumen: ein früherer Lauf hat den Schlüssel versehentlich an den App-Worker gehängt
           yes | $W secret delete ELEVENLABS_API_KEY --name schnitzeljagd-app 2>/dev/null || true
