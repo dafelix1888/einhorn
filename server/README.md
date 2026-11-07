@@ -22,7 +22,7 @@ Damit Eltern ihre Party geschützt speichern und teilen können. Ohne diese Schr
 3. **Anmeldung per Code:** Authentication → Emails → Templates. In „Magic Link“ und „Confirm signup“ den Code einfügen, zum Beispiel:
    `<h2>Dein Code für Funkels Regenbogen</h2><p style="font-size:28px;letter-spacing:4px"><b>{{ .Token }}</b></p><p>Oder hier tippen: <a href="{{ .ConfirmationURL }}">Anmelden</a></p>`
    Der Code ist wichtig: Der Link aus der Mail öffnet sich auf dem iPhone oft in einem anderen Browser, dort fehlt die Party.
-4. **Adressen erlauben:** Authentication → URL Configuration. Site URL `https://dafelix1888.github.io/einhorn/app/`, bei Redirect URLs `https://dafelix1888.github.io/einhorn/app/**` eintragen.
+4. **Adressen erlauben:** Authentication → URL Configuration. Site URL `https://schatzweg.de/app/`, bei Redirect URLs `https://schatzweg.de/app/**`, `https://www.schatzweg.de/app/**`, `https://schnitzeljagd-app.schatzsuche-app.workers.dev/app/**` und `https://dafelix1888.github.io/einhorn/app/**` eintragen.
 5. **Schlüssel eintragen:** Project Settings → API. „Project URL“ und den öffentlichen Schlüssel („anon“ bzw. „publishable“) oben in `app/konto.js` bei `SUPABASE_URL` und `SUPABASE_KEY` eintragen. Beide sind nicht geheim, geschützt wird über die Regeln in `supabase.sql`. **Nie** den `service_role`- oder `secret`-Schlüssel eintragen.
 
 ## Vor dem Start für fremde Eltern

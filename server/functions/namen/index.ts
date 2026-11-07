@@ -17,7 +17,7 @@ const STIMME = {
 };
 const ORDNUNG = ['', 'ersten', 'zweiten', 'dritten', 'vierten', 'fünften', 'sechsten', 'siebten', 'achten', 'neunten', 'zehnten', 'elften', 'zwölften'];
 const NAME = /^[\p{L}][\p{L}\p{M} '’-]{0,29}$/u;
-const ERLAUBT = ['https://dafelix1888.github.io', 'https://schnitzeljagd-app.schatzsuche-app.workers.dev', 'http://localhost:8765'];
+const ERLAUBT = ['https://schatzweg.de', 'https://www.schatzweg.de', 'https://dafelix1888.github.io', 'https://schnitzeljagd-app.schatzsuche-app.workers.dev', 'http://localhost:8765'];
 
 function saetze(n: string, alter: number) {
   const a = ORDNUNG[alter] || '';

@@ -8,4 +8,4 @@ main = "stimmen.js"
 compatibility_date = "2026-10-01"
 
 [vars]
-ERLAUBTE_URSPRUENGE = "https://dafelix1888.github.io,https://schnitzeljagd-app.schatzsuche-app.workers.dev,http://localhost:8765"
+ERLAUBTE_URSPRUENGE = "https://schatzweg.de,https://www.schatzweg.de,https://dafelix1888.github.io,https://schnitzeljagd-app.schatzsuche-app.workers.dev,http://localhost:8765"
