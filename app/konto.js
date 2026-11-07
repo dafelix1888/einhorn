@@ -212,6 +212,13 @@
     return namenAnfrage({aktion:'holen', t:t, hash:hash||undefined}, false);
   }
 
+  // ---------- Nach der Party: Rückmeldung der Gast-Eltern ----------
+  function feedbackGeben(k, wert){ return anfrage('/rest/v1/rpc/feedback_geben', {method:'POST', body:{t:k, wert:wert}}); }
+  function feedbackLesen(thema){
+    var id=partyId(thema); if(!angemeldet() || !id) return Promise.resolve(null);
+    return token().then(function(t){ return anfrage('/rest/v1/feedback?select=wert&party_id=eq.'+id, {token:t}); });
+  }
+
   // ---------- Oberfläche: Karte in der Party-Übersicht und Anmelde-Fenster ----------
   var STIL='.konto{background:var(--karte,#1F1929);border:1px solid var(--linie,#2F2740);border-radius:16px;padding:16px 18px;margin:0 0 14px}'+
     '.konto p{margin:6px 0 12px;color:var(--leise,#B3A9C4);font-size:.95rem}.konto .zeile{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--linie,#2F2740)}'+
@@ -310,6 +317,7 @@
 
   root.Konto={aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
+    feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,
     linkRolle:linkRolle, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
     codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};

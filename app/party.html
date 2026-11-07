@@ -231,6 +231,10 @@
     var h='<div class="oben"><a class="textknopf" href="index.html">← Alle Abenteuer</a><a class="textknopf" href="#" id="aendern">Angaben ändern</a></div>'+
       '<div class="kopf"><img src="'+esc(info.cover)+'" alt=""><div style="min-width:0"><h1>'+esc(partyTitel(p))+'</h1>'+
       '<div class="leise">'+esc(Party.datumText(Party.datum(p)))+' · '+esc(p.start)+' · '+p.kinder+' Kinder</div></div>'+(cd?'<span class="countdown">'+cd+'</span>':'')+'</div>';
+    var dat=Party.datum(p);
+    if(dat && Date.now()>dat.getTime()+120*60000) h+='<section class="jetzt-karte" aria-label="Nach der Party" style="margin-bottom:14px"><div class="marke">Nach der Party</div><h2>Danke an die Gäste</h2>'+
+      '<p>Schickt den Gast-Eltern ein Danke mit Funkels Urkunde für jedes Kind. Das Gruppenfoto teilt ihr direkt aus dem Spiel („Gruppenfoto mit Rahmen“).</p>'+
+      '<div class="reihe"><button type="button" class="knopf mittel" id="danke-link">Danke-Link schicken</button></div><p class="leise" id="rueckmeldung" style="margin:10px 0 0" hidden></p></section>';
     h+='<div class="stapel"><div class="leiste"><div class="bahn"><i style="width:'+Math.round(fertig/l.length*100)+'%"></i></div><b>'+fertig+' von '+l.length+' erledigt</b></div>';
     if(n){
       var w=wann(n);
@@ -273,7 +277,7 @@
       '<button type="button" class="knopf leer mittel" id="kalender">In den Kalender</button>'+
       '</div><p class="leise" style="font-size:.85rem;margin-top:10px">Der Link fürs iPad bringt Route, Kinderzahl und Variante mit. Der Vorausgeher-Link zeigt Karte, Stationen und Startzeit '+Party.uhr(party,-20)+' Uhr.</p>'+
       '<div class="reihe" style="margin-top:24px"><button type="button" class="knopf leer mittel" id="loeschen">Party löschen</button></div>';
-    $('seite').innerHTML=h;
+    $('seite').innerHTML=h; rueckmeldungZeigen();
   }
 
   function linkFuersIpad(){ return Party.spielLink(party, Party.plan(thema)); }
@@ -283,6 +287,15 @@
   }
   function schritt_(id){ return Party.aufgaben(party, tour, Party.plan(thema)).filter(function(a){ return a.id===id; })[0]; }
   function bereit(f){ if(window.Konto) Konto.bereit(thema, f); else f(); }      // mit Server: erst geschützt speichern, dann teilen
+  function dankeLink(){ bereit(function(){ teilen(Party.dankeLink(party, Party.plan(thema)), 'Danke fürs Mitfeiern', 'Danke-Link kopiert. In die Eltern-Gruppe schicken.'); }); }
+  function rueckmeldungZeigen(){                     // Rückmeldungen der Gast-Eltern (nur mit Server)
+    if(!window.Konto || !$('rueckmeldung')) return;
+    Konto.feedbackLesen(thema).then(function(l){
+      var e=$('rueckmeldung'); if(!e || !l || !l.length) return;
+      var z={1:0,2:0,3:0}; l.forEach(function(x){ z[x.wert]=(z[x.wert]||0)+1; });
+      e.textContent=l.length+(l.length===1?' Familie hat':' Familien haben')+' geantwortet: 😍 '+z[3]+' · 🙂 '+z[2]+' · 😐 '+z[1]; e.hidden=false;
+    }, function(){});
+  }
   function gastLink(){ bereit(function(){ teilen(Party.einladungsLink(party, Party.plan(thema)), 'Einladung: '+partyTitel(party), 'Einladungslink kopiert. In die Eltern-Gruppe schicken.'); }); }
 
   document.addEventListener('click', function(ev){
@@ -317,6 +330,7 @@
       el.href=URL.createObjectURL(blob); el.download=thema+'-party.ics'; document.body.appendChild(el); el.click(); el.remove(); toast('Kalenderdatei erstellt. Öffnen, dann landen alle Termine im Kalender.'); return;
     }
     if(t.closest('#teilen')){ bereit(function(){ teilen(linkFuersIpad(), partyTitel(party), 'Link kopiert. Auf dem iPad öffnen.'); }); return; }
+    if(t.closest('#danke-link')){ dankeLink(); return; }
     if(t.closest('#ansehen')){ bereit(function(){ location.href=Party.einladungsLink(party, Party.plan(thema)); }); return; }
     if(t.closest('#vg-link')){ bereit(function(){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+partyTitel(party), 'Link kopiert. An den Vorausgeher schicken.'); }); return; }
     if(t.closest('#gast-link')){ gastLink(); return; }

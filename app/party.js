@@ -160,6 +160,8 @@
     return {t:p.thema, n:p.kind&&p.kind.name, a:p.kind&&p.kind.alter, d:p.datum, s:p.start, w:treff, b:p.abholen||uhr(p,150), o:p.ort, r:bis.toISOString().slice(0,10), tel:p.telefon||'', h:gaesteHinweis(p)};
   }
   function einladungsLink(p, pl){ var k=schluessel(p,'gast'); if(k!==undefined) return k ? basisUrl()+'einladung.html?k='+k : null; return basisUrl()+'einladung.html?e='+code(einladungsDaten(p, pl)); }
+  // Nach der Party: Danke-Seite für die Gast-Eltern (Urkunde, Rückmeldung), gleicher Schlüssel wie die Einladung
+  function dankeLink(p, pl){ var l=einladungsLink(p, pl); return l ? l.replace('/einladung.html?', '/danke.html?') : null; }
   // geteilten Plan (aus einem Link) auf diesem Gerät ablegen; Haken des Geräts bleiben
   function ausLinkUebernehmen(thema, c){
     var o=typeof c==='string' ? decode(c) : JSON.parse(JSON.stringify(c||null)); if(!o || o.thema!==thema) return null;
@@ -168,5 +170,5 @@
     delete o.party; schreib('sj.plan.'+thema, o); return o;
   }
 
-  root.Party={imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
+  root.Party={imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
 })(this);
