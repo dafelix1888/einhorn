@@ -1,0 +1,5 @@
+# Cloudflare (Workers, statische Seiten): Sicherheits-Header. Seiten werden ohnehin bei jedem Aufruf frisch geprüft.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(self), microphone=(self), geolocation=(self)

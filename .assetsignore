@@ -1,0 +1,16 @@
+# Nicht öffentlich ausliefern (Cloudflare Workers, statische Seiten)
+.git
+.github
+.assetsignore
+wrangler.jsonc
+*.md
+server
+worker
+stimmen/*.mjs
+stimmen/rollen.json
+node_modules
+# Altes Original vom Geburtstag bleibt nur auf GitHub Pages (Stimmendatei ist größer als 25 MB)
+original.html
+funkel-stimme.json
+punkte.json
+sw.js

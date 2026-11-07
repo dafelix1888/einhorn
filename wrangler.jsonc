@@ -1,0 +1,14 @@
+// Cloudflare Workers (statische Seiten): liefert die App aus, parallel zu GitHub Pages.
+// Bereitgestellt von .github/workflows/cloudflare.yml bei jedem Push auf main.
+// Was nicht ausgeliefert wird, steht in .assetsignore.
+{
+  "name": "schnitzeljagd-app",
+  "compatibility_date": "2026-11-06",
+  "assets": {
+    "directory": ".",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  },
+  "workers_dev": true,
+  "observability": { "enabled": true }
+}
