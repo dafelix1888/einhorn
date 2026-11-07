@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0F0B17">
+<title>Schatzsuche zum Kindergeburtstag in eurer Straße · Funkels Regenbogen</title>
+<meta name="description" content="Eine Schatzsuche für Kinder von 3 bis 6, die in eurer Umgebung spielt: Ein sprechender Zauberspiegel führt per GPS von Station zu Station.">
+<style>
+:root{--bg:#0F0B17;--panel:#17121F;--karte:#1F1929;--linie:#2F2740;--text:#F5F2FA;--leise:#B3A9C4;--akzent:#A78BFA;--akzent-tief:#7C5BD6;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:17px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:0 16px 48px}
+.held{padding:56px 0 32px;text-align:center}
+h1{font-size:clamp(28px,6vw,42px);line-height:1.15;margin:0 0 16px;text-wrap:balance}
+h2{font-size:22px;margin:40px 0 16px}
+.sub{color:var(--leise);font-size:19px;margin:0 auto 24px;max-width:36em}
+.cta{display:inline-block;background:var(--akzent-tief);color:#fff;text-decoration:none;font-weight:600;padding:16px 28px;border-radius:999px;min-height:48px}
+.cta:hover,.cta:focus-visible{background:var(--akzent)}
+.preis{color:var(--leise);font-size:15px;margin-top:12px}
+.probe{margin:0 0 20px}.hoer{background:none;border:1px solid var(--linie);color:var(--text);border-radius:999px;padding:10px 18px;font:inherit;cursor:pointer;min-height:44px}
+.schritte{list-style:none;counter-reset:s;padding:0;margin:0;display:grid;gap:12px}
+.schritte li{counter-increment:s;background:var(--panel);border:1px solid var(--linie);border-radius:14px;padding:16px 16px 16px 60px;position:relative}
+.schritte li::before{content:counter(s);position:absolute;left:16px;top:16px;width:30px;height:30px;border-radius:50%;background:var(--akzent-tief);display:grid;place-items:center;font-weight:700}
+.schritte b{display:block}.schritte span{color:var(--leise)}
+.vorteile{padding-left:20px}.vorteile li{margin:8px 0}
+table{width:100%;border-collapse:collapse;font-size:15px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--linie);vertical-align:top}
+thead th{color:var(--leise);font-weight:600}tbody th{font-weight:600}
+details{background:var(--panel);border:1px solid var(--linie);border-radius:12px;padding:12px 16px;margin:8px 0}
+summary{cursor:pointer;font-weight:600}details p{color:var(--leise);margin:8px 0 0}
+.schluss{text-align:center;padding-top:32px}
+</style>
+
+</head>
+<body>
+<main data-variant="a">
+  <header class="held">
+    <h1>Eine Schatzsuche, die in eurer Straße spielt</h1>
+    <p class="sub">Für Kinder von 3 bis 6: Ein sprechender Zauberspiegel führt die Geburtstagsgäste von Station zu Station – mit wenigen Klicks für euer Kind und eure Umgebung eingerichtet, statt einer Box, die überall gleich ist.</p>
+    <div class="probe"><button type="button" class="hoer" data-src="themen/einhorn/hoerprobe.mp3">▶ Hörprobe anhören</button></div>
+    <a class="cta" href="planer.html?thema=einhorn" data-track="cta_clicked">Route für eure Straße planen</a>
+    
+  </header>
+  <section><h2>So funktioniert es</h2><ol class="schritte"><li><b>Hörprobe anhören</b><span>Hört rein, wie Funkel das Einhorn die Geschichte erzählt.</span></li><li><b>Route planen</b><span>Adresse eingeben: Die App legt 7 Stationen auf passende Orte in eurer Nähe – Bank, Spielplatz, Zebrastreifen.</span></li><li><b>Party anlegen</b><span>Einladung für WhatsApp, Einkaufsliste und Zeitplan entstehen in einem Rutsch.</span></li></ol></section>
+  <section><h2>Was ihr bekommt</h2><ul class="vorteile"><li>Die Geschichte spielt dort, wo ihr wohnt – nicht auf einer Karte aus der Schachtel.</li><li>Der Zauberspiegel spricht alle Texte. Die Kinder müssen nicht lesen können.</li><li>Bei Regen lässt sich die Geschichte auch zu Hause spielen.</li><li>Der Vorausgeher sieht auf der Karte genau, was wohin kommt.</li></ul></section>
+  <section><h2>Im Vergleich</h2><table><thead><tr><th></th><th>Zauberspiegel</th><th>Box oder selbst basteln</th></tr></thead><tbody><tr><th scope="row">Wo gespielt wird</th><td>In eurer Umgebung, auf echten Orten</td><td>Box: überall gleich · Selbst basteln: ihr sucht die Orte</td></tr><tr><th scope="row">Vorbereitung</th><td>Wenige Klicks und eine Einkaufsliste</td><td>2–3 Abende basteln oder eine Box für 30–50 €</td></tr><tr><th scope="row">Am Partytag</th><td>Der Zauberspiegel erzählt und führt</td><td>Ein Erwachsener liest Rätsel vor</td></tr><tr><th scope="row">Bei Regen</th><td>Auch zu Hause spielbar</td><td>Plan B selbst überlegen</td></tr></tbody></table></section>
+  <section><h2>Fragen von Eltern</h2><details><summary>Brauche ich ein besonderes Gerät?</summary><p>Ein Handy oder Tablet mit Mobilfunk reicht. Der Bereit-Check prüft vorher Ton, GPS, Akku und Offline-Speicher.</p></details><details><summary>Klappt das GPS wirklich?</summary><p>Stationen öffnen nur bei sicherem Signal. Sonst fragt der Spiegel, und ein Erwachsener tippt „Wir sind da“.</p></details><details><summary>Unsere Kinder können noch nicht lesen.</summary><p>Müssen sie nicht: Der Zauberspiegel spricht alle Texte.</p></details><details><summary>Was brauche ich an Material?</summary><p>Die Einkaufsliste zeigt alles mit Links. Vieles davon sind Mitgebsel, die ihr zum Geburtstag ohnehin kauft.</p></details><details><summary>Muss vorher jemand die Stationen vorbereiten?</summary><p>Ja, ein Vorausgeher legt die Dinge hin. Die App zeigt ihm auf der Karte, was wohin kommt.</p></details><details><summary>Wie lange dauert die Schatzsuche?</summary><p>Etwa 50 Minuten plus Heimweg, mit 7 Stationen.</p></details></section>
+  <section class="schluss"><a class="cta" href="planer.html?thema=einhorn" data-track="cta_clicked">Route für eure Straße planen</a></section>
+</main>
+<main data-variant="b" hidden>
+  <header class="held">
+    <h1>Fertig geplant statt drei Abende gebastelt</h1>
+    <p class="sub">Eine komplette Schatzsuche für den Kindergeburtstag in eurer Umgebung, in wenigen Klicks geplant. Am Partytag führt ein sprechender Zauberspiegel die Kinder von Station zu Station.</p>
+    <div class="probe"><button type="button" class="hoer" data-src="themen/einhorn/hoerprobe.mp3">▶ Hörprobe anhören</button></div>
+    <a class="cta" href="planer.html?thema=einhorn" data-track="cta_clicked">Route für eure Straße planen</a>
+    
+  </header>
+  <section><h2>So funktioniert es</h2><ol class="schritte"><li><b>Hörprobe anhören</b><span>Hört rein, wie Funkel das Einhorn die Geschichte erzählt.</span></li><li><b>Route planen</b><span>Adresse eingeben: Die App legt 7 Stationen auf passende Orte in eurer Nähe – Bank, Spielplatz, Zebrastreifen.</span></li><li><b>Party anlegen</b><span>Einladung für WhatsApp, Einkaufsliste und Zeitplan entstehen in einem Rutsch.</span></li></ol></section>
+  <section><h2>Was ihr bekommt</h2><ul class="vorteile"><li>Die Geschichte spielt dort, wo ihr wohnt – nicht auf einer Karte aus der Schachtel.</li><li>Der Zauberspiegel spricht alle Texte. Die Kinder müssen nicht lesen können.</li><li>Bei Regen lässt sich die Geschichte auch zu Hause spielen.</li><li>Der Vorausgeher sieht auf der Karte genau, was wohin kommt.</li></ul></section>
+  <section><h2>Im Vergleich</h2><table><thead><tr><th></th><th>Zauberspiegel</th><th>Box oder selbst basteln</th></tr></thead><tbody><tr><th scope="row">Wo gespielt wird</th><td>In eurer Umgebung, auf echten Orten</td><td>Box: überall gleich · Selbst basteln: ihr sucht die Orte</td></tr><tr><th scope="row">Vorbereitung</th><td>Wenige Klicks und eine Einkaufsliste</td><td>2–3 Abende basteln oder eine Box für 30–50 €</td></tr><tr><th scope="row">Am Partytag</th><td>Der Zauberspiegel erzählt und führt</td><td>Ein Erwachsener liest Rätsel vor</td></tr><tr><th scope="row">Bei Regen</th><td>Auch zu Hause spielbar</td><td>Plan B selbst überlegen</td></tr></tbody></table></section>
+  <section><h2>Fragen von Eltern</h2><details><summary>Brauche ich ein besonderes Gerät?</summary><p>Ein Handy oder Tablet mit Mobilfunk reicht. Der Bereit-Check prüft vorher Ton, GPS, Akku und Offline-Speicher.</p></details><details><summary>Klappt das GPS wirklich?</summary><p>Stationen öffnen nur bei sicherem Signal. Sonst fragt der Spiegel, und ein Erwachsener tippt „Wir sind da“.</p></details><details><summary>Unsere Kinder können noch nicht lesen.</summary><p>Müssen sie nicht: Der Zauberspiegel spricht alle Texte.</p></details><details><summary>Was brauche ich an Material?</summary><p>Die Einkaufsliste zeigt alles mit Links. Vieles davon sind Mitgebsel, die ihr zum Geburtstag ohnehin kauft.</p></details><details><summary>Muss vorher jemand die Stationen vorbereiten?</summary><p>Ja, ein Vorausgeher legt die Dinge hin. Die App zeigt ihm auf der Karte, was wohin kommt.</p></details><details><summary>Wie lange dauert die Schatzsuche?</summary><p>Etwa 50 Minuten plus Heimweg, mit 7 Stationen.</p></details></section>
+  <section class="schluss"><a class="cta" href="planer.html?thema=einhorn" data-track="cta_clicked">Route für eure Straße planen</a></section>
+</main>
+<script>
+(function(){
+  var q=new URLSearchParams(location.search).get('v');
+  var v=(q==='a'||q==='b')?q:(Math.random()<0.5?'a':'b');
+  var main=document.querySelector('main[data-variant="'+v+'"]')||document.querySelector('main');
+  document.querySelectorAll('main').forEach(function(m){ m.hidden=(m!==main); }); v=main.dataset.variant;
+  function track(name,props){ if(window.marketer) window.marketer.track(name,Object.assign({variant:v},props||{})); }
+  window.addEventListener('DOMContentLoaded',function(){ track('visit',{page:'landing'}); });
+  main.addEventListener('click',function(e){
+    var a=e.target.closest('[data-track]'); if(a) track(a.dataset.track,{label:a.textContent.trim()});
+    var h=e.target.closest('.hoer'); if(h){ var au=h._a||(h._a=new Audio(h.dataset.src)); if(au.paused){au.play();track('hoerprobe_played');} else au.pause(); }
+  });
+})();
+</script>
+</body>
+</html>

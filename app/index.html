@@ -450,7 +450,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       a.play()['catch'](function(){}); return; }
   });
   function probeKnoepfe(svg, label){ [].forEach.call(document.querySelectorAll('#probe,[data-probe]'), function(b){ b.innerHTML=svg; b.setAttribute('aria-label', label); }); }
-  $('ton').addEventListener('play', function(){ probeKnoepfe(PAUSE, 'Hörprobe anhalten'); });
+  $('ton').addEventListener('play', function(){ probeKnoepfe(PAUSE, 'Hörprobe anhalten'); if(window.marketer) window.marketer.track('hoerprobe_played'); });   // Marketer, Name nicht ändern
   $('ton').addEventListener('pause', function(){ probeKnoepfe(PLAY, 'Hörprobe abspielen'); });
   $('ton').addEventListener('ended', function(){ probeKnoepfe(PLAY, 'Hörprobe abspielen'); });
   $('suche').addEventListener('input', function(){ suche=this.value.trim().toLowerCase(); if(location.hash.indexOf('#/abenteuer/')===0 || location.hash.indexOf('#/figur/')===0) location.hash='#/'; else startZeigen(); });

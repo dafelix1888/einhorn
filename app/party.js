@@ -14,6 +14,7 @@
   // Party speichern und den Tourplan angleichen (neuer Stand = Spiel übernimmt Variante und Punkte einmal neu)
   function speichern(p){
     var alt=lies('sj.party.'+p.thema); if(alt && alt.server) p.server=alt.server; else delete p.server;   // „server“ gehört konto.js (Schlüssel der Links)
+    if(!alt && root.marketer){ try{ root.marketer.track('party_created'); }catch(e){} }    // Marketer: nur beim ersten Anlegen, Name nicht ändern
     p.geaendert=new Date().toISOString(); schreib('sj.party.'+p.thema, p);
     if(root.Konto) root.Konto.merken(p.thema);                                // angemeldet: kurz danach geschützt speichern
     var pl=plan(p.thema) || {format:1, thema:p.thema, stationen:[], strecke:0};

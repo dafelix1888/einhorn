@@ -373,7 +373,7 @@
       var b=this; b.disabled=true; b.textContent='Moment …'; versuch++;
       rechnen().then(function(){ b.disabled=false; b.textContent='Andere Route'; });
     });
-    $('speichern').addEventListener('click', function(){ speichern(); location.href=(party ? 'party.html' : 'spiel.html')+'?thema='+encodeURIComponent(thema); });
+    $('speichern').addEventListener('click', function(){ speichern(); if(window.marketer) window.marketer.track('route_planned'); location.href=(party ? 'party.html' : 'spiel.html')+'?thema='+encodeURIComponent(thema); });
     if(window.Konto && Konto.aktiv()) $('teilen').hidden=true;   // geteilt wird geschützt über die Party-Seite
     $('teilen').addEventListener('click', function(){
       speichern(); var link=spielLink(plan);
