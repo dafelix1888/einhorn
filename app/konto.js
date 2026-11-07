@@ -19,7 +19,12 @@
 
   var SITZUNG='sj.konto', ROLLEN=['gast','vorausgeher','spiel'];
   var zustand={}, uhr={};                              // je Thema: 'speichert' | 'gespeichert' | 'fehler'
-  function aktiv(){ return !!(SUPABASE_URL && SUPABASE_KEY); }
+  // Notweg: Klappt die Anmeldung aus technischen Gründen nicht (Mailversand gesperrt, Limit, Server weg),
+  // läuft die App einen Tag lang wie ohne Server weiter: Daten stecken im Link, kein Anmelden nötig.
+  var NOTWEG='sj.konto.notweg';
+  function notweg(){ var t=lies(NOTWEG); return !!t && Date.now()-t<864e5; }
+  function aktiv(){ return !!(SUPABASE_URL && SUPABASE_KEY) && !(notweg() && !sitzung()); }
+  function technisch(e){ return !e || !e.status || e.status===429 || e.status>=500 || /not.?authori[sz]ed|over_email_send_rate_limit|rate limit/i.test((e.code||'')+' '+(e.message||'')); }
   function lies(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
   function schreib(k,v){ try{ if(v==null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
@@ -308,7 +313,8 @@
         if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m)){ dlg.querySelector('#kd-f').textContent='Bitte eine E-Mail-Adresse eingeben.'; return; }
         b.disabled=true; b.textContent='Schickt …'; email=m; schreib('sj.konto.email', m);
         codeSchicken(m).then(function(){ schritt2(); }, function(e){ b.disabled=false; b.textContent='Code schicken';
-          dlg.querySelector('#kd-f').textContent=e.status===429?'Zu viele Versuche. Bitte in ein paar Minuten noch mal.':'Das ging nicht. Ist das Internet an?'; });
+          if(technisch(e)){ stoerung(e); return; }
+          dlg.querySelector('#kd-f').textContent='Das ging nicht. Bitte die E-Mail-Adresse prüfen.'; });
       };
       setTimeout(function(){ var i=dlg.querySelector('#kd-mail'); if(i && !i.value) i.focus(); }, 60);
     }
@@ -327,9 +333,18 @@
         b.disabled=true; b.textContent='Prüft …';
         codePruefen(email, c).then(function(){ return angemeldetWeiter(thema); }).then(function(){ fertig(); },
           function(e){ b.disabled=false; b.textContent='Anmelden'; delete feld.dataset.los;
-            dlg.querySelector('#kd-f').textContent=(e.status===400||e.status===401||e.status===403)?'Der Code stimmt nicht oder ist abgelaufen.':'Das ging nicht. Ist das Internet an?'; });
+            if(!(e.status===400||e.status===401||e.status===403) && technisch(e)){ stoerung(e); return; }
+            dlg.querySelector('#kd-f').textContent='Der Code stimmt nicht oder ist abgelaufen.'; });
       };
       setTimeout(function(){ feld.focus(); }, 60);
+    }
+    function stoerung(e){
+      try{ if(root.FehlerMelden) root.FehlerMelden('Anmeldung gestört: '+((e&&e.status)||'kein Netz')+' '+((e&&(e.code||e.message))||''), 'konto.js'); }catch(x){}
+      dlg.innerHTML='<div class="kd-fertig">'+held+'<h2>Die Anmeldung klemmt gerade</h2>'+
+        '<p class="unter">Kein Problem: Es geht auch ohne. Eure Daten stecken dann direkt im Link. Später könnt ihr euch noch anmelden.</p>'+
+        '<button class="los" id="kd-ohne" type="button">Ohne Anmeldung weiter</button><button class="neben" type="button" id="kd-nochmal">Noch mal versuchen</button></div>';
+      dlg.querySelector('#kd-nochmal').onclick=function(){ schritt1(); };
+      dlg.querySelector('#kd-ohne').onclick=function(){ schreib(NOTWEG, Date.now()); dlg.close(); melden({art:'notweg', thema:thema}); if(opt.weiter) opt.weiter(); };
     }
     function fertig(){
       dlg.innerHTML='<div class="kd-fertig"><div class="haken">'+IC.haken+'</div><h2>Geschafft!</h2><p class="unter" style="margin:0">'+esc(opt.fertig||'Eure Party ist gesichert.')+'</p></div>';
@@ -349,7 +364,7 @@
     var p=root.Party&&Party.lesen(thema);
     if(angemeldet() && p && p.server && p.server.k){ sync(thema)['catch'](function(){}); weiter(); return; }
     if(angemeldet()){ angemeldetWeiter(thema); return; }
-    fenster(thema);
+    fenster(thema, {weiter:weiter});
   }
 
   document.addEventListener('click', function(ev){
@@ -367,7 +382,7 @@
   var mailLink=null;
   try{ mailLink=linkAusMail(); }catch(e){}
 
-  root.Konto={mkMelden:mkMelden, aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
+  root.Konto={notweg:notweg, mkMelden:mkMelden, aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
     feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,

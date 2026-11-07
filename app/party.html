@@ -391,6 +391,7 @@
   window.addEventListener('konto', function(ev){
     var d=ev.detail||{}; if(d.thema!==thema) return;
     if(d.art==='fehler'){ toast('Das ging nicht. Ist das Internet an?'); return; }
+    if(d.art==='notweg') toast('Weiter ohne Anmeldung. Die Links enthalten jetzt die Party-Daten.');
     if(entwurf) return;
     party=Party.lesen(thema); if(!party){ neu(); return; }
     var y=window.scrollY; uebersicht(); window.scrollTo(0,y);

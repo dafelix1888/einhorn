@@ -72,6 +72,26 @@ async function mock(route){
   await a.evaluate(()=>localStorage.removeItem('sj.party.einhorn')); await a.goto(B+'party.html?thema=einhorn'); await a.waitForTimeout(600);
   ok(await a.locator('.route-geschafft svg .rg-p').count()===1 && /1 Stationen|Eure Tour steht/.test(await a.locator('.route-geschafft').innerText()), 'Assistent zeigt die Routen-Karte');
 
+  // 6. Mailversand gesperrt (Supabase ohne eigenen Mailserver): Notweg ohne Anmeldung
+  const c6=await b.newContext({viewport:{width:393,height:852}});
+  await c6.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort());
+  const meldungen=[];
+  await c6.route(S+'/**', r=>{ const u=new URL(r.request().url());
+    if(u.pathname==='/auth/v1/otp') return r.fulfill({status:400, contentType:'application/json', body:JSON.stringify({code:400, error_code:'email_address_not_authorized', msg:'Email address not authorized'})});
+    return mock(r); });
+  await c6.route('https://fsqnzmwuojngopffcxso.supabase.co/rest/v1/rpc/fehler_melden', r=>{ meldungen.push(JSON.parse(r.request().postData()).meldung); r.fulfill({status:204}); });
+  await c6.addInitScript(()=>{ window.KONTO_TEST={url:'https://test.supabase.co', key:'anon'}; window.FEHLER_TEST=true; });
+  const g=await c6.newPage(); g.on('pageerror',e=>errs.push(e.message));
+  await g.goto(B+'party.html?thema=einhorn'); await g.evaluate(([p,pl])=>{ localStorage.clear(); localStorage.setItem('sj.party.einhorn', JSON.stringify(p)); localStorage.setItem('sj.plan.einhorn', JSON.stringify(pl)); }, [party, plan]);
+  await g.goto(B+'spiel.html?thema=einhorn'); await g.waitForTimeout(800);
+  await g.click('#btn-main'); await g.fill('#kd-mail','fremd@example.org'); await g.click('#kd-los'); await g.waitForTimeout(500);
+  ok(/klemmt/.test(await g.locator('dialog.konto-dlg').innerText()), 'Mailversand gesperrt: Notweg wird angeboten');
+  await g.click('#kd-ohne'); await g.waitForTimeout(400);
+  ok((await g.evaluate(()=>__zs.state().phase))!=='start', 'Notweg: Tour startet ohne Anmeldung');
+  ok(meldungen.some(m=>/Anmeldung gestört: 400 email_address_not_authorized/.test(m)), 'Störung wird als Fehler gemeldet (PBIM)');
+  await g.goto(B+'party.html?thema=einhorn'); await g.waitForTimeout(600);
+  ok(await g.evaluate(()=>/einladung\.html\?e=/.test(Party.einladungsLink(Party.lesen('einhorn'), Party.plan('einhorn'))||'')), 'Notweg: Einladungslink mit Daten wie früher');
+
   ok(errs.length===0, 'keine Seitenfehler '+errs.join(' | '));
   console.log(fehler?fehler+' FEHLER':'ALLES OK'); await b.close(); process.exit(fehler?1:0);
 })();
