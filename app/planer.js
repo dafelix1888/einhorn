@@ -105,14 +105,16 @@
   }
 
   // ---------- Eingabe ----------
-  function pfeil(r){
-    if(r==='egal') return 'egal';
-    return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate('+WINKEL[r]+'deg)"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
+  var HIMMEL={N:'Norden',NO:'Nordosten',O:'Osten',SO:'Südosten',S:'Süden',SW:'Südwesten',W:'Westen',NW:'Nordwesten'};
+  function richtungKnopf(r){
+    if(r==='egal') return '<span class="r-egal">egal</span>';
+    return '<b>'+r+'</b><svg class="r-pfeil" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate('+WINKEL[r]+'deg)"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
   }
   function segZeichnen(){
     $('variante').innerHTML=Object.keys(tour.varianten).map(function(k){ var v=tour.varianten[k]; return '<button type="button" data-v="'+k+'" aria-pressed="'+(wahl.variante===k)+'">'+esc(v.name)+'</button>'; }).join('');
     $('variante-kurz').textContent=(tour.varianten[wahl.variante]||{}).kurz||'';
-    $('richtung').innerHTML=RICHTUNGEN.map(function(r){ return '<button type="button" data-r="'+r+'" aria-pressed="'+(wahl.richtung===r)+'" aria-label="'+(r==='egal'?'Richtung egal':'Richtung '+r)+'">'+pfeil(r)+'</button>'; }).join('');
+    $('richtung').innerHTML=RICHTUNGEN.map(function(r){ return '<button type="button" data-r="'+r+'" aria-pressed="'+(wahl.richtung===r)+'" aria-label="'+(r==='egal'?'Richtung egal':'Richtung '+HIMMEL[r])+'">'+richtungKnopf(r)+'</button>'; }).join('');
+    $('richtung-text').textContent=wahl.richtung==='egal' ? 'Egal, wo es die schönsten Orte gibt' : 'Richtung '+HIMMEL[wahl.richtung];
     $('form').innerHTML=[[false,'Hin und zurück'],[true,'Rundkurs']].map(function(f){ return '<button type="button" data-f="'+f[0]+'" aria-pressed="'+(wahl.rundkurs===f[0])+'">'+f[1]+'</button>'; }).join('');
     $('form-kurz').textContent=wahl.rundkurs ? 'Zurück möglichst über andere Wege.' : 'Zurück auf dem kürzesten Weg, meist derselbe.';
     var d=$('distanz'), f=wahl.rundkurs?2:1; d.min=tour.strecke.min*f; d.max=tour.strecke.max*f;
