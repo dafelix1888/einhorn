@@ -22,6 +22,24 @@ jobs:
         run: echo "::notice::CLOUDFLARE_API_TOKEN fehlt, Cloudflare wird übersprungen."
       - uses: actions/checkout@v6
         if: env.HAT_TOKEN == 'true'
+      - name: workers.dev-Adresse sicherstellen
+        if: env.HAT_TOKEN == 'true'
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACC: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          API=https://api.cloudflare.com/client/v4
+          [ -n "$ACC" ] || ACC=$(curl -s -H "Authorization: Bearer $T" $API/accounts | jq -r '.result[0].id')
+          echo "Konto: ${ACC:0:6}…"
+          cur=$(curl -s -H "Authorization: Bearer $T" $API/accounts/$ACC/workers/subdomain | jq -r '.result.subdomain // empty')
+          if [ -z "$cur" ]; then
+            for n in schatzsuche-app schatzsuche-app-$RANDOM; do
+              r=$(curl -s -X PUT -H "Authorization: Bearer $T" -H 'Content-Type: application/json' $API/accounts/$ACC/workers/subdomain -d "{\"subdomain\":\"$n\"}")
+              if echo "$r" | jq -e .success >/dev/null; then cur=$n; break; fi
+              echo "$r" | jq -c '.errors'
+            done
+          fi
+          echo "::notice::workers.dev-Adresse: ${cur}.workers.dev"
       - name: App veröffentlichen
         if: env.HAT_TOKEN == 'true'
         uses: cloudflare/wrangler-action@v4
