@@ -147,9 +147,47 @@
       if(!r || (r.rolle!=='spiel' && r.rolle!=='vorausgeher') || !r.daten || r.daten.thema!==thema){
         meldung('Dieser Link geht nicht mehr', 'Er wurde ersetzt oder die Party ist vorbei. Bitte die Eltern um einen neuen Link.'); return; }
       Party.ausLinkUebernehmen(thema, r.daten);
+      schreib('sj.link.'+thema, {k:k, rolle:r.rolle});         // für die Live-Haken des Vorausgehers
       q.delete('k'); location.replace(location.pathname+'?'+q.toString()+location.hash);
     }, function(){ meldung('Kein Netz', 'Zum ersten Öffnen braucht der Link Internet. Danach geht die Tour auch ohne.'); });
     return true;
+  }
+
+  // ---------- Vorausgeher live: Haken „Station steht“ ----------
+  // Schreiben nur mit Vorausgeher-Link; lesen mit Vorausgeher- oder iPad-Link, Eltern über ihren eigenen iPad-Schlüssel.
+  function linkRolle(thema){ var l=lies('sj.link.'+thema); return aktiv() && l && l.k ? l.rolle : null; }
+  function aufbauSchluessel(thema){
+    var l=lies('sj.link.'+thema); if(l && l.k) return l.k;
+    var p=root.Party && Party.lesen(thema); return (p && p.server && p.server.k && p.server.k.spiel) || null;
+  }
+  var offen={}, wiederUhr={};
+  function aufbauSenden(thema){
+    var st=offen[thema], l=lies('sj.link.'+thema); if(!st || !l) return;
+    clearTimeout(wiederUhr[thema]);
+    anfrage('/rest/v1/rpc/aufbau_setzen', {method:'POST', body:{t:l.k, stationen:st}}).then(function(r){
+      if(offen[thema]===st) delete offen[thema];
+      melden({art:r?'aufbau-gesendet':'aufbau-abgelehnt', thema:thema});
+    }, function(){ melden({art:'aufbau-wartet', thema:thema}); wiederUhr[thema]=setTimeout(function(){ aufbauSenden(thema); }, 20000); });
+  }
+  function aufbauMelden(thema, aufgebaut){
+    if(linkRolle(thema)!=='vorausgeher') return false;
+    var st={}; Object.keys(aufgebaut||{}).forEach(function(i){ if(aufgebaut[i]) st[i]=true; });
+    offen[thema]=st; aufbauSenden(thema); return true;
+  }
+  root.addEventListener('online', function(){ Object.keys(offen).forEach(aufbauSenden); });
+  function aufbauLesen(thema){
+    var t=aufbauSchluessel(thema); if(!aktiv() || !t) return Promise.resolve(null);
+    return anfrage('/rest/v1/rpc/aufbau_lesen', {method:'POST', body:{t:t}});
+  }
+  // Alle ms Millisekunden nachsehen, solange die Seite sichtbar ist. cb bekommt {stationen, aktualisiert}.
+  function aufbauBeobachten(thema, cb, ms){
+    if(!aktiv() || !aufbauSchluessel(thema)) return function(){};
+    var uhr=null, aus=false;
+    function holen(){ if(aus) return; if(document.visibilityState==='hidden'){ uhr=setTimeout(holen, ms); return; }
+      aufbauLesen(thema).then(function(r){ if(r) cb(r); }, function(){}).then(function(){ if(!aus) uhr=setTimeout(holen, ms); }); }
+    document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible' && !aus){ clearTimeout(uhr); holen(); } });
+    holen();
+    return function(){ aus=true; clearTimeout(uhr); };
   }
 
   // ---------- Oberfläche: Karte in der Party-Übersicht und Anmelde-Fenster ----------
@@ -250,5 +288,6 @@
 
   root.Konto={aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
+    linkRolle:linkRolle, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
     codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};
 })(this);

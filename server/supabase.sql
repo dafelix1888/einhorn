@@ -84,3 +84,45 @@ begin
     perform cron.schedule('alte-partys', '17 3 * * *', 'select public.alte_partys_loeschen()');
   end if;
 end $$;
+
+-- Vorausgeher live: Haken „Station steht“ für iPad und Eltern. Schreiben darf nur der Vorausgeher-Link,
+-- lesen dürfen Vorausgeher- und iPad-Link (und die Eltern über ihre Party). Gäste sehen nichts.
+create table if not exists public.aufbau (
+  party_id     uuid primary key references public.parties(id) on delete cascade,
+  stationen    jsonb not null default '{}',
+  aktualisiert timestamptz not null default now()
+);
+alter table public.aufbau enable row level security;
+drop policy if exists "eigener Aufbau" on public.aufbau;
+create policy "eigener Aufbau" on public.aufbau for select to authenticated
+  using (exists (select 1 from public.parties p where p.id = party_id and p.owner = auth.uid()));
+revoke all on public.aufbau from anon;
+grant select on public.aufbau to authenticated;
+
+create or replace function public.aufbau_setzen(t text, stationen jsonb) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare pid uuid; sauber jsonb;
+begin
+  select l.party_id into pid from public.links l join public.parties p on p.id = l.party_id
+    where l.token = t and l.rolle = 'vorausgeher' and (p.datum is null or p.datum >= current_date - 30);
+  if pid is null then return null; end if;
+  if jsonb_typeof(stationen) is distinct from 'object' then return null; end if;
+  select coalesce(jsonb_object_agg(key, true), '{}') into sauber
+    from jsonb_each(stationen) where key ~ '^[0-9]{1,2}$' and value = 'true'::jsonb;
+  insert into public.aufbau(party_id, stationen, aktualisiert) values (pid, sauber, now())
+    on conflict (party_id) do update set stationen = excluded.stationen, aktualisiert = now();
+  return jsonb_build_object('stationen', sauber);
+end $$;
+revoke all on function public.aufbau_setzen(text, jsonb) from public;
+grant execute on function public.aufbau_setzen(text, jsonb) to anon, authenticated;
+
+create or replace function public.aufbau_lesen(t text) returns jsonb
+language sql stable security definer set search_path = public as $$
+  select jsonb_build_object('stationen', coalesce(a.stationen, '{}'), 'aktualisiert', a.aktualisiert)
+  from public.links l join public.parties p on p.id = l.party_id
+  left join public.aufbau a on a.party_id = l.party_id
+  where l.token = t and l.rolle in ('vorausgeher','spiel') and (p.datum is null or p.datum >= current_date - 30)
+  limit 1
+$$;
+revoke all on function public.aufbau_lesen(text) from public;
+grant execute on function public.aufbau_lesen(text) to anon, authenticated;
