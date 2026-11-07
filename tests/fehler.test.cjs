@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
 (async()=>{ const b=await chromium.launch(); let f=0; const ok=(c,t)=>{console.log((c?'ok   ':'FEHLER ')+t); if(!c) f++;};
- async function seite(test){ const c=await b.newContext(); if(test) await c.addInitScript(()=>{window.FEHLER_TEST=1;}); const gesendet=[]; await c.route('https://fsqnzmwuojngopffcxso.supabase.co/**', r=>{ if(r.request().url().includes('fehler_melden')) gesendet.push(JSON.parse(r.request().postData())); r.fulfill({status:200,contentType:'application/json',body:'true'}); }); const p=await c.newPage(); return {p,gesendet}; }
+ async function seite(test){ const c=await b.newContext(); await c.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort()); if(test) await c.addInitScript(()=>{window.FEHLER_TEST=1;}); const gesendet=[]; await c.route('https://fsqnzmwuojngopffcxso.supabase.co/**', r=>{ if(r.request().url().includes('fehler_melden')) gesendet.push(JSON.parse(r.request().postData())); r.fulfill({status:200,contentType:'application/json',body:'true'}); }); const p=await c.newPage(); return {p,gesendet}; }
  let {p,gesendet}=await seite(true);
  await p.goto(''+(process.env.BASIS||'http://localhost:8765')+'/app/index.html?k=GEHEIMGEHEIMGEHEIMGEHEIM'); await p.waitForTimeout(800);
  await p.evaluate(()=>{ setTimeout(()=>{ throw new Error('Testfehler bei https://x.y/app/spiel.html?k=GEHEIMGEHEIMGEHEIMGEHEIM'); },0); });

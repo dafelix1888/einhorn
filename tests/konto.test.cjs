@@ -43,6 +43,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   const b=await chromium.launch(), errs=[];
   async function geraet(mitServer=true){
     const c=await b.newContext({viewport:{width:393,height:852}});
+    await c.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort());   // kein echtes Marketer-Tracking aus Tests
     if(mitServer){ await c.addInitScript(()=>{ window.KONTO_TEST={url:'https://test.supabase.co', key:'anon'}; }); await c.route(S+'/**', mock); }
     else await c.addInitScript(()=>{ window.KONTO_TEST={url:'', key:''}; });
     const p=await c.newPage(); p.on('pageerror',e=>errs.push(e.message)); return p;
