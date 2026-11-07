@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "description": "Browser-Tests für die App (Playwright)",
+  "scripts": { "test": "node alle.cjs" },
+  "dependencies": { "playwright": "1.63.0" }
+}
