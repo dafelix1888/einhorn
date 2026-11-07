@@ -126,3 +126,46 @@ language sql stable security definer set search_path = public as $$
 $$;
 revoke all on function public.aufbau_lesen(text) from public;
 grant execute on function public.aufbau_lesen(text) to anon, authenticated;
+
+-- Nach der Party: Gast-Eltern geben mit einem Tipp Rückmeldung (1 = geht so, 2 = gut, 3 = super).
+-- Schreiben nur mit dem Einladungs-Link, höchstens 100 je Party; lesen nur die Eltern der Party.
+create table if not exists public.feedback (
+  id        bigint generated always as identity primary key,
+  party_id  uuid not null references public.parties(id) on delete cascade,
+  wert      smallint not null check (wert between 1 and 3),
+  erstellt  timestamptz not null default now()
+);
+create index if not exists feedback_party on public.feedback(party_id);
+alter table public.feedback enable row level security;
+drop policy if exists "eigenes Feedback" on public.feedback;
+create policy "eigenes Feedback" on public.feedback for select to authenticated
+  using (exists (select 1 from public.parties p where p.id = party_id and p.owner = auth.uid()));
+revoke all on public.feedback from anon;
+grant select on public.feedback to authenticated;
+
+create or replace function public.feedback_geben(t text, wert int) returns boolean
+language plpgsql security definer set search_path = public as $$
+declare pid uuid;
+begin
+  if wert is null or wert < 1 or wert > 3 then return false; end if;
+  select l.party_id into pid from public.links l join public.parties p on p.id = l.party_id
+    where l.token = t and l.rolle = 'gast' and (p.datum is null or p.datum >= current_date - 30);
+  if pid is null then return false; end if;
+  if (select count(*) from public.feedback f where f.party_id = pid) >= 100 then return false; end if;
+  insert into public.feedback(party_id, wert) values (pid, wert);
+  return true;
+end $$;
+revoke all on function public.feedback_geben(text, int) from public;
+grant execute on function public.feedback_geben(text, int) to anon, authenticated;
+
+-- Namens-Sätze (Edge Function „namen“, nur der Server liest und schreibt)
+create table if not exists public.namen (
+  party_id     uuid primary key references public.parties(id) on delete cascade,
+  erzeugungen  int not null default 0,
+  hash         text,
+  saetze       jsonb,
+  aktualisiert timestamptz not null default now(),
+  constraint namen_groesse check (saetze is null or pg_column_size(saetze) < 1500000)
+);
+alter table public.namen enable row level security;
+revoke all on public.namen from anon, authenticated;

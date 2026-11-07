@@ -1,0 +1,127 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0F0B17">
+<meta name="robots" content="noindex">
+<title>Danke fürs Mitfeiern · Zauberspiegel</title>
+<link rel="stylesheet" href="dunkel.css">
+<style>
+body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no-repeat,var(--bg)}
+.seite{max-width:30rem;display:flex;flex-direction:column;gap:18px;padding-top:24px}
+.held{text-align:center}
+.held img{width:min(180px,48vw);aspect-ratio:1;border-radius:50%;padding:8px;background:linear-gradient(135deg,#F7DE9A,#C8922A 45%,#F2D27A 70%,#B8862B);box-shadow:0 12px 40px rgba(0,0,0,.55);object-fit:cover}
+.held h1{font-size:clamp(1.9rem,8vw,2.6rem);line-height:1.1;margin:14px 0 8px}
+.held p{margin:0;color:#D9D2E8}
+.karte{background:var(--karte);border:1px solid var(--linie);border-radius:18px;padding:18px}
+.karte h2{margin:0 0 6px;font-size:1.2rem}
+.karte p{margin:0 0 12px;color:var(--leise)}
+.feld{display:block;width:100%;box-sizing:border-box;font:inherit;font-size:1.1rem;padding:12px 14px;border-radius:12px;border:1.5px solid var(--linie);background:var(--panel);color:inherit;margin:0 0 12px}
+canvas{display:block;width:100%;height:auto;border-radius:10px;background:#fff;margin:0 0 12px}
+.wahl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wahl button{font:inherit;font-weight:700;border:1.5px solid var(--linie);background:var(--panel);color:var(--text);border-radius:14px;padding:12px 4px;min-height:72px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.wahl button span{font-size:1.7rem;line-height:1}
+.wahl button[aria-pressed="true"]{border-color:var(--akzent);background:#2A2140}
+.selbst{text-align:center}
+.selbst .knopf{display:inline-flex;text-decoration:none}
+.fuss{border-top:1px solid var(--linie);padding-top:18px;text-align:center;font-size:.92rem}
+.fuss a{display:inline-flex;align-items:center;min-height:44px}
+</style></head><body>
+<main class="seite" id="seite"><p class="leise">Lädt …</p></main>
+<div class="toast" id="toast" hidden></div>
+<script src="party.js"></script>
+<script src="konto.js"></script>
+<script>
+// Danke-Seite für Gast-Eltern nach der Party: Funkels Urkunde fürs eigene Kind, Rückmeldung mit einem Tipp,
+// Weg zur eigenen Party. Gleicher Schlüssel wie die Einladung (?k=…) oder Daten im Link (?e=…).
+(function(){
+  'use strict';
+  var URKUNDE={einhorn:'gehört ab heute zu Funkels Einhorn-Helfern und hat den Regenbogen gerettet.'};
+  var SELBST='landing.html?utm_source=danke&utm_medium=gaeste&utm_campaign=nach-der-party';
+  function $(id){ return document.getElementById(id); }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3000); }
+  function nichtDa(t){ $('seite').innerHTML='<h1>Seite nicht gefunden</h1><p class="leise">'+esc(t)+'</p><div class="fuss"><a href="'+SELBST+'">Selbst eine Schatzsuche planen</a></div>'; }
+
+  var q=new URLSearchParams(location.search), k=q.get('k'), info=null, bild=null, e=null;
+  function laden(){
+    if(k){
+      if(!window.Konto || !Konto.aktiv()){ nichtDa('Dieser Link geht hier nicht.'); return Promise.resolve(null); }
+      return Konto.linkLesen(k).then(function(r){ if(!r || r.rolle!=='gast' || !r.daten){ nichtDa('Der Link wurde ersetzt oder ist abgelaufen.'); return null; } return r.daten; },
+        function(){ nichtDa('Kein Netz. Bitte später noch einmal öffnen.'); return null; });
+    }
+    var d=null; try{ d=Party.decode(q.get('e')||''); }catch(x){}
+    if(!d || !d.t) nichtDa('Der Link ist unvollständig.');
+    return Promise.resolve(d && d.t ? d : null);
+  }
+  laden().then(function(d){
+    if(!d) return; e=d;
+    return fetch('themen/index.json').then(function(r){ return r.json(); }).then(function(ix){
+      var l=Array.isArray(ix)?ix:(ix.themen||[]); info=l.filter(function(t){ return t.id===e.t; })[0]||{};
+      zeigen();
+    });
+  })['catch'](function(){ if(e) zeigen(); });
+
+  function zeigen(){
+    var name=e.n||'', titel=info.titel||'Schatzsuche', heldBild=info.heldBild||info.cover||'';
+    var h='<section class="held">'+(heldBild?'<img src="'+esc(heldBild)+'" alt="">':'')+
+      '<h1>Danke fürs Mitfeiern!</h1><p>'+(name?esc(name)+' und Funkel sagen Danke':'Funkel sagt Danke')+'. Hier ist die Urkunde für euer Kind.</p></section>';
+    h+='<section class="karte"><h2>Funkels Urkunde</h2><p>Namen eintragen, dann als Bild speichern oder teilen.</p>'+
+      '<input class="feld" id="kind" maxlength="24" autocomplete="off" placeholder="Name eures Kindes">'+
+      '<canvas id="urkunde" width="1200" height="1600" aria-label="Urkunde"></canvas>'+
+      '<button type="button" class="knopf mittel" id="speichern">Urkunde speichern</button></section>';
+    if(k) h+='<section class="karte" id="rueck"><h2>Wie fand euer Kind die Schatzsuche?</h2><p>Ein Tipp reicht. Das sehen nur die Gastgeber.</p>'+
+      '<div class="wahl">'+[[3,'😍','Super'],[2,'🙂','Gut'],[1,'😐','Geht so']].map(function(w){ return '<button type="button" data-wert="'+w[0]+'" aria-pressed="false"><span aria-hidden="true">'+w[1]+'</span>'+w[2]+'</button>'; }).join('')+'</div></section>';
+    h+='<section class="karte selbst"><h2>Selbst feiern?</h2><p>'+esc(titel)+' spielt in eurer eigenen Straße. Route planen geht ohne Anmeldung.</p>'+
+      '<a class="knopf mittel" href="'+SELBST+'">Eigene Schatzsuche planen</a></section>';
+    $('seite').innerHTML=h;
+    if(k){ var alt=null; try{ alt=localStorage.getItem('sj.danke.'+k); }catch(x){} if(alt) markieren(alt, true); }
+    bild=new Image(); bild.onload=malen; bild.onerror=malen; if(heldBild) bild.src=heldBild; else malen();
+    $('kind').addEventListener('input', malen);
+  }
+
+  // Urkunde als Bild: Regenbogenrand, Funkel, Name, Satz, Datum
+  function umbrechen(c, text, x, y, breite, zeile){
+    var w=text.split(' '), z='';
+    w.forEach(function(wort){ var t=z?z+' '+wort:wort; if(c.measureText(t).width>breite && z){ c.fillText(z, x, y); y+=zeile; z=wort; } else z=t; });
+    if(z) c.fillText(z, x, y); return y;
+  }
+  function malen(){
+    var cv=$('urkunde'); if(!cv) return; var c=cv.getContext('2d'), W=cv.width, H=cv.height;
+    c.fillStyle='#FFFDF8'; c.fillRect(0,0,W,H);
+    var farben=['#E23A3F','#F28C1B','#F2B90F','#3A9D4B','#2B6FE0','#9050C8'];
+    farben.forEach(function(f,i){ c.strokeStyle=f; c.lineWidth=12; c.strokeRect(30+i*12, 30+i*12, W-60-i*24, H-60-i*24); });
+    if(bild && bild.complete && bild.naturalWidth){ c.save(); c.beginPath(); c.arc(W/2, 400, 220, 0, Math.PI*2); c.clip(); c.drawImage(bild, W/2-220, 180, 440, 440); c.restore(); }
+    c.textAlign='center'; c.fillStyle='#6B35C9'; c.font='800 120px system-ui,-apple-system,sans-serif'; c.fillText('URKUNDE', W/2, 780);
+    var n=(($('kind')||{}).value||'').trim();
+    c.fillStyle='#241A3D'; c.font='italic 700 '+(n.length>14?84:104)+'px system-ui,-apple-system,sans-serif'; c.fillText(n||' ', W/2, 940);
+    c.strokeStyle='#241A3D'; c.lineWidth=3; c.beginPath(); c.moveTo(220, 975); c.lineTo(W-220, 975); c.stroke();
+    c.font='44px system-ui,-apple-system,sans-serif'; c.fillStyle='#241A3D';
+    umbrechen(c, URKUNDE[e.t]||'hat bei der Schatzsuche toll mitgemacht.', W/2, 1070, W-300, 60);
+    var d=e.d ? new Date(e.d+'T12:00:00') : new Date();
+    c.font='36px system-ui,-apple-system,sans-serif'; c.fillStyle='#5A5073'; c.fillText(d.toLocaleDateString('de-DE',{day:'numeric', month:'long', year:'numeric'}), W/2, 1340);
+    c.font='italic 700 72px system-ui,-apple-system,sans-serif'; c.fillStyle='#241A3D'; c.fillText('Funkel', W/2, 1460);
+  }
+  function speichern(){
+    var cv=$('urkunde'), n=(($('kind')||{}).value||'').trim();
+    if(!n){ toast('Bitte zuerst den Namen eintragen.'); $('kind').focus(); return; }
+    var datei='Urkunde-'+n.replace(/[^\p{L}\p{N}-]+/gu,'-')+'.png';
+    cv.toBlob(function(b){
+      try{ var f=new File([b], datei, {type:'image/png'}); if(navigator.canShare && navigator.canShare({files:[f]})){ navigator.share({files:[f], title:'Urkunde für '+n})['catch'](function(){}); return; } }catch(x){}
+      var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=datei; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    }, 'image/png');
+  }
+  function markieren(w, schon){
+    [].forEach.call(document.querySelectorAll('[data-wert]'), function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-wert')===String(w))); b.disabled=true; });
+    var p=document.querySelector('#rueck p'); if(p) p.textContent=schon?'Danke, eure Rückmeldung ist angekommen.':'Danke! Das freut die Gastgeber.';
+  }
+  document.addEventListener('click', function(ev){
+    var t=ev.target; if(!t.closest) return;
+    if(t.closest('#speichern')){ speichern(); return; }
+    var b=t.closest('[data-wert]'); if(b && k && window.Konto){
+      var w=b.getAttribute('data-wert'); markieren(w);
+      Konto.feedbackGeben(k, +w).then(function(){ try{ localStorage.setItem('sj.danke.'+k, w); }catch(x){} },
+        function(){ [].forEach.call(document.querySelectorAll('[data-wert]'), function(x){ x.disabled=false; x.setAttribute('aria-pressed','false'); }); toast('Das ging nicht. Ist das Internet an?'); });
+    }
+  });
+})();
+</script>
+</body></html>
