@@ -1,0 +1,80 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0F0B17">
+<title>Datenschutz · Funkels Regenbogen</title>
+<link rel="stylesheet" href="dunkel.css">
+<style>
+.seite{max-width:40rem}
+.seite h1{margin:24px 0 8px}.seite h2{font-size:1.15rem;margin:30px 0 8px}.seite h3{font-size:1rem;margin:18px 0 6px}
+.seite p,.seite li{color:#D9D2E8}.seite a{color:var(--akzent)}.seite ul{padding-left:20px}.seite li{margin:6px 0}
+.kurz{background:var(--karte);border:1px solid var(--linie);border-radius:14px;padding:14px 16px;margin:16px 0}
+.fehlt{color:var(--leise);font-style:italic}
+</style></head><body>
+<main class="seite">
+<p><a href="index.html">← Zur Startseite</a></p>
+<h1>Datenschutzerklärung</h1>
+<p class="leise">Stand: 7. November 2026</p>
+
+<div class="kurz">
+<b>Kurz gesagt</b>
+<ul>
+<li>Planen geht ohne Anmeldung. Alles bleibt dann auf eurem Gerät.</li>
+<li>Erst wenn ihr „Speichern und teilen“ nutzt, speichern wir eure E-Mail und die Party auf unserem Server in Frankfurt. 30 Tage nach der Party löschen wir die Party automatisch.</li>
+<li>Keine Cookies, keine Werbung, kein Weiterverkauf von Daten.</li>
+<li>Fotos, Kamera, Mikrofon und euer Standort bleiben auf dem Gerät.</li>
+</ul>
+</div>
+
+<h2>1. Verantwortlich</h2>
+<p class="angabe">{{IMPRESSUM_NAME}}, {{IMPRESSUM_ANSCHRIFT}}, E-Mail: <a href="mailto:{{IMPRESSUM_EMAIL}}">{{IMPRESSUM_EMAIL}}</a></p>
+
+<h2>2. Was wo gespeichert wird</h2>
+<h3>Auf eurem Gerät</h3>
+<p>Party-Angaben (Name und Alter des Geburtstagskinds, Datum, Uhrzeit, Zahl der Kinder, Treffpunkt, freiwillig eine Telefonnummer und ein Hinweis für die Gäste), die geplante Route, Häkchen, Stimmen und Spielstand speichert die App im Speicher des Browsers (localStorage, IndexedDB, Offline-Speicher). Das ist nötig, damit die App funktioniert und auch ohne Internet läuft (§ 25 Abs. 2 Nr. 2 TDDDG). Ihr könnt das jederzeit löschen: in der App mit „Party löschen“ oder über die Website-Daten eures Browsers.</p>
+<h3>Auf unserem Server (nur nach „Speichern und teilen“)</h3>
+<ul>
+<li><b>Anmeldung:</b> eure E-Mail-Adresse. Wir schicken euch damit einen Code zum Anmelden, kein Passwort.</li>
+<li><b>Party:</b> die Angaben oben und die Route, damit ihr sie auf mehreren Geräten habt und mit Links teilen könnt.</li>
+<li><b>Links:</b> Einladung, Vorausgeher und iPad bekommen je einen eigenen geheimen Link. Die Einladung zeigt nur Termin, Treffpunkt, Abholzeit und Hinweis, keine Route.</li>
+<li><b>Vorausgeher:</b> welche Stationen schon aufgebaut sind.</li>
+<li><b>Rückmeldung der Gäste:</b> nur der gewählte Wert (Super, Gut, Geht so), ohne Namen.</li>
+<li><b>„Funkel kennt das Kind“:</b> die drei Sätze mit dem Vornamen des Kindes als Text und Ton.</li>
+</ul>
+<p>Speicherdauer: Die Party mit Links, Haken, Rückmeldungen und Namens-Sätzen löschen wir 30 Tage nach dem Partytag automatisch, mit „Party löschen“ sofort. Das Konto mit eurer E-Mail-Adresse löschen wir, wenn ihr uns schreibt.</p>
+<p>Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (ihr nutzt die Funktionen, die ihr angefordert habt).</p>
+
+<h2>3. Dienste, die wir nutzen</h2>
+<ul>
+<li><b>Cloudflare</b> (Cloudflare, Inc., USA) liefert die App aus und betreibt den Dienst für die Ortsansagen. Dabei werden technisch eure IP-Adresse und Angaben zum Browser verarbeitet, um die Seite auszuliefern und vor Angriffen zu schützen. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO.</li>
+<li><b>GitHub Pages</b> (GitHub, Inc., USA) liefert eine ältere Adresse der App aus, die noch weiterleitet. Gleiche Verarbeitung wie bei Cloudflare.</li>
+<li><b>Supabase</b> (Supabase, Inc., USA; Server in Frankfurt am Main) speichert Konto und Party (siehe 2.) und verschickt die Anmelde-Codes.</li>
+<li><b>ElevenLabs</b> (USA) erzeugt gesprochene Sätze. Übertragen wird nur der Text des Satzes: bei Ortsansagen der Name eines Ortes auf eurer Route, bei „Funkel kennt das Kind“ der Vorname des Kindes. Das passiert nur, wenn ihr diese Funktionen nutzt.</li>
+<li><b>Kartendienste:</b> Für die Routenplanung schickt die App eure eingegebene Adresse bzw. Koordinaten und eure IP-Adresse an Photon (komoot GmbH, Deutschland) für Adressvorschläge, Nominatim und die Kartenkacheln von OpenStreetMap (OpenStreetMap Foundation, Großbritannien), Overpass (overpass-api.de, Deutschland) für Wege und Orte und Open-Meteo (Schweiz) für Höhen. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.</li>
+</ul>
+<p>Soweit Anbieter ihren Sitz in den USA haben, erfolgt die Übermittlung auf Grundlage des EU-US Data Privacy Framework oder von Standardvertragsklauseln. Mit den Anbietern, die für uns Daten speichern, schließen wir Verträge zur Auftragsverarbeitung.</p>
+
+<h2>4. Was auf dem Gerät bleibt</h2>
+<ul>
+<li><b>Standort:</b> Das Spiel nutzt das GPS des Geräts, um zu merken, wann ihr an einer Station seid. Der Standort wird nicht an uns geschickt.</li>
+<li><b>Kamera:</b> Zauberlinse und Gruppenfoto laufen nur auf dem Gerät. Fotos speichern wir nicht. Teilt ihr ein Foto, geht es über die Teilen-Funktion eures Geräts direkt an die gewählte App.</li>
+<li><b>Mikrofon:</b> Eigene Aufnahmen für den Spiegel bleiben auf dem Gerät.</li>
+</ul>
+
+<h2>5. Links zu Händlern und WhatsApp</h2>
+<p>Die Einkaufsliste verlinkt auf Händler wie Amazon. Erst wenn ihr auf einen Link tippt, öffnet sich die Seite des Händlers, dort gilt dessen Datenschutzerklärung. „Wir kommen!“ in der Einladung öffnet WhatsApp oder kopiert einen Text, wir bekommen davon nichts.</p>
+
+<h2>6. Messung von Besuchen</h2>
+<p>Derzeit messen wir keine Besuche. Wenn wir das einführen, dann ohne Cookies und ohne Speicher auf eurem Gerät; diese Erklärung wird vorher angepasst.</p>
+
+<h2>7. Eure Rechte</h2>
+<p>Ihr habt das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15 bis 21 DSGVO). Schreibt uns dazu an die E-Mail-Adresse oben. Ihr könnt euch außerdem bei einer Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel der in eurem Bundesland.</p>
+
+<h2>8. Daten von Kindern</h2>
+<p>Angaben zum Geburtstagskind tragen die Eltern ein. Wir nutzen sie nur für die Party und löschen sie wie oben beschrieben. Die App richtet sich an Eltern, nicht an Kinder selbst.</p>
+
+<p><a href="impressum.html">Impressum</a></p>
+</main>
+<script>
+[].forEach.call(document.querySelectorAll('.angabe'), function(e){ if(e.textContent.indexOf('{{')>=0) e.innerHTML='<span class="fehlt">Die Angaben stehen im Impressum der Hauptseite der App.</span>'; });
+</script>
+</body></html>

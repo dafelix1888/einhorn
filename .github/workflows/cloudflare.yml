@@ -41,6 +41,23 @@ jobs:
             done
           fi
           echo "::notice::workers.dev-Adresse: ${cur}.workers.dev"
+      - name: Impressum-Angaben einsetzen
+        if: env.HAT_TOKEN == 'true'
+        env:
+          NAME: ${{ secrets.IMPRESSUM_NAME }}
+          ANSCHRIFT: ${{ secrets.IMPRESSUM_ANSCHRIFT }}
+          EMAIL: ${{ secrets.IMPRESSUM_EMAIL }}
+        run: |
+          # Angaben stehen nur in GitHub-Secrets, nicht im öffentlichen Repo. Ohne Secret bleibt der Hinweis „Angaben folgen“.
+          [ -n "$NAME" ] || { echo "::warning::IMPRESSUM_NAME fehlt"; exit 0; }
+          python3 - <<'PY'
+          import os, html
+          w={'{{IMPRESSUM_NAME}}':os.environ['NAME'], '{{IMPRESSUM_ANSCHRIFT}}':os.environ.get('ANSCHRIFT',''), '{{IMPRESSUM_EMAIL}}':os.environ.get('EMAIL','')}
+          for f in ['app/impressum.html','app/datenschutz.html']:
+              s=open(f,encoding='utf-8').read()
+              for k,v in w.items(): s=s.replace(k, html.escape(v).replace('\n','<br>'))
+              open(f,'w',encoding='utf-8').write(s)
+          PY
       - name: App veröffentlichen
         if: env.HAT_TOKEN == 'true'
         uses: cloudflare/wrangler-action@v4
