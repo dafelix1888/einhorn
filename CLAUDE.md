@@ -13,3 +13,11 @@
 - Schnittstelle: `docs/integration.md` im Marketer-Repo.
 - Event-Namen (`hoerprobe_played`, `route_planned`, `party_created`) und `app/landing.html` nicht ändern oder umbenennen. Änderungswünsche als Ticket im Projekt MAR anlegen.
 - Ändern sich Preis, Bezahlung, Domain oder Themen, ein Ticket im Projekt MAR anlegen, damit Marketer es berücksichtigt.
+
+## Incidents und Problems (ITSM, Jira-Projekt PBIM)
+
+- Alle Incidents und Problems stehen im Jira-Projekt PBIM (https://fepu.atlassian.net/jira/core/projects/PBIM).
+- Kommt ein Incident (etwas geht nicht, falsches Verhalten, Fehlermeldung), zuerst in PBIM suchen, ob das Thema schon einmal gelöst wurde (JQL, z. B. `project = PBIM AND text ~ "Stichwort"`), und die frühere Lösung nutzen.
+- Neuer Incident: Task mit Label `incident`, Komponente/Bereich im Titel (z. B. „Planer: Karte lädt nicht“). Beschreibung: Was ist passiert, wo, seit wann, Ursache, Lösung, PR-Link.
+- Deuten mehrere Incidents auf dieselbe Ursache, ist das ein Problem: Epic mit Label `problem`, die Incidents als Kinder darunter hängen. Im Epic die gemeinsame Ursache und die dauerhafte Lösung festhalten.
+- Behobene Incidents auf erledigt setzen; die Lösung muss im Ticket stehen, damit man sie beim nächsten Mal findet.
