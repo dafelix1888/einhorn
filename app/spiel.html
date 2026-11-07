@@ -1544,11 +1544,12 @@ function sagen(){                       // der Satz des Schritts; ein zweiter Te
   var kk=kakaSatz(), mg=kakaGen;
   function danach(){ if(!kk || mg!==kakaGen) return; erzFolgt=true; sprechKnopf(); kakaNach(600, mg, function(){ kakaAuftritt(kk); }); }
   var zw=a.zweit || (a.live && clips[a.live] && !indoor() ? {key:a.live, text:a.liveText} : null);   // Ortsansage nur draußen und nur, wenn sie live erzeugt wurde
-  spielen(a.key, a.text, function(){
-    if(!zw){ danach(); return; }
+  function weiter(z){                    // Kette: Satz, kurze Pause, nächster Teil (auch Namens-Sätze)
+    if(!z){ danach(); return; }
     var g=tonGen; tonLaeuft=true; try{ $('mirror').classList.add('spricht'); }catch(e){}
-    tonTimer=setTimeout(function(){ tonTimer=null; if(g!==tonGen) return; spielen(zw.key, zw.text, danach); }, 1200);
-  });
+    tonTimer=setTimeout(function(){ tonTimer=null; if(g!==tonGen) return; spielen(z.key, z.text, function(){ weiter(z.zweit); }); }, 1200);
+  }
+  spielen(a.key, a.text, function(){ weiter(zw); });
   live();
 }
 function hoere(key){
@@ -2121,19 +2122,21 @@ function infoZeigen(){
 
 var KEYPOS={}; TEXTE.forEach(function(t,n){ KEYPOS[t.key]=n; });
 function pos(){ return KEYPOS[akt().key]; }
+// Funkel kennt das Kind: eingesprochene Namens-Sätze (n.gruss, n.schatz, n.abschied) hängen sich in die Kette ein.
+function mitName(nk, rest){ var c=clips[nk]; return c ? {key:nk, text:c.h||'', zweit:rest||null} : (rest||null); }
 function akt(){                         // der Satz, der gerade dran ist
   if(state.phase==='start') return {key:'start', text:T_START};
-  if(state.phase==='end') return {key:'ende.a', text:T_ENDE, zweit:{key:'ende.b', text:T_ENDE2}};
-  if(state.phase==='heim') return state.step>=1 ? {key:'heim.ende', text:T_HEIM2} : {key:'heim', text:T_HEIM};
+  if(state.phase==='end') return {key:'ende.a', text:T_ENDE, zweit:mitName('n.schatz', {key:'ende.b', text:T_ENDE2})};
+  if(state.phase==='heim') return state.step>=1 ? {key:'heim.ende', text:T_HEIM2, zweit:mitName('n.abschied')} : {key:'heim', text:T_HEIM};
   var i=state.idx, st=STATIONS[i], o=(state.variante!=='a' && st.ohne) ? st.ohne : null;   // ohne Ausdrucke: eigene Sätze
   if(state.phase==='seek') return o&&o.seek ? {key:'s'+i+'.weg.ohne', text:o.seek} : {key:'s'+i+'.weg', text:st.seek};
   if(st.kind==='finale') return {key:'s'+i+'.f'+state.step, text:st.steps[state.step].say};
   if(st.after && state.step>=1) return o&&o.after ? {key:'s'+i+'.antwort.ohne', text:o.after} : {key:'s'+i+'.antwort', text:st.after};
   if(o&&o.say && !st.say2) return {key:'s'+i+'.frage.ohne', text:o.say};
-  if(st.say2) return {key:'s'+i+'.a', text:st.say, zweit:{key:'s'+i+'.b', text:st.say2}};
+  if(st.say2) return {key:'s'+i+'.a', text:st.say, zweit:i===0 ? mitName('n.gruss', {key:'s0.b', text:st.say2}) : {key:'s'+i+'.b', text:st.say2}};
   return {key:'s'+i+'.frage', text:st.say};
 }
-function aktText(){ var a=akt(); return a.text+(a.zweit ? ' '+a.zweit.text : ''); }
+function aktText(){ var a=akt(), t=a.text; for(var z=a.zweit; z; z=z.zweit) t+=' '+z.text; return t; }
 function manuell(){ return unterwegs() && (indoor() || !(gps==='an' && ziel())); }   // Station muss von Hand geöffnet werden
 function hauptText(){                   // Beschriftung des einen Hauptknopfs, leer = kein Knopf nötig
   var ph=state.phase, st=STATIONS[state.idx];
@@ -2654,11 +2657,24 @@ fuelleStimmen(); renderClips(); renderListe(); renderProtokoll();
 if(kannSprechen){ try{ speechSynthesis.addEventListener('voiceschanged', fuelleStimmen); }catch(e){ try{ speechSynthesis.onvoiceschanged=fuelleStimmen; }catch(e2){} } }
 render();
 zeige(location.hash==='#einrichten'?'setup':'tour');
-dbOpen(function(){ dbLoad(function(){ renderClips(); render(); clipsVomServer(); liveVorbereiten(); }); });
+dbOpen(function(){ dbLoad(function(){ renderClips(); render(); clipsVomServer(); liveVorbereiten(); namenHolen(); }); });
+function namenHolen(){                   // Namens-Sätze vom Server (nur mit geschütztem Link), danach offline im Gerät
+  if(!window.Konto) return;
+  var th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), hk='sj.namen.'+th, alt=null;
+  try{ alt=localStorage.getItem(hk); }catch(e){}
+  Konto.namenHolen(th, alt).then(function(r){
+    if(!r || r.gleich) return;
+    ['gruss','schatz','abschied'].forEach(function(k){
+      var s=r.saetze && r.saetze[k];
+      if(s && s.b64) dbPut('n.'+k, {type:'audio/mpeg', buf:b64zu(s.b64), h:s.text}); else dbDel('n.'+k);
+    });
+    try{ if(r.hash) localStorage.setItem(hk, r.hash); else localStorage.removeItem(hk); }catch(e){}
+  }, function(){});
+}
 if(state.phase!=='start') gpsStart();
 
 /* Für den Selbsttest: reine Funktionen */
-window.__zs={proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};
+window.__zs={proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, state:function(){ return state; }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};
 };
 </script>
 

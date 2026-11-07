@@ -79,6 +79,7 @@
 <script src="planer-kern.js"></script>
 <script src="party.js"></script>
 <script src="konto.js"></script>
+<script src="namen.js"></script>
 <script>
 (function(){
   'use strict';
@@ -260,6 +261,7 @@
       '<label for="gh">Bitte mitbringen und beachten</label><textarea id="gh" rows="2" maxlength="200" placeholder="z. B. Regenhose, warme Mütze, Wechselsocken">'+esc(Party.gaesteHinweis(party))+'</textarea>'+
       '<p class="leise" style="font-size:.85rem;margin:6px 0 12px">Steht auf der Einladung für die Gast-Eltern, im Link und auf dem Ausdruck.</p>'+
       '<div class="reihe"><button type="button" class="knopf mittel" id="gast-link-2">Einladungslink teilen</button><a class="knopf leer mittel" href="druck.html?thema='+thema+'#einladung">Treffpunkt und Abholzeit</a></div></div>';
+    if(window.Namen) h+=Namen.karte(thema);
     h+='<h2>Teilen und Geräte</h2>'+(window.Konto?Konto.karte(thema):'')+'<div class="werkzeuge">'+
       '<button type="button" class="knopf mittel" id="gast-link">Einladungslink teilen</button>'+
       '<button type="button" class="knopf leer mittel" id="ansehen">Einladung ansehen</button>'+
