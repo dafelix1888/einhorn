@@ -31,7 +31,7 @@ async function mock(route){
   ok(!/'spiel\.html'\+'\?thema=/.test(src) && (src.match(/location\.href='party\.html\?thema='/g)||[]).length===2, 'Planer: „Route übernehmen“ führt immer zur Party');
   await a.evaluate(pl=>localStorage.setItem('sj.plan.einhorn', JSON.stringify(pl)), plan);
   await a.goto(B+'party.html?thema=einhorn'); await a.waitForTimeout(600);
-  ok(/Eure Route ist gespeichert/.test(await a.locator('body').innerText()), 'Assistent: Route schon gespeichert');
+  ok(await a.locator('.route-geschafft').isVisible(), 'Assistent: Route schon gespeichert (Karte)');
 
   // 2. Spiel ohne Anmeldung: vor dem Aufwecken kommt die Anmeldung
   const party={format:1,thema:'einhorn',kind:{name:'Emma',alter:5},datum:new Date(Date.now()+9*864e5).toISOString().slice(0,10),start:'15:00',kinder:8,helfer:2,vorausgeher:true,ort:'draussen',planB:true,ausdrucke:true,erledigt:{},einkauf:{}};
@@ -42,11 +42,14 @@ async function mock(route){
   ok(await a.locator('dialog.konto-dlg[open]').isVisible() && /Bevor Funkel loslegt/.test(await a.locator('dialog.konto-dlg').innerText()), 'Spiel: Anmeldung vor dem Start');
   ok((await a.evaluate(()=>__zs.state().phase))==='start', 'Spiel: Tour noch nicht gestartet');
   await a.fill('#kd-mail','eltern@example.org'); await a.click('#kd-los'); await a.waitForTimeout(300);
-  await a.fill('#kd-code','123456'); await a.click('#kd-ok'); await a.waitForTimeout(800);
+  await a.fill('#kd-code','123456'); await a.waitForTimeout(800);
+  ok(/Geschafft/.test(await a.locator('dialog.konto-dlg').innerText().catch(()=>'')) , 'Code wird nach 6 Ziffern selbst geprüft, „Geschafft!“');
+  await a.waitForTimeout(1600);
   ok(await a.evaluate(()=>Konto.angemeldet()), 'Spiel: angemeldet');
   ok((await a.evaluate(()=>__ev)).includes('signup'), 'Marketer bekommt signup');
   await a.evaluate(()=>document.getElementById('btn-main').click()); await a.waitForTimeout(300);
   ok((await a.evaluate(()=>__zs.state().phase))!=='start', 'Nach der Anmeldung startet die Tour');
+  ok((await a.evaluate(()=>__ev)).filter(x=>x==='activated').length===1, 'Marketer bekommt activated (einmal)');
 
   // 3. iPad mit geheimem Link: kein Konto nötig
   links['SPIELTOKENSPIELTOKEN1234']={rolle:'spiel', daten:Object.assign({}, plan, {party:{thema:'einhorn', kind:{name:'Emma',alter:5}, ort:'draussen'}})};
@@ -55,11 +58,19 @@ async function mock(route){
   await i.evaluate(()=>document.getElementById('btn-main').click()); await i.waitForTimeout(300);
   ok(!(await i.locator('dialog.konto-dlg[open]').count()) && (await i.evaluate(()=>__zs.state().phase))!=='start', 'iPad mit geheimem Link startet ohne Anmeldung');
 
-  // 4. signup nachholen, wenn das Marketer-Skript fehlte
-  const n=await geraet();
-  await n.goto(B+'party.html?thema=einhorn'); await n.evaluate(()=>localStorage.setItem('sj.mk.offen', JSON.stringify('signup')));
-  await n.reload(); await n.waitForTimeout(1200);
-  ok((await n.evaluate(()=>__ev)).includes('signup') && !(await n.evaluate(()=>localStorage.getItem('sj.mk.offen'))), 'signup wird nachgeholt');
+  // 4. Spiel ohne m.js: activated geht direkt an Marketers Schnittstelle
+  const c4=await b.newContext(); const gesendet=[];
+  await c4.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>{ if(r.request().method()==='POST') gesendet.push(JSON.parse(r.request().postData()||'{}')); r.fulfill({status:204}); });
+  await c4.route(S+'/**', mock);
+  await c4.addInitScript(()=>{ window.KONTO_TEST={url:'https://test.supabase.co', key:'anon'}; window.MK_TEST=true; });
+  const n=await c4.newPage(); n.on('pageerror',e=>errs.push(e.message));
+  await n.goto(B+'spiel.html?thema=einhorn&k=SPIELTOKENSPIELTOKEN1234'); await n.waitForURL(u=>!/k=/.test(String(u))); await n.waitForTimeout(1000);
+  await n.evaluate(()=>document.getElementById('btn-main').click()); await n.waitForTimeout(500);
+  ok(gesendet.some(e=>e.name==='activated' && e.properties && e.properties.rolle==='spiel' && !e.email), 'Spiel meldet activated direkt, ohne persönliche Daten');
+
+  // 5. Übergabe vom Planer: Routen-Karte
+  await a.evaluate(()=>localStorage.removeItem('sj.party.einhorn')); await a.goto(B+'party.html?thema=einhorn'); await a.waitForTimeout(600);
+  ok(await a.locator('.route-geschafft svg .rg-p').count()===1 && /1 Stationen|Eure Tour steht/.test(await a.locator('.route-geschafft').innerText()), 'Assistent zeigt die Routen-Karte');
 
   ok(errs.length===0, 'keine Seitenfehler '+errs.join(' | '));
   console.log(fehler?fehler+' FEHLER':'ALLES OK'); await b.close(); process.exit(fehler?1:0);
