@@ -27,7 +27,7 @@ Damit Eltern ihre Party geschützt speichern und teilen können. Ohne diese Schr
 
 ## Vor dem Start für fremde Eltern
 
-- **Eigener Mailversand:** Der eingebaute Versand von Supabase schickt nur an Mitglieder des eigenen Supabase-Teams und nur wenige Mails pro Stunde. Für echte Nutzer unter Authentication → Emails → SMTP einen Anbieter eintragen (zum Beispiel Brevo, Resend, Postmark; mit Server in der EU).
+- **Eigener Mailversand:** Der eingebaute Versand von Supabase schickt nur an Mitglieder des eigenen Supabase-Teams und nur wenige Mails pro Stunde. Für echte Nutzer unter Authentication → Emails → SMTP einen Anbieter eintragen (zum Beispiel Brevo, Resend, Postmark; mit Server in der EU). Bis dahin bietet die App bei gesperrtem Versand einen Notweg an („Ohne Anmeldung weiter“, Daten im Link wie früher, einen Tag lang) und meldet die Störung in der Tabelle `fehler`.
 - **Datenschutz:** Hinweis zur Speicherung (E-Mail, Party-Daten, Löschung nach 30 Tagen) in die Datenschutzerklärung; Supabase als Auftragsverarbeiter (DPA im Dashboard).
 
 ## Testen

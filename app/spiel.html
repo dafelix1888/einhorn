@@ -1986,7 +1986,7 @@ function startPruefen(weiter){
   if(!K || !K.aktiv() || K.linkRolle(th) || K.angemeldet()){ los(); return; }
   var f=function(e){ if(e.detail && e.detail.art==='angemeldet'){ window.removeEventListener('konto', f); toast('Angemeldet. Jetzt „Spiegel aufwecken“ tippen.'); } };
   window.addEventListener('konto', f);
-  K.fenster(th, {titel:'Bevor Funkel loslegt', text:'Einmal kurz anmelden, dann geht eure Tour los.', fertig:'Jetzt „Spiegel aufwecken“ tippen. Funkel wartet schon.'});
+  K.fenster(th, {titel:'Bevor Funkel loslegt', text:'Einmal kurz anmelden, dann geht eure Tour los.', fertig:'Jetzt „Spiegel aufwecken“ tippen. Funkel wartet schon.', weiter:los});
 }
 function haupt(){
   tonAn();

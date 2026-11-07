@@ -18,6 +18,7 @@
         body:JSON.stringify({seite:location.pathname, meldung:meldung, quelle:ohne(quelle).slice(0,300), zeile:zeile|0, stapel:ohne(stapel).slice(0,2000), version:version, geraet:navigator.userAgent.slice(0,160)})})['catch'](function(){});
     }catch(e){}
   }
+  window.FehlerMelden=function(meldung, quelle){ melden(meldung, quelle||'', 0, ''); };   // für bekannte Störungen, z. B. Anmeldung
   window.addEventListener('error', function(e){
     if(!e || !e.message) return;                                   // Ladefehler von Bildern o. Ä. ohne Meldung
     melden(e.message, e.filename, e.lineno, e.error && e.error.stack);
