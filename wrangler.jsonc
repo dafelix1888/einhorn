@@ -10,5 +10,10 @@
     "not_found_handling": "none"
   },
   "workers_dev": true,
+  // eigene Domain (Cloudflare legt DNS-Eintrag und Zertifikat selbst an; Token braucht Zone → Workers Routes → Write)
+  "routes": [
+    { "pattern": "schatzweg.de", "custom_domain": true },
+    { "pattern": "www.schatzweg.de", "custom_domain": true }
+  ],
   "observability": { "enabled": true }
 }
