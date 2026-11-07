@@ -52,6 +52,8 @@ input[type=range]{width:100%;height:44px;margin:0;accent-color:var(--akzent)}
 .richtung{display:grid;grid-template-columns:repeat(3,44px);gap:4px}
 .richtung button{width:44px;height:44px;padding:0;border-radius:12px;border:1.5px solid var(--linie);background:var(--panel);color:var(--leise);display:grid;place-items:center;font-size:.72rem;font-weight:800}
 .richtung button[aria-pressed=true]{background:var(--akzent);border-color:var(--akzent);color:#160C2B}
+.richtung button{gap:0;align-content:center;line-height:1}.richtung button b{font-size:.95rem;font-weight:800;letter-spacing:.02em}.richtung .r-pfeil{opacity:.55;margin-top:2px}.richtung button[aria-pressed=true] .r-pfeil{opacity:.9}
+.richtung .r-egal{font-size:.72rem}.richtung-text{margin:8px 0 0;color:var(--leise);font-size:.82rem;max-width:150px;line-height:1.3}
 .zaehler{display:flex;align-items:center;gap:14px}
 .zaehler button{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--leise);background:none;font-size:1.3rem;line-height:1}
 .zaehler b{font-size:1.4rem;min-width:2.2rem;text-align:center}
