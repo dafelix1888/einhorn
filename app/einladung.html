@@ -42,6 +42,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
 <audio id="ton" preload="none"></audio>
 <div class="toast" id="toast" hidden></div>
 <script src="party.js"></script>
+<script src="konto.js"></script>
 <script>
 (function(){
   'use strict';
@@ -49,8 +50,24 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3000); }
-  var e=null; try{ e=Party.decode(new URLSearchParams(location.search).get('e')||''); }catch(x){}
-  if(!e || !e.d){ $('seite').innerHTML='<h1>Einladung nicht gefunden</h1><p class="leise">Der Link ist unvollständig. Bitte die Gastgeber, ihn noch einmal zu schicken.</p><div class="fuss"><a href="index.html">Zur Startseite</a></div>'; return; }
+  function nichtDa(t){ $('seite').innerHTML='<h1>Einladung nicht gefunden</h1><p class="leise">'+t+'</p><div class="fuss"><a href="index.html">Zur Startseite</a></div>'; }
+  var q=new URLSearchParams(location.search), k=q.get('k');
+  if(k){                                              // geschützter Link: Daten vom Server, zuletzt gesehene als Ersatz ohne Netz
+    var gemerkt=null; try{ gemerkt=JSON.parse(localStorage.getItem('sj.einladung.'+k)||'null'); }catch(x){}
+    if(!window.Konto || !Konto.aktiv()){ if(gemerkt) zeigen(gemerkt); else nichtDa('Dieser Link geht hier nicht.'); return; }
+    $('seite').innerHTML='<p class="leise">Einladung wird geladen …</p>';
+    Konto.linkLesen(k).then(function(r){
+      if(!r || r.rolle!=='gast' || !r.daten){ try{ localStorage.removeItem('sj.einladung.'+k); }catch(x){} nichtDa('Der Link wurde ersetzt oder die Party ist vorbei. Bitte die Gastgeber um den neuen Link.'); return; }
+      try{ localStorage.setItem('sj.einladung.'+k, JSON.stringify(r.daten)); }catch(x){}
+      zeigen(r.daten);
+    }, function(){ if(gemerkt) zeigen(gemerkt); else nichtDa('Kein Netz. Bitte später noch einmal öffnen.'); });
+    return;
+  }
+  var e0=null; try{ e0=Party.decode(q.get('e')||''); }catch(x){}
+  zeigen(e0);
+
+  function zeigen(e){
+  if(!e || !e.d){ nichtDa('Der Link ist unvollständig. Bitte die Gastgeber, ihn noch einmal zu schicken.'); return; }
   var name=String(e.n||'').slice(0,30), alter=e.a, start=new Date(e.d+'T'+(e.s||'15:00')+':00'), thema=String(e.t||'einhorn').replace(/[^a-z0-9-]/gi,'');
   var datumLang=start.toLocaleDateString('de-DE',{weekday:'long', day:'numeric', month:'long'});
   var datumKurz=start.toLocaleDateString('de-DE',{weekday:'short', day:'numeric', month:'numeric'});
@@ -117,6 +134,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
   });
   $('ton').addEventListener('play', function(){ $('probe').innerHTML=PAUSE; $('probe').setAttribute('aria-label','Anhalten'); });
   $('ton').addEventListener('pause', function(){ $('probe').innerHTML=PLAY; $('probe').setAttribute('aria-label','Funkels Gruß anhören'); });
+  }
 })();
 </script>
 </body></html>

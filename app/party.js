@@ -13,7 +13,9 @@
 
   // Party speichern und den Tourplan angleichen (neuer Stand = Spiel übernimmt Variante und Punkte einmal neu)
   function speichern(p){
+    var alt=lies('sj.party.'+p.thema); if(alt && alt.server) p.server=alt.server; else delete p.server;   // „server“ gehört konto.js (Schlüssel der Links)
     p.geaendert=new Date().toISOString(); schreib('sj.party.'+p.thema, p);
+    if(root.Konto) root.Konto.merken(p.thema);                                // angemeldet: kurz danach geschützt speichern
     var pl=plan(p.thema) || {format:1, thema:p.thema, stationen:[], strecke:0};
     if(pl.variante!==variante(p) || pl.kinder!==p.kinder){                 // nur bei echter Änderung: das Spiel übernimmt dann Variante und Punkte neu
       pl.variante=variante(p); pl.kinder=p.kinder; pl.stand=new Date().toISOString();
@@ -42,7 +44,7 @@
     var l=[
       {id:'einladen', tag:-14, titel:'Einladung als Link schicken', kurz:'Per WhatsApp, Eltern sagen mit einem Tipp zu',
         text:'Ein Link für alle Gast-Eltern: Termin, Treffpunkt, Abholzeit und Zusage.', knopf:'Link teilen', aktion:'gast-link',
-        link:'einladung.html?e='+code(einladungsDaten(p, pl)), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
+        link:einladungsLink(p, pl)||('party.html?thema='+t+'#einladung'), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
       {id:'bestellen', tag:-14, titel:'Alles auf einmal bestellen', kurz:'Eine Liste, Mengen passend zu '+p.kinder+' Kindern',
         text:'Haarreifen, Holz-Regenbogen, Glückssteine und Zaubertafeln. Alle Mengen stehen in der Einkaufsliste.', knopf:'Zur Einkaufsliste', link:'#einkauf',
         teile:[{id:'bestellen', titel:'Alles bestellt', erkannt:allesGekauft}]},
@@ -137,7 +139,10 @@
   }
 
 
-  // ---------- Links zum Teilen (ohne Server: die Daten stecken im Link) ----------
+  // ---------- Links zum Teilen ----------
+  // Mit Server (konto.js eingerichtet): Link mit Schlüssel je Rolle, null solange die Party nicht gespeichert ist.
+  // Ohne Server: die Daten stecken im Link.
+  function schluessel(p, rolle){ if(!(root.Konto && root.Konto.aktiv())) return undefined; var a=lesen(p.thema), sv=(a && a.server) || p.server; return (sv && sv.k && sv.k[rolle]) || null; }
   function code(o){ var b=new TextEncoder().encode(JSON.stringify(o)), s=''; for(var i=0;i<b.length;i++) s+=String.fromCharCode(b[i]); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
   function decode(c){ var b=c.replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4) b+='='; var bin=atob(b), a=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return JSON.parse(new TextDecoder().decode(a)); }
   function basisUrl(){ return location.href.replace(/[?#].*$/,'').replace(/[^/]*$/,''); }
@@ -146,20 +151,21 @@
   function gaesteHinweis(p){ if(typeof p.gaesteHinweis==='string') return p.gaesteHinweis.trim(); return p.ort==='drinnen' ? '' : 'Feste Schuhe und Kleidung für draußen, bei Regen Regenjacke und Matschhose.'; }
   function planKern(pl, p){ pl=pl||{}; return {format:1, thema:p.thema, stand:pl.stand, variante:pl.variante||variante(p), kinder:pl.kinder||p.kinder, adresse:pl.adresse,
       stationen:(pl.stationen||[]).map(function(s){ return {lat:s.lat, lng:s.lng, name:s.name, an:s.an, zu:s.zu}; }), party:partyKern(p)}; }
-  function spielLink(p, pl){ return basisUrl()+'spiel.html?thema='+p.thema+'&plan='+code(planKern(pl,p)); }
-  function vorausgeherLink(p, pl){ return basisUrl()+'vorausgeher.html?thema='+p.thema+'&plan='+code(planKern(pl,p)); }
+  function spielLink(p, pl){ var k=schluessel(p,'spiel'); if(k!==undefined) return k ? basisUrl()+'spiel.html?thema='+p.thema+'&k='+k : null; return basisUrl()+'spiel.html?thema='+p.thema+'&plan='+code(planKern(pl,p)); }
+  function vorausgeherLink(p, pl){ var k=schluessel(p,'vorausgeher'); if(k!==undefined) return k ? basisUrl()+'vorausgeher.html?thema='+p.thema+'&k='+k : null; return basisUrl()+'vorausgeher.html?thema='+p.thema+'&plan='+code(planKern(pl,p)); }
   function einladungsDaten(p, pl){
     var bis=datum(p); bis.setDate(bis.getDate()-7);
     var treff=p.treffpunkt || (p.ort==='drinnen' || !pl || !pl.adresse || pl.adresse==='Mein Standort' ? 'bei uns zu Hause' : pl.adresse);
     return {t:p.thema, n:p.kind&&p.kind.name, a:p.kind&&p.kind.alter, d:p.datum, s:p.start, w:treff, b:p.abholen||uhr(p,150), o:p.ort, r:bis.toISOString().slice(0,10), tel:p.telefon||'', h:gaesteHinweis(p)};
   }
-  function einladungsLink(p, pl){ return basisUrl()+'einladung.html?e='+code(einladungsDaten(p, pl)); }
+  function einladungsLink(p, pl){ var k=schluessel(p,'gast'); if(k!==undefined) return k ? basisUrl()+'einladung.html?k='+k : null; return basisUrl()+'einladung.html?e='+code(einladungsDaten(p, pl)); }
   // geteilten Plan (aus einem Link) auf diesem Gerät ablegen; Haken des Geräts bleiben
   function ausLinkUebernehmen(thema, c){
-    var o=decode(c); if(!o || o.thema!==thema) return null;
-    if(o.party){ var alt=lesen(thema); o.party.erledigt=(alt&&alt.erledigt)||{}; o.party.einkauf=(alt&&alt.einkauf)||{}; o.party.aufgebaut=(alt&&alt.aufgebaut)||{}; schreib('sj.party.'+thema, o.party); }
+    var o=typeof c==='string' ? decode(c) : JSON.parse(JSON.stringify(c||null)); if(!o || o.thema!==thema) return null;
+    if(o.party){ var alt=lesen(thema); o.party.erledigt=(alt&&alt.erledigt)||{}; o.party.einkauf=(alt&&alt.einkauf)||{}; o.party.aufgebaut=(alt&&alt.aufgebaut)||{};
+      if(alt&&alt.server) o.party.server=alt.server; if(alt&&alt.telefon&&!o.party.telefon) o.party.telefon=alt.telefon; schreib('sj.party.'+thema, o.party); }
     delete o.party; schreib('sj.plan.'+thema, o); return o;
   }
 
-  root.Party={imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
+  root.Party={imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
 })(this);

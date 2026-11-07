@@ -31,6 +31,7 @@
 </main>
 <div class="toast" id="toast" hidden></div>
 <script src="party.js"></script>
+<script src="konto.js"></script>
 <script>
 (function(){
   'use strict';
@@ -176,7 +177,8 @@
     else if(t.closest('#gps')) gps();
     else if(t.closest('#akku')){ zustand.akku=true; zeichnen(); }
     else if(t.closest('#sperre')){ zustand.sperre=true; zeichnen(); }
-    else if(t.closest('#vg-link')){ var name=party.kind&&party.kind.name?party.kind.name:'Party'; teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+name, 'Link kopiert. An den Vorausgeher schicken.'); }
+    else if(t.closest('#vg-link')){ var name=party.kind&&party.kind.name?party.kind.name:'Party', los=function(){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+name, 'Link kopiert. An den Vorausgeher schicken.'); };
+      if(window.Konto) Konto.bereit(thema, los); else los(); }
   });
   ablauf();
   fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }).then(function(t){

@@ -1,6 +1,6 @@
 # Zauberspiegel: Status und nächste Schritte
 
-Stand: 2. November 2026 (nach PR #42). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
+Stand: 7. November 2026 (Konto und geschützte Links). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
 
 ## Worum es geht
 
@@ -24,6 +24,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 | Vorausgeher | `app/vorausgeher.html` | Fokus auf die nächste Station: Entfernung, „Hier hinlegen“ zum Abhaken, „Station steht, weiter“; Countdown bis zum Gruppenstart; Karte und alle Stationen aufklappbar. Haken nur auf dem eigenen Handy |
 | Startklar | `app/bereit.html` | Bereit-Check und Partytag auf einer Seite: Stimmen, Offline, GPS, Akku prüfen sich selbst, Ton und Sperre bestätigt man; darunter Uhrzeiten für Kreidespur, Vorausgeher (mit Link) und Start |
 | Stimmen | `stimmen/`, `stimmen/pakete/` | Feste Sätze per GitHub Action bei ElevenLabs; `aufteilen.mjs` teilt in Pakete (Geschichte 2,4 MB, je Erzähler etwa 5 MB); das Spiel lädt nur, was fehlt |
+| Konto | `app/konto.js`, `server/` | Party geschützt speichern und teilen über Supabase (Frankfurt), ohne Bibliothek. Planen ohne Konto; „Speichern und teilen“ fragt E-Mail und Code (kein Passwort). Links je Rolle mit Zufallsschlüssel (`?k=`): Einladung ohne Route, Vorausgeher und iPad mit Route; „Link sperren“ ersetzt einen Link. Zweites Gerät holt die Party nach dem Anmelden. Löschen nach 30 Tagen. **Noch nicht eingerichtet**: solange `SUPABASE_URL` in `konto.js` leer ist, läuft alles wie bisher mit Daten im Link. Einrichten: `server/README.md` |
 | Live-Stimmen | `worker/` | Cloudflare Worker für Ortsansagen, nur Vorlagen-Sätze, mit Cache. **Noch nicht eingerichtet** (siehe unten) |
 
 ## Entscheidungen
@@ -32,7 +33,9 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 
 - Kartendaten von OpenStreetMap (Overpass, Nominatim), Höhen von Open-Meteo, Adressvorschläge beim Tippen über Photon (komoot), alles ohne Schlüssel. Nominatim erlaubt keine Vorschläge beim Tippen, deshalb Photon dafür.
 - Architektur vorerst statisch: Jedes Abenteuer ist eine `tour.json`, Daten der Eltern liegen im Gerät (`localStorage`: `sj.party.<thema>`, `sj.plan.<thema>`), Teilen läuft über Links mit eingebetteten Daten.
-- Server kommt später. Offen ist, ob Cloudflare oder Supabase.
+- Server: Supabase in Frankfurt (Login per E-Mail-Code, Datenbank mit Zugriffsregeln, Daten in der EU). Stimmen bleiben beim Cloudflare Worker.
+- Konto nur für die Eltern, die feiern, und erst beim Teilen. Planen und die Route um die eigene Adresse ansehen geht ohne Konto. Gast-Eltern, Vorausgeher und iPad brauchen kein Konto, nur ihren Link. Das iPad bekommt kein Zauberwort, der geheime Link reicht.
+- „Einmal gratis“ wird nicht gezählt (ohne Konto nicht sicher möglich); die Grenze ist „Speichern und teilen“.
 - Anpassen kostet künftig Geld: Paket mit 3 Neuerzeugungen, ein Prompt zählt als eine Neuerzeugung. Grenze je Prompt: so lang wie eine WhatsApp-Nachricht, höchstens 3 Stationen oder 2 Figuren, höchstens 2.000 gesprochene Zeichen. Höchstens 2 Bonus-Stationen je Party. Fest bleiben Reihenfolge, Rätsel, Utensilien und Sicherheit.
 - Funkel nennt das Kind an drei Stellen beim Namen: Begrüßung, Geburtstagsgruß beim Schatz, Abschied (Teil des bezahlten Pakets).
 - Einladung für Gast-Eltern: ja, schon gebaut. Vorausgeher mit Live-Ansicht auf dem iPad: ja, braucht aber den Server.
@@ -41,7 +44,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 
 1. **Echter Test durch Felix:** Party anlegen, Route bei euch planen, Link aufs iPad, Bereit-Check, Einladungs- und Vorausgeher-Link aufs Handy. Bisher ist alles nur mit nachgebauten Kartendaten getestet.
 2. **Worker einrichten** (Felix, etwa 10 Minuten): `cd worker && npx wrangler login && npx wrangler secret put ELEVENLABS_API_KEY && npx wrangler deploy`, danach die Worker-Adresse in `app/config.json` bei `liveUrl` eintragen.
-3. **Server wählen** (Cloudflare KV/D1 + R2 oder Supabase). Daran hängen: Live-Haken des Vorausgehers, Party auf mehreren Geräten, Namens-Sätze speichern, später Konten und Käufe.
+3. **Supabase einrichten** (Felix, etwa 15 Minuten, siehe `server/README.md`), dann URL und öffentlichen Schlüssel in `app/konto.js`. Vor fremden Nutzern: eigener Mailversand (SMTP) und Datenschutzhinweis. Darauf bauen später: Live-Haken des Vorausgehers, Namens-Sätze, Käufe.
 4. **Etappe 2: Funkel kennt das Kind.** Namens-Sätze an den drei Stellen, Probehören, Aussprache-Feld, Grenze für Neuerzeugungen, später hinter einer Bezahlschranke.
 5. **Anpassen mit Leitplanken:** Prompt-Eingabe, KI schätzt Umfang und ändert Sätze, Eltern prüfen die Änderungen, dann Vertonung. Braucht Server und Bezahlung.
 6. ~~Planer und Spiel im dunklen Stil~~ erledigt in PR #41. Offen: echter Test auf iPad und Handy (dunkle OSM-Karte mit echten Kacheln, Ziehen per Touch).
@@ -61,7 +64,6 @@ Punkte mit dem Handy gesetzt, gespielt mit dem iPad: Stationen öffneten mal zu 
 
 ## Offene Fragen
 
-- Server: Cloudflare oder Supabase?
 - Preis des Anpassungs-Pakets.
 - Preise der Abenteuer (Vorschlag: Einhorn kostenlos, weitere Einzelkauf).
 
