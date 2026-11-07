@@ -1,4 +1,6 @@
-# Server: Supabase einrichten (etwa 15 Minuten)
+# Server: Supabase einrichten
+
+Stand: Projekt `zauberspiegel` (Frankfurt, `fsqnzmwuojngopffcxso`) ist angelegt, Schritte 1, 2 und 5 sind erledigt. Offen sind nur die Schritte 3 und 4 im Dashboard.
 
 Damit Eltern ihre Party geschützt speichern und teilen können. Ohne diese Schritte läuft die App wie bisher (Daten stecken im Link).
 

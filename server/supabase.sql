@@ -34,7 +34,7 @@ create table if not exists public.links (
 create index if not exists links_party on public.links(party_id);
 
 -- Zeitstempel bei jeder Änderung
-create or replace function public.zeit_setzen() returns trigger language plpgsql as $$
+create or replace function public.zeit_setzen() returns trigger language plpgsql set search_path = public as $$
 begin new.aktualisiert := now(); return new; end $$;
 drop trigger if exists parties_zeit on public.parties;
 create trigger parties_zeit before update on public.parties for each row execute function public.zeit_setzen();
