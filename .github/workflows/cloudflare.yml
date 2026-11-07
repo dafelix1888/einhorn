@@ -20,22 +20,24 @@ jobs:
       - name: Token vorhanden?
         if: env.HAT_TOKEN != 'true'
         run: echo "::notice::CLOUDFLARE_API_TOKEN fehlt, Cloudflare wird übersprungen."
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         if: env.HAT_TOKEN == 'true'
       - name: App veröffentlichen
         if: env.HAT_TOKEN == 'true'
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          wranglerVersion: '4.158.0'
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
       - name: Stimmen-Worker veröffentlichen
         if: env.HAT_TOKEN == 'true'
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          wranglerVersion: '4.158.0'
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: worker
           command: deploy
