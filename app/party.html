@@ -38,6 +38,15 @@
 .werkzeuge .knopf{width:100%}
 .werkzeuge .knopf{padding:10px 12px;font-size:.92rem}
 @media (max-width:340px){ .werkzeuge{grid-template-columns:1fr} }
+.route-geschafft{display:flex;gap:14px;align-items:center;margin:0 0 20px;padding:12px 14px 12px 10px;border-radius:18px;
+  background:radial-gradient(120% 140% at 0% 0%,rgba(167,139,250,.28),rgba(167,139,250,0) 60%),var(--karte);box-shadow:inset 0 0 0 1px rgba(167,139,250,.28);animation:rg-rein .5s cubic-bezier(.2,1.3,.4,1)}
+.route-geschafft svg{flex:none;border-radius:12px;background:rgba(15,11,23,.55)}
+.route-geschafft b{display:block;font-size:1.15rem;margin:4px 0 2px}.route-geschafft .leise{display:block;font-size:.9rem}
+.rg-marke{display:inline-block;font-size:.75rem;font-weight:800;letter-spacing:.02em;color:#0F2A17;background:var(--gruen);border-radius:999px;padding:2px 9px}
+.rg-weg{fill:none;stroke:rgba(255,255,255,.55);stroke-width:2.5;stroke-dasharray:1;stroke-dashoffset:1;stroke-linecap:round;stroke-linejoin:round;animation:rg-zeichnen 1.1s .15s ease forwards;vector-effect:non-scaling-stroke}
+.rg-p{transform-box:fill-box;transform-origin:center;animation:rg-plopp .45s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes rg-zeichnen{to{stroke-dashoffset:0}}@keyframes rg-plopp{from{transform:scale(0)}}@keyframes rg-rein{from{transform:translateY(10px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.route-geschafft,.rg-p,.rg-weg{animation:none;stroke-dashoffset:0}}
 /* Assistent */
 .feld{display:block;margin:0}
 .feld span{display:block;font-weight:700;margin-bottom:6px}
@@ -116,14 +125,28 @@
     l.push(e.helfer<2?'Alles wird vorher aufgebaut':e.vorausgeher?'Ein Erwachsener geht voraus':'Kein Vorausgeher');
     return l.join(' · ');
   }
+  // Übergabe vom Planer: kleine Regenbogen-Karte der geplanten Route
+  var REGENBOGEN=['#E5484D','#F59E0B','#F2C94C','#3FB950','#3B82F6','#6366F1','#8B5CF6'];
+  function routeGeschafft(pl){
+    var st=pl.stationen, k=Math.cos(st[0].lat*Math.PI/180), xs=st.map(function(p){ return p.lng*k; }), ys=st.map(function(p){ return -p.lat; });
+    var x0=Math.min.apply(0,xs), x1=Math.max.apply(0,xs), y0=Math.min.apply(0,ys), y1=Math.max.apply(0,ys), W=128, H=96, r=12;
+    var f=Math.min((W-2*r)/Math.max(1e-9,x1-x0), (H-2*r)/Math.max(1e-9,y1-y0));
+    var px=st.map(function(p,i){ return [r+(xs[i]-x0)*f+((W-2*r)-(x1-x0)*f)/2, r+(ys[i]-y0)*f+((H-2*r)-(y1-y0)*f)/2]; });
+    var weg=px.map(function(q,i){ return (i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1); }).join(' ')+(pl.rundkurs===true?' Z':'');
+    var punkte=px.map(function(q,i){ return i===0 ? '<circle cx="'+q[0].toFixed(1)+'" cy="'+q[1].toFixed(1)+'" r="7" fill="#fff"/><path d="M'+(q[0]-3.5).toFixed(1)+' '+(q[1]+3).toFixed(1)+'v-3.6l3.5-3 3.5 3v3.6z" fill="#7C5BD6"/>' :
+      '<circle class="rg-p" style="animation-delay:'+(0.25+i*0.12).toFixed(2)+'s" cx="'+q[0].toFixed(1)+'" cy="'+q[1].toFixed(1)+'" r="5.5" fill="'+REGENBOGEN[(i-1)%7]+'" stroke="#17121F" stroke-width="2"/>'; }).join('');
+    var km=pl.strecke ? (pl.strecke/1000).toFixed(1).replace('.',',')+' km' : '';
+    return '<div class="route-geschafft"><svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" aria-hidden="true"><path class="rg-weg" d="'+weg+'" pathLength="1"/>'+punkte+'</svg>'+
+      '<div><span class="rg-marke">✓ Route gespeichert</span><b>Eure Tour steht</b><span class="leise">'+(st.length-1)+' Stationen'+(km?' · '+km:'')+'</span><span class="leise">Jetzt noch kurz zur Party.</span></div></div>';
+  }
   function assistent(){
     var e=entwurf, zurueck=schritt>0 ? '<button type="button" class="textknopf" id="zurueck">← Zurück</button>' :
       '<a class="textknopf" href="'+(party?'party.html?thema='+thema:'index.html#/abenteuer/'+thema)+'">← '+(party?'Zur Party':'Zurück')+'</a>';
     var h='<div class="oben">'+zurueck+'<span class="leise">Schritt '+(schritt+1)+' von '+SCHRITTE+'</span></div>'+
       '<div class="fortschritt">'+[0,1,2].map(function(i){ return '<i class="'+(i<=schritt?'an':'')+'"></i>'; }).join('')+'</div><div class="stapel">';
     if(schritt===0){
-      var pl0=Party.plan(thema), mitRoute=!party && pl0 && pl0.stationen && pl0.stationen.length;
-      h+=(mitRoute?'<p class="leise" style="margin:0 0 8px">✓ Eure Route ist gespeichert. Jetzt noch kurz zur Party.</p>':'')+'<h1>Für wen und wann?</h1>'+
+      var pl0=Party.plan(thema), mitRoute=!party && pl0 && pl0.stationen && pl0.stationen.length>1;
+      h+=(mitRoute?routeGeschafft(pl0):'')+'<h1>Für wen und wann?</h1>'+
         '<label class="feld"><span>Vorname</span><input id="name" type="text" autocomplete="off" value="'+esc(e.kind.name)+'" placeholder="z. B. Emma"></label>'+
         '<div class="zwei"><label class="feld"><span>Wird</span><input id="alter" type="number" min="2" max="12" inputmode="numeric" value="'+esc(e.kind.alter||'')+'" placeholder="5"></label>'+
         '<label class="feld"><span>Start</span><input id="start" type="time" step="900" value="'+esc(e.start||'15:00')+'"></label></div>'+

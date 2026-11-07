@@ -66,13 +66,15 @@
       return sitzungMerken(j, email);
     });
   }
-  // Ereignis an Marketer; fehlt das Skript auf dieser Seite (Spiel), beim nächsten Seitenaufruf mit Skript nachholen
-  function mkMelden(name){
-    if(root.marketer && root.marketer.track){ try{ root.marketer.track(name); }catch(e){} return; }
-    schreib('sj.mk.offen', name);
+  // Ereignis an Marketer (gleiche Schnittstelle wie m.js, ohne Cookies, nichts auf dem Gerät).
+  // Seiten mit m.js nutzen dessen track(); das Spiel lädt m.js bewusst nicht und schickt nur seine wenigen Ereignisse direkt.
+  var MK_URL='https://efdjomgubucdnvgtuqmp.supabase.co/functions/v1/track', MK_KEY='45d4d32f10391d24b7e915bd19d6790a4152644ef418aa07';
+  function mkMelden(name, props){
+    if(root.marketer && root.marketer.track){ try{ root.marketer.track(name, props); }catch(e){} return; }
+    if(!root.fetch || /^(localhost|127\.)/.test(location.hostname) && !root.MK_TEST) return;
+    try{ fetch(MK_URL, {method:'POST', keepalive:true, credentials:'omit', headers:{'content-type':'application/json', authorization:'Bearer '+MK_KEY},
+      body:JSON.stringify({name:name, properties:Object.assign({path:location.pathname}, props||{})})})['catch'](function(){}); }catch(e){}
   }
-  function mkNachholen(){ var n=lies('sj.mk.offen'); if(n && root.marketer && root.marketer.track){ schreib('sj.mk.offen', null); try{ root.marketer.track(n); }catch(e){} } }
-  if(root.addEventListener) root.addEventListener('load', function(){ setTimeout(mkNachholen, 500); });
   function abmelden(){
     var s=sitzung(); schreib(SITZUNG, null);
     if(s) anfrage('/auth/v1/logout', {method:'POST', token:s.access_token})['catch'](function(){});
@@ -237,9 +239,28 @@
     '.konto{background:var(--karte,#1F1929);border:1px solid var(--linie,#2F2740);border-radius:16px;padding:16px 18px;margin:0 0 14px}'+
     '.konto p{margin:6px 0 12px;color:var(--leise,#B3A9C4);font-size:.95rem}.konto .zeile{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--linie,#2F2740)}'+
     '.konto .stand{font-size:.85rem;color:var(--leise,#B3A9C4)}.konto .stand.gut{color:var(--gruen,#4ADE80)}.konto .stand.schlecht{color:var(--rot,#F87171)}.konto summary{cursor:pointer;color:var(--akzent,#A78BFA);font-weight:700;margin-top:6px}'+
-    'dialog.konto-dlg{border:0;border-radius:20px;padding:22px;max-width:26rem;width:calc(100% - 32px);background:var(--panel,#17121F);color:var(--text,#F5F2FA)}dialog.konto-dlg::backdrop{background:rgba(0,0,0,.6)}'+
-    '.konto-dlg h2{margin:0 0 8px;font-size:1.3rem}.konto-dlg p{color:var(--leise,#B3A9C4);margin:0 0 14px}.konto-dlg input{width:100%;box-sizing:border-box;font:inherit;font-size:1.1rem;padding:12px 14px;border-radius:12px;border:1.5px solid var(--linie,#2F2740);background:var(--karte,#1F1929);color:inherit;margin:0 0 12px}'+
-    '.konto-dlg input.code{letter-spacing:.3em;text-align:center;font-size:1.4rem}.konto-dlg .fehler{color:var(--rot,#F87171);min-height:1.2em;margin:-4px 0 10px;font-size:.92rem}.konto-dlg .reihe{display:flex;gap:10px;flex-wrap:wrap}';
+    'dialog.konto-dlg{border:0;border-radius:24px;padding:26px 22px 20px;max-width:25rem;width:calc(100% - 32px);color:var(--text,#F5F2FA);'+
+      'background:radial-gradient(120% 70% at 50% -10%,rgba(167,139,250,.28),rgba(167,139,250,0) 60%),var(--panel,#17121F);box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 0 0 1px rgba(167,139,250,.18)}'+
+    'dialog.konto-dlg[open]{animation:kd-rein .38s cubic-bezier(.2,1.3,.4,1)}dialog.konto-dlg::backdrop{background:rgba(8,5,16,.66);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}'+
+    '@keyframes kd-rein{from{transform:translateY(24px) scale(.97);opacity:0}to{transform:none;opacity:1}}'+
+    '@media (max-width:599px){dialog.konto-dlg{margin:auto auto 0;width:100%;max-width:100%;border-radius:26px 26px 0 0;padding-bottom:calc(22px + env(safe-area-inset-bottom))}@keyframes kd-rein{from{transform:translateY(100%)}to{transform:none}}}'+
+    '@media (prefers-reduced-motion:reduce){dialog.konto-dlg[open]{animation:none}}'+
+    '.kd-held{width:88px;height:88px;margin:-6px auto 10px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(167,139,250,.45),rgba(167,139,250,0) 70%)}'+
+    '.kd-held img{width:76px;height:76px;object-fit:contain;animation:kd-schweb 3.2s ease-in-out infinite}@keyframes kd-schweb{50%{transform:translateY(-4px) rotate(-3deg)}}'+
+    '.konto-dlg h2{margin:0 0 6px;font-size:1.45rem;text-align:center;line-height:1.2}.konto-dlg .unter{color:var(--leise,#B3A9C4);margin:0 0 16px;text-align:center}'+
+    '.kd-vorteile{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:10px}'+
+    '.kd-vorteile li{display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:center;background:rgba(255,255,255,.035);border:1px solid var(--linie,#2F2740);border-radius:14px;padding:10px 12px}'+
+    '.kd-vorteile .ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#A78BFA,#7C5BD6);color:#fff}'+
+    '.kd-vorteile b{display:block;font-size:.98rem}.kd-vorteile small{color:var(--leise,#B3A9C4);font-size:.85rem;line-height:1.35;display:block}'+
+    '.konto-dlg input{width:100%;box-sizing:border-box;font:inherit;font-size:1.1rem;padding:14px 16px;border-radius:14px;border:1.5px solid var(--linie,#2F2740);background:var(--karte,#1F1929);color:inherit;margin:0 0 10px;transition:border-color .2s,box-shadow .2s}'+
+    '.konto-dlg input:focus{outline:none;border-color:var(--akzent,#A78BFA);box-shadow:0 0 0 4px rgba(167,139,250,.22)}'+
+    '.konto-dlg input.code{letter-spacing:.45em;text-align:center;font-size:2rem;font-weight:800;padding:14px 8px 14px 20px;font-variant-numeric:tabular-nums}'+
+    '.konto-dlg .fehler{color:var(--rot,#F87171);min-height:1.2em;margin:0 0 8px;font-size:.92rem;text-align:center}'+
+    '.konto-dlg .los{width:100%;padding:15px 18px;font-size:1.05rem;background:linear-gradient(135deg,#B79CFF,#7C5BD6);box-shadow:0 10px 26px rgba(124,91,214,.45)}'+
+    '.konto-dlg .neben{display:block;margin:12px auto 0;background:none;color:var(--leise,#B3A9C4);font-weight:600;min-height:40px;padding:8px 14px}'+
+    '.konto-dlg .mail{display:inline-block;background:rgba(167,139,250,.14);color:var(--text,#F5F2FA);border-radius:999px;padding:3px 10px;font-weight:700}'+
+    '.kd-fertig{text-align:center;padding:10px 0 6px}.kd-fertig .haken{width:72px;height:72px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#4ADE80,#16A34A);color:#fff;animation:kd-plopp .5s cubic-bezier(.2,1.6,.4,1)}'+
+    '@keyframes kd-plopp{from{transform:scale(.3);opacity:0}}';
   function stilEinmal(){ if(document.getElementById('konto-stil')) return; var s=document.createElement('style'); s.id='konto-stil'; s.textContent=STIL; document.head.appendChild(s); }
   var aktuellesThema=null;
   function karte(thema){
@@ -266,12 +287,21 @@
     stilEinmal(); aktuellesThema=thema;
     if(!dlg){ dlg=document.createElement('dialog'); dlg.className='konto-dlg'; document.body.appendChild(dlg); }
     var email=(sitzung()&&sitzung().email)||lies('sj.konto.email')||'';
+    var IC={schloss:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>',
+      teilen:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18h3"/></svg>',
+      brief:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>',
+      haken:'<svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>'};
+    var held=thema==='einhorn' ? '<div class="kd-held"><img alt="" src="themen/einhorn/figuren/funkel.svg"></div>' : '';
     function schritt1(fehler){
-      dlg.innerHTML='<form method="dialog" id="kd1"><h2>'+esc(opt.titel||'Party speichern und teilen')+'</h2>'+
-        '<p>'+esc(opt.text||'Wir schicken dir einen Code per E-Mail. Kein Passwort. Deine Gäste brauchen kein Konto.')+'</p>'+
-        '<input type="email" id="kd-mail" autocomplete="email" inputmode="email" placeholder="deine@email.de" required value="'+esc(email)+'">'+
+      dlg.innerHTML='<form method="dialog" id="kd1">'+held+'<h2>'+esc(opt.titel||'Party speichern und teilen')+'</h2>'+
+        '<p class="unter">'+esc(opt.text||'Einmal anmelden, dann kann es losgehen.')+'</p>'+
+        '<ul class="kd-vorteile">'+
+          '<li><span class="ic">'+IC.schloss+'</span><span><b>Eure Tour ist geschützt</b><small>Route und Treffpunkt sieht nur, wer euren Link hat.</small></span></li>'+
+          '<li><span class="ic">'+IC.teilen+'</span><span><b>Links für iPad und Gäste</b><small>Die brauchen kein Konto, ein Tipp auf den Link reicht.</small></span></li>'+
+          '<li><span class="ic">'+IC.brief+'</span><span><b>Code statt Passwort</b><small>Wir schicken dir einen Code per E-Mail.</small></span></li></ul>'+
+        '<input type="email" id="kd-mail" autocomplete="email" inputmode="email" placeholder="deine@email.de" aria-label="E-Mail-Adresse" required value="'+esc(email)+'">'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+
-        '<div class="reihe"><button class="knopf mittel" id="kd-los" type="submit">Code schicken</button><button class="knopf leer mittel" type="button" id="kd-zu">Später</button></div></form>';
+        '<button class="los" id="kd-los" type="submit">Code schicken</button><button class="neben" type="button" id="kd-zu">Später</button></form>';
       dlg.querySelector('#kd-zu').onclick=function(){ dlg.close(); };
       dlg.querySelector('#kd1').onsubmit=function(ev){ ev.preventDefault();
         var m=dlg.querySelector('#kd-mail').value.trim(), b=dlg.querySelector('#kd-los');
@@ -280,23 +310,30 @@
         codeSchicken(m).then(function(){ schritt2(); }, function(e){ b.disabled=false; b.textContent='Code schicken';
           dlg.querySelector('#kd-f').textContent=e.status===429?'Zu viele Versuche. Bitte in ein paar Minuten noch mal.':'Das ging nicht. Ist das Internet an?'; });
       };
-      setTimeout(function(){ var i=dlg.querySelector('#kd-mail'); if(i) i.focus(); }, 50);
+      setTimeout(function(){ var i=dlg.querySelector('#kd-mail'); if(i && !i.value) i.focus(); }, 60);
     }
     function schritt2(fehler){
-      dlg.innerHTML='<form method="dialog" id="kd2"><h2>Code eingeben</h2><p>Wir haben einen Code an '+esc(email)+' geschickt. Schau auch im Spam-Ordner nach.</p>'+
-        '<input class="code" id="kd-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" required>'+
+      dlg.innerHTML='<form method="dialog" id="kd2"><div class="kd-held" style="width:72px;height:72px"><span class="ic" style="color:#fff">'+IC.brief.replace(/20/g,'34')+'</span></div><h2>Code eingeben</h2>'+
+        '<p class="unter">Gerade an <span class="mail">'+esc(email)+'</span> geschickt.<br>Nichts da? Schau im Spam-Ordner nach.</p>'+
+        '<input class="code" id="kd-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="······" aria-label="Code aus der E-Mail" required>'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+
-        '<div class="reihe"><button class="knopf mittel" id="kd-ok" type="submit">Anmelden</button><button class="knopf leer mittel" type="button" id="kd-zurueck">Andere E-Mail</button></div></form>';
+        '<button class="los" id="kd-ok" type="submit">Anmelden</button><button class="neben" type="button" id="kd-zurueck">Andere E-Mail</button></form>';
       dlg.querySelector('#kd-zurueck').onclick=function(){ schritt1(); };
+      var feld=dlg.querySelector('#kd-code');
+      feld.addEventListener('input', function(){ var c=feld.value.replace(/\D/g,''); if(c!==feld.value) feld.value=c; if(c.length===6 && !feld.dataset.los){ feld.dataset.los='1'; dlg.querySelector('#kd2').requestSubmit ? dlg.querySelector('#kd2').requestSubmit() : dlg.querySelector('#kd-ok').click(); } });
       dlg.querySelector('#kd2').onsubmit=function(ev){ ev.preventDefault();
-        var c=dlg.querySelector('#kd-code').value.replace(/\D/g,''), b=dlg.querySelector('#kd-ok');
+        var c=feld.value.replace(/\D/g,''), b=dlg.querySelector('#kd-ok');
         if(c.length<6){ dlg.querySelector('#kd-f').textContent='Der Code hat mindestens 6 Ziffern.'; return; }
         b.disabled=true; b.textContent='Prüft …';
-        codePruefen(email, c).then(function(){ return angemeldetWeiter(thema); }).then(function(){ dlg.close(); },
-          function(e){ b.disabled=false; b.textContent='Anmelden';
+        codePruefen(email, c).then(function(){ return angemeldetWeiter(thema); }).then(function(){ fertig(); },
+          function(e){ b.disabled=false; b.textContent='Anmelden'; delete feld.dataset.los;
             dlg.querySelector('#kd-f').textContent=(e.status===400||e.status===401||e.status===403)?'Der Code stimmt nicht oder ist abgelaufen.':'Das ging nicht. Ist das Internet an?'; });
       };
-      setTimeout(function(){ var i=dlg.querySelector('#kd-code'); if(i) i.focus(); }, 50);
+      setTimeout(function(){ feld.focus(); }, 60);
+    }
+    function fertig(){
+      dlg.innerHTML='<div class="kd-fertig"><div class="haken">'+IC.haken+'</div><h2>Geschafft!</h2><p class="unter" style="margin:0">'+esc(opt.fertig||'Eure Party ist gesichert.')+'</p></div>';
+      setTimeout(function(){ if(dlg.open) dlg.close(); }, 1400);
     }
     schritt1();
     if(!dlg.open) dlg.showModal();
@@ -330,7 +367,7 @@
   var mailLink=null;
   try{ mailLink=linkAusMail(); }catch(e){}
 
-  root.Konto={aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
+  root.Konto={mkMelden:mkMelden, aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
     feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,

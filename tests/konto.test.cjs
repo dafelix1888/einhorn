@@ -62,9 +62,9 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(await a.locator('dialog.konto-dlg').isVisible(), 'Teilen öffnet Anmeldung');
   await a.fill('#kd-mail','eltern@test.de'); await a.click('#kd-los'); await a.waitForSelector('#kd-code');
   pruefe(mails[0]==='eltern@test.de', 'Code angefordert');
-  await a.fill('#kd-code','000000'); await a.click('#kd-ok'); await a.waitForTimeout(300);
+  await a.fill('#kd-code','000000'); await a.waitForTimeout(500);
   pruefe(/stimmt nicht/.test(await a.locator('#kd-f').innerText()), 'falscher Code wird abgelehnt');
-  await a.fill('#kd-code','123456'); await a.click('#kd-ok'); await a.waitForTimeout(1200);
+  await a.fill('#kd-code','123456'); await a.waitForTimeout(2600);
   pruefe(!(await a.locator('dialog.konto-dlg').isVisible()), 'Fenster zu nach Anmeldung');
   pruefe(/Geschützt gespeichert/.test(await a.locator('#konto-karte').innerText()), 'Karte: geschützt gespeichert');
   await a.screenshot({path:'konto-karte.png'});
