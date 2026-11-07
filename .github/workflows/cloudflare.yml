@@ -1,0 +1,43 @@
+# Veröffentlicht die App und den Stimmen-Worker bei Cloudflare.
+# Braucht das GitHub-Secret CLOUDFLARE_API_TOKEN (Vorlage „Edit Cloudflare Workers“),
+# optional CLOUDFLARE_ACCOUNT_ID. Ohne Token wird nichts getan.
+name: Cloudflare
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cloudflare
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HAT_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+    steps:
+      - name: Token vorhanden?
+        if: env.HAT_TOKEN != 'true'
+        run: echo "::notice::CLOUDFLARE_API_TOKEN fehlt, Cloudflare wird übersprungen."
+      - uses: actions/checkout@v4
+        if: env.HAT_TOKEN == 'true'
+      - name: App veröffentlichen
+        if: env.HAT_TOKEN == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+      - name: Stimmen-Worker veröffentlichen
+        if: env.HAT_TOKEN == 'true'
+        uses: cloudflare/wrangler-action@v3
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker
+          command: deploy
+          secrets: |
+            ELEVENLABS_API_KEY
