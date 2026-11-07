@@ -18,7 +18,7 @@ async function mock(route){
 let f=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) f++; };
 (async()=>{
   const b=await chromium.launch(), errs=[];
-  async function geraet(){ const c=await b.newContext({viewport:{width:393,height:852}}); await c.addInitScript(()=>{ window.KONTO_TEST={url:'https://test.supabase.co', key:'anon'}; }); await c.route(S+'/**', mock); const p=await c.newPage(); p.on('pageerror',e=>errs.push(e.message)); return p; }
+  async function geraet(){ const c=await b.newContext({viewport:{width:393,height:852}}); await c.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort()); await c.addInitScript(()=>{ window.KONTO_TEST={url:'https://test.supabase.co', key:'anon'}; }); await c.route(S+'/**', mock); const p=await c.newPage(); p.on('pageerror',e=>errs.push(e.message)); return p; }
   const heute=new Date().toISOString().slice(0,10);
   const party={format:1,thema:'einhorn',kind:{name:'Emma',alter:5},datum:heute,start:'00:01',kinder:6,helfer:2,vorausgeher:true,ort:'draussen',planB:true,ausdrucke:true,erledigt:{},einkauf:{}};
   const a=await geraet(); await a.goto(B+'party.html?thema=einhorn');
@@ -41,7 +41,7 @@ let f=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) f++; };
   ok(/landing\.html\?utm_source=danke/.test(await g.locator('.selbst a').getAttribute('href')), 'Weg zur eigenen Party');
   await a.reload(); await a.waitForTimeout(1500);
   ok(/1 Familie hat geantwortet: 😍 1/.test(await a.locator('#rueckmeldung').innerText()), 'Eltern sehen Rückmeldung');
-  const oc=await b.newContext(); await oc.addInitScript(()=>{ window.KONTO_TEST={url:'',key:''}; }); const ohne=await oc.newPage(); await ohne.goto(B+'party.html'); const alt=await ohne.evaluate(p=>{ return Party.dankeLink(p,null); }, party);
+  const oc=await b.newContext(); await oc.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort()); await oc.addInitScript(()=>{ window.KONTO_TEST={url:'',key:''}; }); const ohne=await oc.newPage(); await ohne.goto(B+'party.html'); const alt=await ohne.evaluate(p=>{ return Party.dankeLink(p,null); }, party);
   await ohne.goto(alt); await ohne.waitForTimeout(800);
   ok(/Danke fürs Mitfeiern/.test(await ohne.locator('#seite').innerText()) && await ohne.locator('#rueck').count()===0, 'ohne Server: Danke-Seite ohne Abstimmung');
   ok(errs.length===0, 'keine Seitenfehler '+errs.join(' | '));

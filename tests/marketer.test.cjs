@@ -4,6 +4,7 @@ let f=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) f++; };
 (async()=>{
   const b=await chromium.launch(), errs=[];
   const c=await b.newContext({viewport:{width:393,height:852}});
+  await c.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort());   // echtes Tracking aus, Stub bleibt
   await c.addInitScript(()=>{ window.__ev=[]; window.marketer={track:(n,p)=>window.__ev.push(n)}; });
   const p=await c.newPage(); p.on('pageerror',e=>errs.push(e.message));
   await p.goto(B+'landing.html?v=b'); await p.waitForTimeout(300);
@@ -16,7 +17,7 @@ let f=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) f++; };
   ok((await p.evaluate(()=>__ev)).includes('hoerprobe_played'), 'Startseite meldet hoerprobe_played');
   await p.evaluate(()=>{ localStorage.removeItem('sj.party.einhorn'); __ev=[]; Party.speichern({format:1,thema:'einhorn',kind:{name:'X',alter:5}}); Party.speichern(Party.lesen('einhorn')); });
   ok((await p.evaluate(()=>__ev)).filter(x=>x==='party_created').length===1, 'party_created genau einmal');
-  const q=await (await b.newContext()).newPage(); const e2=[]; q.on('pageerror',e=>e2.push(e.message));
+  const qc=await b.newContext(); await qc.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort()); const q=await qc.newPage(); const e2=[]; q.on('pageerror',e=>e2.push(e.message));
   await q.goto(B+'landing.html'); await q.locator('main:not([hidden]) .hoer').click(); await q.goto(B+'party.html?thema=einhorn');
   await q.evaluate(()=>Party.speichern({format:1,thema:'einhorn',kind:{name:'Y',alter:4}}));
   ok(e2.length===0, 'ohne Tracking-Skript keine Fehler');

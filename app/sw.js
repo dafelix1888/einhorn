@@ -1,5 +1,5 @@
 // Schnitzeljagd: hält Spiel, Thema, Stimmen und Funkel in 3D für unterwegs ohne Empfang bereit.
-var CACHE='schnitzeljagd-v20';
+var CACHE='schnitzeljagd-v21';
 var DATEIEN=['./','./index.html','./spiel.html','./tour-laden.js','./config.json','./themen/index.json','./themen/einhorn/tour.json','./themen/einhorn/cover.svg','./themen/einhorn/figuren/funkel.svg','./themen/einhorn/figuren/kakapups.svg','./stil.css','./planer.html','./planer.js','./planer-kern.js','../stimmen/pakete/einhorn-basis.json','../stimmen/pakete/einhorn-kakapups.json','./party.html','./party.js','./konto.js','./namen.js','./landing.html','./danke.html','./recht.js','./fehler.js','./impressum.html','./datenschutz.html','./schrift/baloo2.woff','./schrift/atkinson-regular.woff','./schrift/atkinson-bold.woff','./bereit.html','./vorausgeher.html','./einladung.html','./druck.html','./dunkel.css','../funkel3d.js','../three.module.min.js'];
 self.addEventListener('install', function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){
