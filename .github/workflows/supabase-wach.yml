@@ -1,0 +1,32 @@
+# Hält das kostenlose Supabase-Projekt wach: Supabase pausiert es nach etwa einer Woche ohne Datenbank-Zugriffe.
+# Einmal am Tag eine harmlose Abfrage (link_lesen mit einem Schlüssel, den es nicht gibt).
+# URL und Schlüssel stammen aus app/konto.js; beide sind öffentlich.
+name: Supabase wach halten
+on:
+  schedule:
+    - cron: '23 4 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: app/konto.js
+          sparse-checkout-cone-mode: false
+      - name: Datenbank kurz abfragen
+        run: |
+          URL=$(grep -oP "SUPABASE_URL='\K[^']+" app/konto.js | head -1)
+          KEY=$(grep -oP "SUPABASE_KEY='\K[^']+" app/konto.js | head -1)
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then echo "Kein Server eingetragen, nichts zu tun."; exit 0; fi
+          for i in 1 2 3; do
+            code=$(curl -s -o /tmp/antwort -w '%{http_code}' -X POST "$URL/rest/v1/rpc/link_lesen" \
+              -H "apikey: $KEY" -H 'Content-Type: application/json' -d '{"t":"wachhalten0000000000000000"}')
+            echo "Versuch $i: HTTP $code $(cat /tmp/antwort)"
+            [ "$code" = "200" ] && exit 0
+            sleep 30
+          done
+          echo "::error::Supabase antwortet nicht. Ist das Projekt pausiert? Im Dashboard auf Resume project tippen."
+          exit 1
