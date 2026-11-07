@@ -130,6 +130,7 @@
   function speichern(){
     plan.stand=new Date().toISOString(); plan.variante=wahl.variante; plan.kinder=wahl.kinder;
     try{ localStorage.setItem(PLAN_KEY, JSON.stringify(plan)); }catch(e){}
+    if(window.Konto) Konto.merken(thema);           // angemeldet: Route geschützt mitspeichern
   }
 
   // ---------- Kennzahlen: Strecke, Dauer, Heimweg ----------
@@ -373,6 +374,7 @@
       rechnen().then(function(){ b.disabled=false; b.textContent='Andere Route'; });
     });
     $('speichern').addEventListener('click', function(){ speichern(); location.href=(party ? 'party.html' : 'spiel.html')+'?thema='+encodeURIComponent(thema); });
+    if(window.Konto && Konto.aktiv()) $('teilen').hidden=true;   // geteilt wird geschützt über die Party-Seite
     $('teilen').addEventListener('click', function(){
       speichern(); var link=spielLink(plan);
       if(navigator.share){ navigator.share({title:tour.titel, text:'Unsere Schnitzeljagd', url:link})['catch'](function(){}); return; }

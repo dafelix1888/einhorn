@@ -78,6 +78,7 @@
 <div class="toast" id="toast" hidden></div>
 <script src="planer-kern.js"></script>
 <script src="party.js"></script>
+<script src="konto.js"></script>
 <script>
 (function(){
   'use strict';
@@ -259,9 +260,9 @@
       '<label for="gh">Bitte mitbringen und beachten</label><textarea id="gh" rows="2" maxlength="200" placeholder="z. B. Regenhose, warme Mütze, Wechselsocken">'+esc(Party.gaesteHinweis(party))+'</textarea>'+
       '<p class="leise" style="font-size:.85rem;margin:6px 0 12px">Steht auf der Einladung für die Gast-Eltern, im Link und auf dem Ausdruck.</p>'+
       '<div class="reihe"><button type="button" class="knopf mittel" id="gast-link-2">Einladungslink teilen</button><a class="knopf leer mittel" href="druck.html?thema='+thema+'#einladung">Treffpunkt und Abholzeit</a></div></div>';
-    h+='<h2>Teilen und Geräte</h2><div class="werkzeuge">'+
+    h+='<h2>Teilen und Geräte</h2>'+(window.Konto?Konto.karte(thema):'')+'<div class="werkzeuge">'+
       '<button type="button" class="knopf mittel" id="gast-link">Einladungslink teilen</button>'+
-      '<a class="knopf leer mittel" href="einladung.html?e='+Party.einladungsLink(party, pl).split('?e=')[1]+'">Einladung ansehen</a>'+
+      '<button type="button" class="knopf leer mittel" id="ansehen">Einladung ansehen</button>'+
       (party.vorausgeher?'<button type="button" class="knopf leer mittel" id="vg-link">Link für den Vorausgeher</button>':'')+
       '<button type="button" class="knopf leer mittel" id="teilen">Link fürs iPad</button>'+
       (party.ort!=='drinnen'?'<a class="knopf leer mittel" href="planer.html?thema='+thema+'">Route ändern</a>':'')+
@@ -279,7 +280,8 @@
     try{ navigator.clipboard.writeText(link).then(function(){ toast(ok); }, function(){ prompt('Link kopieren:', link); }); }catch(x){ prompt('Link kopieren:', link); }
   }
   function schritt_(id){ return Party.aufgaben(party, tour, Party.plan(thema)).filter(function(a){ return a.id===id; })[0]; }
-  function gastLink(){ teilen(Party.einladungsLink(party, Party.plan(thema)), 'Einladung: '+partyTitel(party), 'Einladungslink kopiert. In die Eltern-Gruppe schicken.'); }
+  function bereit(f){ if(window.Konto) Konto.bereit(thema, f); else f(); }      // mit Server: erst geschützt speichern, dann teilen
+  function gastLink(){ bereit(function(){ teilen(Party.einladungsLink(party, Party.plan(thema)), 'Einladung: '+partyTitel(party), 'Einladungslink kopiert. In die Eltern-Gruppe schicken.'); }); }
 
   document.addEventListener('click', function(ev){
     var t=ev.target, b;
@@ -312,8 +314,9 @@
       var blob=new Blob([Party.ics(party, tour, Party.plan(thema))],{type:'text/calendar'}), el=document.createElement('a');
       el.href=URL.createObjectURL(blob); el.download=thema+'-party.ics'; document.body.appendChild(el); el.click(); el.remove(); toast('Kalenderdatei erstellt. Öffnen, dann landen alle Termine im Kalender.'); return;
     }
-    if(t.closest('#teilen')){ teilen(linkFuersIpad(), partyTitel(party), 'Link kopiert. Auf dem iPad öffnen.'); return; }
-    if(t.closest('#vg-link')){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+partyTitel(party), 'Link kopiert. An den Vorausgeher schicken.'); return; }
+    if(t.closest('#teilen')){ bereit(function(){ teilen(linkFuersIpad(), partyTitel(party), 'Link kopiert. Auf dem iPad öffnen.'); }); return; }
+    if(t.closest('#ansehen')){ bereit(function(){ location.href=Party.einladungsLink(party, Party.plan(thema)); }); return; }
+    if(t.closest('#vg-link')){ bereit(function(){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+partyTitel(party), 'Link kopiert. An den Vorausgeher schicken.'); }); return; }
     if(t.closest('#gast-link')){ gastLink(); return; }
     var k=t.closest('[data-kauf],[data-kauf-zurueck]');
     if(k){ party.einkauf=party.einkauf||{}; if(k.hasAttribute('data-kauf')) party.einkauf[k.getAttribute('data-kauf')]=true; else delete party.einkauf[k.getAttribute('data-kauf-zurueck')]; einkaufNeu(); return; }
@@ -325,7 +328,7 @@
     if(t.closest('#in-korb')){ party.korbGeoeffnet=Party.einkauf(party, tour).filter(Party.imKorb).map(function(x){ return x.id; }); party=Party.speichern(party); setTimeout(einkaufNeu, 300); return; }
     if(t.closest('#korb-ja')){ party.einkauf=party.einkauf||{}; party.korbGeoeffnet.forEach(function(id){ party.einkauf[id]=true; }); party.korbGeoeffnet=null; einkaufNeu(); toast('Abgehakt. Die Artikel stehen unter „Schon da oder bestellt“.'); return; }
     if(t.closest('#korb-nein')){ party.korbGeoeffnet=null; einkaufNeu(); return; }
-    if(t.closest('#loeschen')){ if(confirm('Party wirklich löschen? Route und Checkliste bleiben erhalten.')){ Party.loeschen(thema); party=null; neu(); } return; }
+    if(t.closest('#loeschen')){ if(confirm('Party wirklich löschen? Route und Checkliste bleiben erhalten.')){ if(window.Konto) Konto.serverLoeschen(thema, party); Party.loeschen(thema); party=null; neu(); } return; }
   });
   document.addEventListener('change', function(ev){
     var t=ev.target;
@@ -344,12 +347,22 @@
     if(ev.target.id!=='vorein') return;
     voreinOffen=ev.target.open; var m=ev.target.querySelector('summary em'); if(m) m.textContent=voreinOffen?'Fertig':'Ändern';
   }, true);
+  // Konto: nach Anmelden, neuem Link oder Abmelden die Übersicht neu zeichnen
+  window.addEventListener('konto', function(ev){
+    var d=ev.detail||{}; if(d.thema!==thema) return;
+    if(d.art==='fehler'){ toast('Das ging nicht. Ist das Internet an?'); return; }
+    if(entwurf) return;
+    party=Party.lesen(thema); if(!party){ neu(); return; }
+    var y=window.scrollY; uebersicht(); window.scrollTo(0,y);
+    toast(d.art==='angemeldet'?'Gespeichert. Jetzt könnt ihr die Links teilen.':d.art==='neuer-link'?'Neuer Link erstellt. Der alte geht nicht mehr.':'Abgemeldet.');
+  });
   function neu(){ entwurf={format:1, thema:thema, kind:{name:'', alter:null}, datum:'', start:'15:00', kinder:tour.kinder.standard, helfer:2, vorausgeher:true, ort:'draussen', planB:true, ausdrucke:true, erledigt:{}, einkauf:{}, erstellt:new Date().toISOString()}; schritt=0; vgVonHand=false; voreinOffen=false; assistent(); }
 
   Promise.all([fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }), fetch('themen/index.json').then(function(r){ return r.json(); })]).then(function(r){
     tour=r[0]; info=r[1].themen.filter(function(t){ return t.id===thema; })[0];
     party=Party.lesen(thema);
     if(!party || q.has('neu')) neu(); else uebersicht();
+    if(window.Konto){ if(!Konto.nachMailLink(thema) && party) Konto.merken(thema); }
   })['catch'](function(e){ $('seite').innerHTML='<p>Die Party lässt sich nicht laden: '+esc(e.message)+'</p>'; });
 })();
 </script>

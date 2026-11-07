@@ -59,10 +59,12 @@ details.alle[open] summary svg{transform:rotate(180deg)}
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="planer-kern.js"></script>
 <script src="party.js"></script>
+<script src="konto.js"></script>
 <script>
 (function(){
   'use strict';
   var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
+  if(window.Konto && Konto.einloesen(thema)) return;      // ?k=… geschützter Link: holen, dann ohne Schlüssel neu laden
   if(q.get('plan')){ try{ Party.ausLinkUebernehmen(thema, q.get('plan')); }catch(e){} q.delete('plan'); try{ history.replaceState(null,'',location.pathname+'?'+q.toString()); }catch(e){} }
   var party=Party.lesen(thema), plan=Party.plan(thema), tour=null, ich=null, karte=null, ebene=null, ichMarker=null;
   var RAUM={'Küche':1,'Flur':2,'Treppe':3,'Türen':4,'Kissenberg':5,'Sofa':6};
