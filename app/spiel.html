@@ -412,6 +412,10 @@ details.karte.achtung{border-color:rgba(248,113,113,.45)}
 .station-txt{display:flex;flex-direction:column;min-width:0;line-height:1.2}
 .station-txt b{font-family:var(--font-display);font-weight:800;font-size:1.3rem}
 .station-txt span{color:var(--ink-soft);font-size:.95rem}
+.station-txt .aufbau-live[hidden]{display:none}
+.station-txt .aufbau-live{margin:3px 0 0;font-size:.8rem;color:var(--ink-soft);line-height:1.2}
+.station-txt .aufbau-live.warn{color:#F2B90F;font-weight:700}
+.aufbau-live.warn::before{content:'Achtung: '}
 body:not(.m-tour) .fortschritt, body:not(.m-tour) .station-txt{display:none}
 .erw-wrap{position:relative;display:flex;align-items:center;gap:10px;flex:none}
 .erw-btn,.zur-tour{border:0;border-radius:999px;background:var(--surface);color:var(--ink-soft);font-weight:700;font-size:1rem;
@@ -508,7 +512,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
   <header class="top">
     <div class="top-left">
       <div class="fortschritt" id="fortschritt" role="img" aria-label="Regenbogen"></div>
-      <p class="station-txt"><b id="station-nr"></b><span id="count"></span></p>
+      <p class="station-txt"><b id="station-nr"></b><span id="count"></span><span class="aufbau-live" id="aufbau-live" hidden></span></p>
       <h1>Funkels Zauberspiegel</h1>
     </div>
     <div class="erw-wrap">
@@ -2182,7 +2186,21 @@ function kopfZeigen(found){             // Kopfzeile: kleiner Regenbogen und „
   $('fortschritt').setAttribute('aria-label', 'Regenbogen: '+n+' von '+ARCS.length+' Bögen gefunden');
   $('station-nr').textContent = ph==='start' ? 'Bereit' : z[0];
   $('count').textContent = ph==='start' ? z[0] : (z[1]||'');
+  aufbauZeigen();
 }
+// Vorausgeher live (geschützter Link): wie weit ist aufgebaut? Warnt, wenn die nächste Station noch nicht steht.
+var aufbauStand=null;
+function aufbauZeigen(){
+  var e=$('aufbau-live'); if(!e) return;
+  if(!aufbauStand || !aufbauStand.aktualisiert){ e.hidden=true; return; }
+  var s=aufbauStand.stationen||{}, bis=0;
+  for(var i=1;i<N;i++){ if(s[i]) bis=i; else break; }
+  var naechste=state.phase==='start' ? 1 : state.idx+1;
+  e.textContent = bis>=N-1 ? 'Vorausgeher: alles aufgebaut' : bis===0 ? 'Vorausgeher: noch nichts aufgebaut' : 'Vorausgeher: bis Station '+(bis+1)+' aufgebaut';
+  e.classList.toggle('warn', state.phase!=='start' && naechste<N && bis<naechste);
+  e.hidden=false;
+}
+if(window.Konto) Konto.aufbauBeobachten((new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), function(r){ aufbauStand=r; aufbauZeigen(); }, 20000);
 var letzterKey=null, gehoert={}, letzteFound={};
 var schwebTimer=null, schwebTimer2=null, neueBoegen={}, geschwebtBei=null;
 // Der Regenbogen schwebt einmal je Schritt ein, und zwar genau dann, wenn „Regenbogen“ oder „Bögen“ gesagt wird.

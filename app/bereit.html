@@ -88,11 +88,16 @@
     $('ablauf-titel').textContent=t===0?'Heute':'Am Partytag';
     var l=[];
     if(draussen && v!=='c') l.push([-60,'Kreidespur malen','Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.','']);
-    if(party.vorausgeher) l.push([-20,'Vorausgeher startet','Mit der Tasche vorgehen und die Stationen aufbauen. Den Link mit Karte und Packliste schickst du hier.','<div style="margin-top:8px"><button type="button" class="knopf klein leer mittel" id="vg-link">Link schicken</button></div>']);
+    if(party.vorausgeher) l.push([-20,'Vorausgeher startet','Mit der Tasche vorgehen und die Stationen aufbauen. Den Link mit Karte und Packliste schickst du hier.','<span id="vg-live" hidden></span><div style="margin-top:8px"><button type="button" class="knopf klein leer mittel" id="vg-link">Link schicken</button></div>']);
     l.push([0,draussen?'Alle an der Haustür':'Alle zusammen','Tattoos verteilen, dann den Zauberspiegel aufwecken.','']);
     $('heute').innerHTML=l.map(function(x){ return '<div class="termin"><b>'+Party.uhr(party,x[0])+'</b><div><b>'+esc(x[1])+'</b><span>'+esc(x[2])+'</span>'+x[3]+'</div></div>'; }).join('')+
       (draussen && party.planB ? '<p class="leise" style="font-size:.88rem;margin:4px 0 0">Regen? Auf der Party-Seite mit einem Tipp auf drinnen umschalten.</p>' : '');
     $('ablauf').hidden=false;
+    if(party.vorausgeher && window.Konto && !window.__vgLive) window.__vgLive=Konto.aufbauBeobachten(thema, function(r){
+      var e=$('vg-live'); if(!e || !r.aktualisiert) return;
+      var n=Object.keys(r.stationen||{}).length; e.hidden=false; e.style.display='block'; e.style.fontWeight='700';
+      e.textContent='Live: '+n+(n===1?' Station steht':' Stationen stehen')+' (Stand '+new Date(r.aktualisiert).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr)';
+    }, 30000);
   }
 
   // ---------- Stimmen: Pakete wie im Spiel in IndexedDB ----------
