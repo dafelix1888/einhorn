@@ -46,6 +46,9 @@ main>header,main>section:not(.show){max-width:720px;margin-left:auto;margin-righ
 main{max-width:1040px}
 .marke{max-width:1040px;margin:0 auto;padding:16px 16px 0;font-weight:700;letter-spacing:.02em;color:var(--leise)}
 .marke b{color:var(--text)}
+.marke{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mein{color:var(--text);text-decoration:none;font-size:14px;font-weight:600;letter-spacing:0;border:1px solid var(--linie);border-radius:999px;padding:8px 14px;min-height:36px}
+.mein:hover,.mein:focus-visible{border-color:var(--akzent)}
 .leise{color:var(--leise)}
 /* Screenshots im Handy-Rahmen, wechseln beim Scrollen (MAR-9) */
 .show h2{text-align:center}
@@ -93,7 +96,7 @@ html.js .zeig.sichtbar,html.js .figur.sichtbar{opacity:1;transform:none}
 </style>
 <script src="https://efdjomgubucdnvgtuqmp.supabase.co/functions/v1/track/m.js" data-key="45d4d32f10391d24b7e915bd19d6790a4152644ef418aa07" data-auto="off" defer></script>
 </head>
-<body><div class="marke"><b>Schatzweg</b></div>
+<body><div class="marke"><b>Schatzweg</b><a class="mein" href="party.html?thema=einhorn" data-track="cta_clicked" data-ziel="meine_party">Meine Party</a></div>
 <main data-variant="a">
   <header class="held">
     <h1>Eine Schatzsuche, die in eurer Straße spielt</h1>
@@ -155,7 +158,7 @@ html.js .zeig.sichtbar,html.js .figur.sichtbar{opacity:1;transform:none}
   window.addEventListener('DOMContentLoaded',function(){ track('visit',{page:'landing'}); });
   var laeuft=null;   // immer nur eine Figurenstimme
   main.addEventListener('click',function(e){
-    var a=e.target.closest('[data-track]'); if(a) track(a.dataset.track,{label:a.textContent.trim()});
+    var a=e.target.closest('[data-track]'); if(a) track(a.dataset.track,{label:a.textContent.trim(),ziel:a.dataset.ziel||'planer'});
     var h=e.target.closest('.hoer'); if(h){ var au=h._a||(h._a=new Audio(h.dataset.src)); if(au.paused){au.play();track('hoerprobe_played');} else au.pause(); }
     var s=e.target.closest('.stimme'); if(s){
       var st=s._a||(s._a=new Audio(s.dataset.src));
@@ -166,6 +169,8 @@ html.js .zeig.sichtbar,html.js .figur.sichtbar{opacity:1;transform:none}
       else st.pause();
     }
   });
+  var kopf=document.querySelector('.marke [data-track]');
+  if(kopf) kopf.addEventListener('click',function(){ track(kopf.dataset.track,{label:kopf.textContent.trim(),ziel:kopf.dataset.ziel||''}); });
   if(!('IntersectionObserver' in window)) return;
   // Screenshots: Schritt in der Bildschirmmitte bestimmt Bild und Text
   main.querySelectorAll('.show').forEach(function(sh){

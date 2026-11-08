@@ -68,6 +68,15 @@ const pfad=u=>{ const x=new URL(u); return x.pathname.replace(/^\/app\//,'')+x.s
   const mitRoute=await p.$$eval('a', as=>as.filter(a=>/Party planen|Weiter zur Party|Spiel öffnen/.test(a.textContent+(a.getAttribute('aria-label')||''))).map(a=>a.getAttribute('href')));
   ok(mitRoute.length>0 && mitRoute.every(h=>/^party\.html/.test(h)), 'Katalog mit Route: alle Wege → Party, kein „Spiel öffnen“ ('+mitRoute.join(', ')+')');
 
+  // 7b) Landingpage „Meine Party“ (MAR-58): ohne Party → Auswahl Anmelden/Neue Party; mit Party → Übersicht
+  p=await neu(); await p.goto(B+'landing.html'); await klick(p,'.marke a.mein');
+  await p.waitForSelector('#holen', {timeout:8000}).catch(()=>{});
+  ok(pfad(p.url()).startsWith('party.html') && await p.locator('#holen').count()===1, 'Landing „Meine Party“ ohne Party → Anmelden und Party holen');
+  ok(await p.locator('a[href^="planer.html"]', {hasText:'Neue Party planen'}).count()===1, 'Auswahl bietet „Neue Party planen“ → Planer');
+  p=await neu({'sj.party.einhorn':PARTY}); await p.goto(B+'landing.html'); await klick(p,'.marke a.mein');
+  await p.waitForSelector('#seite .marke-sw', {timeout:10000}).catch(()=>{});
+  ok(/Mias Einhorn/.test(await p.locator('#seite').innerText()), 'Landing „Meine Party“ mit Party → Party-Übersicht');
+
   // 8) Impressum: Zurück → vorige Seite bzw. Landingpage
   p=await neu(); await p.goto(B+'landing.html'); await p.goto(B+'impressum.html'); await klick(p,'a[data-zurueck]');
   ok(pfad(p.url()).startsWith('landing.html'), 'Impressum Zurück → Landingpage');
