@@ -18,4 +18,13 @@ ok(bild && fs.existsSync(path.join(R,bild)), 'Startadresse hat Vorschaubild ('+b
 ok(/og:title/.test(start) && /rel="canonical"/.test(start), 'Startadresse mit Titel und Canonical');
 for(const s of ['spiel','party','einladung','danke','vorausgeher','bereit'])
   ok(/<meta name="robots" content="noindex">/.test(fs.readFileSync(path.join(R,'app',s+'.html'),'utf8')), s+' mit noindex im Kopf (auch für GitHub Pages)');
+// Themenseiten von Marketer (UNICORN-24): alle Pfade auf eigene Dateien gibt es, nichts gesperrt
+const ideen=fs.readdirSync(path.join(R,'ideen')).filter(d=>d.endsWith('.html'));
+ok(ideen.length===9, '9 Themenseiten unter /ideen/');
+ok(!/Disallow:\s*\/ideen/.test(robots), 'robots.txt sperrt /ideen/ nicht');
+const fehlend=[];
+for(const d of ideen){ const h=fs.readFileSync(path.join(R,'ideen',d),'utf8');
+  for(const m of h.matchAll(/(?:href|src|data-src)="(\/[^"#?]*|[a-z0-9-]+\.html)/g)){ let u=m[1]; let f=u.startsWith('/')?path.join(R,u):path.join(R,'ideen',u); if(u.endsWith('/')) f=path.join(f,'index.html'); if(!fs.existsSync(f)) fehlend.push(d+': '+u); }
+  ok(sitemap.includes('https://schatzweg.de/ideen/'+(d==='index.html'?'':d)+'<'), 'Sitemap enthält ideen/'+d); }
+ok(fehlend.length===0, 'Themenseiten verweisen nur auf vorhandene Dateien '+fehlend.slice(0,5).join(', '));
 console.log(fehler?fehler+' FEHLER':'ALLES OK'); process.exit(fehler?1:0);
