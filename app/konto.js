@@ -321,12 +321,14 @@
     function schritt2(fehler){
       dlg.innerHTML='<form method="dialog" id="kd2"><div class="kd-held" style="width:72px;height:72px"><span class="ic" style="color:#fff">'+IC.brief.replace(/20/g,'34')+'</span></div><h2>Code eingeben</h2>'+
         '<p class="unter">Gerade an <span class="mail">'+esc(email)+'</span> geschickt.<br>Nichts da? Schau im Spam-Ordner nach.</p>'+
-        '<input class="code" id="kd-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="······" aria-label="Code aus der E-Mail" required>'+
+        '<input class="code" id="kd-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code" aria-label="Code aus der E-Mail" required>'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+
         '<button class="los" id="kd-ok" type="submit">Anmelden</button><button class="neben" type="button" id="kd-zurueck">Andere E-Mail</button></form>';
       dlg.querySelector('#kd-zurueck').onclick=function(){ schritt1(); };
       var feld=dlg.querySelector('#kd-code');
-      feld.addEventListener('input', function(){ var c=feld.value.replace(/\D/g,''); if(c!==feld.value) feld.value=c; if(c.length===6 && !feld.dataset.los){ feld.dataset.los='1'; dlg.querySelector('#kd2').requestSubmit ? dlg.querySelector('#kd2').requestSubmit() : dlg.querySelector('#kd-ok').click(); } });
+      var warte=null;   // Code-Länge kann 6 bis 10 Ziffern sein: nach kurzer Tipp-Pause selbst prüfen
+      feld.addEventListener('input', function(){ var c=feld.value.replace(/\D/g,''); if(c!==feld.value) feld.value=c; clearTimeout(warte);
+        if(c.length>=6 && !feld.dataset.los) warte=setTimeout(function(){ feld.dataset.los='1'; dlg.querySelector('#kd2').requestSubmit ? dlg.querySelector('#kd2').requestSubmit() : dlg.querySelector('#kd-ok').click(); }, c.length>=10?0:900); });
       dlg.querySelector('#kd2').onsubmit=function(ev){ ev.preventDefault();
         var c=feld.value.replace(/\D/g,''), b=dlg.querySelector('#kd-ok');
         if(c.length<6){ dlg.querySelector('#kd-f').textContent='Der Code hat mindestens 6 Ziffern.'; return; }

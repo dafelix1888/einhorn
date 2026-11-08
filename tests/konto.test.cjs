@@ -62,7 +62,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(await a.locator('dialog.konto-dlg').isVisible(), 'Teilen öffnet Anmeldung');
   await a.fill('#kd-mail','eltern@test.de'); await a.click('#kd-los'); await a.waitForSelector('#kd-code');
   pruefe(mails[0]==='eltern@test.de', 'Code angefordert');
-  await a.fill('#kd-code','000000'); await a.waitForTimeout(500);
+  await a.fill('#kd-code','000000'); await a.waitForFunction(()=>/stimmt nicht/.test((document.getElementById('kd-f')||{}).textContent||''), null, {timeout:8000}).catch(()=>{});
   pruefe(/stimmt nicht/.test(await a.locator('#kd-f').innerText()), 'falscher Code wird abgelehnt');
   await a.fill('#kd-code','123456'); await a.waitForTimeout(2600);
   pruefe(!(await a.locator('dialog.konto-dlg').isVisible()), 'Fenster zu nach Anmeldung');
