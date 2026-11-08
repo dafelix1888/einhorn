@@ -9,7 +9,7 @@
 //   GET  /hoehe?latitude=…&longitude=…  Höhen (Open-Meteo), bis 100 Punkte
 //   POST /overpass   body: data=…      Wege und Orte (Overpass)
 
-const AGENT = 'Zauberspiegel-Schnitzeljagd/1.0 (+https://github.com/dafelix1888/einhorn)';
+const AGENT = 'Schatzweg/1.0 (+https://schatzweg.de)';
 const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter'];
 const TAG = 86400;
 

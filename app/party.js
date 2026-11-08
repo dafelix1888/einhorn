@@ -136,7 +136,7 @@
       }
       termin(a.id, tour.titel+': '+a.titel, (a.text||'')+(a.link&&a.link.charAt(0)!=='#'?'\n'+basis+a.link:''), new Date(a.datum), false, 20);
     });
-    return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Zauberspiegel//Party//DE','CALSCALE:GREGORIAN'].concat(ev,['END:VCALENDAR']).join('\r\n')+'\r\n';
+    return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Schatzweg//Party//DE','CALSCALE:GREGORIAN'].concat(ev,['END:VCALENDAR']).join('\r\n')+'\r\n';
   }
 
 

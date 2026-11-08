@@ -25,7 +25,7 @@ let fehler=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) feh
   let r=await anfrage('/overpass', post); await Promise.all(warten);
   const j=await r.json();
   ok(r.status===200 && /kumi/.test(j.quelle) && r.headers.get('X-Karte')==='dienst', 'Overpass: weicht auf den zweiten Server aus');
-  ok(aufrufe.every(a=>/Zauberspiegel-Schnitzeljagd/.test(a)), 'meldet sich mit eigenem Namen an');
+  ok(aufrufe.every(a=>/Schatzweg\/1.0/.test(a)), 'meldet sich mit eigenem Namen an');
   r=await anfrage('/overpass', post); ok(r.headers.get('X-Karte')==='cache', 'gleiche Abfrage kommt aus dem Cache');
 
   // veraltete Antwort, Dienst aus: ältere Antwort springt ein

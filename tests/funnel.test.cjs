@@ -92,6 +92,16 @@ async function mock(route){
   await g.goto(B+'party.html?thema=einhorn'); await g.waitForTimeout(600);
   ok(await g.evaluate(()=>/einladung\.html\?e=/.test(Party.einladungsLink(Party.lesen('einhorn'), Party.plan('einhorn'))||'')), 'Notweg: Einladungslink mit Daten wie früher');
 
+  // 7. Startadresse: neu → Landingpage (mit utm), mit Party → App, alter #tour-Link → Spiel
+  const r=await geraet(); await r.goto(B.replace(/app\/$/,'')); await r.evaluate(()=>localStorage.clear());
+  await r.goto(B.replace(/app\/$/,'')+'?utm_source=test'); await r.waitForURL(/landing\.html/);
+  ok(/landing\.html\?utm_source=test/.test(r.url()), 'Startadresse: neue Besucher auf die Landingpage, utm bleibt');
+  await r.evaluate(p=>localStorage.setItem('sj.party.einhorn', JSON.stringify(p)), party);
+  await r.goto(B.replace(/app\/$/,'')); await r.waitForURL(u=>/\/app\/(index\.html)?$/.test(new URL(u).pathname));
+  ok(true, 'Startadresse: mit Party in die App');
+  await r.goto(B.replace(/app\/$/,'')+'#tour'); await r.waitForURL(/spiel\.html/);
+  ok(/spiel\.html\?thema=einhorn#tour/.test(r.url()), 'Startadresse: alter #tour-Link ins Spiel');
+
   ok(errs.length===0, 'keine Seitenfehler '+errs.join(' | '));
   console.log(fehler?fehler+' FEHLER':'ALLES OK'); await b.close(); process.exit(fehler?1:0);
 })();

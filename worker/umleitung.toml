@@ -9,4 +9,10 @@ workers_dev = false
 pattern = "www.schatzweg.de"
 custom_domain = true
 
-# schatzsweg.de und www.schatzsweg.de kommen dazu, sobald die Zone in Cloudflare aktiv ist.
+[[routes]]
+pattern = "schatzsweg.de"
+custom_domain = true
+
+[[routes]]
+pattern = "www.schatzsweg.de"
+custom_domain = true
