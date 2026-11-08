@@ -37,7 +37,7 @@
   }
   function draussen(){ return !!(tour.varianten[wahl.variante]||{}).draussen; }
   function km(m){ m=Math.round(m||0); return m>=1000 ? (m/1000).toFixed(1).replace('.',',')+' km' : m+' m'; }
-  function zurueckZiel(){ return party ? 'party.html?thema='+encodeURIComponent(thema) : 'index.html'; }
+  function zurueckZiel(){ return party ? 'party.html?thema='+encodeURIComponent(thema) : './'; }
 
   // ---------- Netz ----------
   function mitZeitlimit(p, ms, text){ return Promise.race([p, new Promise(function(_,nein){ setTimeout(function(){ nein(new Error(text)); }, ms); })]); }

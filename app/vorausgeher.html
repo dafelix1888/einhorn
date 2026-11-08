@@ -126,7 +126,7 @@ details.alle[open] summary svg{transform:rotate(180deg)}
       '<div id="fokus"></div>'+
       '<details class="alle" id="alle"><summary><span id="alleTitel">Alle Stationen</span>'+PFEIL+'</summary><div class="alle-innen">'+(drinnen?'':'<div id="karte"></div>')+'<div id="liste"></div></div></details>'+
       '<p class="hinweis" id="live-hinweis">'+(window.Konto && Konto.linkRolle(thema)==='vorausgeher' ? 'Das iPad sieht deine Haken live.' : 'Die Haken sieht nur dieses Handy.')+'</p>'+
-      '<p class="hinweis"><a href="index.html">Zur Übersicht</a></p>';
+      '<p class="hinweis"><a href="./">Zur Übersicht</a></p>';
     $('alle').addEventListener('toggle', function(){ if($('alle').open && !drinnen){ if(karte===null) karteBauen(); else if(karte) karte.invalidateSize(); } });
   }
 
