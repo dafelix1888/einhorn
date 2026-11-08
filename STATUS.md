@@ -1,12 +1,12 @@
 # Zauberspiegel: Status und nächste Schritte
 
-Stand: 7. November 2026 (Cloudflare-Hosting live). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
+Stand: 8. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
 
 ## Worum es geht
 
 Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzeljagden mit sprechendem Zauberspiegel (Tablet). Zielgruppe sind Eltern, die einen Kindergeburtstag organisieren. Später sollen Abenteuer verkauft werden, Utensilien laufen über Partnerlinks und Boxen.
 
-- Live: <https://dafelix1888.github.io/einhorn/app/> (GitHub Pages, Repo `dafelix1888/einhorn`, öffentlich)
+- Live: <https://schatzweg.de/app/> (Cloudflare, eigene Domain seit 8. November), weiter erreichbar: <https://dafelix1888.github.io/einhorn/app/> (GitHub Pages, Repo `dafelix1888/einhorn`, öffentlich) und die workers.dev-Adresse
 - Die Startadresse <https://dafelix1888.github.io/einhorn/> leitet zur App weiter; alte Links auf `#tour` landen direkt im Spiel.
 - Original vom Geburtstag: `/original.html`, verschlüsselt mit dem Zauberwort (GitHub-Secret `ZAUBERWORT`). Inhalt unverändert, nur umbenannt.
 
@@ -52,7 +52,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 ## Nächste Schritte
 
 1. **Echter Test durch Felix:** Party anlegen, Route bei euch planen, Link aufs iPad, Bereit-Check, Einladungs- und Vorausgeher-Link aufs Handy. Bisher ist alles nur mit nachgebauten Kartendaten getestet.
-2. ~~Worker einrichten~~ erledigt über die Cloudflare-Action. **Domain entschieden (7. November): schatzweg.de** (Marke „Schatzweg“, passt zu allen Geschichten; bei DENIC frei, schatzpfad.de und hoerspur.de waren vergeben; Namen mit „Kiez“ verworfen wegen „Kiezjagd“). Felix: Markenschutz im DPMAregister prüfen, bei INWX kaufen (Cloudflare verkauft kein .de), in Cloudflare aufnehmen, Nameserver umstellen, Email Routing (z. B. hallo@schatzweg.de). Danach: App und Worker auf die Domain, Supabase-Adressen, erlaubte Herkünfte in Karten- und Stimmen-Worker und `namen`, MAR-Ticket, dann Mail-Anbieter für Codes (PBIM-17). Der Cloudflare-Token braucht dafür ggf. Rechte für die Zone (DNS, Workers Routes).
+2. ~~Worker einrichten~~ erledigt über die Cloudflare-Action. **Domain live seit 8. November: schatzweg.de** (Marke „Schatzweg“; INWX, Nameserver dexter/michelle.ns.cloudflare.com). App-Worker mit eigener Domain `schatzweg.de`, Worker `schatzweg-umleitung` (`worker/umleitung.*`) leitet `www.schatzweg.de` mit 301 um (Pfad und Parameter bleiben). Tippfehler-Domain **schatzsweg.de** ebenfalls gekauft (Verlängerung aus), Nameserver bei Cloudflare; kommt in die Umleitung, sobald die Zone aktiv ist und ihre A-Einträge gelöscht sind. Supabase Site URL/Redirects auf schatzweg.de. Marketer: MAR-54 (Herkunft erlauben). Noch offen: Startseite `schatzweg.de/` (heute Weiterleitung in den Katalog; Vorschlag Landingpage), App-Titel sagen noch „Zauberspiegel“ (Umbenennung in „Schatzweg“), Mailversand (PBIM-17). Cloudflare-Token hat mehr Rechte als nötig (Felix lässt es vorerst so).
 3. **Supabase fertig machen** (Felix, etwa 3 Minuten): Code in die Mail-Vorlagen und App-Adresse erlauben, siehe `server/README.md` Schritte 3 und 4. Danach echter Test: Party anlegen, „Speichern und teilen“, Einladung auf einem zweiten Handy öffnen. **Vor fremden Nutzern Pflicht: eigener Mailversand (SMTP)**, sonst bekommen nur Team-Mitglieder einen Code und alle anderen landen im Notweg. Braucht praktisch die eigene Domain (Absender-Adresse). Darauf bauen später: Live-Haken des Vorausgehers, Namens-Sätze, Käufe.
 4. ~~Etappe 2: Funkel kennt das Kind~~ gebaut. Offen: Secret `ELEVENLABS_API_KEY` in Supabase eintragen, echt anhören, später hinter die Bezahlung.
 5. **Anpassen mit Leitplanken:** Prompt-Eingabe, KI schätzt Umfang und ändert Sätze, Eltern prüfen die Änderungen, dann Vertonung. Braucht Server und Bezahlung.
