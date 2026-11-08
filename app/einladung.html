@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0F0B17">
 <meta name="robots" content="noindex">
-<title>Einladung · Zauberspiegel</title>
+<title>Einladung · Schatzweg</title>
 <link rel="stylesheet" href="dunkel.css">
 <style>
 body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no-repeat,var(--bg)}
@@ -85,7 +85,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
   function ics(){
     function z(n){ return ('0'+n).slice(-2); } function f(d){ return d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'T'+z(d.getHours())+z(d.getMinutes())+'00'; }
     var ende=e.b ? new Date(e.d+'T'+e.b+':00') : new Date(start.getTime()+150*60000);
-    return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Zauberspiegel//Einladung//DE','BEGIN:VEVENT','UID:einladung-'+e.d+'-'+encodeURIComponent(name)+'@zauberspiegel','DTSTAMP:'+f(new Date()),
+    return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Schatzweg//Einladung//DE','BEGIN:VEVENT','UID:einladung-'+e.d+'-'+encodeURIComponent(name)+'@zauberspiegel','DTSTAMP:'+f(new Date()),
       'DTSTART:'+f(start),'DTEND:'+f(ende),'SUMMARY:'+name+'s Einhorn-Party','LOCATION:'+String(e.w||'').replace(/[,;]/g,'\\$&'),'DESCRIPTION:Abholen um '+(e.b||'')+' Uhr'+(hinweis?'. Bitte beachten: '+hinweis.replace(/[,;]/g,'\\$&'):''),'END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';
   }
   var ja=antwortLink(true), nein=antwortLink(false);
