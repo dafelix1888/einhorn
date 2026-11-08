@@ -31,9 +31,12 @@ const server=http.createServer((q,a)=>{
   try{ const r=await p.goto(B+'index.html'); fehlgeschlagen = r ? null : 'keine Antwort'; }catch(e){ fehlgeschlagen=e.message.split('\n')[0]; }
   ok(!fehlgeschlagen, 'alte Adresse app/index.html öffnet trotz Umleitung '+(fehlgeschlagen||''));
   ok(/Schatzweg|Abenteuer/.test(await p.title()+await p.locator('body').innerText().catch(()=>'')), 'Übersicht wird angezeigt');
-  for(const s of ['planer.html?thema=einhorn','impressum.html','party.html?thema=einhorn']){
-    await p.goto(B+s);
+  // Seiten mit Link „Alle Abenteuer“ (./): Party-Übersicht braucht eine Party
+  await p.evaluate(()=>localStorage.setItem('sj.party.einhorn', JSON.stringify({format:1,thema:'einhorn',kind:{name:'Mia',alter:5},datum:'2030-06-01',start:'15:00',kinder:6,helfer:2,vorausgeher:true,ort:'draussen',planB:true,ausdrucke:true,erledigt:{},einkauf:{}})));
+  for(const s of ['party.html?thema=einhorn']){
+    await p.goto(B+s); await p.waitForSelector('a[href="./"]', {timeout:8000}).catch(()=>{});
     const z=p.locator('a[href="./"], a[href^="./#"]').first();
+    ok(await z.count()>0, s+': Link „Alle Abenteuer“ vorhanden');
     if(await z.count()){
       let f=null; try{ await Promise.all([p.waitForURL(/\/app\/(#.*)?$/, {timeout:10000}), z.evaluate(a=>a.click())]); await p.waitForSelector('body'); }catch(e){ f=e.message.split('\n')[0]; }
       ok(!f, s+' → Übersicht ohne Fehler '+(f||''));

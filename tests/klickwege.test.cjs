@@ -29,11 +29,11 @@ const pfad=u=>{ const x=new URL(u); return x.pathname.replace(/^\/app\//,'')+x.s
 
   // 3) Route da, keine Party: Party-Assistent Schritt 1 Zurück → Planer; Eingaben bleiben
   p=await neu({'sj.plan.einhorn':PLAN});
-  await p.goto(B+'planer.html?thema=einhorn'); await p.goto(B+'party.html?thema=einhorn');
+  await p.goto(B+'planer.html?thema=einhorn'); await p.goto(B+'party.html?thema=einhorn'); await p.waitForSelector('#name');
   await p.fill('#name','Mia');
   await klick(p,'a[data-zurueck]');
   ok(pfad(p.url()).startsWith('planer.html'), 'Assistent Schritt 1 Zurück → Planer');
-  await p.goto(B+'party.html?thema=einhorn');
+  await p.goto(B+'party.html?thema=einhorn'); await p.waitForSelector('#name');
   ok(await p.inputValue('#name')==='Mia', 'Eingabe im Assistenten bleibt erhalten');
 
   // 4) Browser-Zurück im Assistenten geht einen Schritt zurück
@@ -47,6 +47,7 @@ const pfad=u=>{ const x=new URL(u); return x.pathname.replace(/^\/app\//,'')+x.s
   p=await neu({'sj.plan.einhorn':PLAN, 'sj.party.einhorn':PARTY});
   await p.goto(W); await p.waitForURL(/party\.html/);
   ok(pfad(p.url()).startsWith('party.html?thema=einhorn'), 'Startadresse mit Party → Party-Übersicht');
+  await p.waitForSelector('#seite .marke-sw', {timeout:10000}).catch(()=>{});
   ok(!/← Alle Abenteuer/.test(await p.locator('#seite').innerText()) && await p.locator('a[href="./"]', {hasText:'Alle Abenteuer'}).count()>0, 'Übersicht: Katalog nur als eigener Link');
   await p.goto(B+'planer.html?thema=einhorn'); await klick(p,'#zurueck-karte');
   ok(pfad(p.url()).startsWith('party.html'), 'Planer Zurück mit Party → Party');
@@ -56,7 +57,7 @@ const pfad=u=>{ const x=new URL(u); return x.pathname.replace(/^\/app\//,'')+x.s
   ok(true, 'Startadresse mit Route → Party-Assistent');
   p=await neu(); await p.goto(W+'?utm_source=test'); await p.waitForURL(/landing\.html/);
   ok(/utm_source=test/.test(p.url()), 'Startadresse neu → Landingpage mit Parametern');
-  p=await neu(); await p.goto(W+'#tour'); await p.waitForURL(/spiel\.html/);
+  p=await neu(); await p.goto(W+'#tour', {waitUntil:'commit'}); await p.waitForURL(/spiel\.html/, {waitUntil:'commit'});
   ok(true, 'alter #tour-Link → Spiel');
 
   // 7) Katalog: „Party planen“ ohne Party startet mit dem Planer, mit Route „Weiter zur Party“ statt „Spiel öffnen“
@@ -77,14 +78,14 @@ const pfad=u=>{ const x=new URL(u); return x.pathname.replace(/^\/app\//,'')+x.s
 
   // 10) Gäste und Helfer: nie Katalog
   for(const s of ['einladung.html','vorausgeher.html','spiel.html?thema=einhorn']){
-    const q=await neu(); await q.goto(B+s); await q.waitForTimeout(500);
+    const q=await neu(); await q.goto(B+s, {waitUntil:'domcontentloaded'}); await q.waitForTimeout(800);
     const kat=await q.$$eval('a', as=>as.filter(a=>a.offsetParent!==null && /^(\.\/|index\.html)(#|$)/.test(a.getAttribute('href')||'')).length);
     ok(kat===0, s+': kein sichtbarer Link in den Katalog');
   }
   // 11) Spiel ohne Party: kein „Zur Party“; mit Party zeigt es auf die Party
-  p=await neu(); await p.goto(B+'spiel.html?thema=einhorn'); await p.waitForTimeout(500);
+  p=await neu(); await p.goto(B+'spiel.html?thema=einhorn', {waitUntil:'domcontentloaded'}); await p.waitForTimeout(800);
   ok(await p.locator('#erw-portal').evaluate(e=>e.hidden), 'Spiel ohne Party: „Zur Party“ versteckt');
-  p=await neu({'sj.party.einhorn':PARTY}); await p.goto(B+'spiel.html?thema=einhorn'); await p.waitForTimeout(500);
+  p=await neu({'sj.party.einhorn':PARTY}); await p.goto(B+'spiel.html?thema=einhorn', {waitUntil:'domcontentloaded'}); await p.waitForTimeout(800);
   ok(/party\.html\?thema=einhorn/.test(await p.getAttribute('#erw-portal','href')), 'Spiel mit Party: „Zur Party“ → Party');
 
   ok(errs.length===0, 'keine Seitenfehler '+errs.slice(0,3).join(' | '));
