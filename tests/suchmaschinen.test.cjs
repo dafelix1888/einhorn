@@ -12,4 +12,10 @@ ok(!/^\/\*\n(?:  .*\n)*  X-Robots-Tag/m.test(kopf), 'kein noindex für alle Seit
 ok(/Sitemap: https:\/\/schatzweg\.de\/sitemap\.xml/.test(robots) && sitemap.includes('https://schatzweg.de/app/landing.html'), 'Sitemap mit Landingpage');
 const ss=[...sitemap.matchAll(/<loc>https:\/\/schatzweg\.de\/(.*?)<\/loc>/g)].map(m=>m[1]);
 ok(ss.every(u=>fs.existsSync(path.join(R,u.endsWith('/')?u+'index.html':u))), 'alle Sitemap-Seiten gibt es');
+const start=fs.readFileSync(path.join(R,'index.html'),'utf8');
+const bild=(start.match(/og:image" content="https:\/\/schatzweg\.de\/(.*?)"/)||[])[1];
+ok(bild && fs.existsSync(path.join(R,bild)), 'Startadresse hat Vorschaubild ('+bild+')');
+ok(/og:title/.test(start) && /rel="canonical"/.test(start), 'Startadresse mit Titel und Canonical');
+for(const s of ['spiel','party','einladung','danke','vorausgeher','bereit'])
+  ok(/<meta name="robots" content="noindex">/.test(fs.readFileSync(path.join(R,'app',s+'.html'),'utf8')), s+' mit noindex im Kopf (auch für GitHub Pages)');
 console.log(fehler?fehler+' FEHLER':'ALLES OK'); process.exit(fehler?1:0);
