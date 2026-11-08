@@ -4,8 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0F0B17">
-<title>Schatzsuche zum Kindergeburtstag in eurer Straße · Funkels Regenbogen</title>
-<meta name="description" content="Eine Schatzsuche für Kinder von 3 bis 6, die in eurer Umgebung spielt: Ein sprechender Zauberspiegel führt per GPS von Station zu Station.">
+<title>Schatzweg · Schatzsuche zum Kindergeburtstag in eurer Straße</title>
+<meta name="description" content="Eine Schatzsuche für Kinder von 3 bis 6, die in eurer Umgebung spielt: Funkel, das Einhorn, führt aus dem Zauberspiegel per GPS von Station zu Station. Ohne Konto ausprobieren.">
+<script>document.documentElement.classList.add('js')</script>
 <style>
 :root{--bg:#0F0B17;--panel:#17121F;--karte:#1F1929;--linie:#2F2740;--text:#F5F2FA;--leise:#B3A9C4;--akzent:#A78BFA;--akzent-tief:#7C5BD6;color-scheme:dark}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:17px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -28,38 +29,109 @@ thead th{color:var(--leise);font-weight:600}tbody th{font-weight:600}
 details{background:var(--panel);border:1px solid var(--linie);border-radius:12px;padding:12px 16px;margin:8px 0}
 summary{cursor:pointer;font-weight:600}details p{color:var(--leise);margin:8px 0 0}
 .schluss{text-align:center;padding-top:32px}
+main>header,main>section:not(.show){max-width:720px;margin-left:auto;margin-right:auto}
+main{max-width:1040px}
+.marke{max-width:1040px;margin:0 auto;padding:16px 16px 0;font-weight:700;letter-spacing:.02em;color:var(--leise)}
+.marke b{color:var(--text)}
+.leise{color:var(--leise)}
+/* Screenshots im Handy-Rahmen, wechseln beim Scrollen (MAR-9) */
+.show h2{text-align:center}
+.show-buehne{display:flex;flex-direction:column;align-items:center;gap:20px}
+.phone{position:relative;height:min(58svh,620px);aspect-ratio:390/844;border-radius:34px;border:8px solid #2A2338;background:#000;overflow:hidden;box-shadow:0 0 0 1px var(--linie),0 24px 60px -20px rgba(124,91,214,.55)}
+.phone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.04);transition:opacity .55s ease,transform .7s ease}
+.phone img.on{opacity:1;transform:none}
+.caps{display:grid;width:min(100%,420px);text-align:center}
+.cap{grid-area:1/1;opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.cap.on{opacity:1;transform:none}
+.cap b{display:block;font-size:22px;margin-bottom:6px}.cap span{color:var(--leise)}
+.dots{display:flex;justify-content:center;gap:6px;margin-top:14px}
+.dots i{width:6px;height:6px;border-radius:3px;background:var(--linie);transition:width .3s ease,background .3s ease}
+.dots i.on{width:18px;background:var(--akzent)}
+.hinweis{margin:10px 0 0;font-size:13px;color:var(--leise)}
+html.js .show{position:relative}
+html.js .show-buehne{position:sticky;top:0;height:100svh;justify-content:center}
+html.js .steps{margin-top:-100svh}
+html.js .step{height:85svh}
+html.js .step:last-child{height:100svh}
+html:not(.js) .phone{height:auto;border:0;box-shadow:none;background:none}
+html:not(.js) .phone img{position:static;opacity:1;transform:none;margin-bottom:12px;border-radius:24px}
+html:not(.js) .caps{display:block}html:not(.js) .cap{opacity:1;transform:none;margin-bottom:16px}
+html:not(.js) .dots,html:not(.js) .steps{display:none}
+@media (min-width:860px){
+  .show-buehne{flex-direction:row;justify-content:center;gap:72px}
+  .phone{height:min(80svh,700px)}
+  .caps{text-align:left}.cap b{font-size:28px}
+  .dots{justify-content:flex-start}
+}
+/* Erzähler mit Hörprobe */
+.reihe{list-style:none;margin:0 -16px;padding:4px 16px 12px;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.figur{flex:0 0 min(70vw,240px);scroll-snap-align:center;background:var(--panel);border:1px solid var(--linie);border-radius:18px;padding:18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.figur img{width:112px;height:112px;border-radius:50%;background:var(--karte);padding:8px}
+.figur b{font-size:17px}.figur span{color:var(--leise);font-size:15px;flex:1}
+.stimme{margin-top:8px;background:none;border:1px solid var(--linie);color:var(--text);border-radius:999px;padding:8px 16px;font:inherit;font-size:15px;cursor:pointer;min-height:44px}
+.stimme.spielt{background:var(--akzent-tief);border-color:var(--akzent-tief)}
+@media (min-width:860px){.reihe{display:grid;grid-template-columns:repeat(3,1fr);overflow:visible;margin:0}}
+/* sanftes Einblenden beim Scrollen */
+html.js .zeig,html.js .figur{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+html.js .zeig.sichtbar,html.js .figur.sichtbar{opacity:1;transform:none}
+.fuss{max-width:720px;margin:0 auto;padding:24px 16px 40px;text-align:center;color:var(--leise);font-size:14px}
+.fuss a{color:var(--leise)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html.js .zeig,html.js .figur{opacity:1;transform:none}}
 </style>
 <script src="https://efdjomgubucdnvgtuqmp.supabase.co/functions/v1/track/m.js" data-key="45d4d32f10391d24b7e915bd19d6790a4152644ef418aa07" data-auto="off" defer></script>
 </head>
-<body>
+<body><div class="marke"><b>Schatzweg</b></div>
 <main data-variant="a">
   <header class="held">
     <h1>Eine Schatzsuche, die in eurer Straße spielt</h1>
-    <p class="sub">Für Kinder von 3 bis 6: Ein sprechender Zauberspiegel führt die Geburtstagsgäste von Station zu Station – mit wenigen Klicks für euer Kind und eure Umgebung eingerichtet, statt einer Box, die überall gleich ist.</p>
+    <p class="sub">Für Kinder von 3 bis 6: Funkel, das Einhorn, spricht aus dem Zauberspiegel und führt die Geburtstagsgäste von Station zu Station – mit wenigen Klicks für euer Kind und eure Umgebung eingerichtet, statt einer Box, die überall gleich ist.</p>
     <div class="probe"><button type="button" class="hoer" data-src="themen/einhorn/hoerprobe.mp3">▶ Hörprobe anhören</button></div>
     <a class="cta" href="planer.html?thema=einhorn" data-track="cta_clicked">Route für eure Straße planen</a>
-    
+    <p class="preis">Ohne Konto ausprobieren</p>
   </header>
-  <section><h2>So funktioniert es</h2><ol class="schritte"><li><b>Hörprobe anhören</b><span>Hört rein, wie Funkel das Einhorn die Geschichte erzählt.</span></li><li><b>Route planen</b><span>Adresse eingeben: Die App legt 7 Stationen auf passende Orte in eurer Nähe – Bank, Spielplatz, Zebrastreifen.</span></li><li><b>Party anlegen</b><span>Einladung für WhatsApp, Einkaufsliste und Zeitplan entstehen in einem Rutsch.</span></li></ol></section>
-  <section><h2>Was ihr bekommt</h2><ul class="vorteile"><li>Die Geschichte spielt dort, wo ihr wohnt – nicht auf einer Karte aus der Schachtel.</li><li>Der Zauberspiegel spricht alle Texte. Die Kinder müssen nicht lesen können.</li><li>Bei Regen lässt sich die Geschichte auch zu Hause spielen.</li><li>Der Vorausgeher sieht auf der Karte genau, was wohin kommt.</li></ul></section>
-  <section><h2>Im Vergleich</h2><table><thead><tr><th></th><th>Zauberspiegel</th><th>Box oder selbst basteln</th></tr></thead><tbody><tr><th scope="row">Wo gespielt wird</th><td>In eurer Umgebung, auf echten Orten</td><td>Box: überall gleich · Selbst basteln: ihr sucht die Orte</td></tr><tr><th scope="row">Vorbereitung</th><td>Wenige Klicks und eine Einkaufsliste</td><td>2–3 Abende basteln oder eine Box für 30–50 €</td></tr><tr><th scope="row">Am Partytag</th><td>Der Zauberspiegel erzählt und führt</td><td>Ein Erwachsener liest Rätsel vor</td></tr><tr><th scope="row">Bei Regen</th><td>Auch zu Hause spielbar</td><td>Plan B selbst überlegen</td></tr></tbody></table></section>
-  <section><h2>Fragen von Eltern</h2><details><summary>Brauche ich ein besonderes Gerät?</summary><p>Ein Handy oder Tablet mit Mobilfunk reicht. Der Bereit-Check prüft vorher Ton, GPS, Akku und Offline-Speicher.</p></details><details><summary>Klappt das GPS wirklich?</summary><p>Stationen öffnen nur bei sicherem Signal. Sonst fragt der Spiegel, und ein Erwachsener tippt „Wir sind da“.</p></details><details><summary>Unsere Kinder können noch nicht lesen.</summary><p>Müssen sie nicht: Der Zauberspiegel spricht alle Texte.</p></details><details><summary>Was brauche ich an Material?</summary><p>Die Einkaufsliste zeigt alles mit Links. Vieles davon sind Mitgebsel, die ihr zum Geburtstag ohnehin kauft.</p></details><details><summary>Muss vorher jemand die Stationen vorbereiten?</summary><p>Ja, ein Vorausgeher legt die Dinge hin. Die App zeigt ihm auf der Karte, was wohin kommt.</p></details><details><summary>Wie lange dauert die Schatzsuche?</summary><p>Etwa 50 Minuten plus Heimweg, mit 7 Stationen.</p></details></section>
-  <section class="schluss"><a class="cta" href="planer.html?thema=einhorn" data-track="cta_clicked">Route für eure Straße planen</a></section>
+  
+  <section class="show" style="--n:3">
+    <h2>So einfach geht&#x27;s</h2>
+    <div class="show-buehne"><div class="phone"><img src="landing/1-planer.webp" alt="Planer: Route mit sieben Stationen auf einer Karte" data-i="0" class="on" width="390" height="844" decoding="async"><img src="landing/2-party.webp" alt="Party-Übersicht mit Einladung und Plan" data-i="1" width="390" height="844" decoding="async" loading="lazy"><img src="landing/3-spiegel.webp" alt="Zauberspiegel mit Funkel dem Einhorn" data-i="2" width="390" height="844" decoding="async" loading="lazy"></div><div class="caps"><div class="cap on" data-i="0"><b>Eure Straße wird zur Schatzkarte</b><span>Adresse eingeben: Schatzweg legt 7 Stationen auf echte Orte in eurer Nähe, etwa Ecken, Bänke und Spielplätze. Jede Station lässt sich mit dem Finger verschieben.</span></div><div class="cap" data-i="1"><b>Party anlegen in einem Rutsch</b><span>Name, Alter, Datum: Daraus entstehen Einladung als Link, Einkaufsliste und ein Plan, der zeigt, was als Nächstes dran ist.</span></div><div class="cap" data-i="2"><b>Am Partytag führt der Zauberspiegel</b><span>Ein Handy oder Tablet reicht: Funkel spricht aus dem Spiegel und führt die Kinder per GPS von Station zu Station. Lesen müssen sie nicht.</span></div><div class="dots"><i class="on"></i><i></i><i></i></div><p class="hinweis">Bilder aus der App mit Beispieldaten</p></div></div>
+    <div class="steps" aria-hidden="true"><div class="step" data-i="0"></div><div class="step" data-i="1"></div><div class="step" data-i="2"></div></div>
+  </section>
+  
+  <section class="figuren">
+    <h2>Wählt euren Erzähler</h2>
+    <p class="leise">Funkel erzählt die Geschichte. Durch die Stationen begleitet euch eine von sechs Figuren. Hört rein und sucht aus.</p>
+    <ul class="reihe"><li class="figur"><img src="themen/einhorn/figuren/kakapups.svg" alt="" width="120" height="120" loading="lazy"><b>Professor Kakapups</b><span>Pupst und legt ein Häufchen.</span><button type="button" class="stimme" data-src="landing/stimmen/kakapups.mp3" data-figur="kakapups" aria-label="Stimme von Professor Kakapups anhören">▶ Stimme hören</button></li><li class="figur"><img src="themen/einhorn/figuren/rudi.svg" alt="" width="120" height="120" loading="lazy"><b>Rudi, die ratlose Ratte</b><span>Total verplant, sucht ständig seinen Zettel.</span><button type="button" class="stimme" data-src="landing/stimmen/rudi.mp3" data-figur="rudi" aria-label="Stimme von Rudi, die ratlose Ratte anhören">▶ Stimme hören</button></li><li class="figur"><img src="themen/einhorn/figuren/alfonso.svg" alt="" width="120" height="120" loading="lazy"><b>Alfonso, die alberne Ameise</b><span>Kichert und albert herum.</span><button type="button" class="stimme" data-src="landing/stimmen/alfonso.mp3" data-figur="alfonso" aria-label="Stimme von Alfonso, die alberne Ameise anhören">▶ Stimme hören</button></li><li class="figur"><img src="themen/einhorn/figuren/bruno.svg" alt="" width="120" height="120" loading="lazy"><b>Bruno, der brummige Bär</b><span>Brummt, ist aber eigentlich lieb.</span><button type="button" class="stimme" data-src="landing/stimmen/bruno.mp3" data-figur="bruno" aria-label="Stimme von Bruno, der brummige Bär anhören">▶ Stimme hören</button></li><li class="figur"><img src="themen/einhorn/figuren/charly.svg" alt="" width="120" height="120" loading="lazy"><b>Charly, der coole Clown</b><span>Supercool, hupt mit seiner Tröte.</span><button type="button" class="stimme" data-src="landing/stimmen/charly.mp3" data-figur="charly" aria-label="Stimme von Charly, der coole Clown anhören">▶ Stimme hören</button></li><li class="figur"><img src="themen/einhorn/figuren/dagobert.svg" alt="" width="120" height="120" loading="lazy"><b>Dagobert, der dusslige Dachs</b><span>Stolpert und bringt alles durcheinander.</span><button type="button" class="stimme" data-src="landing/stimmen/dagobert.mp3" data-figur="dagobert" aria-label="Stimme von Dagobert, der dusslige Dachs anhören">▶ Stimme hören</button></li></ul>
+  </section>
+  <section class="zeig"><h2>Was ihr bekommt</h2><ul class="vorteile"><li>Die Geschichte spielt dort, wo ihr wohnt – nicht auf einer Karte aus der Schachtel.</li><li>Der Zauberspiegel spricht alle Texte. Die Kinder müssen nicht lesen können.</li><li>Bei Regen lässt sich die Geschichte auch zu Hause spielen.</li><li>Der Vorausgeher sieht auf der Karte genau, was wohin kommt.</li></ul></section>
+  <section class="zeig"><h2>Im Vergleich</h2><table><thead><tr><th></th><th>Schatzweg</th><th>Box oder selbst basteln</th></tr></thead><tbody><tr><th scope="row">Wo gespielt wird</th><td>In eurer Umgebung, auf echten Orten</td><td>Box: überall gleich · Selbst basteln: ihr sucht die Orte</td></tr><tr><th scope="row">Vorbereitung</th><td>Wenige Klicks und eine Einkaufsliste</td><td>2–3 Abende basteln oder eine Box für 30–50 €</td></tr><tr><th scope="row">Am Partytag</th><td>Der Zauberspiegel erzählt und führt</td><td>Ein Erwachsener liest Rätsel vor</td></tr><tr><th scope="row">Bei Regen</th><td>Auch zu Hause spielbar</td><td>Plan B selbst überlegen</td></tr></tbody></table></section>
+  <section class="zeig"><h2>Fragen von Eltern</h2><details><summary>Brauche ich ein Konto?</summary><p>Nein. Hörprobe, Route planen und Party anlegen gehen ohne Konto. Erst wenn ihr Einladung oder iPad-Link teilt, meldet ihr euch mit einem Code per E-Mail an, ohne Passwort.</p></details><details><summary>Brauche ich ein besonderes Gerät?</summary><p>Ein Handy oder Tablet mit Mobilfunk reicht. Der Bereit-Check prüft vorher Ton, GPS, Akku und Offline-Speicher.</p></details><details><summary>Klappt das GPS wirklich?</summary><p>Stationen öffnen nur bei sicherem Signal. Sonst fragt der Spiegel, und ein Erwachsener tippt „Wir sind da“.</p></details><details><summary>Unsere Kinder können noch nicht lesen.</summary><p>Müssen sie nicht: Der Zauberspiegel spricht alle Texte.</p></details><details><summary>Was brauche ich an Material?</summary><p>Die Einkaufsliste zeigt alles mit Links. Vieles davon sind Mitgebsel, die ihr zum Geburtstag ohnehin kauft.</p></details><details><summary>Muss vorher jemand die Stationen vorbereiten?</summary><p>Ja, ein Vorausgeher legt die Dinge hin. Die App zeigt ihm auf der Karte, was wohin kommt.</p></details><details><summary>Wie lange dauert die Schatzsuche?</summary><p>Etwa 50 Minuten plus Heimweg, mit 7 Stationen.</p></details></section>
+  <section class="schluss"><a class="cta" href="planer.html?thema=einhorn" data-track="cta_clicked">Route für eure Straße planen</a><p class="preis">Ohne Konto ausprobieren</p></section>
 </main>
 <main data-variant="b" hidden>
   <header class="held">
     <h1>Fertig geplant statt drei Abende gebastelt</h1>
-    <p class="sub">Eine komplette Schatzsuche für den Kindergeburtstag in eurer Umgebung, in wenigen Klicks geplant. Am Partytag führt ein sprechender Zauberspiegel die Kinder von Station zu Station.</p>
+    <p class="sub">Eine komplette Schatzsuche für den Kindergeburtstag in eurer Umgebung, in wenigen Klicks geplant. Am Partytag führt Funkel, das Einhorn, aus dem Zauberspiegel die Kinder von Station zu Station.</p>
     <div class="probe"><button type="button" class="hoer" data-src="themen/einhorn/hoerprobe.mp3">▶ Hörprobe anhören</button></div>
     <a class="cta" href="planer.html?thema=einhorn" data-track="cta_clicked">Route für eure Straße planen</a>
-    
+    <p class="preis">Ohne Konto ausprobieren</p>
   </header>
-  <section><h2>So funktioniert es</h2><ol class="schritte"><li><b>Hörprobe anhören</b><span>Hört rein, wie Funkel das Einhorn die Geschichte erzählt.</span></li><li><b>Route planen</b><span>Adresse eingeben: Die App legt 7 Stationen auf passende Orte in eurer Nähe – Bank, Spielplatz, Zebrastreifen.</span></li><li><b>Party anlegen</b><span>Einladung für WhatsApp, Einkaufsliste und Zeitplan entstehen in einem Rutsch.</span></li></ol></section>
-  <section><h2>Was ihr bekommt</h2><ul class="vorteile"><li>Die Geschichte spielt dort, wo ihr wohnt – nicht auf einer Karte aus der Schachtel.</li><li>Der Zauberspiegel spricht alle Texte. Die Kinder müssen nicht lesen können.</li><li>Bei Regen lässt sich die Geschichte auch zu Hause spielen.</li><li>Der Vorausgeher sieht auf der Karte genau, was wohin kommt.</li></ul></section>
-  <section><h2>Im Vergleich</h2><table><thead><tr><th></th><th>Zauberspiegel</th><th>Box oder selbst basteln</th></tr></thead><tbody><tr><th scope="row">Wo gespielt wird</th><td>In eurer Umgebung, auf echten Orten</td><td>Box: überall gleich · Selbst basteln: ihr sucht die Orte</td></tr><tr><th scope="row">Vorbereitung</th><td>Wenige Klicks und eine Einkaufsliste</td><td>2–3 Abende basteln oder eine Box für 30–50 €</td></tr><tr><th scope="row">Am Partytag</th><td>Der Zauberspiegel erzählt und führt</td><td>Ein Erwachsener liest Rätsel vor</td></tr><tr><th scope="row">Bei Regen</th><td>Auch zu Hause spielbar</td><td>Plan B selbst überlegen</td></tr></tbody></table></section>
-  <section><h2>Fragen von Eltern</h2><details><summary>Brauche ich ein besonderes Gerät?</summary><p>Ein Handy oder Tablet mit Mobilfunk reicht. Der Bereit-Check prüft vorher Ton, GPS, Akku und Offline-Speicher.</p></details><details><summary>Klappt das GPS wirklich?</summary><p>Stationen öffnen nur bei sicherem Signal. Sonst fragt der Spiegel, und ein Erwachsener tippt „Wir sind da“.</p></details><details><summary>Unsere Kinder können noch nicht lesen.</summary><p>Müssen sie nicht: Der Zauberspiegel spricht alle Texte.</p></details><details><summary>Was brauche ich an Material?</summary><p>Die Einkaufsliste zeigt alles mit Links. Vieles davon sind Mitgebsel, die ihr zum Geburtstag ohnehin kauft.</p></details><details><summary>Muss vorher jemand die Stationen vorbereiten?</summary><p>Ja, ein Vorausgeher legt die Dinge hin. Die App zeigt ihm auf der Karte, was wohin kommt.</p></details><details><summary>Wie lange dauert die Schatzsuche?</summary><p>Etwa 50 Minuten plus Heimweg, mit 7 Stationen.</p></details></section>
-  <section class="schluss"><a class="cta" href="planer.html?thema=einhorn" data-track="cta_clicked">Route für eure Straße planen</a></section>
+  
+  <section class="show" style="--n:3">
+    <h2>So einfach geht&#x27;s</h2>
+    <div class="show-buehne"><div class="phone"><img src="landing/1-planer.webp" alt="Planer: Route mit sieben Stationen auf einer Karte" data-i="0" class="on" width="390" height="844" decoding="async"><img src="landing/2-party.webp" alt="Party-Übersicht mit Einladung und Plan" data-i="1" width="390" height="844" decoding="async" loading="lazy"><img src="landing/3-spiegel.webp" alt="Zauberspiegel mit Funkel dem Einhorn" data-i="2" width="390" height="844" decoding="async" loading="lazy"></div><div class="caps"><div class="cap on" data-i="0"><b>Eure Straße wird zur Schatzkarte</b><span>Adresse eingeben: Schatzweg legt 7 Stationen auf echte Orte in eurer Nähe, etwa Ecken, Bänke und Spielplätze. Jede Station lässt sich mit dem Finger verschieben.</span></div><div class="cap" data-i="1"><b>Party anlegen in einem Rutsch</b><span>Name, Alter, Datum: Daraus entstehen Einladung als Link, Einkaufsliste und ein Plan, der zeigt, was als Nächstes dran ist.</span></div><div class="cap" data-i="2"><b>Am Partytag führt der Zauberspiegel</b><span>Ein Handy oder Tablet reicht: Funkel spricht aus dem Spiegel und führt die Kinder per GPS von Station zu Station. Lesen müssen sie nicht.</span></div><div class="dots"><i class="on"></i><i></i><i></i></div><p class="hinweis">Bilder aus der App mit Beispieldaten</p></div></div>
+    <div class="steps" aria-hidden="true"><div class="step" data-i="0"></div><div class="step" data-i="1"></div><div class="step" data-i="2"></div></div>
+  </section>
+  
+  <section class="figuren">
+    <h2>Wählt euren Erzähler</h2>
+    <p class="leise">Funkel erzählt die Geschichte. Durch die Stationen begleitet euch eine von sechs Figuren. Hört rein und sucht aus.</p>
+    <ul class="reihe"><li class="figur"><img src="themen/einhorn/figuren/kakapups.svg" alt="" width="120" height="120" loading="lazy"><b>Professor Kakapups</b><span>Pupst und legt ein Häufchen.</span><button type="button" class="stimme" data-src="landing/stimmen/kakapups.mp3" data-figur="kakapups" aria-label="Stimme von Professor Kakapups anhören">▶ Stimme hören</button></li><li class="figur"><img src="themen/einhorn/figuren/rudi.svg" alt="" width="120" height="120" loading="lazy"><b>Rudi, die ratlose Ratte</b><span>Total verplant, sucht ständig seinen Zettel.</span><button type="button" class="stimme" data-src="landing/stimmen/rudi.mp3" data-figur="rudi" aria-label="Stimme von Rudi, die ratlose Ratte anhören">▶ Stimme hören</button></li><li class="figur"><img src="themen/einhorn/figuren/alfonso.svg" alt="" width="120" height="120" loading="lazy"><b>Alfonso, die alberne Ameise</b><span>Kichert und albert herum.</span><button type="button" class="stimme" data-src="landing/stimmen/alfonso.mp3" data-figur="alfonso" aria-label="Stimme von Alfonso, die alberne Ameise anhören">▶ Stimme hören</button></li><li class="figur"><img src="themen/einhorn/figuren/bruno.svg" alt="" width="120" height="120" loading="lazy"><b>Bruno, der brummige Bär</b><span>Brummt, ist aber eigentlich lieb.</span><button type="button" class="stimme" data-src="landing/stimmen/bruno.mp3" data-figur="bruno" aria-label="Stimme von Bruno, der brummige Bär anhören">▶ Stimme hören</button></li><li class="figur"><img src="themen/einhorn/figuren/charly.svg" alt="" width="120" height="120" loading="lazy"><b>Charly, der coole Clown</b><span>Supercool, hupt mit seiner Tröte.</span><button type="button" class="stimme" data-src="landing/stimmen/charly.mp3" data-figur="charly" aria-label="Stimme von Charly, der coole Clown anhören">▶ Stimme hören</button></li><li class="figur"><img src="themen/einhorn/figuren/dagobert.svg" alt="" width="120" height="120" loading="lazy"><b>Dagobert, der dusslige Dachs</b><span>Stolpert und bringt alles durcheinander.</span><button type="button" class="stimme" data-src="landing/stimmen/dagobert.mp3" data-figur="dagobert" aria-label="Stimme von Dagobert, der dusslige Dachs anhören">▶ Stimme hören</button></li></ul>
+  </section>
+  <section class="zeig"><h2>Was ihr bekommt</h2><ul class="vorteile"><li>Die Geschichte spielt dort, wo ihr wohnt – nicht auf einer Karte aus der Schachtel.</li><li>Der Zauberspiegel spricht alle Texte. Die Kinder müssen nicht lesen können.</li><li>Bei Regen lässt sich die Geschichte auch zu Hause spielen.</li><li>Der Vorausgeher sieht auf der Karte genau, was wohin kommt.</li></ul></section>
+  <section class="zeig"><h2>Im Vergleich</h2><table><thead><tr><th></th><th>Schatzweg</th><th>Box oder selbst basteln</th></tr></thead><tbody><tr><th scope="row">Wo gespielt wird</th><td>In eurer Umgebung, auf echten Orten</td><td>Box: überall gleich · Selbst basteln: ihr sucht die Orte</td></tr><tr><th scope="row">Vorbereitung</th><td>Wenige Klicks und eine Einkaufsliste</td><td>2–3 Abende basteln oder eine Box für 30–50 €</td></tr><tr><th scope="row">Am Partytag</th><td>Der Zauberspiegel erzählt und führt</td><td>Ein Erwachsener liest Rätsel vor</td></tr><tr><th scope="row">Bei Regen</th><td>Auch zu Hause spielbar</td><td>Plan B selbst überlegen</td></tr></tbody></table></section>
+  <section class="zeig"><h2>Fragen von Eltern</h2><details><summary>Brauche ich ein Konto?</summary><p>Nein. Hörprobe, Route planen und Party anlegen gehen ohne Konto. Erst wenn ihr Einladung oder iPad-Link teilt, meldet ihr euch mit einem Code per E-Mail an, ohne Passwort.</p></details><details><summary>Brauche ich ein besonderes Gerät?</summary><p>Ein Handy oder Tablet mit Mobilfunk reicht. Der Bereit-Check prüft vorher Ton, GPS, Akku und Offline-Speicher.</p></details><details><summary>Klappt das GPS wirklich?</summary><p>Stationen öffnen nur bei sicherem Signal. Sonst fragt der Spiegel, und ein Erwachsener tippt „Wir sind da“.</p></details><details><summary>Unsere Kinder können noch nicht lesen.</summary><p>Müssen sie nicht: Der Zauberspiegel spricht alle Texte.</p></details><details><summary>Was brauche ich an Material?</summary><p>Die Einkaufsliste zeigt alles mit Links. Vieles davon sind Mitgebsel, die ihr zum Geburtstag ohnehin kauft.</p></details><details><summary>Muss vorher jemand die Stationen vorbereiten?</summary><p>Ja, ein Vorausgeher legt die Dinge hin. Die App zeigt ihm auf der Karte, was wohin kommt.</p></details><details><summary>Wie lange dauert die Schatzsuche?</summary><p>Etwa 50 Minuten plus Heimweg, mit 7 Stationen.</p></details></section>
+  <section class="schluss"><a class="cta" href="planer.html?thema=einhorn" data-track="cta_clicked">Route für eure Straße planen</a><p class="preis">Ohne Konto ausprobieren</p></section>
 </main>
+<footer class="fuss"><a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a></footer>
 <script>
 (function(){
   var q=new URLSearchParams(location.search).get('v');
@@ -68,10 +140,29 @@ summary{cursor:pointer;font-weight:600}details p{color:var(--leise);margin:8px 0
   document.querySelectorAll('main').forEach(function(m){ m.hidden=(m!==main); }); v=main.dataset.variant;
   function track(name,props){ if(window.marketer) window.marketer.track(name,Object.assign({variant:v},props||{})); }
   window.addEventListener('DOMContentLoaded',function(){ track('visit',{page:'landing'}); });
+  var laeuft=null;   // immer nur eine Figurenstimme
   main.addEventListener('click',function(e){
     var a=e.target.closest('[data-track]'); if(a) track(a.dataset.track,{label:a.textContent.trim()});
     var h=e.target.closest('.hoer'); if(h){ var au=h._a||(h._a=new Audio(h.dataset.src)); if(au.paused){au.play();track('hoerprobe_played');} else au.pause(); }
+    var s=e.target.closest('.stimme'); if(s){
+      var st=s._a||(s._a=new Audio(s.dataset.src));
+      if(!s._init){ s._init=1; var t=s.textContent;
+        st.addEventListener('play',function(){ s.classList.add('spielt'); s.textContent='❚❚ Pause'; });
+        ['pause','ended'].forEach(function(n){ st.addEventListener(n,function(){ s.classList.remove('spielt'); s.textContent=t; }); }); }
+      if(st.paused){ if(laeuft&&laeuft!==st){laeuft.pause();laeuft.currentTime=0;} laeuft=st; st.play(); track('hoerprobe_played',{figur:s.dataset.figur}); }
+      else st.pause();
+    }
   });
+  if(!('IntersectionObserver' in window)) return;
+  // Screenshots: Schritt in der Bildschirmmitte bestimmt Bild und Text
+  main.querySelectorAll('.show').forEach(function(sh){
+    var parts=sh.querySelectorAll('.phone img,.cap,.dots i');
+    function zeige(i){ parts.forEach(function(el,j){ var k=el.dataset.i!==undefined?el.dataset.i:Array.prototype.indexOf.call(el.parentNode.children,el); el.classList.toggle('on',String(k)===String(i)); }); }
+    var io=new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting) zeige(x.target.dataset.i); }); },{rootMargin:'-50% 0px -50% 0px'});
+    sh.querySelectorAll('.step').forEach(function(st){ io.observe(st); });
+  });
+  var rein=new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('sichtbar'); rein.unobserve(x.target); } }); },{rootMargin:'0px 0px -10% 0px'});
+  main.querySelectorAll('.zeig,.figur').forEach(function(el){ rein.observe(el); });
 })();
 </script>
 <script src="funkel-buehne.js" defer></script>
