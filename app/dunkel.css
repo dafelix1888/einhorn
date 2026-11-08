@@ -70,3 +70,4 @@ input:focus{border-color:var(--akzent);outline:none}
 .summe-box{background:linear-gradient(130deg,#3B2A64,#1F1929);border-radius:16px;padding:16px;margin:4px 0 10px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
 .summe-box .betrag{font-size:1.6rem;font-weight:800;display:block;line-height:1.1}
 .summe-box small{display:block;color:var(--leise);font-size:.82rem;margin-top:4px}
+.marke-sw{font-weight:800;letter-spacing:.03em;color:var(--text);font-size:1.05rem}
