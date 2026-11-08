@@ -2,6 +2,19 @@
 
 Stand: 8. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
 
+## Rollen und Jira-Projekte
+
+| Rolle | Jira | Aufgabe |
+|---|---|---|
+| Strategist | STRAT | Gesamtstrategie, Kosten und Erlöse (CEO/CFO/CRO). Preis- und Kostenentscheidungen fallen in STRAT und werden als Kommentar in UNICORN/MAR gespiegelt. Kein Ticket mit Kosten > 0 €/Monat ohne STRAT-Freigabe |
+| Einhorn | UNICORN | Product Manager Schatzweg-App |
+| Marketer | MAR | Product Manager Marketer-App und Client Success für den ersten Kunden (Schatzweg) |
+| Architektur | ADR | Architektur- und Technik-Entscheidungen, Label `standard` gilt für neue Apps |
+| Knowledge Management | KM | Wissensmanagement (Anleitungen, Erfahrungen, Startliste KM-15) |
+| Problem & Incident | PBIM | Incidents und Problems (ITSM) |
+
+**STRAT seit 8. November (Sync mit UNICORN und MAR):** 5 Epics – STRAT-1 Strategie & Portfolio (Schatzweg ist der Beweis für Marketer; Kosten bleiben bei null bis Erlöse; Fokus ein Vorhaben je Produkt), STRAT-2 Kosten im Blick (Kostenstruktur, Upgrade-Schwellen: Supabase Pro ab 10 fremden Partys, ElevenLabs ab 20 Erzeugungen/Monat; Datenquelle MAR-57), STRAT-3 Erlöse Schatzweg (Stufen: Partnerlinks → Namens-Sätze → Einzelkauf → Anpassungs-Paket → Box), STRAT-4 Erlöse Marketer (Gate G0→G1: Warteliste ≥ 20 oder 5 Interviews mit Zahlungsbereitschaft; Discovery vor Plattformbau), STRAT-5 Kennzahlen & wöchentlicher Review (Nordstern Schatzweg `signup`, Sonntag 20 Minuten). Offene Entscheidungen für Felix: STRAT-6 Hauptprodukt und Wochenbudget, STRAT-7 Amazon-Partner-ID, STRAT-8 Preise (Vorschlag: Einhorn 0 €, Namens-Sätze 4,99 €, Abenteuer 9,99 €, Anpassungs-Paket 14,99 €).
+
 ## Worum es geht
 
 Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzeljagden mit sprechendem Zauberspiegel (Tablet). Zielgruppe sind Eltern, die einen Kindergeburtstag organisieren. Später sollen Abenteuer verkauft werden, Utensilien laufen über Partnerlinks und Boxen.
@@ -49,11 +62,13 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 - Anpassen kostet künftig Geld: Paket mit 3 Neuerzeugungen, ein Prompt zählt als eine Neuerzeugung. Grenze je Prompt: so lang wie eine WhatsApp-Nachricht, höchstens 3 Stationen oder 2 Figuren, höchstens 2.000 gesprochene Zeichen. Höchstens 2 Bonus-Stationen je Party. Fest bleiben Reihenfolge, Rätsel, Utensilien und Sicherheit.
 - Funkel nennt das Kind an drei Stellen beim Namen: Begrüßung, Geburtstagsgruß beim Schatz, Abschied (Teil des bezahlten Pakets).
 - Einladung für Gast-Eltern und Vorausgeher mit Live-Ansicht auf dem iPad: beide gebaut.
+- **Strategist, 8. November:** Erlös-Reihenfolge Partnerlinks → Namens-Sätze → Einzelkauf → Anpassungs-Paket → Box (STRAT-3). Kein Upgrade auf bezahlte Tarife vor den Schwellen in STRAT-2. Marketer: Discovery (MAR-14, MAR-15) vor Plattformbau (STRAT-10). Zweites Abenteuer (UNICORN-16) wartet auf die Entscheidung „Hauptprodukt“ (STRAT-6, Anfang Januar 2027).
+- **Klickwege, 8. November (UNICORN-25, ADR-26):** Zuhause ist die eigene Party, sonst die Landingpage; Zurück geht einen Schritt zurück; der Katalog („Alle Abenteuer“) ist nie Ziel von Zurück.
 
 ## Nächste Schritte
 
 1. **Echter Test durch Felix:** Party anlegen, Route bei euch planen, Link aufs iPad, Bereit-Check, Einladungs- und Vorausgeher-Link aufs Handy. Bisher ist alles nur mit nachgebauten Kartendaten getestet.
-2. ~~Worker einrichten~~ erledigt über die Cloudflare-Action. **Domain live seit 8. November: schatzweg.de** (Marke „Schatzweg“; INWX, Nameserver dexter/michelle.ns.cloudflare.com). App-Worker mit eigener Domain `schatzweg.de`, Worker `schatzweg-umleitung` (`worker/umleitung.*`) leitet `www.schatzweg.de` mit 301 um (Pfad und Parameter bleiben). Tippfehler-Domain **schatzsweg.de** ebenfalls gekauft (Verlängerung aus), leitet wie www mit 301 auf schatzweg.de um. Supabase Site URL/Redirects auf schatzweg.de. Marketer: MAR-54 (Herkunft erlauben). Startseite `schatzweg.de/` (Entscheidung 8. November): neue Besucher → Landingpage (Parameter wie `utm_*` bleiben), wer eine Party im Gerät hat → App-Katalog, alte `#tour`-Links → Spiel. App-Name in Seitentiteln, Kopf und Kalender-Dateien heißt jetzt „Schatzweg“; „Zauberspiegel“ bleibt nur als Figur der Einhorn-Geschichte (Spiegel auf dem iPad, Spieltitel „Funkels Zauberspiegel“). Tippfehler-Domain in der Umleitung. Noch offen: Mailversand (PBIM-17); Landingpage-Texte zum Namen macht Marketer (MAR-54). Cloudflare-Token hat mehr Rechte als nötig (Felix lässt es vorerst so).
+2. ~~Worker einrichten~~ erledigt über die Cloudflare-Action. **Domain live seit 8. November: schatzweg.de** (Marke „Schatzweg“; INWX, Nameserver dexter/michelle.ns.cloudflare.com). App-Worker mit eigener Domain `schatzweg.de`, Worker `schatzweg-umleitung` (`worker/umleitung.*`) leitet `www.schatzweg.de` mit 301 um (Pfad und Parameter bleiben). Tippfehler-Domain **schatzsweg.de** ebenfalls gekauft (Verlängerung aus), leitet wie www mit 301 auf schatzweg.de um. Supabase Site URL/Redirects auf schatzweg.de. Marketer: MAR-54 (Herkunft erlauben). Startseite `schatzweg.de/` (Entscheidung 8. November): neue Besucher → Landingpage (Parameter wie `utm_*` bleiben), wer eine Party im Gerät hat → seit UNICORN-25 die eigene Party-Übersicht, alte `#tour`-Links → Spiel. App-Name in Seitentiteln, Kopf und Kalender-Dateien heißt jetzt „Schatzweg“; „Zauberspiegel“ bleibt nur als Figur der Einhorn-Geschichte (Spiegel auf dem iPad, Spieltitel „Funkels Zauberspiegel“). Tippfehler-Domain in der Umleitung. Noch offen: Mailversand (PBIM-17); Landingpage-Texte zum Namen macht Marketer (MAR-54). Cloudflare-Token hat mehr Rechte als nötig (Felix lässt es vorerst so).
 3. ~~Supabase und Mailversand~~ erledigt am 8. November (Brevo, PBIM-17 geschlossen). Offen: Einladung auf einem zweiten Handy öffnen (echter Test der geschützten Links).
 4. ~~Etappe 2: Funkel kennt das Kind~~ gebaut. Offen: Secret `ELEVENLABS_API_KEY` in Supabase eintragen, echt anhören, später hinter die Bezahlung.
 5. **Anpassen mit Leitplanken:** Prompt-Eingabe, KI schätzt Umfang und ändert Sätze, Eltern prüfen die Änderungen, dann Vertonung. Braucht Server und Bezahlung.
@@ -74,8 +89,8 @@ Punkte mit dem Handy gesetzt, gespielt mit dem iPad: Stationen öffneten mal zu 
 
 ## Offene Fragen
 
-- Preis des Anpassungs-Pakets.
-- Preise der Abenteuer (Vorschlag: Einhorn kostenlos, weitere Einzelkauf).
+- Preis des Anpassungs-Pakets → Vorschlag in STRAT-8.
+- Preise der Abenteuer (Vorschlag: Einhorn kostenlos, weitere Einzelkauf) → Vorschlag in STRAT-8.
 
 ## Arbeitsweise im Repo
 
