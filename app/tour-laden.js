@@ -52,7 +52,7 @@
     return tp;
   }
   function fehler(t){
-    document.body.innerHTML='<main style="font:19px/1.45 system-ui,sans-serif;padding:32px;max-width:32rem;margin:auto"><h1>Das Spiel lässt sich nicht laden</h1><p>'+t+'</p><p><a href="./">Zur Übersicht</a></p></main>';
+    document.body.innerHTML='<main style="font:19px/1.45 system-ui,sans-serif;padding:32px;max-width:32rem;margin:auto"><h1>Das Spiel lässt sich nicht laden</h1><p>'+t+'</p><p><a href="'+(window.Weg?Weg.heim():'landing.html')+'">Weiter</a></p></main>';
   }
   function json(u){ return fetch(u,{cache:'no-cache'}).then(function(r){ if(!r.ok) throw new Error(u+': HTTP '+r.status); return r.json(); }); }
 

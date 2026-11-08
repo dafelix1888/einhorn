@@ -50,7 +50,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3000); }
-  function nichtDa(t){ $('seite').innerHTML='<h1>Einladung nicht gefunden</h1><p class="leise">'+t+'</p><div class="fuss"><a href="./">Zur Startseite</a></div>'; }
+  function nichtDa(t){ $('seite').innerHTML='<h1>Einladung nicht gefunden</h1><p class="leise">'+t+'</p><div class="fuss"><a href="landing.html?utm_source=einladung">Was ist Schatzweg?</a></div>'; }
   var q=new URLSearchParams(location.search), k=q.get('k');
   if(k){                                              // geschützter Link: Daten vom Server, zuletzt gesehene als Ersatz ohne Netz
     var gemerkt=null; try{ gemerkt=JSON.parse(localStorage.getItem('sj.einladung.'+k)||'null'); }catch(x){}
@@ -114,7 +114,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
     '<div class="kacheln"><div><span>Wann</span><b>'+esc(datumKurz)+'</b><small>'+esc(e.s)+' Uhr</small></div><div><span>Wo</span><b>'+esc(e.w)+'</b></div><div><span>Abholen</span><b>'+esc(e.b)+'</b><small>Uhr</small></div></div>'+
     (hinweis?'<div class="mit"><b>Bitte mitbringen und beachten</b><br>'+esc(hinweis)+'</div>':'')+
     '<div id="antwort"></div>'+
-    '<div class="fuss"><p class="leise">Selbst bald eine Party? Funkels Regenbogen plant die Schnitzeljagd für jeden Park und jede Wohnung.</p><a href="./#/abenteuer/einhorn">So funktioniert der Zauberspiegel</a></div>';
+    '<div class="fuss"><p class="leise">Selbst bald eine Party? Funkels Regenbogen plant die Schnitzeljagd für jeden Park und jede Wohnung.</p><a href="landing.html?utm_source=einladung">So funktioniert Schatzweg</a></div>';
   antwortZeichnen('');
 
   document.addEventListener('click', function(ev){

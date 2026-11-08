@@ -238,6 +238,8 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   function dauerMin(t, p){ var d=(TOUR[t.id]||{}).dauer||{}; if(!p || !p.strecke) return t.minuten; return (d.stationenMinuten||35)+Math.round(p.strecke/(d.meterProMinute||35)); }
   function zielLink(t){ return 'party.html?thema='+t.id; }
   function party(id){ return Party.lesen(id); }
+  // Eine Reihenfolge wie auf der Landingpage (UNICORN-25): erst Route, dann Party. Mit Route oder Party direkt zur Party.
+  function ziel(id){ return party(id)||plan(id) ? 'party.html?thema='+id : 'planer.html?thema='+id; }
   function genitiv(n){ return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
   function partyName(pa){ return pa.kind && pa.kind.name ? genitiv(pa.kind.name)+' Party' : 'Eure Party'; }
   function countdown(pa){ var t=Party.tageBis(pa); return t==null?'':t>1?'in '+t+' Tagen':t===1?'morgen':t===0?'heute':'vorbei'; }
@@ -305,7 +307,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
     if(!t){
       var e=THEMEN.filter(verfuegbar)[0];
       return '<h2>Deine nächste Tour</h2><img class="cover" src="'+e.cover+'" alt=""><h3>'+esc(e.titel)+'</h3><p class="unter">Noch nicht geplant</p>'+
-        '<div class="box"><h4>So geht’s</h4><p class="unter" style="margin:0">Name, Datum und Kinderzahl eingeben, dann die Route ab eurer Haustür. In rund 15 Minuten steht der Plan.</p><div class="knopfreihe"><a class="voll" href="party.html?thema='+e.id+'">Party planen</a></div></div>';
+        '<div class="box"><h4>So geht’s</h4><p class="unter" style="margin:0">Name, Datum und Kinderzahl eingeben, dann die Route ab eurer Haustür. In rund 15 Minuten steht der Plan.</p><div class="knopfreihe"><a class="voll" href="'+ziel(e.id)+'">Party planen</a></div></div>';
     }
     var p=plan(t.id), vb=vorbereitung(t,p), tour=TOUR[t.id]||{};
     var variante=(tour.varianten && tour.varianten[p.variante||'a'] || {}).name||'';
@@ -317,7 +319,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
         '<div><span>Kinder</span><b>'+(p.kinder||tour.kinder&&tour.kinder.standard||'–')+'</b></div>'+
       '</div></div>'+
       (vb?'<div class="box"><h4>Vorbereitung</h4><div class="balken"><i style="width:'+Math.round(vb.fertig/Math.max(1,vb.n)*100)+'%"></i></div><p class="unter" style="margin:0">'+vb.fertig+' von '+vb.n+' Punkten erledigt</p><div class="knopfreihe"><a class="pille" href="spiel.html?thema='+t.id+'#einrichten">Checkliste</a></div></div>':'')+
-      '<div class="knopfreihe"><a class="voll" href="spiel.html?thema='+t.id+'">Spiel öffnen</a><a class="pille" href="planer.html?thema='+t.id+'">Route ändern</a></div>';
+      '<div class="knopfreihe"><a class="voll" href="party.html?thema='+t.id+'">Weiter zur Party</a><a class="pille" href="planer.html?thema='+t.id+'">Route ändern</a></div>';
   }
 
   // ---------- Startseite ----------
@@ -362,7 +364,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       var pa2=party(t.id), tour=TOUR[t.id]||{};
       h+='<section class="buehne" style="--farbe:'+esc(t.farbe||'#7C5BD6')+'"><a href="#/abenteuer/'+t.id+'" aria-label="'+esc(t.titel)+': mehr erfahren"><img src="'+t.cover+'" alt=""></a><div class="unten">'+
         (t.preis?'<span class="frei">'+esc(t.preis)+'</span>':'')+'<h1>'+esc(t.titel)+'</h1><p>'+esc(t.untertitel)+'. '+esc(t.alter)+', '+(t.orte.indexOf('draussen')>=0?'ab eurer Haustür.':'in der Wohnung.')+'</p>'+
-        '<div class="knoepfe"><a class="voll" href="party.html?thema='+t.id+'">'+(pa2?'Zur Party':'Party planen')+'</a>'+
+        '<div class="knoepfe"><a class="voll" href="'+ziel(t.id)+'">'+(pa2?'Zur Party':'Party planen')+'</a>'+
         (t.hoerprobe?'<button type="button" class="probeknopf" data-probe="'+t.id+'" aria-label="Hörprobe abspielen">'+PLAY+'</button><span class="klein0">Hörprobe, 21 Sek.</span>':'')+'</div></div></section>'+
         '<div class="zahlen"><div><b>15 Min.</b><span>zum Planen</span></div><div><b>6</b><span>Schritte bis zur Party</span></div><div><b>'+(tour.dauer&&tour.dauer.minuten||t.minuten)+' Min.</b><span>Abenteuer</span></div></div>';
     }
@@ -392,7 +394,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       '<div class="held"><img src="'+t.cover+'" alt=""><div><div class="art">Schnitzeljagd'+(verfuegbar(t)?'':' · bald verfügbar')+'</div><h1>'+esc(t.titel)+'</h1>'+
       '<div class="wer">'+esc(t.held)+' <span>· '+esc(t.alter)+' · '+t.stationen+' Stationen · ca. '+t.minuten+' min</span></div></div></div>'+
       '<div class="aktion">'+
-        (verfuegbar(t)?'<a class="gross" href="party.html?thema='+id+'" aria-label="'+(party(id)?'Zur Party':'Party planen')+'">'+PLAY+'</a><a class="pille" href="party.html?thema='+id+'">'+(party(id)?'Zur Party':'Party planen')+'</a>'+(party(id)?'<a class="pille" href="spiel.html?thema='+id+'">Spiel öffnen</a>':''):'<button class="pille" disabled>Kommt bald</button>')+
+        (verfuegbar(t)?'<a class="gross" href="'+ziel(id)+'" aria-label="'+(party(id)?'Zur Party':'Party planen')+'">'+PLAY+'</a><a class="pille" href="'+ziel(id)+'">'+(party(id)?'Zur Party':'Party planen')+'</a>'+(party(id)?'<a class="pille" href="spiel.html?thema='+id+'">Spiel öffnen</a>':''):'<button class="pille" disabled>Kommt bald</button>')+
         '<button class="pille'+(gemerkt?' an':'')+'" data-merken="'+id+'">'+(gemerkt?'✓ Gemerkt':'＋ Merken')+'</button>'+
       '</div>';
     h+='<section class="abschnitt-d"><h2>Informationen</h2><p class="info zu" id="info">'+esc(t.kurz)+(tour?' '+esc(tour.untertitel)+'. Das Tablet wird zum sprechenden Zauberspiegel: Er erzählt die Geschichte, stellt Rätsel und führt per GPS von Station zu Station. Draußen plant der Planer die Route an jedem Ort, drinnen öffnet ihr die Stationen per Knopf.':'')+'</p>'+

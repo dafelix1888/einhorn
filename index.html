@@ -18,9 +18,14 @@
 // Startadresse: alte Spiel-Links (#tour, #einrichten) ins Spiel, Eltern mit eigener Party in die App,
 // alle anderen auf die Landingpage.
 (function(){
-  var h=location.hash, party=false;
-  try{ for(var i=0;i<localStorage.length;i++){ if(/^sj\.party\./.test(localStorage.key(i))){ party=true; break; } } }catch(e){}
-  location.replace(/^#(tour|einrichten)$/.test(h) ? 'app/spiel.html?thema=einhorn'+h : party ? 'app/'+(h||'') : 'app/landing.html'+location.search);
+  // Eltern mit Party → ihre Party; mit begonnener Route → weiter zur Party; sonst Landingpage (UNICORN-25)
+  var h=location.hash, ziel=null;
+  try{
+    for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(/^sj\.party\./.test(k)){ ziel=k.slice(9); break; } }
+    if(!ziel) for(var j=0;j<localStorage.length;j++){ var k2=localStorage.key(j); if(/^sj\.plan\./.test(k2)){ var p=JSON.parse(localStorage.getItem(k2)); if(p && p.stationen && p.stationen.length>1){ ziel=k2.slice(8); break; } } }
+  }catch(e){}
+  if(ziel && !/^[a-z0-9-]+$/.test(ziel)) ziel=null;
+  location.replace(/^#(tour|einrichten)$/.test(h) ? 'app/spiel.html?thema=einhorn'+h : ziel ? 'app/party.html?thema='+ziel : 'app/landing.html'+location.search);
 })();
 </script>
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0F0B17;color:#F5F2FA;font:18px/1.5 "Avenir Next","Trebuchet MS",Arial,sans-serif}a{color:#A78BFA}</style>

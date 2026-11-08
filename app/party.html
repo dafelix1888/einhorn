@@ -88,6 +88,7 @@
 <div class="toast" id="toast" hidden></div>
 <script src="planer-kern.js"></script>
 <script src="party.js"></script>
+<script src="weg.js"></script>
 <script src="konto.js"></script>
 <script src="namen.js"></script>
 <script>
@@ -142,7 +143,8 @@
   }
   function assistent(){
     var e=entwurf, zurueck=schritt>0 ? '<button type="button" class="textknopf" id="zurueck">← Zurück</button>' :
-      '<a class="textknopf" href="'+(party?'party.html?thema='+thema:'./#/abenteuer/'+thema)+'">← '+(party?'Zur Party':'Zurück')+'</a>';
+      (party ? '<a class="textknopf" href="party.html?thema='+thema+'">← Zur Party</a>'
+             : '<a class="textknopf" href="'+(Weg.plan(thema)?'planer.html?thema='+thema:'landing.html')+'" data-zurueck="'+(Weg.plan(thema)?'planer.html?thema='+thema:'landing.html')+'">← Zurück</a>');
     var h='<div class="oben">'+zurueck+'<span class="leise">Schritt '+(schritt+1)+' von '+SCHRITTE+'</span></div>'+
       '<div class="fortschritt">'+[0,1,2].map(function(i){ return '<i class="'+(i<=schritt?'an':'')+'"></i>'; }).join('')+'</div><div class="stapel">';
     if(schritt===0){
@@ -253,7 +255,7 @@
     var p=party, pl=Party.plan(thema), l=Party.aufgaben(p, tour, pl), n=Party.naechste(l), tage=Party.tageBis(p);
     var fertig=l.filter(function(a){ return a.fertig; }).length;
     var cd=tage==null?'':tage>1?tage+' Tage':tage===1?'morgen':tage===0?'heute':'vorbei';
-    var h='<div class="oben"><a class="textknopf" href="./">← Alle Abenteuer</a><a class="textknopf" href="#" id="aendern">Angaben ändern</a></div>'+
+    var h='<div class="oben"><span class="marke-sw">Schatzweg</span><span style="display:flex;gap:14px;font-size:.86rem;white-space:nowrap"><a class="textknopf" href="#" id="aendern">Ändern</a><a class="textknopf" href="./">Alle Abenteuer</a></span></div>'+
       '<div class="kopf"><img src="'+esc(info.cover)+'" alt=""><div style="min-width:0"><h1>'+esc(partyTitel(p))+'</h1>'+
       '<div class="leise">'+esc(Party.datumText(Party.datum(p)))+' · '+esc(p.start)+' · '+p.kinder+' Kinder</div></div>'+(cd?'<span class="countdown">'+cd+'</span>':'')+'</div>';
     var dat=Party.datum(p);
@@ -324,6 +326,8 @@
   function gastLink(){ bereit(function(){ teilen(Party.einladungsLink(party, Party.plan(thema)), 'Einladung: '+partyTitel(party), 'Einladungslink kopiert. In die Eltern-Gruppe schicken.'); }); }
 
   document.addEventListener('click', function(ev){
+    var zb=ev.target.closest && ev.target.closest('[data-zurueck]'); if(zb){ ev.preventDefault(); if(entwurf){ uebernehmen(); merkeEntwurf(); } Weg.zurueck(zb.getAttribute('data-zurueck')); return; }
+    if(ev.target.closest && ev.target.closest('#holen')){ Konto.fenster(thema, {titel:'Anmelden und Party holen', text:'Wir schicken dir einen Code. Danach ist deine Party auch auf diesem Gerät.', fertig:'Angemeldet.'}); return; }
     var t=ev.target, b;
     if(entwurf){
       if((b=t.closest('[data-z]'))){
@@ -333,13 +337,14 @@
         assistent(); var z=$('seite').querySelector('[data-z="'+k+'"][data-d="'+d+'"]'); if(z) z.focus(); return;
       }
       if((b=t.closest('[data-ort]'))){ entwurf.ort=b.getAttribute('data-ort'); if(entwurf.ort==='draussen') entwurf.warDraussen=true; assistent(); var o=$('seite').querySelector('[data-ort="'+entwurf.ort+'"]'); if(o) o.focus(); return; }
-      if(t.closest('#zurueck')){ uebernehmen(); schritt--; assistent(); return; }
+      if(t.closest('#zurueck')){ uebernehmen(); merkeEntwurf(); if(gepusht>0){ history.back(); } else { schritt--; assistent(); } return; }
       if(t.closest('#weiter')){
         var f=uebernehmen(); if(f){ $('fehler').textContent=f; return; }
-        if(schritt<SCHRITTE-1){ schritt++; assistent(); window.scrollTo(0,0); return; }
+        if(schritt<SCHRITTE-1){ schritt++; merkeEntwurf(); try{ history.pushState({schritt:schritt},'','#schritt-'+(schritt+1)); gepusht++; }catch(e){} assistent(); window.scrollTo(0,0); return; }
         if(entwurf.ort==='draussen') entwurf.warDraussen=true;
         var neuAngelegt=!party;
-        party=Party.speichern(entwurf); entwurf=null;
+        party=Party.speichern(entwurf); entwurf=null; vergissEntwurf();
+        if(gepusht>0){ var n=gepusht; gepusht=0; nachRueck=true; history.go(-n); }   // Schritt-Einträge aus dem Verlauf nehmen
         uebersicht(); window.scrollTo(0,0); toast(neuAngelegt?'Dein Plan steht.':'Gespeichert.'); return;
       }
       return;
@@ -394,16 +399,45 @@
     if(d.art==='fehler'){ toast('Das ging nicht. Ist das Internet an?'); return; }
     if(d.art==='notweg') toast('Weiter ohne Anmeldung. Die Links enthalten jetzt die Party-Daten.');
     if(entwurf) return;
-    party=Party.lesen(thema); if(!party){ neu(); return; }
+    party=Party.lesen(thema); if(!party){ waehlen(d.art==='angemeldet'); return; }
     var y=window.scrollY; uebersicht(); window.scrollTo(0,y);
     toast(d.art==='angemeldet'?'Gespeichert. Jetzt könnt ihr die Links teilen.':d.art==='neuer-link'?'Neuer Link erstellt. Der alte geht nicht mehr.':'Abgemeldet.');
   });
+  // ---------- Klickwege (UNICORN-25): Assistent im Browser-Verlauf, Entwurf überlebt Zurück und Neuladen ----------
+  var gepusht=0, nachRueck=false, EKEY='sj.entwurf.'+thema;
+  function merkeEntwurf(){ try{ if(entwurf && !party) sessionStorage.setItem(EKEY, JSON.stringify({e:entwurf, s:schritt})); }catch(e){} }
+  function vergissEntwurf(){ try{ sessionStorage.removeItem(EKEY); }catch(e){} }
+  function entwurfLesen(){ try{ var g=JSON.parse(sessionStorage.getItem(EKEY)); if(!g || !g.e) return null; var m=location.hash.match(/schritt-(\d)/); g.s=m?(+m[1]-1):0; return g; }catch(e){ return null; } }
+  window.addEventListener('popstate', function(ev){
+    if(nachRueck){ nachRueck=false; return; }
+    if(!entwurf) return;
+    uebernehmen(); merkeEntwurf();
+    var m=location.hash.match(/schritt-(\d)/), s=ev.state && ev.state.schritt!=null ? ev.state.schritt : (m ? +m[1]-1 : 0);
+    schritt=Math.max(0, Math.min(s, SCHRITTE-1)); gepusht=schritt; assistent(); window.scrollTo(0,0);
+  });
+  // Neues Gerät ohne Party und ohne Route: erst fragen, ob es schon eine Party gibt (anmelden und holen)
+  function waehlen(nichtsGefunden){
+    entwurf=null;
+    if(!nichtsGefunden && Konto.angemeldet()){
+      $('seite').innerHTML='<p class="leise">Party wird geholt …</p>';
+      Konto.holen().then(function(){ party=Party.lesen(thema); if(party) uebersicht(); else waehlen(true); }, function(){ waehlen(true); });
+      return;
+    }
+    $('seite').innerHTML='<div class="oben"><a class="textknopf" href="landing.html" data-zurueck="landing.html">← Zurück</a><span class="marke-sw">Schatzweg</span></div>'+
+      '<div class="stapel"><h1>Deine Party</h1>'+
+      '<p class="leise">Schon eine Party geplant, zum Beispiel auf einem anderen Handy? Melde dich an, dann holen wir sie auf dieses Gerät.</p>'+
+      (nichtsGefunden ? '<p class="leise" style="color:var(--gelb)">Unter dieser E-Mail-Adresse ist noch keine Party gespeichert.</p>' : '')+
+      '<button type="button" class="knopf breit" id="holen">Anmelden und Party holen</button>'+
+      '<a class="knopf leer breit" href="planer.html?thema='+thema+'">Neue Party planen</a></div>';
+  }
   function neu(){ entwurf={format:1, thema:thema, kind:{name:'', alter:null}, datum:'', start:'15:00', kinder:tour.kinder.standard, helfer:2, vorausgeher:true, ort:'draussen', planB:true, ausdrucke:true, erledigt:{}, einkauf:{}, erstellt:new Date().toISOString()}; schritt=0; vgVonHand=false; voreinOffen=false; assistent(); }
 
   Promise.all([fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }), fetch('themen/index.json').then(function(r){ return r.json(); })]).then(function(r){
     tour=r[0]; info=r[1].themen.filter(function(t){ return t.id===thema; })[0];
     party=Party.lesen(thema);
-    if(!party || q.has('neu')) neu(); else uebersicht();
+    if(party && !q.has('neu')) uebersicht();
+    else if(!party && !q.has('neu') && !Weg.plan(thema) && window.Konto && Konto.aktiv()) waehlen(false);
+    else { neu(); var gm=entwurfLesen(); if(gm && !party){ entwurf=gm.e; schritt=Math.min(gm.s, SCHRITTE-1); assistent(); } }
     if(window.Konto){ if(!Konto.nachMailLink(thema) && party) Konto.merken(thema); }
   })['catch'](function(e){ $('seite').innerHTML='<p>Die Party lässt sich nicht laden: '+esc(e.message)+'</p>'; });
 })();

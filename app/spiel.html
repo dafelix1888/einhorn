@@ -1,5 +1,5 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
-<meta name="robots" content="noindex"><script src="fehler.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Schatzweg"><title>Funkels Zauberspiegel</title><style>@font-face{font-family:"Baloo 2";src:url(schrift/baloo2.woff) format("woff");font-weight:400 800;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-regular.woff) format("woff");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-bold.woff) format("woff");font-weight:700;font-display:swap}</style><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
+<meta name="robots" content="noindex"><script src="fehler.js"></script><script src="weg.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Schatzweg"><title>Funkels Zauberspiegel</title><style>@font-face{font-family:"Baloo 2";src:url(schrift/baloo2.woff) format("woff");font-weight:400 800;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-regular.woff) format("woff");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-bold.woff) format("woff");font-weight:700;font-display:swap}</style><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
 <style>
 /* Layout: oben Fortschritt und der Knopf für Erwachsene, in der Mitte der runde Spiegel,
    darunter Titel, Sprechtext und ein großer Hauptknopf. Dunkler Nachthimmel wie auf der
@@ -534,7 +534,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         </button>
         <a href="./" id="erw-portal">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg>
-          <span><b>Zur Übersicht</b><small>Alle Abenteuer und deine Party. Die Tour bleibt gespeichert.</small></span>
+          <span><b>Zur Party</b><small>Checkliste, Links und Einkauf. Die Tour bleibt gespeichert.</small></span>
         </a>
         <p style="margin:6px 0 0;font-size:.8rem;text-align:center"><a href="impressum.html" style="color:inherit">Impressum</a> · <a href="datenschutz.html" style="color:inherit">Datenschutz</a></p>
       </div>
@@ -762,7 +762,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       <button type="button" class="btn quiet" id="btn-test">Testknopf: Station ohne GPS öffnen</button>
       <button type="button" class="btn quiet" id="btn-linse" hidden>Kamera aus</button>
       <button type="button" class="btn ghost" id="btn-foto" hidden>Gruppenfoto mit Rahmen</button>
-      <a class="btn ghost" id="btn-portal" href="./" hidden>Zur Übersicht</a>
+      <a class="btn ghost" id="btn-portal" href="./" hidden>Zur Party</a>
     </div>
   </div>
 
@@ -2313,7 +2313,7 @@ function render(keepPic){
   }
   $('stage').classList.toggle('atmet', uw && !ankunft && !wartet);
   $('btn-foto').hidden = !(ph==='end' || ph==='heim');
-  $('btn-portal').hidden = !(ph==='heim' && state.step>=1);   // nach der Tour zurück zur Übersicht
+  $('btn-portal').hidden = !(ph==='heim' && state.step>=1) || !hatParty();   // nach der Tour zurück zur Party (nur wo es eine gibt, nicht auf dem iPad per Link)
   if(alt!==null && k!==alt && k!=='start' && ph!=='seek' && state.autoSag && beruehrt && view==='tour') sagen();   // unterwegs nie von selbst: erst sammeln, dann tippen
 }
 function chipText(){
@@ -2632,7 +2632,10 @@ $('pitch').addEventListener('click', function(e){ var b=e.target.closest ? e.tar
 $('voice').addEventListener('change', function(){ state.voice=this.value||null; save(); });
 $('btn-probe').addEventListener('click', function(){ tonAn(); still(); sprich('Hallo, ich bin Funkel, das Einhorn! Folgt den Hufspuren.'); });
 $('btn-restart').addEventListener('click', vonVorn);
-['erw-portal','btn-portal'].forEach(function(id){ $(id).addEventListener('click', function(){ save(); }); });   // Stand sichern, bevor es zur Übersicht geht
+// „Zur Party“ nur auf Geräten mit eigener Party (UNICORN-25); iPad per Link sieht keinen Weg in die Plattform
+function hatParty(){ var t=new URLSearchParams(location.search).get('thema')||'einhorn'; return !!(window.Weg && Weg.party(t)); }
+(function(){ var t=new URLSearchParams(location.search).get('thema')||'einhorn'; ['erw-portal','btn-portal'].forEach(function(id){ if(window.Weg) $(id).href=Weg.heim(t); }); if(!hatParty()) $('erw-portal').hidden=true; })();
+['erw-portal','btn-portal'].forEach(function(id){ $(id).addEventListener('click', function(){ save(); }); });   // Stand sichern, bevor es zur Party geht
 $('btn-copy').addEventListener('click', function(){
   var ta=$('code'); ta.value=codeAus(state.points);
   function markieren(){ ta.focus(); ta.select(); toast('Code ist markiert. Jetzt kopieren.'); }

@@ -37,7 +37,7 @@
   }
   function draussen(){ return !!(tour.varianten[wahl.variante]||{}).draussen; }
   function km(m){ m=Math.round(m||0); return m>=1000 ? (m/1000).toFixed(1).replace('.',',')+' km' : m+' m'; }
-  function zurueckZiel(){ return party ? 'party.html?thema='+encodeURIComponent(thema) : './'; }
+  function zurueckZiel(){ return party ? 'party.html?thema='+encodeURIComponent(thema) : 'landing.html'; }   // nie in den Katalog (UNICORN-25)
 
   // ---------- Netz ----------
   function mitZeitlimit(p, ms, text){ return Promise.race([p, new Promise(function(_,nein){ setTimeout(function(){ nein(new Error(text)); }, ms); })]); }
@@ -376,7 +376,8 @@
     });
     $('planen').addEventListener('click', planenKlick);
     $('zur-route').addEventListener('click', ergebnisZeigen);
-    $('zurueck-eingabe').addEventListener('click', function(e){ if(plan && plan.stationen && plan.stationen.length){ e.preventDefault(); ergebnisZeigen(); } });
+    $('zurueck-eingabe').addEventListener('click', function(e){ e.preventDefault(); if(plan && plan.stationen && plan.stationen.length){ ergebnisZeigen(); return; } Weg.zurueck(zurueckZiel()); });
+    $('zurueck-karte').addEventListener('click', function(e){ e.preventDefault(); Weg.zurueck(zurueckZiel()); });
     $('start-pille').addEventListener('click', zeigeEingabe);
     $('aendern').addEventListener('click', zeigeEingabe);
     $('liste').addEventListener('click', function(e){ var b=e.target.closest('button[data-i]'); if(b) waehle(+b.getAttribute('data-i'), true); });
