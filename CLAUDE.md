@@ -5,6 +5,7 @@
 - Texte für Eltern und Kinder auf Deutsch, kurz und ohne Fachwörter.
 - Keine echten Adressen, Straßennamen oder Namen aus Felix' Umfeld ins Repo (es ist öffentlich). Das Zauberwort nie ins Repo schreiben.
 - Arbeiten über Branch und Pull Request; PRs direkt in `main` mergen.
+- Jira-Tickets in UNICORN nachziehen: Status „Delivery“, sobald gebaut, aber noch etwas von Felix fehlt (Schlüssel, Test, ID); „Done“, sobald live und geprüft. Kommentar mit PR-Link dazu.
 
 ## Marketing (Marketer)
 
