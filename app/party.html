@@ -142,7 +142,7 @@
   }
   function assistent(){
     var e=entwurf, zurueck=schritt>0 ? '<button type="button" class="textknopf" id="zurueck">← Zurück</button>' :
-      '<a class="textknopf" href="'+(party?'party.html?thema='+thema:'index.html#/abenteuer/'+thema)+'">← '+(party?'Zur Party':'Zurück')+'</a>';
+      '<a class="textknopf" href="'+(party?'party.html?thema='+thema:'./#/abenteuer/'+thema)+'">← '+(party?'Zur Party':'Zurück')+'</a>';
     var h='<div class="oben">'+zurueck+'<span class="leise">Schritt '+(schritt+1)+' von '+SCHRITTE+'</span></div>'+
       '<div class="fortschritt">'+[0,1,2].map(function(i){ return '<i class="'+(i<=schritt?'an':'')+'"></i>'; }).join('')+'</div><div class="stapel">';
     if(schritt===0){
@@ -253,7 +253,7 @@
     var p=party, pl=Party.plan(thema), l=Party.aufgaben(p, tour, pl), n=Party.naechste(l), tage=Party.tageBis(p);
     var fertig=l.filter(function(a){ return a.fertig; }).length;
     var cd=tage==null?'':tage>1?tage+' Tage':tage===1?'morgen':tage===0?'heute':'vorbei';
-    var h='<div class="oben"><a class="textknopf" href="index.html">← Alle Abenteuer</a><a class="textknopf" href="#" id="aendern">Angaben ändern</a></div>'+
+    var h='<div class="oben"><a class="textknopf" href="./">← Alle Abenteuer</a><a class="textknopf" href="#" id="aendern">Angaben ändern</a></div>'+
       '<div class="kopf"><img src="'+esc(info.cover)+'" alt=""><div style="min-width:0"><h1>'+esc(partyTitel(p))+'</h1>'+
       '<div class="leise">'+esc(Party.datumText(Party.datum(p)))+' · '+esc(p.start)+' · '+p.kinder+' Kinder</div></div>'+(cd?'<span class="countdown">'+cd+'</span>':'')+'</div>';
     var dat=Party.datum(p);

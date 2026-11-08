@@ -152,7 +152,7 @@
   }
   function meldung(titel, text){
     document.body.innerHTML='<main style="font:19px/1.45 system-ui,sans-serif;padding:32px;max-width:32rem;margin:auto;color:#F5F2FA;background:#0F0B17;min-height:100vh;box-sizing:border-box">'+
-      '<h1 style="font-size:1.5rem">'+esc(titel)+'</h1><p style="color:#B3A9C4">'+esc(text)+'</p><p><a style="color:#A78BFA" href="index.html">Zur Übersicht</a></p></main>';
+      '<h1 style="font-size:1.5rem">'+esc(titel)+'</h1><p style="color:#B3A9C4">'+esc(text)+'</p><p><a style="color:#A78BFA" href="./">Zur Übersicht</a></p></main>';
     document.body.style.margin='0';
   }
   // Für Spiel und Vorausgeher: ?k=… holen, im Gerät ablegen, Seite ohne Schlüssel neu laden. true = Seite wartet.
