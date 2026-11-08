@@ -1,3 +1,13 @@
-# Die App ist vorerst privat und soll nicht in Suchmaschinen erscheinen.
+# Seit 8. November für Suchmaschinen offen (Entscheidung Felix).
+# Gesperrt bleiben Seiten, die nur mit geheimem Link Sinn ergeben.
 User-agent: *
-Disallow: /
+Disallow: /app/spiel.html
+Disallow: /app/party.html
+Disallow: /app/einladung.html
+Disallow: /app/danke.html
+Disallow: /app/vorausgeher.html
+Disallow: /app/bereit.html
+Disallow: /app/druck.html
+Disallow: /original.html
+
+Sitemap: https://schatzweg.de/sitemap.xml

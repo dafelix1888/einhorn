@@ -3,4 +3,19 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(self), microphone=(self), geolocation=(self)
+
+# Seiten mit geheimen Links nie in Suchmaschinen
+/app/spiel.html
+  X-Robots-Tag: noindex
+/app/party.html
+  X-Robots-Tag: noindex
+/app/einladung.html
+  X-Robots-Tag: noindex
+/app/danke.html
+  X-Robots-Tag: noindex
+/app/vorausgeher.html
+  X-Robots-Tag: noindex
+/app/bereit.html
+  X-Robots-Tag: noindex
+/app/druck.html
   X-Robots-Tag: noindex
