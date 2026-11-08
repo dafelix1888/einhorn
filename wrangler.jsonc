@@ -10,5 +10,9 @@
     "not_found_handling": "none"
   },
   "workers_dev": true,
+  // eigene Domain; www und die Tippfehler-Domain leitet worker/umleitung.js hierher um (Cloudflare legt DNS-Eintrag und Zertifikat selbst an; Token braucht Zone → Workers Routes → Write)
+  "routes": [
+    { "pattern": "schatzweg.de", "custom_domain": true }
+  ],
   "observability": { "enabled": true }
 }
