@@ -1,4 +1,5 @@
-# Nicht öffentlich ausliefern (Cloudflare Workers, statische Seiten)
+# Nicht öffentlich ausliefern (Cloudflare Workers, statische Seiten).
+# Achtung: Muster ohne „/“ gelten in jedem Ordner. Nur den Hauptordner meinen → mit „/“ anfangen (PBIM-18).
 .git
 .github
 .assetsignore
@@ -10,8 +11,8 @@ stimmen/*.mjs
 stimmen/rollen.json
 node_modules
 # Altes Original vom Geburtstag bleibt nur auf GitHub Pages (Stimmendatei ist größer als 25 MB)
-original.html
-funkel-stimme.json
-punkte.json
-sw.js
+/original.html
+/funkel-stimme.json
+/punkte.json
+/sw.js
 tests
