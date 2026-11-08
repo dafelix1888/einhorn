@@ -42,7 +42,7 @@ async function mock(route){
   ok(await a.locator('dialog.konto-dlg[open]').isVisible() && /Bevor Funkel loslegt/.test(await a.locator('dialog.konto-dlg').innerText()), 'Spiel: Anmeldung vor dem Start');
   ok((await a.evaluate(()=>__zs.state().phase))==='start', 'Spiel: Tour noch nicht gestartet');
   await a.fill('#kd-mail','eltern@example.org'); await a.click('#kd-los'); await a.waitForTimeout(300);
-  await a.fill('#kd-code','123456'); await a.waitForTimeout(800);
+  await a.fill('#kd-code','123456'); await a.waitForFunction(()=>/Geschafft/.test((document.querySelector('dialog.konto-dlg')||{}).innerText||''), null, {timeout:8000}).catch(()=>{});
   ok(/Geschafft/.test(await a.locator('dialog.konto-dlg').innerText().catch(()=>'')) , 'Code wird nach 6 Ziffern selbst geprüft, „Geschafft!“');
   await a.waitForTimeout(1600);
   ok(await a.evaluate(()=>Konto.angemeldet()), 'Spiel: angemeldet');
@@ -84,7 +84,7 @@ async function mock(route){
   const g=await c6.newPage(); g.on('pageerror',e=>errs.push(e.message));
   await g.goto(B+'party.html?thema=einhorn'); await g.evaluate(([p,pl])=>{ localStorage.clear(); localStorage.setItem('sj.party.einhorn', JSON.stringify(p)); localStorage.setItem('sj.plan.einhorn', JSON.stringify(pl)); }, [party, plan]);
   await g.goto(B+'spiel.html?thema=einhorn'); await g.waitForTimeout(800);
-  await g.click('#btn-main'); await g.fill('#kd-mail','fremd@example.org'); await g.click('#kd-los'); await g.waitForTimeout(500);
+  await g.click('#btn-main'); await g.fill('#kd-mail','fremd@example.org'); await g.click('#kd-los'); await g.waitForFunction(()=>/klemmt/.test((document.querySelector('dialog.konto-dlg')||{}).innerText||''), null, {timeout:8000}).catch(()=>{});
   ok(/klemmt/.test(await g.locator('dialog.konto-dlg').innerText()), 'Mailversand gesperrt: Notweg wird angeboten');
   await g.click('#kd-ohne'); await g.waitForTimeout(400);
   ok((await g.evaluate(()=>__zs.state().phase))!=='start', 'Notweg: Tour startet ohne Anmeldung');
