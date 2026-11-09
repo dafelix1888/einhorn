@@ -6,6 +6,7 @@
 - Keine echten Adressen, Straßennamen oder Namen aus Felix' Umfeld ins Repo (es ist öffentlich). Das Zauberwort nie ins Repo schreiben.
 - Arbeiten über Branch und Pull Request; PRs direkt in `main` mergen.
 - Jira-Tickets in UNICORN nachziehen: Status „Delivery“, sobald gebaut, aber noch etwas von Felix fehlt (Schlüssel, Test, ID); „Done“, sobald live und geprüft. Kommentar mit PR-Link dazu.
+- In jedem bearbeiteten Ticket (UNICORN, MAR, STRAT, PBIM, ADR, KM) einen kurzen, präzisen Kommentar hinterlassen: was getan wurde, was festgestellt wurde, was offen ist und bei wem (mit PR-Link). So wissen Strategist, Marketer und andere Sitzungen ohne Rückfrage, wo das Ticket steht.
 
 ## Zusammenarbeit
 
