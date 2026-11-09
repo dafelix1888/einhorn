@@ -1,7 +1,7 @@
 // Cloudflare Worker „Karte“: Zwischenstation für die freien Kartendienste des Planers.
 // - meldet sich mit eigenem Namen (User-Agent) an, wie es Nominatim und Overpass verlangen
 // - merkt sich Antworten im Cloudflare-Cache, damit dieselbe Gegend nicht zweimal abgefragt wird
-// - fragt bei Overpass mehrere Server versetzt (nächster startet bei Fehler sofort, sonst nach 6 s); der erste Treffer gewinnt
+// - fragt Overpass hartnäckig: reihum bis zu 8 Versuche, nach Ablehnung kurz warten, höchstens zwei gleichzeitig; erster Treffer gewinnt
 // - nimmt nur Anfragen von der App an (Herkunft) und nur Abfragen, wie der Planer sie stellt
 //
 //   GET  /suche?q=…&lat=…&lon=…      Vorschläge beim Tippen (Photon)
@@ -11,7 +11,7 @@
 
 const AGENT = 'Schatzweg/1.0 (+https://schatzweg.de)';
 const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
-const OVERPASS_VERSATZ = 6000, OVERPASS_JE_SERVER = 40000, OVERPASS_GESAMT = 50000;   // Gesamt unter dem Zeitlimit des Planers (60 s)
+const OVERPASS_VERSATZ = 8000, OVERPASS_JE_SERVER = 60000, OVERPASS_GESAMT = 85000, OVERPASS_VERSUCHE = 8, OVERPASS_PAUSE = 1500;   // Gesamt unter dem Zeitlimit des Planers (95 s)
 const TAG = 86400;
 
 function cors(req, env) {
@@ -56,20 +56,26 @@ async function holeJson(url, init, ms) {
   if (!r.ok) throw new Error('HTTP ' + r.status);
   const text = await r.text(); JSON.parse(text); return text;    // nur gültiges JSON merken
 }
-// Overpass versetzt fragen: Server 1 sofort, bei Fehler sofort der nächste, sonst alle OVERPASS_VERSATZ ms einer mehr.
-// Der erste gültige Treffer gewinnt, die übrigen werden abgebrochen. Nach OVERPASS_GESAMT ms ist Schluss.
+// Overpass hartnäckig fragen (UNICORN-7, Praxistest 9. Nov.): Die öffentlichen Server lehnen bei Last sofort ab (502/504)
+// und antworten sonst nach 15–45 s. Deshalb: reihum bis zu OVERPASS_VERSUCHE Versuche, nach einer Ablehnung kurz warten,
+// höchstens zwei gleichzeitig (zweiter startet nach OVERPASS_VERSATZ ms ohne Antwort). Erster Treffer gewinnt, Rest wird abgebrochen.
 function overpassVersetzt(daten) {
   const body = 'data=' + encodeURIComponent(daten);
   return new Promise((ja, nein) => {
-    const laeufe = []; let naechster = 0, offen = 0, fertig = false, letzter = new Error('Zeit');
+    const laeufe = new Set(); let versuch = 0, fertig = false, letzter = new Error('Zeit');
     const ende = (fn, wert) => { if (fertig) return; fertig = true; laeufe.forEach((c) => c.abort()); timer.forEach(clearTimeout); fn(wert); };
     const starte = () => {
-      if (fertig || naechster >= OVERPASS.length) return;
-      const ac = new AbortController(); laeufe.push(ac); offen++;
-      holeJson(OVERPASS[naechster++], { method: 'POST', body, signal: ac.signal, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }, OVERPASS_JE_SERVER)
-        .then((text) => ende(ja, text), (e) => { letzter = e; offen--; if (naechster < OVERPASS.length) starte(); else if (!offen) ende(nein, letzter); });
+      if (fertig || versuch >= OVERPASS_VERSUCHE || laeufe.size >= 2) return;
+      const ac = new AbortController(); laeufe.add(ac);
+      const server = OVERPASS[versuch++ % OVERPASS.length];
+      holeJson(server, { method: 'POST', body, signal: ac.signal, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }, OVERPASS_JE_SERVER)
+        .then((text) => ende(ja, text), (e) => {
+          letzter = e; laeufe.delete(ac);
+          if (versuch >= OVERPASS_VERSUCHE) { if (!laeufe.size) ende(nein, letzter); return; }
+          timer.push(setTimeout(starte, OVERPASS_PAUSE));
+        });
     };
-    const timer = [setTimeout(starte, OVERPASS_VERSATZ), setTimeout(starte, 2 * OVERPASS_VERSATZ), setTimeout(() => ende(nein, letzter), OVERPASS_GESAMT)];
+    const timer = [setTimeout(starte, OVERPASS_VERSATZ), setTimeout(() => ende(nein, letzter), OVERPASS_GESAMT)];
     starte();
   });
 }

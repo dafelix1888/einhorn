@@ -6,9 +6,11 @@ let fehler=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) feh
   globalThis.caches={default:{
     match:async k=>{ const v=speicher.get(k.url); return v ? new Response(v.text, {headers:v.headers}) : undefined; },
     put:async (k,r)=>{ speicher.set(k.url, {text:await r.text(), headers:Object.fromEntries(r.headers)}); } }};
-  let aufrufe=[], dienst='gut', abgebrochen=0;
+  let aufrufe=[], dienst='gut', abgebrochen=0, overpassZaehler=0;
   globalThis.fetch=async (url, init)=>{ aufrufe.push(String(url)+' '+((init&&init.headers&&init.headers['User-Agent'])||''));
     if(dienst==='aus') throw new Error('weg');
+    if(/interpreter/.test(String(url))) overpassZaehler++;
+    if(/interpreter/.test(String(url)) && dienst==='zweimal-504' && overpassZaehler<=2) return new Response('busy', {status:504});
     if(String(url).includes('overpass-api.de') && dienst==='erster-aus') return new Response('busy', {status:429});
     if(String(url).includes('overpass-api.de') && dienst==='erster-langsam') await new Promise((ja,nein)=>{ const t=setTimeout(ja, 15000); init.signal && init.signal.addEventListener('abort', ()=>{ clearTimeout(t); abgebrochen++; nein(new Error('abgebrochen')); }); });
     return new Response(JSON.stringify({elements:[{type:'node',id:1}], quelle:String(url)}), {status:200}); };
@@ -32,8 +34,14 @@ let fehler=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) feh
   // erster Server hängt: nach 6 s fragt der Worker den zweiten dazu, der erste wird abgebrochen
   dienst='erster-langsam'; aufrufe=[]; speicher.clear();
   const t0=Date.now(); r=await anfrage('/overpass', {...post, body:Q.replace('900','901')}); const dauer=Date.now()-t0;
-  ok(r.status===200 && /mail\.ru/.test((await r.json()).quelle) && dauer>5500 && dauer<9000, 'Overpass: hängt der erste, gewinnt nach ~6 s der zweite ('+dauer+' ms)');
+  ok(r.status===200 && /mail\.ru/.test((await r.json()).quelle) && dauer>7500 && dauer<11000, 'Overpass: hängt der erste, gewinnt nach ~8 s der zweite ('+dauer+' ms)');
   ok(abgebrochen===1, 'der hängende Server wird abgebrochen');
+  dienst='gut'; r=await anfrage('/overpass', post); await Promise.all(warten);
+
+  // alle Server lehnen zweimal sofort ab (504): der Worker versucht es nach kurzer Pause weiter
+  dienst='zweimal-504'; overpassZaehler=0; speicher.clear();
+  r=await anfrage('/overpass', {...post, body:Q.replace('900','902')}); await Promise.all(warten);
+  ok(r.status===200 && overpassZaehler===3, 'Overpass: nach zwei Ablehnungen klappt der dritte Versuch ('+overpassZaehler+' Versuche)');
   dienst='gut'; r=await anfrage('/overpass', post); await Promise.all(warten);
 
   // veraltete Antwort, Dienst aus: ältere Antwort springt ein
