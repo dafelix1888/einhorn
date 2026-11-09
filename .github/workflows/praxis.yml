@@ -1,0 +1,42 @@
+# Praxistest (UNICORN-7): Planer mit echten Kartendaten an öffentlichen Orten.
+# Nur von Hand starten (Actions → Praxistest → Run workflow), damit Nominatim/Overpass nicht unnötig belastet werden.
+name: Praxistest
+on:
+  workflow_dispatch:
+    inputs:
+      orte:
+        description: 'Nur diese Orte (z. B. 1,5,11), leer = alle'
+        required: false
+        default: ''
+permissions:
+  contents: read
+jobs:
+  planer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Playwright installieren
+        working-directory: tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Seite lokal starten
+        run: |
+          python3 -m http.server 8765 >/tmp/server.log 2>&1 &
+          for i in $(seq 1 20); do curl -sf http://localhost:8765/app/ >/dev/null && break; sleep 0.5; done
+      - name: Planer an echten Orten
+        env:
+          TZ: Europe/Berlin
+          ORTE: ${{ inputs.orte }}
+          AUSGABE: ${{ runner.temp }}/praxis
+        run: node tests/praxis/praxis.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: praxistest
+          path: ${{ runner.temp }}/praxis
+          retention-days: 14
