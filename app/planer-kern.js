@@ -25,7 +25,7 @@
   function overpassAbfrage(lat, lng, radius){
     var a='(around:'+Math.round(radius)+','+lat.toFixed(6)+','+lng.toFixed(6)+')';
     return '[out:json][timeout:40];('+
-      'way'+a+'[highway~"^(footway|path|pedestrian|track|steps|bridleway|cycleway|living_street|residential|service|unclassified|tertiary|tertiary_link|secondary|secondary_link|primary|primary_link)$"]["access"!~"^(private|no)$"]["foot"!~"^(no|private)$"];'+
+      'way'+a+'[highway~"^(footway|path|pedestrian|track|steps|bridleway|cycleway|living_street|residential|service|unclassified|tertiary|tertiary_link|secondary|secondary_link|primary|primary_link)$"]["access"!~"^(private|no)$"]["foot"!~"^(no|private)$"]["service"!~"^(parking_aisle|driveway|drive-through)$"];'+
       ')->.w;.w out body geom;'+
       '(node'+a+'[highway~"^(crossing|traffic_signals)$"];node'+a+'[amenity=bench];node'+a+'[leisure=playground];node'+a+'[natural=peak];node'+a+'[tourism=viewpoint];)->.n;.n out body;'+
       '(way'+a+'[barrier~"^(fence|hedge|wall)$"];)->.z;.z out body geom;'+

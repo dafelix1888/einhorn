@@ -5,7 +5,7 @@
   'use strict';
   var NOMINATIM='https://nominatim.openstreetmap.org/search';
   var PHOTON='https://photon.komoot.io/api/';      // Suche beim Tippen (OpenStreetMap-Daten); Nominatim erlaubt keine Vorschläge beim Tippen
-  var OVERPASS=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+  var OVERPASS=['https://overpass-api.de/api/interpreter','https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
   var ELEVATION='https://api.open-meteo.com/v1/elevation';
   // Karten-Worker (config.json „kartenUrl“): merkt sich Antworten und probiert mehrere Server. Fällt er aus, direkt wie bisher.
   var KARTE=null, kartenBereit=fetch('config.json').then(function(r){ return r.json(); }).then(function(c){ if(c && c.kartenUrl) KARTE=c.kartenUrl.replace(/\/$/,''); })['catch'](function(){});
@@ -79,7 +79,7 @@
     var v=vorschlagListe[i]; if(!v) return;
     wahl.start={lat:v.lat, lng:v.lng}; wahl.adresse=v.voll; $('adresse').value=v.voll;
     $('start-info').textContent='Startpunkt gesetzt: '+v.voll;
-    vorschlaegeZu(); status('');
+    vorschlaegeZu(); status(''); vorladen();
   }
 
   function adresseSuchen(text){
@@ -87,15 +87,25 @@
         return fetch(NOMINATIM+'?format=jsonv2&limit=1&accept-language=de&q='+encodeURIComponent(text)).then(function(r){ if(!r.ok) throw new Error('Adresssuche: HTTP '+r.status); return r.json(); }); })
       .then(function(l){ if(!l.length) throw new Error('Diese Adresse kenne ich nicht. Mit Ort versuchen, z. B. „Musterweg 3, Hamburg“.'); return {lat:+l[0].lat, lng:+l[0].lon, name:l[0].display_name}; });
   }
+  // Gleiche Abfrage nur einmal stellen: Vorladen beim Wählen der Adresse und „Route planen“ teilen sich die Antwort (UNICORN-7)
+  var overpassLaeuft={};
   function overpass(abfrage){
+    if(overpassLaeuft[abfrage]) return overpassLaeuft[abfrage];
+    var p=overpassHolen(abfrage); overpassLaeuft[abfrage]=p;
+    p['catch'](function(){ delete overpassLaeuft[abfrage]; });
+    return p;
+  }
+  function overpassHolen(abfrage){
     var i=0;
     function versuchen(){
-      return mitZeitlimit(fetch(OVERPASS[i], {method:'POST', body:'data='+encodeURIComponent(abfrage), headers:{'Content-Type':'application/x-www-form-urlencoded'}}), 45000, 'Kartendienst antwortet nicht')
+      return mitZeitlimit(fetch(OVERPASS[i], {method:'POST', body:'data='+encodeURIComponent(abfrage), headers:{'Content-Type':'application/x-www-form-urlencoded'}}), 30000, 'Kartendienst antwortet nicht')
         .then(function(r){ if(!r.ok) throw new Error('Kartendienst: HTTP '+r.status); return r.json(); })
         ['catch'](function(e){ if(++i<OVERPASS.length) return versuchen(); throw e; });
     }
     return ueberKarte('/overpass', {method:'POST', body:'data='+encodeURIComponent(abfrage), headers:{'Content-Type':'application/x-www-form-urlencoded'}}, versuchen, 60000);
   }
+  function umkreis(distanz, rundkurs){ return Math.min(2500, distanz*(rundkurs?0.6:1.0)+150); }   // Stationen liegen höchstens ~Distanz vom Start
+  function vorladen(){ if(!wahl.start || !draussen()) return; overpass(PlanerKern.overpassAbfrage(wahl.start.lat, wahl.start.lng, umkreis(wahl.distanz, wahl.rundkurs)))['catch'](function(){}); }
   function hoehen(punkte){                       // Open-Meteo: bis zu 100 Punkte je Anfrage
     var teile=[]; for(var i=0;i<punkte.length;i+=100) teile.push(punkte.slice(i,i+100));
     return Promise.all(teile.map(function(t){
@@ -306,7 +316,7 @@
   }
   function netzNachladen(){                      // gespeicherte Tour: Wegenetz im Hintergrund holen, damit Verschieben live rechnet
     if(netz || !plan || !plan.start) return;
-    var radius=Math.min(2500, (plan.distanz||wahl.distanz)*(plan.rundkurs?0.6:1.15)+200);
+    var radius=umkreis(plan.distanz||wahl.distanz, plan.rundkurs);
     netzLaedt=true;
     overpass(PlanerKern.overpassAbfrage(plan.start.lat, plan.start.lng, radius)).then(function(osm){
       osmCache={osm:osm, start:plan.start, distanz:plan.distanz||wahl.distanz}; wahl.start=plan.start;
@@ -329,8 +339,9 @@
     startHolen.then(function(start){
       if(osmCache && osmCache.start===start && wahl.distanz<=osmCache.distanz) return rechnen();   // gleiche Gegend: Daten wiederverwenden
       status('Wege, Bänke, Zäune und Kreuzungen werden geladen …');
-      var radius=Math.min(2500, wahl.distanz*(wahl.rundkurs?0.6:1.15)+200);
-      return overpass(PlanerKern.overpassAbfrage(start.lat, start.lng, radius)).then(function(osm){ osmCache={osm:osm, start:start, distanz:wahl.distanz}; netz=null; return rechnen(); });
+      var geduld=setTimeout(function(){ status('Die Karte antwortet heute langsam. Noch einen Moment, das kann bis zu einer Minute dauern …'); }, 12000);
+      var radius=umkreis(wahl.distanz, wahl.rundkurs);
+      return overpass(PlanerKern.overpassAbfrage(start.lat, start.lng, radius)).then(function(osm){ clearTimeout(geduld); osmCache={osm:osm, start:start, distanz:wahl.distanz}; netz=null; return rechnen(); }, function(e){ clearTimeout(geduld); throw e; });
     })['catch'](function(e){ status(String(e.message||e), true); })
     .then(function(){ $('planen').disabled=false; });
   }
@@ -370,7 +381,7 @@
       if(!navigator.geolocation){ toast('Dieses Gerät kann den Standort nicht bestimmen.'); return; }
       status('Standort wird bestimmt …');
       navigator.geolocation.getCurrentPosition(function(p){
-        wahl.start={lat:p.coords.latitude, lng:p.coords.longitude}; wahl.adresse='Mein Standort'; $('adresse').value='Mein Standort';
+        wahl.start={lat:p.coords.latitude, lng:p.coords.longitude}; wahl.adresse='Mein Standort'; $('adresse').value='Mein Standort'; vorladen();
         $('start-info').textContent='Genauigkeit etwa '+Math.round(p.coords.accuracy)+' m'; status('');
       }, function(){ status('Standort nicht erlaubt. Bitte die Adresse eintippen.', true); }, {enableHighAccuracy:true, timeout:15000});
     });
