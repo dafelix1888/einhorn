@@ -8,6 +8,10 @@ on:
         description: 'Nur diese Orte (z. B. 1,5,11), leer = alle'
         required: false
         default: ''
+      varianten:
+        description: 'Abfrage-Varianten messen (ja/nein)'
+        required: false
+        default: 'nein'
 permissions:
   contents: read
 jobs:
@@ -28,7 +32,11 @@ jobs:
         run: |
           python3 -m http.server 8765 >/tmp/server.log 2>&1 &
           for i in $(seq 1 20); do curl -sf http://localhost:8765/app/ >/dev/null && break; sleep 0.5; done
+      - name: Abfrage-Varianten messen
+        if: ${{ inputs.varianten == 'ja' }}
+        run: node tests/praxis/varianten.cjs
       - name: Planer an echten Orten
+        if: ${{ inputs.varianten != 'ja' }}
         env:
           TZ: Europe/Berlin
           ORTE: ${{ inputs.orte }}
