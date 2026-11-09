@@ -7,6 +7,10 @@
 - Arbeiten über Branch und Pull Request; PRs direkt in `main` mergen.
 - Jira-Tickets in UNICORN nachziehen: Status „Delivery“, sobald gebaut, aber noch etwas von Felix fehlt (Schlüssel, Test, ID); „Done“, sobald live und geprüft. Kommentar mit PR-Link dazu.
 
+## Zusammenarbeit
+
+- **Strategist (Projekt STRAT):** Kommentare in unseren Tickets, die mit „Strategist:“ beginnen, sind Vorgaben der Geschäftsführung (Felix, vertreten durch STRAT), keine Vorschläge. Wir setzen sie um oder widersprechen begründet im genannten STRAT-Ticket; stillschweigend abweichen ist nicht vorgesehen. Preise, Kosten > 0 €/Monat und Richtungsentscheidungen werden nur in STRAT entschieden; vor einem Ticket mit laufenden Kosten holen wir dort eine Freigabe. Aktuelle Strategie: STRAT-1 bis STRAT-5 und `claude/STATUS.md`, Abschnitt „Rollen und Jira-Projekte“.
+
 ## Marketing (Marketer)
 
 - Marketing für diese App kommt aus dem Projekt Marketer (Repo `dafelix1888/Marketer`, Jira-Projekt MAR).
