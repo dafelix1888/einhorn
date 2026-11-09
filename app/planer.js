@@ -98,11 +98,11 @@
   function overpassHolen(abfrage){
     var i=0;
     function versuchen(){
-      return mitZeitlimit(fetch(OVERPASS[i], {method:'POST', body:'data='+encodeURIComponent(abfrage), headers:{'Content-Type':'application/x-www-form-urlencoded'}}), 30000, 'Kartendienst antwortet nicht')
+      return mitZeitlimit(fetch(OVERPASS[i], {method:'POST', body:'data='+encodeURIComponent(abfrage), headers:{'Content-Type':'application/x-www-form-urlencoded'}}), 45000, 'Kartendienst antwortet nicht')
         .then(function(r){ if(!r.ok) throw new Error('Kartendienst: HTTP '+r.status); return r.json(); })
-        ['catch'](function(e){ if(++i<OVERPASS.length) return versuchen(); throw e; });
+        ['catch'](function(e){ if(++i<OVERPASS.length) return versuchen(); throw new Error('Die Kartendienste sind gerade überlastet. Bitte in einer Minute noch einmal auf „Route planen“ tippen.'); });
     }
-    return ueberKarte('/overpass', {method:'POST', body:'data='+encodeURIComponent(abfrage), headers:{'Content-Type':'application/x-www-form-urlencoded'}}, versuchen, 60000);
+    return ueberKarte('/overpass', {method:'POST', body:'data='+encodeURIComponent(abfrage), headers:{'Content-Type':'application/x-www-form-urlencoded'}}, versuchen, 95000);
   }
   function umkreis(distanz, rundkurs){ return Math.min(2500, distanz*(rundkurs?0.6:1.0)+150); }   // Stationen liegen höchstens ~Distanz vom Start
   function vorladen(){ if(!wahl.start || !draussen()) return; overpass(PlanerKern.overpassAbfrage(wahl.start.lat, wahl.start.lng, umkreis(wahl.distanz, wahl.rundkurs)))['catch'](function(){}); }
@@ -339,7 +339,7 @@
     startHolen.then(function(start){
       if(osmCache && osmCache.start===start && wahl.distanz<=osmCache.distanz) return rechnen();   // gleiche Gegend: Daten wiederverwenden
       status('Wege, Bänke, Zäune und Kreuzungen werden geladen …');
-      var geduld=setTimeout(function(){ status('Die Karte antwortet heute langsam. Noch einen Moment, das kann bis zu einer Minute dauern …'); }, 12000);
+      var geduld=setTimeout(function(){ status('Die Kartendienste sind gerade gut besucht. Noch einen Moment, das kann bis zu einer Minute dauern …'); geduld=setTimeout(function(){ status('Fast geschafft, die Karte sucht noch Wege in eurer Gegend …'); }, 30000); }, 12000);
       var radius=umkreis(wahl.distanz, wahl.rundkurs);
       return overpass(PlanerKern.overpassAbfrage(start.lat, start.lng, radius)).then(function(osm){ clearTimeout(geduld); osmCache={osm:osm, start:start, distanz:wahl.distanz}; netz=null; return rechnen(); }, function(e){ clearTimeout(geduld); throw e; });
     })['catch'](function(e){ status(String(e.message||e), true); })
