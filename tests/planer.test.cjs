@@ -35,7 +35,7 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42
 
 (async()=>{
   const b=await chromium.launch(), errs=[];
-  async function lauf(workerGeht){
+  async function lauf(workerGeht, vorschlagNehmen){
     const c=await b.newContext({viewport:{width:393,height:852}}), log=[];
     await c.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort());
     await c.addInitScript(()=>{ window.KONTO_TEST={url:'', key:''}; window.marketer={track:(n)=>{ const l=JSON.parse(sessionStorage.getItem('ev')||'[]'); l.push(n); sessionStorage.setItem('ev', JSON.stringify(l)); }}; });
@@ -54,6 +54,8 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42
     await p.goto(B+'planer.html?thema=einhorn'); await p.evaluate(()=>localStorage.clear()); await p.reload(); await p.waitForTimeout(600);
     await p.fill('#adresse','Musterweg 1'); await p.waitForTimeout(700);
     const vorschlag=await p.locator('#vorschlaege li[data-i]').count();
+    if(vorschlagNehmen){ await p.click('#vorschlaege li[data-i="0"]'); await p.waitForTimeout(300); }
+    log.push('klick');
     await p.click('#planen');
     await p.waitForFunction(()=>{ try{ const pl=JSON.parse(localStorage.getItem('sj.plan.einhorn')||'null'); return !!(document.querySelector('#speichern') && document.querySelector('#speichern').offsetParent); }catch(e){ return false; } }, null, {timeout:30000}).catch(()=>{});
     const status=await p.locator('#status').innerText().catch(()=>'');
@@ -73,6 +75,12 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42
   ok(/party\.html/.test(a.url), '„Route übernehmen“ führt in den Party-Assistenten');
   ok(a.ev.includes('route_planned'), 'route_planned an Marketer');
   ok(a.log.includes('karte/overpass') && !a.log.includes('overpass') && !a.log.includes('nominatim'), 'Karten-Worker wird zuerst gefragt ('+[...new Set(a.log)].join(', ')+')');
+
+  // Vorschlag gewählt: Kartendaten laden schon vor „Route planen“ und werden nur einmal geholt (UNICORN-7)
+  const v=await lauf(true, true);
+  ok(v.sichtbar && v.stationen===7, 'mit gewähltem Vorschlag: Route mit 7 Stationen');
+  ok(v.log.indexOf('karte/overpass')>-1 && v.log.indexOf('karte/overpass')<v.log.indexOf('klick'), 'Kartendaten werden beim Wählen der Adresse vorgeladen');
+  ok(v.log.filter(x=>x==='karte/overpass').length===1, 'Kartendaten nur einmal geholt ('+v.log.filter(x=>x==='karte/overpass').length+')');
 
   const f=await lauf(false);
   ok(f.sichtbar && f.stationen===7, 'Worker aus: Planer weicht auf die Dienste direkt aus');

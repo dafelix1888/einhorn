@@ -47,8 +47,10 @@ function hoehenmeter(p){ if(!p||p.length<2) return null; let auf=0; for(let i=1;
     const r={nr:n+1, lage, adresse};
     try{
       await p.goto(B+'planer.html?thema=einhorn'); await p.evaluate(()=>localStorage.clear()); await p.reload(); await p.waitForSelector('#adresse');
-      await p.fill('#adresse', adresse); await p.waitForTimeout(1200);
+      await p.fill('#adresse', adresse); await p.waitForSelector('#vorschlaege li[data-i]', {timeout:8000}).catch(()=>{});
+      r.vorschlag=await p.locator('#vorschlaege li[data-i]').count();
       const t0=Date.now();
+      if(r.vorschlag){ await p.click('#vorschlaege li[data-i="0"]'); await p.waitForTimeout(3000); }   // wie ein Mensch: Adresse wählen, kurz schauen, dann planen
       await p.click('#planen');
       await p.waitForFunction(()=>{ const s=document.querySelector('#speichern'); const st=(document.querySelector('#status')||{}).className||''; return (s && s.offsetParent) || /fehler/.test(st); }, null, {timeout:150000});
       r.sekunden=Math.round((Date.now()-t0)/100)/10;
