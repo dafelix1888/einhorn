@@ -170,6 +170,27 @@ create table if not exists public.namen (
 alter table public.namen enable row level security;
 revoke all on public.namen from anon, authenticated;
 
+-- Verbrauch der Stimme je Monat (UNICORN-8, Schwelle STRAT-2: 20 Erzeugungen/Monat). Ohne Namen, ohne Party-Bezug.
+-- Ablesen: select * from stimm_verbrauch order by monat desc;
+create table if not exists public.stimm_verbrauch (
+  monat        date primary key,
+  erzeugungen  int not null default 0,
+  zeichen      int not null default 0,
+  aktualisiert timestamptz not null default now()
+);
+alter table public.stimm_verbrauch enable row level security;
+revoke all on public.stimm_verbrauch from anon, authenticated;
+create or replace function public.stimm_verbrauch_zaehlen(z int)
+returns void language sql security definer set search_path = public as $$
+  insert into public.stimm_verbrauch(monat, erzeugungen, zeichen)
+  values (date_trunc('month', now() at time zone 'Europe/Berlin')::date, 1, greatest(z, 0))
+  on conflict (monat) do update set erzeugungen = stimm_verbrauch.erzeugungen + 1,
+                                    zeichen = stimm_verbrauch.zeichen + excluded.zeichen,
+                                    aktualisiert = now();
+$$;
+revoke all on function public.stimm_verbrauch_zaehlen(int) from public, anon, authenticated;
+grant execute on function public.stimm_verbrauch_zaehlen(int) to service_role;
+
 -- Fehlermeldungen aus der App (anonym, technisch). Schreiben über fehler_melden, lesen nur der Server/Dashboard.
 -- Gleiche Meldung wird gezählt statt neu angelegt (kennung = md5 aus Seite, Meldung, Datei, Zeile). Löschen nach 90 Tagen.
 create table if not exists public.fehler (
