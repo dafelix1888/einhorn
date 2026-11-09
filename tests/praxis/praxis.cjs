@@ -22,6 +22,7 @@ const ORTE=[
   ['Hanglage, steil',         'Ölberg, Wuppertal'],
   ['Alpendorf',               'Oberstdorf'],
 ];
+let ersteAbfrage=null;
 const nur=process.env.ORTE ? process.env.ORTE.split(',').map(Number) : null;
 
 function hoehenmeter(p){ if(!p||p.length<2) return null; let auf=0; for(let i=1;i<p.length;i++){ const d=p[i].h-p[i-1].h; if(d>0) auf+=d; } return Math.round(auf); }
@@ -36,6 +37,11 @@ function hoehenmeter(p){ if(!p||p.length<2) return null; let auf=0; for(let i=1;
     await c.route(/efdjomgubucdnvgtuqmp\.supabase\.co|fsqnzmwuojngopffcxso\.supabase\.co/, r=>r.abort());   // keine Messung, kein Konto
     const anfragen=[], fehler=[];
     c.on('request', r=>{ const u=r.url(); if(/workers\.dev|overpass|nominatim|photon|open-meteo/.test(u)) anfragen.push({u:u.replace(/\?.*/,''), t:Date.now()}); });
+    const zeiten=[];
+    c.on('requestfinished', async q=>{ const u=q.url(); if(!/workers\.dev|overpass|nominatim|photon|open-meteo/.test(u)) return;
+      const t=q.timing(); const res=await q.response().catch(()=>null);
+      zeiten.push({pfad:u.replace(/^https:\/\/([^/]+)\/?([^?]*).*$/,'$1/$2'), status:res?res.status():0, quelle:res?(res.headers()['x-karte']||''):'', ms:Math.round(t.responseEnd)});
+      if(/overpass/.test(u) && q.postData()) ersteAbfrage=ersteAbfrage||q.postData(); });
     c.on('requestfailed', r=>{ if(!/tile\.openstreetmap/.test(r.url())) fehler.push('Anfrage fehlgeschlagen: '+r.url().replace(/\?.*/,'')+' '+(r.failure()||{}).errorText); });
     const p=await c.newPage(); p.on('pageerror',e=>fehler.push('Seitenfehler: '+e.message));
     const r={nr:n+1, lage, adresse};
@@ -70,10 +76,24 @@ function hoehenmeter(p){ if(!p||p.length<2) return null; let auf=0; for(let i=1;
       }
     }catch(e){ r.fehler=(r.fehler||'')+e.message.split('\n')[0]; await p.screenshot({path:path.join(AUS, String(n+1).padStart(2,'0')+'-fehler.png')}).catch(()=>{}); }
     r.anfragen=anfragen.length; r.ueberWorker=anfragen.filter(a=>/workers\.dev/.test(a.u)).length; r.direkt=anfragen.filter(a=>!/workers\.dev/.test(a.u)).length;
-    r.meldungen=fehler.slice(0,5);
+    r.meldungen=fehler.filter(m=>!/m\.js/.test(m)).slice(0,5); r.zeiten=zeiten;
     erg.push(r); console.log(JSON.stringify(r));
     await c.close();
     await new Promise(z=>setTimeout(z, 2000));   // freundlich zu Nominatim und Overpass
+  }
+  // Overpass-Server direkt messen (gleiche Abfrage wie der Planer), um langsame Server zu erkennen
+  if(ersteAbfrage){
+    for(const srv of ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass.private.coffee/api/interpreter']){
+      const t0=Date.now(); let st='';
+      try{ const ac=new AbortController(); const to=setTimeout(()=>ac.abort(),60000);
+        const rr=await fetch(srv,{method:'POST',body:ersteAbfrage,headers:{'Content-Type':'application/x-www-form-urlencoded','User-Agent':'Schatzweg-Praxistest/1.0 (+https://schatzweg.de)'},signal:ac.signal});
+        clearTimeout(to); st=rr.status+' '+((await rr.text()).length)+' Bytes'; }catch(e){ st='Fehler '+e.name; }
+      console.log('OVERPASS-DIREKT', srv, st, (Date.now()-t0)+' ms');
+    }
+    for(let k=0;k<2;k++){ const t0=Date.now(); let st='';
+      try{ const rr=await fetch('https://schnitzeljagd-karte.schatzsuche-app.workers.dev/overpass',{method:'POST',body:ersteAbfrage,headers:{'Content-Type':'application/x-www-form-urlencoded','Origin':'http://localhost:8765'}});
+        st=rr.status+' '+(rr.headers.get('x-karte')||'')+' '+((await rr.text()).length)+' Bytes'; }catch(e){ st='Fehler '+e.message; }
+      console.log('OVERPASS-WORKER', k+1, st, (Date.now()-t0)+' ms'); }
   }
   await b.close();
   fs.writeFileSync(path.join(AUS,'ergebnis.json'), JSON.stringify(erg,null,1));
