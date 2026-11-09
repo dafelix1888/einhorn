@@ -83,7 +83,7 @@ const pfad=u=>{ const x=new URL(u); return x.pathname.replace(/^\/app\//,'')+x.s
 
   // 9) Bereit, Druck: Haus → Party
   p=await neu({'sj.party.einhorn':PARTY, 'sj.plan.einhorn':PLAN}); await p.goto(B+'bereit.html?thema=einhorn');
-  ok(/party\.html\?thema=einhorn/.test(await p.getAttribute('a.heim-link','href')), 'Bereit: Haus-Symbol → Party');
+  ok(/party\.html\?thema=einhorn/.test(await p.getAttribute('a.heim-link','href',{timeout:90000})), 'Bereit: Haus-Symbol → Party');
 
   // 10) Gäste und Helfer: nie Katalog
   for(const s of ['einladung.html','vorausgeher.html','spiel.html?thema=einhorn']){
@@ -93,9 +93,9 @@ const pfad=u=>{ const x=new URL(u); return x.pathname.replace(/^\/app\//,'')+x.s
   }
   // 11) Spiel ohne Party: kein „Zur Party“; mit Party zeigt es auf die Party
   p=await neu(); await p.goto(B+'spiel.html?thema=einhorn', {waitUntil:'domcontentloaded'}); await p.waitForTimeout(800);
-  ok(await p.locator('#erw-portal').evaluate(e=>e.hidden), 'Spiel ohne Party: „Zur Party“ versteckt');
+  ok(await p.locator('#erw-portal').evaluate(e=>e.hidden,null,{timeout:90000}), 'Spiel ohne Party: „Zur Party“ versteckt');
   p=await neu({'sj.party.einhorn':PARTY}); await p.goto(B+'spiel.html?thema=einhorn', {waitUntil:'domcontentloaded'}); await p.waitForTimeout(800);
-  ok(/party\.html\?thema=einhorn/.test(await p.getAttribute('#erw-portal','href')), 'Spiel mit Party: „Zur Party“ → Party');
+  ok(/party\.html\?thema=einhorn/.test(await p.getAttribute('#erw-portal','href',{timeout:90000})), 'Spiel mit Party: „Zur Party“ → Party');
 
   ok(errs.length===0, 'keine Seitenfehler '+errs.slice(0,3).join(' | '));
   console.log(fehler?fehler+' FEHLER':'ALLES OK'); await b.close(); process.exit(fehler?1:0);

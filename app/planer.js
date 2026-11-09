@@ -102,7 +102,23 @@
         .then(function(r){ if(!r.ok) throw new Error('Kartendienst: HTTP '+r.status); return r.json(); })
         ['catch'](function(e){ if(++i<OVERPASS.length) return versuchen(); throw new Error('Die Kartendienste sind gerade überlastet. Bitte in einer Minute noch einmal auf „Route planen“ tippen.'); });
     }
-    return ueberKarte('/overpass', {method:'POST', body:'data='+encodeURIComponent(abfrage), headers:{'Content-Type':'application/x-www-form-urlencoded'}}, versuchen, 95000);
+    // Worker zuerst (Cache, mehrere Server). Antwortet er nach GEDULD ms nicht oder scheitert, fragt der Browser zusätzlich direkt:
+    // overpass-api.de begrenzt je IP-Adresse, vom Handy der Eltern klappt es oft besser als von den geteilten Cloudflare-Adressen.
+    // Die erste gültige Antwort gewinnt; der Worker rechnet im Hintergrund weiter und füllt seinen Cache (UNICORN-7, Praxistest 3).
+    var GEDULD=window.KARTE_GEDULD||20000;
+    var UEBERLAST='Die Kartendienste sind gerade überlastet. Bitte in einer Minute noch einmal auf „Route planen“ tippen.';
+    return new Promise(function(ja, nein){
+      var fertig=false, offen=0, direktLaeuft=false;
+      function gut(x){ if(!fertig){ fertig=true; ja(x); } }
+      function weg(){ offen--; if(!direktLaeuft) direkt(); else if(offen<=0 && !fertig){ fertig=true; nein(new Error(UEBERLAST)); } }
+      function direkt(){ if(direktLaeuft || fertig) return; direktLaeuft=true; offen++; versuchen().then(gut, weg); }
+      kartenBereit.then(function(){
+        if(!KARTE){ direkt(); return; }
+        offen++;
+        mitZeitlimit(fetch(KARTE+'/overpass', {method:'POST', body:'data='+encodeURIComponent(abfrage), headers:{'Content-Type':'application/x-www-form-urlencoded'}}), 95000, 'Karte').then(alsJson).then(gut, weg);
+        setTimeout(direkt, GEDULD);
+      });
+    });
   }
   function umkreis(distanz, rundkurs){ return Math.min(2500, distanz*(rundkurs?0.6:1.0)+150); }   // Stationen liegen höchstens ~Distanz vom Start
   function vorladen(){ if(!wahl.start || !draussen()) return; overpass(PlanerKern.overpassAbfrage(wahl.start.lat, wahl.start.lng, umkreis(wahl.distanz, wahl.rundkurs)))['catch'](function(){}); }
