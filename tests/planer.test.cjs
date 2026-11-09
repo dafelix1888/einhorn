@@ -35,19 +35,21 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42
 
 (async()=>{
   const b=await chromium.launch(), errs=[];
-  async function lauf(workerGeht, vorschlagNehmen){
+  async function lauf(workerGeht, vorschlagNehmen, workerHaengt, allesAus){
     const c=await b.newContext({viewport:{width:393,height:852}}), log=[];
     await c.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort());
+    if(workerHaengt) await c.addInitScript(()=>{ window.KARTE_GEDULD=1500; });
     await c.addInitScript(()=>{ window.KONTO_TEST={url:'', key:''}; window.marketer={track:(n)=>{ const l=JSON.parse(sessionStorage.getItem('ev')||'[]'); l.push(n); sessionStorage.setItem('ev', JSON.stringify(l)); }}; });
     const json=(r,o)=>r.fulfill({status:200, contentType:'application/json', body:typeof o==='string'?o:JSON.stringify(o), headers:{'Access-Control-Allow-Origin':'*'}});
     const hoehe=r=>{ const n=new URL(r.request().url()).searchParams.get('latitude').split(',').length; return json(r,{elevation:Array.from({length:n},(_,i)=>10+(i%7))}); };
     await c.route(KARTE+'/**', r=>{ const u=new URL(r.request().url()); log.push('karte'+u.pathname);
       if(!workerGeht) return r.fulfill({status:502, body:'{}', headers:{'Access-Control-Allow-Origin':'*'}});
+      if(workerHaengt && u.pathname==='/overpass') return;   // keine Antwort
       if(u.pathname==='/suche') return json(r,PHOTON); if(u.pathname==='/adresse') return json(r,ADRESSE);
       if(u.pathname==='/overpass') return json(r,OSM); if(u.pathname==='/hoehe') return hoehe(r); return r.fulfill({status:404}); });
     await c.route('https://photon.komoot.io/**', r=>{ log.push('photon'); json(r,PHOTON); });
     await c.route('https://nominatim.openstreetmap.org/**', r=>{ log.push('nominatim'); json(r,ADRESSE); });
-    await c.route(/overpass-api\.de|kumi\.systems/, r=>{ log.push('overpass'); json(r,OSM); });
+    await c.route(/overpass-api\.de|kumi\.systems|mail\.ru/, r=>{ log.push('overpass'); if(allesAus) return r.fulfill({status:504, body:'busy', headers:{'Access-Control-Allow-Origin':'*'}}); json(r,OSM); });
     await c.route('https://api.open-meteo.com/**', r=>{ log.push('open-meteo'); hoehe(r); });
     await c.route('https://tile.openstreetmap.org/**', r=>r.fulfill({status:200, contentType:'image/png', body:PNG}));
     const p=await c.newPage(); p.on('pageerror',e=>errs.push(e.message));
@@ -81,6 +83,14 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42
   ok(v.sichtbar && v.stationen===7, 'mit gewähltem Vorschlag: Route mit 7 Stationen');
   ok(v.log.indexOf('karte/overpass')>-1 && v.log.indexOf('karte/overpass')<v.log.indexOf('klick'), 'Kartendaten werden beim Wählen der Adresse vorgeladen');
   ok(v.log.filter(x=>x==='karte/overpass').length===1, 'Kartendaten nur einmal geholt ('+v.log.filter(x=>x==='karte/overpass').length+')');
+
+  // Worker antwortet nicht: nach der Geduld fragt der Planer zusätzlich direkt, die erste Antwort gewinnt
+  const h=await lauf(true, false, true);
+  ok(h.sichtbar && h.stationen===7 && h.log.includes('overpass'), 'Worker hängt: Planer fragt nach kurzer Zeit direkt und plant trotzdem');
+
+  // Alles überlastet: verständliche Meldung statt ewigem Warten
+  const x=await lauf(false, false, false, true);
+  ok(!x.sichtbar && /überlastet/.test(x.status), 'alle Kartendienste überlastet: klare Meldung ('+x.status.slice(0,60)+')');
 
   const f=await lauf(false);
   ok(f.sichtbar && f.stationen===7, 'Worker aus: Planer weicht auf die Dienste direkt aus');
