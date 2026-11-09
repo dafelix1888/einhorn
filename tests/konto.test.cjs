@@ -2,6 +2,7 @@
 const { chromium } = require('playwright');
 const S='https://test.supabase.co', B=''+(process.env.BASIS||'http://localhost:8765')+'/app/';
 const db={parties:{}, links:{}, aufbau:{}, namen:{}}, mails=[];
+let stimmeAus=true;   // erst ohne Schlüssel (UNICORN-8)
 function nutzer(req){ const a=req.headers()['authorization']||''; return a.startsWith('Bearer AT-') ? 'U-'+a.slice(10) : null; }
 async function mock(route){
   const req=route.request(), u=new URL(req.url()), m=req.method(), body=req.postData()?JSON.parse(req.postData()):null, me=nutzer(req);
@@ -19,7 +20,9 @@ async function mock(route){
     const n=db.namen[body.party_id]||{erzeugungen:0};
     if(body.aktion==='stand') return j(200,{max:3,uebrig:3-n.erzeugungen,hash:n.hash||null,texte:n.saetze?{gruss:n.saetze.gruss.text,schatz:n.saetze.schatz.text,abschied:n.saetze.abschied.text}:null,name:n.saetze?n.saetze.gruss.name:'',aussprache:''});
     if(!/^[\p{L}][\p{L} '-]{0,29}$/u.test(body.name)) return j(400,{fehler:'Bitte nur einen Vornamen mit Buchstaben eingeben.'});
+    if(n.saetze && n.saetze.gruss.name===body.name) return j(200,{max:3,uebrig:3-n.erzeugungen,hash:n.hash,saetze:n.saetze,gleich:true});   // gleicher Text kostet nichts
     if(n.erzeugungen>=3) return j(402,{fehler:'Alle 3 Erzeugungen sind verbraucht.',uebrig:0});
+    if(stimmeAus) return j(503,{fehler:'Die Stimme ist noch nicht eingerichtet.'});   // wie live ohne ELEVENLABS_API_KEY
     const mp3=require('fs').readFileSync(require('path').join(__dirname,'..','app/themen/einhorn/hoerprobe.mp3')).toString('base64');
     const mk=t=>({text:t,name:body.name,aussprache:body.aussprache,b64:mp3});
     db.namen[body.party_id]={erzeugungen:n.erzeugungen+1,hash:'h'+(n.erzeugungen+1),saetze:{gruss:mk('Und heute ist ein ganz besonderer Tag: '+body.name+' hat Geburtstag!'),schatz:mk('Alles Liebe, '+body.name+'!'),abschied:mk('Tschüss, '+body.name+'!')}};
@@ -77,8 +80,14 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   // Funkel kennt das Kind
   await a.waitForSelector('#namen-name', {timeout:5000});
   pruefe(await a.inputValue('#namen-name')==='Emma', 'Namens-Karte mit Vorname');
+  await a.click('#namen-los'); await a.waitForSelector('.namen-fehler', {timeout:5000});
+  pruefe(/noch nicht eingerichtet/.test(await a.locator('#namen-karte').innerText()) && /Noch 3 von 3/.test(await a.locator('#namen-karte').innerText()), 'Ohne Schlüssel: verständliche Meldung, nichts verbraucht');
+  stimmeAus=false;
   await a.click('#namen-los'); await a.waitForSelector('[data-namen-hoeren="gruss"]', {timeout:5000});
   pruefe(/Emma hat Geburtstag/.test(await a.locator('#namen-karte').innerText()) && /Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()), 'Sätze erzeugt, noch 2 übrig');
+  await a.click('#namen-los'); await a.waitForFunction(()=>!document.querySelector('#namen-los') || !document.querySelector('#namen-los').disabled);
+  await a.waitForTimeout(300);
+  pruefe(/Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()) && db.namen[Object.keys(db.namen)[0]].erzeugungen===1, 'Gleicher Name noch einmal: zählt nicht');
   await a.locator('#namen-karte').screenshot({path:'namen-karte.png'});
   // Änderung wird nachgespeichert
   await a.fill('#gh','Regenhose und Mütze'); await a.locator('#gh').blur(); await a.waitForTimeout(2000);

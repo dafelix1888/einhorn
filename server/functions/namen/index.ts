@@ -7,6 +7,7 @@
 // Schutz der Credits: nur feste Vorlagen (Name und Alter werden eingesetzt), Name geprüft,
 // höchstens MAX Erzeugungen je Party, gleicher Text kostet nichts.
 // Secret: ELEVENLABS_API_KEY (Dashboard → Edge Functions → Secrets).
+// Verbrauch je Monat: Tabelle stimm_verbrauch (Anzahl Erzeugungen, Zeichen), ohne Namen (UNICORN-8, STRAT-2).
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const MAX = 3;
@@ -121,5 +122,8 @@ Deno.serve(async (req) => {
   }
   const { error } = await admin.from('namen').upsert({ party_id: p.id, erzeugungen: genutzt + 1, hash, saetze: neu, aktualisiert: new Date().toISOString() });
   if (error) return antwort(500, { fehler: 'Speichern ging nicht.' });
+  // Verbrauch je Monat zählen (Schwelle STRAT-2): nur Anzahl und gesprochene Zeichen, kein Name, keine Party
+  const zeichen = Object.values(sprech).reduce((s, t) => s + t.length, 0);
+  try { await admin.rpc('stimm_verbrauch_zaehlen', { z: zeichen }); } catch (_) { /* Zählen darf das Ergebnis nicht verhindern */ }
   return antwort(200, { max: MAX, uebrig: Math.max(0, MAX - genutzt - 1), hash, saetze: neu });
 });
