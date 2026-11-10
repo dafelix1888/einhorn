@@ -43,21 +43,22 @@
     var km=pl && pl.strecke ? (pl.strecke>=1000 ? (pl.strecke/1000).toFixed(1).replace('.',',')+' km' : Math.round(pl.strecke)+' m') : '';
     var wetter=!draussen ? '' : p.planB ? ' Regen gemeldet? Dann schaltest du mit einem Tipp auf drinnen um.' : ' Ohne Plan B: bei Regen Termin oder Ort überlegen.';
     var l=[
-      {id:'einladen', tag:-14, titel:'Einladung als Link schicken', kurz:'Per WhatsApp, Eltern sagen mit einem Tipp zu',
-        text:'Ein Link für alle Gast-Eltern: Termin, Treffpunkt, Abholzeit und Zusage.', knopf:'Link teilen', aktion:'gast-link',
-        link:einladungsLink(p, pl)||('party.html?thema='+t+'#einladung'), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
-      {id:'bestellen', tag:-14, titel:'Alles auf einmal bestellen', kurz:'Eine Liste, Mengen passend zu '+p.kinder+' Kindern',
-        text:'Haarreifen, Holz-Regenbogen, Glückssteine und Zaubertafeln. Alle Mengen stehen in der Einkaufsliste.', knopf:'Zur Einkaufsliste', link:'#einkauf',
+      // Reihenfolge (UNICORN-27): zuerst, was Lieferzeit braucht; die Einladung geht, wann man mag. Nichts ist gesperrt.
+      {id:'bestellen', tag:-14, titel:'Alles bestellen', kurz:'Eine Liste, passend für '+p.kinder+' Kinder',
+        text:'Haarreifen, Holz-Regenbogen, Glückssteine und Zaubertafeln: Die Mengen passen schon zu '+p.kinder+' Kindern.', knopf:'Zur Einkaufsliste', link:'#einkauf',
         teile:[{id:'bestellen', titel:'Alles bestellt', erkannt:allesGekauft}]},
+      {id:'einladen', tag:-14, titel:'Gäste einladen', kurz:'Ein Link für alle Eltern, Zusage mit einem Tipp',
+        text:'Ein Link für alle Gast-Eltern. Sie sehen Termin, Treffpunkt und Abholzeit und sagen mit einem Tipp zu.', knopf:'Link teilen', aktion:'gast-link',
+        link:einladungsLink(p, pl)||('party.html?thema='+t+'#einladung'), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
       draussen ?
-        {id:'route', tag:-7, titel:'Route planen und einmal ablaufen', kurz:route?'Route steht'+(km?', '+km:'')+'. Jetzt einmal ablaufen':'Der Planer findet die Orte für die Stationen',
-          text:route?'Die Route steht'+(km?' ('+km+')':'')+'. Geh sie einmal ab und verschieb Stationen, wo es nicht passt.':'Adresse eingeben, Route prüfen, beim Spaziergang Stationen verschieben, wo es nicht passt.',
+        {id:'route', tag:-7, titel:route?'Route ablaufen':'Route planen', kurz:route?'Steht schon'+(km?', '+km:'')+'. Einmal zur Probe gehen':'Der Planer findet die Orte für die Stationen',
+          text:route?'Eure Route steht'+(km?' ('+km+')':'')+'. Geh sie einmal ab. Passt ein Ort nicht, verschiebst du die Station im Planer mit dem Finger.':'Adresse eingeben, Richtung wählen: Der Planer sucht passende Orte für die Stationen. Danach einmal ablaufen.',
           knopf:route?'Route ansehen':'Route planen', link:'planer.html?thema='+t,
           teile:[{id:'route', titel:'Route geplant', nurAuto:true, erkannt:route}, {id:'probelauf', titel:'Einmal abgelaufen'}]} :
         {id:'route', tag:-7, titel:'Räume festlegen', kurz:'Küche, Flur, Treppe, Toberaum und Sofa',
           text:'Leg fest, welche Station in welchem Raum steht. Die Liste im Spiel hilft dabei.', knopf:'Liste öffnen', link:'spiel.html?thema='+t+'#einrichten',
           teile:[{id:'probelauf', titel:'Räume festgelegt'}]},
-      {id:'basteln', tag:-7, titel:'Bastel- und Druckabend', kurz:'Schatzkiste, Fuchsbau, Urkunden'+(v==='a'?', Wolke':''),
+      {id:'basteln', tag:-7, titel:'Basteln und drucken', kurz:'Schatzkiste, Fuchsbau, Urkunden'+(v==='a'?', Wolke':''),
         text:'Etwa eine Stunde: Schatzkiste bekleben, Fuchsbau grau anmalen, Sticker in '+p.kinder+' Stücke schneiden. '+(v==='a'?'Dazu Urkunden und die schlafende Wolke (A3) drucken.':'Dazu die Urkunden drucken.'),
         knopf:'Druckvorlagen öffnen', link:'druck.html?thema='+t, neben:{text:'Bastelliste im Spiel', link:'spiel.html?thema='+t+'#einrichten'},
         teile:[{id:'basteln', titel:'Gebastelt'}, {id:'drucken', titel:'Gedruckt'}]},

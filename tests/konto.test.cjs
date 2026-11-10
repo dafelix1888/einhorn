@@ -61,6 +61,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   await a.goto(B+'party.html?thema=einhorn'); await a.waitForTimeout(800);
   pruefe(await a.locator('#konto-karte').innerText().then(t=>/Noch nicht gespeichert/.test(t)), 'Karte: noch nicht gespeichert');
   pruefe(await a.evaluate(()=>Party.einladungsLink(Party.lesen('einhorn'), Party.plan('einhorn'))===null), 'ohne Speichern kein Einladungslink');
+  await a.click('[data-oeffne="einladen"]');   // Einladungslink steckt im Schritt „Gäste einladen“
   await a.locator('#gast-link').click();
   pruefe(await a.locator('dialog.konto-dlg').isVisible(), 'Teilen öffnet Anmeldung');
   await a.fill('#kd-mail','eltern@test.de'); await a.click('#kd-los'); await a.waitForSelector('#kd-code');
@@ -69,6 +70,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(/stimmt nicht/.test(await a.locator('#kd-f').innerText()), 'falscher Code wird abgelehnt');
   await a.fill('#kd-code','123456'); await a.waitForTimeout(2600);
   pruefe(!(await a.locator('dialog.konto-dlg').isVisible()), 'Fenster zu nach Anmeldung');
+  await a.click('#zum-ueberblick');
   pruefe(/Geschützt gespeichert/.test(await a.locator('#konto-karte').innerText()), 'Karte: geschützt gespeichert');
   await a.screenshot({path:'konto-karte.png'});
   pruefe(Object.keys(db.parties).length===1 && Object.keys(db.links).length===3, 'Server: 1 Party, 3 Links');
@@ -128,6 +130,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(gastLiest===null, 'Gast-Link liest keinen Aufbau');
 
   // Link sperren
+  await a.click('#zum-ueberblick');
   await a.locator('#konto-karte summary').click();
   a.once('dialog', x=>x.accept()); await a.locator('[data-konto-neu="gast"]').click(); await a.waitForTimeout(1200);
   const neuE=await a.evaluate(()=>Party.einladungsLink(Party.lesen('einhorn'), Party.plan('einhorn')));
@@ -135,6 +138,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   const g2=await geraet(); await g2.goto(links.e); await g2.waitForTimeout(800);
   pruefe(/ersetzt/.test(await g2.locator('#seite').innerText()), 'alter Gast-Link geht nicht mehr');
   // nach dem Sperren weiter ändern: alter Schlüssel darf nicht zurückkommen
+  await a.click('[data-oeffne="einladen"]');
   await a.fill('#gh','Gummistiefel'); await a.locator('#gh').blur(); await a.waitForTimeout(2000);
   pruefe(!db.links[links.e.split('k=')[1]] && Object.values(db.links).find(l=>l.rolle==='gast').daten.h==='Gummistiefel', 'alter Schlüssel bleibt gesperrt');
 
@@ -148,6 +152,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(await f.evaluate(()=>Konto.holen())===0, 'fremdes Konto sieht keine Party');
 
   // Löschen räumt den Server auf
+  await a.click('#zum-ueberblick');
   await a.evaluate(()=>{ window.confirm=()=>true; }); await a.locator('#loeschen').click(); await a.waitForTimeout(800);
   pruefe(Object.keys(db.parties).length===0 && Object.keys(db.links).length===0, 'Party löschen löscht auch auf dem Server');
 
