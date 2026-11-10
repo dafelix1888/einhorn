@@ -35,6 +35,7 @@
 - Zu Beginn einer Sitzung und auf Nachfrage neue Einträge ansehen (`select id, erstellt, sterne, text, wo, stand from meinungen where ticket is null order by erstellt`) und Felix kurz berichten: Anzahl, Schnitt, Auffälliges.
 - Wünsche und Kritik als Ticket in UNICORN bündeln (Label `feedback`). Story- und Charakter-Wünsche zusätzlich als Kommentar in UNICORN-16 (zweites Abenteuer). Danach den Ticket-Schlüssel oder `gelesen` in `meinungen.ticket` eintragen.
 - Beschreibt jemand darin einen Fehler: wie einen Incident behandeln (PBIM).
+- Bei jedem neuen Eintrag geht eine Mail an Felix (UNICORN-31): Trigger `meinung_melden` → `pg_net` → Brevo-API. Schlüssel (`brevo_api_key`) und Empfänger (`feedback_mail_an`) stehen im Supabase Vault, nie im Repo. Höchstens 20 Mails in 24 Stunden; `meinungen.gemeldet` zeigt, ob eine Mail rausging. Kommt keine Mail an: `select status_code, content, error_msg, created from net._http_response order by created desc limit 5` (201 = von Brevo angenommen, 401 = Schlüssel falsch oder IP bei Brevo gesperrt).
 
 ## Architektur und Wissen (Jira-Projekte ADR und KM)
 
