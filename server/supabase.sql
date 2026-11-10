@@ -333,3 +333,62 @@ begin
     perform cron.schedule('alte-meinungen', '37 3 * * *', $c$delete from public.meinungen where erstellt < now() - interval '365 days'$c$);
   end if;
 end $$;
+
+-- Mail bei neuem Feedback (UNICORN-31): Jeder neue Eintrag in meinungen schickt über pg_net eine Mail über die Brevo-API.
+-- Schlüssel und Empfänger stehen im Supabase Vault, nicht hier:
+--   brevo_api_key     Brevo-API-Schlüssel (trägt Felix im Dashboard ein: Integrations → Vault → Secrets)
+--   feedback_mail_an  Empfänger-Adresse
+-- Fehlt eines davon oder geht etwas schief, passiert nichts; das Feedback wird immer gespeichert.
+-- Bremse: höchstens 20 Mails in 24 Stunden, damit Spam das Brevo-Tageslimit (300, auch für Login-Codes) nicht aufbraucht.
+-- gemeldet = Zeitpunkt, zu dem die Mail an Brevo übergeben wurde. Antwort von Brevo: net._http_response (201 = angenommen).
+alter table public.meinungen add column if not exists gemeldet timestamptz;
+
+create or replace function public.meinung_melden() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare
+  schluessel text;
+  an text;
+  bisher int;
+  wo_text text;
+  stand_text text;
+  inhalt text;
+begin
+  begin
+    select decrypted_secret into schluessel from vault.decrypted_secrets where name = 'brevo_api_key';
+    select decrypted_secret into an from vault.decrypted_secrets where name = 'feedback_mail_an';
+    if coalesce(btrim(schluessel), '') = '' or coalesce(btrim(an), '') = '' then return new; end if;
+    select count(*) into bisher from public.meinungen where gemeldet > now() - interval '1 day';
+    if bisher >= 20 then return new; end if;
+    wo_text := case new.wo when 'start' then 'Startseite' when 'bereich' then 'Mein Bereich'
+      when 'party' then 'Party-Seite' when 'nach-party' then 'Party-Seite, nach der Party'
+      else coalesce(nullif(new.wo, ''), 'unbekannt') end;
+    stand_text := case new.stand when 'ohne-party' then 'noch keine Party' when 'in-planung' then 'Party in Planung'
+      when 'gefeiert' then 'Party gefeiert' else coalesce(nullif(new.stand, ''), 'unbekannt') end;
+    inhalt := repeat('★', new.sterne) || repeat('☆', 5 - new.sterne) || '  ' || new.sterne || ' von 5 Sternen' || E'\n\n'
+      || case when new.text = '' then '(ohne Text)' else new.text end || E'\n\n'
+      || 'Wo: ' || wo_text || E'\n'
+      || 'Stand: ' || stand_text || E'\n'
+      || 'Wann: ' || to_char(now() at time zone 'Europe/Berlin', 'DD.MM.YYYY, HH24:MI') || E' Uhr\n\n'
+      || 'Alle Rückmeldungen: https://supabase.com/dashboard/project/fsqnzmwuojngopffcxso/editor/' || tg_relid::text || '?schema=public'
+      || case when bisher = 19 then E'\n\nDas war die 20. Mail in 24 Stunden. Weitere Rückmeldungen stehen bis morgen nur in der Tabelle.' else '' end;
+    perform net.http_post(
+      url := 'https://api.brevo.com/v3/smtp/email',
+      body := jsonb_build_object(
+        'sender', jsonb_build_object('name', 'Schatzweg Feedback', 'email', 'code@schatzweg.de'),
+        'to', jsonb_build_array(jsonb_build_object('email', btrim(an))),
+        'subject', 'Schatzweg-Feedback: ' || new.sterne || ' von 5 Sternen',
+        'textContent', inhalt,
+        'tags', jsonb_build_array('feedback')),
+      headers := jsonb_build_object('api-key', btrim(schluessel), 'Content-Type', 'application/json', 'accept', 'application/json'),
+      timeout_milliseconds := 10000);
+    new.gemeldet := now();
+  exception when others then
+    new.gemeldet := null;
+  end;
+  return new;
+end $$;
+revoke all on function public.meinung_melden() from public, anon, authenticated;
+
+drop trigger if exists meinung_melden on public.meinungen;
+create trigger meinung_melden before insert on public.meinungen
+  for each row execute function public.meinung_melden();
