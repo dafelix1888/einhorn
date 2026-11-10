@@ -569,10 +569,20 @@
    "name": "Holz-Regenbogen (Stapelspielzeug)",
    "menge": 1,
    "wann": "Stationen 1 bis 7",
-   "asin": "B0FCDZ971Q",
-   "packung": 1,
-   "preis": null,
-   "link": "https://www.amazon.de/dp/B0FCDZ971Q",
+   "artikel": [
+    {
+     "asin": "B0FCDZ971Q",
+     "link": "https://www.amazon.de/dp/B0FCDZ971Q",
+     "packung": 1,
+     "preis": 12.99
+    },
+    {
+     "asin": "B0CN4CN2KN",
+     "link": "https://www.amazon.de/dp/B0CN4CN2KN",
+     "packung": 1,
+     "preis": 8.69
+    }
+   ],
    "hinweis": "Passt jeder Holz-Regenbogen mit Rot, Gelb, Grün und Blau, egal wie viele Bögen. Die zwei kleinsten gibt es an der Haustür, die anderen kommen nach Farbe an die Stationen."
   },
   {
