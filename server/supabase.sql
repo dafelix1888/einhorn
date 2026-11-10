@@ -294,3 +294,42 @@ begin
 end $$;
 revoke all on function public.einladung_gesehen(text) from public;
 grant execute on function public.einladung_gesehen(text) to anon, authenticated;
+
+-- Feedback zur App (UNICORN-30): 1 bis 5 Sterne und freier Text, ohne Namen und ohne Bezug zu Konto oder Party.
+-- Schreiben über meinung_geben (auch ohne Anmeldung), lesen nur Server/Dashboard. Gelöscht nach 12 Monaten.
+-- Nicht zu verwechseln mit „feedback“ oben: Das ist die Rückmeldung der Gäste nach der Party.
+create table if not exists public.meinungen (
+  id       bigint generated always as identity primary key,
+  sterne   int  not null check (sterne between 1 and 5),
+  text     text not null default '' check (char_length(text) <= 1000),
+  wo       text not null default '',   -- von welcher Stelle: start, bereich, party, nach-party
+  stand    text not null default '',   -- ohne-party, in-planung, gefeiert
+  ticket   text,                        -- verarbeitet: Ticket-Schlüssel oder „gelesen“ (Ablauf in CLAUDE.md)
+  erstellt timestamptz not null default now()
+);
+alter table public.meinungen enable row level security;
+revoke all on public.meinungen from anon, authenticated;
+
+create or replace function public.meinung_geben(p_sterne int, p_text text, p_wo text, p_stand text) returns boolean
+language plpgsql security definer set search_path = public as $$
+begin
+  if p_sterne is null or p_sterne < 1 or p_sterne > 5 then return false; end if;
+  -- Bremse gegen Missbrauch: höchstens 300 am Tag, 20000 insgesamt
+  if (select count(*) from public.meinungen where erstellt > now() - interval '1 day') >= 300 then return false; end if;
+  if (select count(*) from public.meinungen) >= 20000 then return false; end if;
+  insert into public.meinungen(sterne, text, wo, stand) values (p_sterne,
+    btrim(left(regexp_replace(coalesce(p_text,''), '[\x01-\x08\x0B\x0C\x0E-\x1F]', '', 'g'), 1000)),
+    left(regexp_replace(coalesce(p_wo,''), '[^a-z-]', '', 'g'), 20),
+    left(regexp_replace(coalesce(p_stand,''), '[^a-z-]', '', 'g'), 20));
+  return true;
+end $$;
+revoke all on function public.meinung_geben(int, text, text, text) from public;
+grant execute on function public.meinung_geben(int, text, text, text) to anon, authenticated;
+
+do $$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    perform cron.unschedule(jobid) from cron.job where jobname = 'alte-meinungen';
+    perform cron.schedule('alte-meinungen', '37 3 * * *', $c$delete from public.meinungen where erstellt < now() - interval '365 days'$c$);
+  end if;
+end $$;
