@@ -7,7 +7,9 @@
   function lies(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
   function schreib(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 
-  function lesen(thema){ var p=lies('sj.party.'+thema); return p && p.thema===thema ? p : null; }
+  // Vornamen beginnen groß, auch wenn klein getippt wurde (UNICORN-28)
+  function gross(n){ n=String(n||''); return n ? n.charAt(0).toUpperCase()+n.slice(1) : n; }
+  function lesen(thema){ var p=lies('sj.party.'+thema); if(p && p.kind && typeof p.kind.name==='string') p.kind.name=gross(p.kind.name); return p && p.thema===thema ? p : null; }
   function plan(thema){ var p=lies('sj.plan.'+thema); return p && p.thema===thema ? p : null; }
   function variante(p){ return !p ? 'a' : p.ort==='drinnen' ? 'c' : (p.ausdrucke===false ? 'b' : 'a'); }
 

@@ -81,7 +81,7 @@
       body:JSON.stringify({name:name, properties:Object.assign({path:location.pathname}, props||{})})})['catch'](function(){}); }catch(e){}
   }
   function abmelden(){
-    var s=sitzung(); schreib(SITZUNG, null);
+    var s=sitzung(); schreib(SITZUNG, null); gaesteVergessen();
     if(s) anfrage('/auth/v1/logout', {method:'POST', token:s.access_token})['catch'](function(){});
   }
   // Anmelde-Link aus der Mail (gleicher Browser): Tokens stehen im #-Teil der Adresse
@@ -141,7 +141,7 @@
   }
   function serverLoeschen(thema, p){
     if(!angemeldet() || !p || !p.server) return Promise.resolve();
-    schreib('sj.konto.stand.'+thema, null);
+    schreib('sj.konto.stand.'+thema, null); schreib('sj.gaeste.'+thema, null);
     return token().then(function(t){ return anfrage('/rest/v1/parties?id=eq.'+p.server.id, {method:'DELETE', token:t}); })['catch'](function(){});
   }
 
@@ -237,6 +237,31 @@
     return token().then(function(t){ return anfrage('/rest/v1/feedback?select=wert&party_id=eq.'+id, {token:t}); });
   }
 
+  // ---------- Gästeliste (UNICORN-29): Zu- und Absagen über den Einladungs-Link ----------
+  // Gäste schreiben mit dem Schlüssel des Einladungs-Links (ohne Konto), lesen und entfernen dürfen nur die Eltern der Party.
+  function antwortGeben(k, kennung, name, kommt){ return anfrage('/rest/v1/rpc/antwort_geben', {method:'POST', body:{t:k, k:kennung, n:name, ja:!!kommt}}); }
+  function einladungGesehen(k){ return anfrage('/rest/v1/rpc/einladung_gesehen', {method:'POST', body:{t:k}}); }
+  function gaesteGemerkt(thema){ var g=lies('sj.gaeste.'+thema), id=partyId(thema); return g && id && g.id===id && angemeldet() ? g : null; }
+  function gaeste(thema){
+    var id=partyId(thema); if(!angemeldet() || !id) return Promise.resolve(null);
+    return token().then(function(t){ return Promise.all([
+      anfrage('/rest/v1/antworten?select=kennung,name,kommt,geaendert&party_id=eq.'+id+'&order=geaendert.asc', {token:t}),
+      anfrage('/rest/v1/links?select=geoeffnet&rolle=eq.gast&party_id=eq.'+id, {token:t})]);
+    }).then(function(r){
+      var l=(r[0]||[]).map(function(x){ return {kennung:String(x.kennung), name:String(x.name||''), kommt:!!x.kommt}; });
+      var g={id:id, liste:l, ja:l.filter(function(x){ return x.kommt; }).length, nein:l.filter(function(x){ return !x.kommt; }).length,
+        geoeffnet:(r[1] && r[1][0] && +r[1][0].geoeffnet)||0, zeit:Date.now()};
+      schreib('sj.gaeste.'+thema, g); return g;
+    });
+  }
+  function gastEntfernen(thema, kennung){
+    var id=partyId(thema); if(!angemeldet() || !id) return Promise.reject(new Error('nicht angemeldet'));
+    return token().then(function(t){ return anfrage('/rest/v1/antworten?party_id=eq.'+id+'&kennung=eq.'+encodeURIComponent(kennung), {method:'DELETE', token:t}); }).then(function(){ return gaeste(thema); });
+  }
+  function gaesteKurz(g){ if(!g) return ''; var t=[]; if(g.ja) t.push(g.ja+(g.ja===1?' Zusage':' Zusagen')); if(g.nein) t.push(g.nein+(g.nein===1?' Absage':' Absagen')); return t.join(' · '); }
+  function gaesteZeile(g){ return !g ? 'Lädt …' : (gaesteKurz(g)||'Noch keine Antwort')+' · '+(g.geoeffnet ? 'Einladung '+g.geoeffnet+'-mal geöffnet' : 'Einladung noch nicht geöffnet'); }
+  function gaesteVergessen(){ try{ for(var i=localStorage.length-1;i>=0;i--){ var k=localStorage.key(i); if(/^sj\.gaeste\./.test(k)) localStorage.removeItem(k); } }catch(e){} }
+
   // ---------- Oberfläche: Karte in der Party-Übersicht und Anmelde-Fenster ----------
   var STIL='.konto-dlg button{font:inherit;font-weight:700;border-radius:999px;padding:11px 18px;min-height:44px;cursor:pointer;border:0;background:var(--akzent,#7C5BD6);color:#fff}'+
     '.konto-dlg button.leer{background:transparent;color:inherit;border:1px solid var(--linie,#2F2740)}'+
@@ -265,7 +290,15 @@
     '.konto-dlg .neben{display:block;margin:12px auto 0;background:none;color:var(--leise,#B3A9C4);font-weight:600;min-height:40px;padding:8px 14px}'+
     '.konto-dlg .mail{display:inline-block;background:rgba(167,139,250,.14);color:var(--text,#F5F2FA);border-radius:999px;padding:3px 10px;font-weight:700}'+
     '.kd-fertig{text-align:center;padding:10px 0 6px}.kd-fertig .haken{width:72px;height:72px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#4ADE80,#16A34A);color:#fff;animation:kd-plopp .5s cubic-bezier(.2,1.6,.4,1)}'+
-    '@keyframes kd-plopp{from{transform:scale(.3);opacity:0}}';
+    '@keyframes kd-plopp{from{transform:scale(.3);opacity:0}}'+
+    '.konto-dlg .kd-zu{position:absolute;top:12px;right:12px;width:44px;height:44px;padding:0;background:none;color:var(--leise,#B3A9C4);font-size:1.7rem;line-height:1;font-weight:400}'+
+    '.mb h2{text-align:left;margin:0 44px 8px 0}.mb h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--leise,#B3A9C4);margin:20px 0 8px}'+
+    '.mb p{margin:0 0 10px;color:var(--leise,#B3A9C4);font-size:.95rem;line-height:1.4}'+
+    '.mb-zeile{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;margin:0 0 8px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--linie,#2F2740);color:inherit;text-decoration:none}'+
+    '.mb-zeile b{display:block}.mb-zeile small{display:block;color:var(--leise,#B3A9C4);font-size:.86rem;line-height:1.3}'+
+    '.mb-zeile .pf{width:9px;height:9px;flex:0 0 auto;border-right:2px solid var(--leise,#B3A9C4);border-top:2px solid var(--leise,#B3A9C4);transform:rotate(45deg);margin-right:4px}'+
+    '.konto-dlg .mb-klein{padding:7px 13px;min-height:38px;font-size:.88rem;flex:0 0 auto}'+
+    '.mb .mb-fuss{margin:18px 0 0;text-align:center;font-size:.85rem}.mb-fuss a{color:var(--leise,#B3A9C4)}';
   function stilEinmal(){ if(document.getElementById('konto-stil')) return; var s=document.createElement('style'); s.id='konto-stil'; s.textContent=STIL; document.head.appendChild(s); }
   var aktuellesThema=null;
   function karte(thema){
@@ -288,7 +321,7 @@
 
   var dlg=null;
   function fenster(thema, opt){
-    opt=opt||{};
+    opt=opt||{}; bereichOffen=false;
     stilEinmal(); aktuellesThema=thema;
     if(!dlg){ dlg=document.createElement('dialog'); dlg.className='konto-dlg'; document.body.appendChild(dlg); }
     var email=(sitzung()&&sitzung().email)||lies('sj.konto.email')||'';
@@ -360,6 +393,51 @@
       .then(function(n){ zeichnen(thema); melden({art:'angemeldet', thema:thema, geholt:n}); });
   }
 
+  // ---------- Mein Bereich (UNICORN-28): das Profil für ein Konto auf Zeit ----------
+  // Kein Platz für Einstellungen, denn es gibt nichts einzustellen. Gezeigt wird, was Eltern an einer Stelle sehen wollen:
+  // Bin ich angemeldet? Meine Party. Wer kommt? Wer hat welchen Link? Was ist gespeichert und wie lange?
+  var bereichOffen=false;
+  function bereich(thema){
+    stilEinmal(); aktuellesThema=thema;
+    if(!dlg){ dlg=document.createElement('dialog'); dlg.className='konto-dlg'; document.body.appendChild(dlg); }
+    if(!dlg.__mb){ dlg.__mb=true;
+      dlg.addEventListener('close', function(){ bereichOffen=false; });
+      dlg.addEventListener('click', function(ev){
+        if(!bereichOffen) return;
+        var r=dlg.getBoundingClientRect(), draussen=ev.target===dlg && (ev.clientX<r.left || ev.clientX>r.right || ev.clientY<r.top || ev.clientY>r.bottom);
+        if(draussen || ev.target.closest('[data-mb="zu"]') || ev.target.closest('a')) dlg.close();
+      });
+    }
+    var s=sitzung(), p=root.Party&&Party.lesen(thema), gesichert=!!(s && p && p.server && p.server.id), g=gaesteGemerkt(thema);
+    var h='<div class="mb"><button class="kd-zu" type="button" data-mb="zu" aria-label="Schließen">×</button><h2>Mein Bereich</h2>';
+    if(!aktiv()) h+='<p>Hier läuft Schatzweg ohne Anmeldung. Alles bleibt auf diesem Gerät.</p>';
+    else if(s) h+='<p>Angemeldet als <span class="mail">'+esc(s.email)+'</span></p>'+(p && !gesichert ? '<p>Eure Party liegt noch nur auf diesem Gerät.</p><button class="los" type="button" data-konto="anmelden">Party sichern</button>' : '');
+    else h+='<p>'+(p ? 'Ihr seid nicht angemeldet, eure Party liegt nur auf diesem Gerät. Mit Anmeldung ist sie gesichert, und ihr könnt Einladung und Links teilen.'
+                    : 'Zum Ausprobieren braucht ihr kein Konto. Schon eine Party auf einem anderen Gerät? Meldet euch an, dann holen wir sie hierher.')+'</p>'+
+      '<button class="los" type="button" data-konto="anmelden">'+(p?'Anmelden und sichern':'Anmelden')+'</button>';
+    if(p){
+      var d=Party.datum(p), n=p.kind&&p.kind.name ? p.kind.name+(/[sßxz]$/i.test(p.kind.name)?'’':'s')+' Party' : 'Eure Party';
+      h+='<h3>Eure Party</h3><a class="mb-zeile" href="party.html?thema='+thema+'"><span><b>'+esc(n)+'</b><small>'+esc(Party.datumText(d))+', '+esc(p.start)+' Uhr</small></span><span class="pf"></span></a>';
+      if(gesichert){
+        h+='<a class="mb-zeile" href="party.html?thema='+thema+'#einladung"><span><b>Gäste</b><small id="mb-gaeste">'+esc(gaesteZeile(g))+'</small></span><span class="pf"></span></a>'+
+          '<h3>Links</h3><p>Jeder Link zeigt nur, was er braucht. Ein neuer Link sperrt den alten.</p>'+
+          [['gast','Einladung','für die Gast-Eltern, ohne Route'],['vorausgeher','Vorausgeher','Route und Stationen'],['spiel','iPad','die ganze Tour']].map(function(z){
+            return '<div class="mb-zeile"><span><b>'+z[1]+'</b><small>'+z[2]+'</small></span><button type="button" class="leer mb-klein" data-konto-neu="'+z[0]+'">Neuer Link</button></div>'; }).join('');
+      }
+      var weg=new Date(d.getTime()+30*864e5).toLocaleDateString('de-DE',{day:'numeric', month:'long'});
+      h+='<h3>Eure Daten</h3><p>'+(gesichert ? 'Ein Konto auf Zeit: Am '+esc(weg)+', 30 Tage nach der Party, löschen wir alles von selbst. Früher geht es in der Party mit „Party löschen“.'
+                                           : 'Ohne Anmeldung bleibt eure Party nur auf diesem Gerät.')+'</p>';
+    }
+    h+=(s?'<button type="button" class="leer" data-konto="abmelden">Abmelden</button>':'')+
+      '<p class="mb-fuss"><a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a></p></div>';
+    dlg.innerHTML=h; bereichOffen=true;
+    if(!dlg.open) dlg.showModal();
+    if(gesichert) gaeste(thema).then(function(neu){ var e=document.getElementById('mb-gaeste'); if(e && neu) e.textContent=gaesteZeile(neu); }, function(){});
+  }
+  root.addEventListener('konto', function(ev){
+    if(bereichOffen && dlg && dlg.open && ev.detail && /^(angemeldet|abgemeldet|neuer-link)$/.test(ev.detail.art||'')) bereich(ev.detail.thema||aktuellesThema);
+  });
+
   // Vor dem Teilen: ohne Server sofort weiter; mit Server erst anmelden und speichern.
   function bereit(thema, weiter){
     if(!aktiv()){ weiter(); return; }
@@ -386,7 +464,8 @@
 
   root.Konto={notweg:notweg, mkMelden:mkMelden, aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
-    feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen,
+    feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen, bereich:bereich,
+    antwortGeben:antwortGeben, einladungGesehen:einladungGesehen, gaeste:gaeste, gaesteGemerkt:gaesteGemerkt, gastEntfernen:gastEntfernen, gaesteKurz:gaesteKurz, gaesteZeile:gaesteZeile,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,
     linkRolle:linkRolle, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
     codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};

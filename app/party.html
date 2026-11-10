@@ -107,6 +107,15 @@
 .blaettern{display:flex;justify-content:space-between;gap:14px;margin-top:8px;font-size:.92rem}
 .blaettern .textknopf{text-align:left}.blaettern .weiter{text-align:right;margin-left:auto}
 @media (prefers-reduced-motion:reduce){ .ansicht.neu,.station.dran .kreis,.bogen .figur,.funke{animation:none} .bogen .b.neu{animation:none;stroke-dashoffset:0} }
+.g-stand{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.g-stand span{background:var(--karte);border-radius:999px;padding:6px 12px;font-size:.9rem;color:var(--leise)}
+.g-stand b{color:var(--text)}.g-stand .g-ja b{color:var(--gruen)}
+.g-liste{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px}
+.g-liste li{display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 14px;border-radius:14px;background:var(--karte)}
+.g-liste .punkt{width:26px;height:26px}.g-liste .punkt svg{width:15px;height:15px}
+.g-liste .t{flex:1;min-width:0}.g-liste .t b{display:block}.g-liste small{color:var(--leise);font-size:.84rem}
+.g-liste .nein .t b{color:var(--leise)}
+.g-liste .textknopf{min-height:40px;padding:0}
 /* Einkaufsliste */
 .ding{display:grid;grid-template-columns:28px 1fr;gap:2px 12px;align-items:start;padding:12px 0;border-top:1px solid var(--linie)}
 .ding input{width:24px;height:24px;accent-color:var(--gruen);margin-top:2px}
@@ -255,7 +264,7 @@
   }
   function uebernehmen(){                         // Felder des aktuellen Schritts in den Entwurf
     var e=entwurf;
-    if(schritt===0){ e.kind.name=$('name').value.trim().replace(/\s+/g,' ').slice(0,30); e.kind.alter=+$('alter').value||null; e.datum=$('datum').value; e.start=$('start').value||'15:00';
+    if(schritt===0){ e.kind.name=$('name').value.trim().replace(/\s+/g,' ').slice(0,30); if(e.kind.name) e.kind.name=e.kind.name.charAt(0).toUpperCase()+e.kind.name.slice(1); e.kind.alter=+$('alter').value||null; e.datum=$('datum').value; e.start=$('start').value||'15:00';
       if(!e.kind.name) return 'Bitte den Vornamen eingeben.'; if(!e.kind.alter || e.kind.alter<2 || e.kind.alter>12) return 'Bitte ein Alter zwischen 2 und 12 eingeben.'; if(!e.datum) return 'Bitte ein Datum wählen.'; }
     if(schritt===1){ e.vorausgeher=!!(e.vorausgeher && e.helfer>=2); }
     return '';
@@ -356,7 +365,7 @@
     if(nr<0) offen='';
     var wechsel=gezeigt!==offen; gezeigt=offen;
     $('seite').innerHTML='<div class="ansicht'+(wechsel?' neu':'')+'">'+(nr<0 ? ueberblick(l, n, tage, p) : schrittAnsicht(l[nr], nr, l, p, pl, tage))+'</div>';
-    gefeiert=-1; rueckmeldungZeigen(); feldPassen();
+    gefeiert=-1; rueckmeldungZeigen(); feldPassen(); gaesteLaden();
   }
   // Regenbogen: außen der erste Schritt, innen der Partytag. Erledigte Bögen leuchten, der neueste zeichnet sich ein.
   function bogen(l){
@@ -384,11 +393,13 @@
         (gefeiert>=0?FUNKEN:'')+'</div>'+
       '<p class="sprech" aria-live="polite">'+satz+'</p>'+
       (n ? '' : '<a class="knopf breit" href="bereit.html?thema='+thema+'" style="margin-top:12px">Startklar öffnen</a>')+'</section>';
+    var gz=window.Konto && Konto.gaesteGemerkt ? Konto.gaesteGemerkt(thema) : null, gt=gz?Konto.gaesteKurz(gz):'';
     h+='<h2 class="weg-titel">Deine '+l.length+' Schritte</h2><ol class="weg">'+l.map(function(a, i){
       var z=a.fertig?'erledigt':zeit(a, tage);
+      if(a.id==='einladen' && gt) z=gt;
       return '<li class="station'+(a.fertig?' fertig':'')+(a===n?' dran':'')+'" style="--f:'+FARBEN[i%FARBEN.length]+'"><button type="button" data-oeffne="'+a.id+'">'+
         '<span class="kreis">'+(a.fertig?HAKEN:symbol(a.id))+'</span>'+
-        '<span class="titel">'+(a===n?'<em class="dran-marke">Als Nächstes</em>':'')+'<b>'+esc(a.titel)+'</b><span class="zeit'+(z==='wird knapp'?' knapp':'')+'">'+esc(z)+'</span></span>'+
+        '<span class="titel">'+(a===n?'<em class="dran-marke">Als Nächstes</em>':'')+'<b>'+esc(a.titel)+'</b><span class="zeit'+(z==='wird knapp'?' knapp':'')+'"'+(a.id==='einladen'?' id="gaeste-kurz"':'')+'>'+esc(z)+'</span></span>'+
         '<span class="pfeil" aria-hidden="true"></span></button></li>';
     }).join('')+'</ol>'+
       '<p class="leise klein" style="margin:10px 2px 0">Die Reihenfolge ist nur ein Vorschlag. Jeder Schritt geht jederzeit.</p>'+
@@ -436,9 +447,10 @@
     }
     if(a.id==='einladen') return '<div class="feld-karte"><label for="gh">Bitte mitbringen und beachten</label><textarea id="gh" rows="2" maxlength="200" placeholder="z. B. Regenhose, warme Mütze, Wechselsocken">'+esc(Party.gaesteHinweis(p))+'</textarea>'+
         '<p class="leise klein">Steht auf der Einladung, im Link und auf dem Ausdruck.</p></div>'+
-      kachel({id:'gast-link', haupt:true, symbol:'teilen', titel:'Einladungslink teilen', text:'Für die Eltern-Gruppe, zum Beispiel per WhatsApp. Jede Familie sagt mit einem Tipp zu.'})+
+      kachel({id:'gast-link', haupt:true, symbol:'teilen', titel:'Einladungslink teilen', text:'Für die Eltern-Gruppe, zum Beispiel per WhatsApp. Jede Familie sagt dort zu oder ab.'})+
       kachel({id:'ansehen', symbol:'auge', titel:'Einladung ansehen', text:'So sehen die Gast-Eltern die Einladung.'})+
       kachel({href:'druck.html?thema='+thema+'#einladung', symbol:'druck', titel:'Einladung drucken', text:'Dieselbe Einladung auf Papier, zwei Karten pro Blatt.'})+
+      '<h2>Wer kommt?</h2><div id="gaeste">'+gaesteHtml()+'</div>'+
       '<p class="leise klein">Schon anders eingeladen? Dann hak den Schritt unten einfach ab.</p>';
     if(a.id==='route') return draussen ? routeKarte(p, pl) :
       kachel({href:'spiel.html?thema='+thema+'#einrichten', haupt:true, symbol:'liste', titel:'Liste öffnen', text:'Zeigt, welche Station in welchen Raum kommt und was dort hingehört.'});
@@ -456,6 +468,30 @@
       }
     }
     return h;
+  }
+  // Gästeliste (UNICORN-29): Zu- und Absagen aus dem Einladungs-Link. Gemerkter Stand sofort, frischer Stand kommt nach.
+  var gaesteZeit=0;
+  function gaesteHtml(){
+    if(!window.Konto || !Konto.gaeste || !Konto.aktiv()) return '<p class="leise klein">Die Antworten kommen per WhatsApp oder als Text bei dir an.</p>';
+    if(!Konto.angemeldet() || !(party.server && party.server.id)) return '<p class="leise klein">Sobald du den Link geteilt hast, siehst du hier, wer zu- oder abgesagt hat.</p>';
+    var g=Konto.gaesteGemerkt(thema);
+    if(!g) return '<p class="leise klein">Lädt …</p>';
+    var h='<div class="g-stand"><span class="g-ja"><b>'+g.ja+'</b> '+(g.ja===1?'kommt':'kommen')+'</span><span><b>'+g.nein+'</b> '+(g.nein===1?'kann nicht':'können nicht')+'</span><span><b>'+g.geoeffnet+'</b>-mal geöffnet</span></div>';
+    if(!g.liste.length) return h+'<p class="leise klein">Noch keine Antwort. Die Eltern tragen auf der Einladung den Vornamen ihres Kindes ein und tippen „Wir kommen!“.</p>';
+    return h+'<ul class="g-liste">'+g.liste.slice().sort(function(a, b){ return (b.kommt?1:0)-(a.kommt?1:0); }).map(function(x){
+      return '<li class="'+(x.kommt?'ja':'nein')+'"><span class="punkt '+(x.kommt?'ok':'ring')+'">'+(x.kommt?HAKEN:'')+'</span><span class="t"><b>'+esc(x.name)+'</b><small>'+(x.kommt?'kommt':'kann nicht')+'</small></span>'+
+        '<button type="button" class="textknopf klein" data-gast-weg="'+esc(x.kennung)+'" aria-label="'+esc(x.name)+' entfernen">Entfernen</button></li>';
+    }).join('')+'</ul><p class="leise klein">Geplant sind '+party.kinder+' Kinder. Passt das nicht mehr? Im Überblick oben auf „Ändern“ tippen.</p>';
+  }
+  function gaesteZeigen(){
+    var e=$('gaeste'); if(e) e.innerHTML=gaesteHtml();
+    var z=$('gaeste-kurz'), g=window.Konto && Konto.gaesteGemerkt ? Konto.gaesteGemerkt(thema) : null, t=g?Konto.gaesteKurz(g):''; if(z && t) z.textContent=t;
+  }
+  function gaesteLaden(erzwingen){
+    if(!window.Konto || !Konto.gaeste || !Konto.angemeldet() || !(party && party.server && party.server.id)) return;
+    if(!erzwingen && Date.now()-gaesteZeit<20000) return;
+    gaesteZeit=Date.now();
+    Konto.gaeste(thema).then(function(g){ if(g && party && !entwurf) gaesteZeigen(); }, function(){});
   }
   // Ansicht wechseln: '' = Überblick. Vom Überblick in einen Schritt kommt ein Eintrag in den Browser-Verlauf.
   function zeige(id, oben){
@@ -535,6 +571,10 @@
       return;
     }
     if((b=t.closest('[data-oeffne]'))){ zeige(b.getAttribute('data-oeffne')); return; }
+    if((b=t.closest('[data-gast-weg]'))){
+      if(confirm('Eintrag entfernen?')){ b.disabled=true; Konto.gastEntfernen(thema, b.getAttribute('data-gast-weg')).then(function(){ gaesteZeigen(); toast('Entfernt.'); }, function(){ b.disabled=false; toast('Das hat nicht geklappt. Kein Netz?'); }); }
+      return;
+    }
     if((b=t.closest('[data-umschalten]'))){ var a=schritt_(b.getAttribute('data-umschalten')), y=window.scrollY; party=Party.speichern(Party.abhaken(party, a, !a.fertig)); uebersicht(); window.scrollTo(0,y); return; }
     if((b=t.closest('#held-hoeren'))){
       if(!hoer){ hoer=new Audio(info.hoerprobe); hoer.addEventListener('ended', function(){ var e=$('held-hoeren'); if(e) e.classList.remove('spielt'); }); }
@@ -565,6 +605,8 @@
     if(t.closest('#loeschen')){ if(confirm('Party wirklich löschen? Route und Checkliste bleiben erhalten.')){ if(window.Konto) Konto.serverLoeschen(thema, party); Party.loeschen(thema); party=null; neu(); } return; }
   });
   document.addEventListener('input', function(ev){ if(ev.target.id==='gh') feldPassen(); });
+  // zurück aus WhatsApp oder vom anderen Tab: Gästeliste auffrischen
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden && party && !entwurf) gaesteLaden(); });
   // zurück aus dem Planer oder der Druckseite (Seite kam aus dem Zwischenspeicher): Stand neu lesen
   window.addEventListener('pageshow', function(ev){ if(ev.persisted && party && !entwurf){ party=Party.lesen(thema)||party; uebersicht(); } });
   document.addEventListener('change', function(ev){

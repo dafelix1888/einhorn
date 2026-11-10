@@ -240,3 +240,57 @@ begin
     perform cron.schedule('alte-fehler', '27 3 * * *', $c$delete from public.fehler where zuletzt < now() - interval '90 days'$c$);
   end if;
 end $$;
+
+-- Gästeliste (UNICORN-29): Gast-Eltern sagen über den Einladungs-Link zu oder ab. Gespeichert werden nur der Vorname
+-- des Kindes und ja/nein. Schreiben nur mit dem Einladungs-Link (höchstens 60 je Party, bis zum Partytag);
+-- lesen und entfernen nur die Eltern der Party. Geht mit der Party weg (30 Tage danach).
+create table if not exists public.antworten (
+  party_id  uuid not null references public.parties(id) on delete cascade,
+  kennung   text not null check (kennung ~ '^[A-Za-z0-9_-]{16,40}$'),
+  name      text not null check (char_length(name) between 1 and 40),
+  kommt     boolean not null,
+  erstellt  timestamptz not null default now(),
+  geaendert timestamptz not null default now(),
+  primary key (party_id, kennung)
+);
+alter table public.antworten enable row level security;
+drop policy if exists "eigene Antworten lesen" on public.antworten;
+create policy "eigene Antworten lesen" on public.antworten for select to authenticated
+  using (exists (select 1 from public.parties p where p.id = party_id and p.owner = auth.uid()));
+drop policy if exists "eigene Antworten entfernen" on public.antworten;
+create policy "eigene Antworten entfernen" on public.antworten for delete to authenticated
+  using (exists (select 1 from public.parties p where p.id = party_id and p.owner = auth.uid()));
+revoke all on public.antworten from anon, authenticated;
+grant select, delete on public.antworten to authenticated;
+
+-- t = Schlüssel des Einladungs-Links, k = Kennung des Geräts (damit „Antwort ändern“ denselben Eintrag trifft),
+-- n = Vorname des Kindes, ja = kommt oder kommt nicht.
+create or replace function public.antwort_geben(t text, k text, n text, ja boolean) returns boolean
+language plpgsql security definer set search_path = public as $$
+declare pid uuid; sauber text;
+begin
+  if ja is null or k is null or k !~ '^[A-Za-z0-9_-]{16,40}$' then return false; end if;
+  sauber := btrim(left(btrim(regexp_replace(regexp_replace(coalesce(n,''), '[[:cntrl:]<>]', '', 'g'), '\s+', ' ', 'g')), 40));
+  if char_length(sauber) < 1 then return false; end if;
+  select l.party_id into pid from public.links l join public.parties p on p.id = l.party_id
+    where l.token = t and l.rolle = 'gast' and (p.datum is null or p.datum >= current_date);
+  if pid is null then return false; end if;
+  if not exists (select 1 from public.antworten a where a.party_id = pid and a.kennung = k)
+     and (select count(*) from public.antworten a where a.party_id = pid) >= 60 then return false; end if;
+  insert into public.antworten(party_id, kennung, name, kommt) values (pid, k, sauber, ja)
+    on conflict (party_id, kennung) do update set name = excluded.name, kommt = excluded.kommt, geaendert = now();
+  return true;
+end $$;
+revoke all on function public.antwort_geben(text, text, text, boolean) from public;
+grant execute on function public.antwort_geben(text, text, text, boolean) to anon, authenticated;
+
+-- Wie oft die Einladung geöffnet wurde: nur ein Zähler am Einladungs-Link, die App meldet jedes Gerät einmal.
+alter table public.links add column if not exists geoeffnet int not null default 0;
+create or replace function public.einladung_gesehen(t text) returns boolean
+language plpgsql security definer set search_path = public as $$
+begin
+  update public.links set geoeffnet = geoeffnet + 1 where token = t and rolle = 'gast' and geoeffnet < 100000;
+  return found;
+end $$;
+revoke all on function public.einladung_gesehen(text) from public;
+grant execute on function public.einladung_gesehen(text) to anon, authenticated;
