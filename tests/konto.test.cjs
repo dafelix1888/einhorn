@@ -77,7 +77,8 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   const links=await a.evaluate(()=>{ const p=Party.lesen('einhorn'), pl=Party.plan('einhorn'); return {e:Party.einladungsLink(p,pl), v:Party.vorausgeherLink(p,pl), s:Party.spielLink(p,pl)}; });
   pruefe(/einladung\.html\?k=[\w-]{24}$/.test(links.e) && /&k=/.test(links.v) && /&k=/.test(links.s) && !/plan=|e=/.test(links.e+links.v+links.s), 'Links nur mit Schlüssel');
 
-  // Funkel kennt das Kind
+  // Funkel kennt das Kind (steht im Schritt „iPad startklar machen“)
+  await a.click('[data-oeffne="geraet"]');
   await a.waitForSelector('#namen-name', {timeout:5000});
   pruefe(await a.inputValue('#namen-name')==='Emma', 'Namens-Karte mit Vorname');
   await a.click('#namen-los'); await a.waitForSelector('.namen-fehler', {timeout:5000});
@@ -90,6 +91,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(/Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()) && db.namen[Object.keys(db.namen)[0]].erzeugungen===1, 'Gleicher Name noch einmal: zählt nicht');
   await a.locator('#namen-karte').screenshot({path:'namen-karte.png'});
   // Änderung wird nachgespeichert
+  await a.click('[data-oeffne="einladen"]');
   await a.fill('#gh','Regenhose und Mütze'); await a.locator('#gh').blur(); await a.waitForTimeout(2000);
   pruefe(Object.values(db.links).find(l=>l.rolle==='gast').daten.h==='Regenhose und Mütze', 'Änderung landet auf dem Server');
 
