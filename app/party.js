@@ -49,8 +49,8 @@
       {id:'bestellen', tag:-14, titel:'Alles bestellen', kurz:'Eine Liste, passend für '+p.kinder+' Kinder',
         text:'Haarreifen, Holz-Regenbogen, Glückssteine und Zaubertafeln: Die Mengen passen schon zu '+p.kinder+' Kindern.', knopf:'Zur Einkaufsliste', link:'#einkauf',
         teile:[{id:'bestellen', titel:'Alles bestellt', erkannt:allesGekauft}]},
-      {id:'einladen', tag:-14, titel:'Gäste einladen', kurz:'Ein Link für alle Eltern, Zusage mit einem Tipp',
-        text:'Ein Link für alle Gast-Eltern. Sie sehen Termin, Treffpunkt und Abholzeit und sagen mit einem Tipp zu.', knopf:'Link teilen', aktion:'gast-link',
+      {id:'einladen', tag:-14, titel:'Gäste einladen', kurz:'Ein Link für alle Eltern, du siehst, wer kommt',
+        text:'Ein Link für alle Gast-Eltern. Sie sehen Termin, Treffpunkt und Abholzeit und sagen dort zu oder ab. Wer kommt, siehst du hier.', knopf:'Link teilen', aktion:'gast-link',
         link:einladungsLink(p, pl)||('party.html?thema='+t+'#einladung'), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
       draussen ?
         {id:'route', tag:-7, titel:route?'Route ablaufen':'Route planen', kurz:route?'Steht schon'+(km?', '+km:'')+'. Einmal zur Probe gehen':'Der Planer findet die Orte für die Stationen',
