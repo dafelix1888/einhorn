@@ -19,7 +19,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 .mitte{flex:1;display:flex;justify-content:center;gap:8px;min-width:0}
 .rund{width:48px;height:48px;border-radius:50%;border:0;background:var(--karte);display:grid;place-items:center;flex:0 0 auto}
 .rund:hover{background:var(--hover)}
-.suche{display:flex;align-items:center;gap:10px;background:var(--karte);border-radius:999px;padding:0 18px;height:48px;width:min(480px,100%);border:2px solid transparent}
+.profil{width:46px;height:46px;border-radius:50%;border:0;padding:3px;flex:0 0 auto;cursor:pointer;background:conic-gradient(#E23A3F,#F2B90F,#3A9D4B,#2B6FE0,#9050C8,#E23A3F)}
+.profil span{width:100%;height:100%;border-radius:50%;background:#0F0B17;display:grid;place-items:center;font-weight:800;font-size:1.05rem;color:var(--text)}
+.profil svg{width:20px;height:20px}
+.profil:hover span{background:var(--karte)}
+.suche{display:flex;align-items:center;gap:10px;background:var(--karte);border-radius:999px;padding:0 18px;height:48px;width:min(480px,100%);min-width:0;border:2px solid transparent}
 .suche:focus-within{border-color:var(--leise)}
 .suche input{flex:1;background:none;border:0;color:var(--text);font:inherit;font-size:1rem;outline:none;min-width:0}
 .suche svg,.rund svg{width:22px;height:22px;flex:0 0 auto}
@@ -27,7 +31,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .raster{display:grid;grid-template-columns:300px 1fr 320px;gap:8px;padding:0 8px 8px;height:calc(100% - 64px)}
 .flaeche{background:var(--panel);border-radius:10px;overflow:auto;min-height:0}
 @media (max-width:1180px){ .raster{grid-template-columns:260px 1fr} .jetzt{display:none} }
-@media (max-width:820px){ .raster{grid-template-columns:1fr} .bib{display:none} body{overflow:auto} .raster{height:auto} .marke span{display:none} }
+@media (max-width:820px){ .raster{grid-template-columns:1fr} .bib{display:none} body{overflow:auto} .raster{height:auto} .marke{display:none} .profil{order:-1} }
 /* Bibliothek */
 .bib{padding:16px 8px}
 .bib h2{font-size:1.05rem;margin:0 8px 12px;display:flex;justify-content:space-between;align-items:center}
@@ -168,14 +172,28 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   .inhalt:not(.sucht) .handy{display:flex;flex-direction:column;gap:18px}
   .inhalt:not(.sucht) .desk{display:none}
 }
-.meine{display:block;text-decoration:none;background:linear-gradient(130deg,#3B2A64,#1F1929);border-radius:18px;padding:16px}
-.meine .zeile0{display:flex;gap:12px;align-items:center}
-.meine img{width:56px;height:56px;border-radius:50%;border:2px solid #E8C26A;object-fit:cover;flex:0 0 auto;background:var(--karte)}
-.meine b{display:block}
-.meine .unter0{color:var(--leise);font-size:.9rem}
-.meine .dran0{margin-top:12px;background:rgba(0,0,0,.25);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.92rem;min-height:44px}
+.meine{background:radial-gradient(130% 90% at 50% 0,rgba(167,139,250,.28),rgba(167,139,250,0) 70%),linear-gradient(130deg,#2B2147,#1F1929);border-radius:22px;padding:14px 16px 16px;box-shadow:inset 0 0 0 1px rgba(167,139,250,.22)}
+.m-oben{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.m-oben h2{margin:0;font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--leise)}
+.m-status{background:rgba(167,139,250,.2);color:var(--text);border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:800;white-space:nowrap}
+.m-status.gut{background:var(--gruen);color:#062B12}
+.m-kopf{display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit}
+.m-bogen{width:92px;height:auto;flex:0 0 auto;overflow:visible}
+.m-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.m-chips span{background:rgba(0,0,0,.28);border-radius:999px;padding:4px 11px;font-size:.84rem;color:#D9D2E8;white-space:nowrap}
+.m-kopf b{display:block;font-size:1.3rem;line-height:1.15;margin-bottom:3px}
+.meine .unter0{display:block;color:var(--leise);font-size:.9rem}
+.m-weiter{display:flex;align-items:center;justify-content:center;min-height:52px;font-size:1.05rem;margin-top:14px}
+.meine .dran0{margin-top:10px;background:rgba(0,0,0,.25);border-radius:14px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.92rem;min-height:48px;text-decoration:none;color:inherit}
 .meine .dran0 em{font-style:normal;color:var(--leise)}
 .meine .dran0 svg{width:20px;height:20px;color:var(--akzent);flex:0 0 auto}
+.kompakt{display:flex;align-items:center;gap:10px;background:var(--karte);border-radius:16px;padding:10px 12px 10px 10px}
+.reihe-bald .kompakt a{flex:1;display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;color:inherit}
+.reihe-bald .kompakt img{width:72px;height:72px;border-radius:12px;filter:none;flex:0 0 auto}
+.reihe-bald .kompakt b{display:block;font-size:1.02rem;margin:0;white-space:normal}
+.reihe-bald .kompakt span span{display:block;color:var(--leise);font-size:.84rem;line-height:1.3}
+.kompakt .probeknopf{border-color:var(--leise);color:var(--text)}
+.bald-unter{margin:-6px 0 12px;color:var(--leise);font-size:.9rem}
 .buehne{border-radius:18px;overflow:hidden;background:linear-gradient(180deg,var(--farbe,#7C5BD6),#2A2140)}
 .buehne > a img{width:100%;aspect-ratio:1/1;max-height:340px;object-fit:cover;display:block}
 .buehne .unten{padding:16px}
@@ -206,6 +224,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
     <a class="rund" href="#/" aria-label="Start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></a>
     <label class="suche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="suche" type="search" placeholder="Welches Abenteuer suchst du?" aria-label="Abenteuer suchen"></label>
   </div>
+  <button type="button" class="profil" id="profil" aria-label="Mein Bereich"><span></span></button>
 </header>
 <div class="raster">
   <aside class="flaeche bib" aria-label="Meine Abenteuer">
@@ -218,6 +237,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
 </div>
 <audio id="ton" preload="none"></audio>
 <script src="party.js"></script>
+<script src="konto.js"></script>
 <script>
 (function(){
   'use strict';
@@ -241,7 +261,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   // Eine Reihenfolge wie auf der Landingpage (UNICORN-25): erst Route, dann Party. Mit Route oder Party direkt zur Party.
   function ziel(id){ return party(id)||plan(id) ? 'party.html?thema='+id : 'planer.html?thema='+id; }
   function genitiv(n){ return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
-  function partyName(pa){ return pa.kind && pa.kind.name ? genitiv(pa.kind.name)+' Party' : 'Eure Party'; }
+  function partyName(pa){ var n=pa.kind && pa.kind.name ? pa.kind.name.charAt(0).toUpperCase()+pa.kind.name.slice(1) : ''; return n ? genitiv(n)+' Party' : 'Eure Party'; }
   function countdown(pa){ var t=Party.tageBis(pa); return t==null?'':t>1?'in '+t+' Tagen':t===1?'morgen':t===0?'heute':'vorbei'; }
   function ortText(t){ return t.orte.map(function(o){ return o==='draussen'?'draußen':'drinnen'; }).join(' & '); }
 
@@ -351,16 +371,33 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       '<div class="mobil-jetzt" style="margin-top:30px">'+jetztHtml()+'</div>'+
     '</div></div>';
   }
-  // Handy: eigene Party mit „Jetzt dran“, das spielbare Abenteuer groß, Kennzahlen, „Bald verfügbar“ als Reihe
+  // Handy-Start (UNICORN-28). Mit Party: „Deine Party“ als Hauptblock (Status, Regenbogen, Gäste, weiter planen),
+  // das Abenteuer kompakt darunter, dann „Bald auf Schatzweg“. Ohne Party ist das spielbare Abenteuer groß der Einstieg.
+  var BOGENFARBEN=['#EF5A6F','#F59E0B','#F2C94C','#3FB950','#3B82F6','#8B5CF6'];   // wie auf der Party-Seite
+  function miniBogen(l){
+    return '<svg class="m-bogen" viewBox="0 0 160 88" aria-hidden="true">'+l.map(function(a, i){ var r=78-i*8;
+      return '<path d="M'+(80-r)+' 84A'+r+' '+r+' 0 0 1 '+(80+r)+' 84" fill="none" stroke-width="6.5" stroke-linecap="round" stroke="'+BOGENFARBEN[i%6]+'" opacity="'+(a.fertig?1:.18)+'"/>'; }).join('')+'</svg>';
+  }
+  function schrittAnker(id){ return {einladen:'einladung', bestellen:'einkauf'}[id] || 's-'+id; }
+  function gaesteStand(id){ var g=window.Konto && Konto.gaesteGemerkt ? Konto.gaesteGemerkt(id) : null; return g ? Konto.gaesteKurz(g) : ''; }
   function handyHtml(){
     var h='', tp=THEMEN.filter(function(x){ return party(x.id) && TOUR[x.id]; })[0];
     if(tp){
-      var pa=party(tp.id), l=Party.aufgaben(pa, TOUR[tp.id], plan(tp.id)), n=Party.naechste(l), fertig=l.filter(function(a){ return a.fertig; }).length;
-      h+='<a class="meine" href="party.html?thema='+tp.id+'"><div class="zeile0"><img src="'+tp.cover+'" alt=""><div style="min-width:0"><b>'+esc(partyName(pa))+'</b><span class="unter0">'+esc(countdown(pa))+' · '+fertig+' von '+l.length+' erledigt</span></div></div>'+
-        '<div class="dran0"><span>'+(n?'<em>Jetzt dran:</em> <b style="display:inline">'+esc(n.titel)+'</b>':'<b style="display:inline">Alles vorbereitet</b>')+'</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>';
+      var pa=party(tp.id), l=Party.aufgaben(pa, TOUR[tp.id], plan(tp.id)), n=Party.naechste(l), fertig=l.filter(function(a){ return a.fertig; }).length, tage=Party.tageBis(pa);
+      var status=tage!=null && tage<0 ? 'Gefeiert' : tage===0 ? 'Heute ist es so weit' : !n ? 'Alles bereit' : 'In Planung', gt=gaesteStand(tp.id);
+      h+='<section class="meine" aria-label="Deine Party"><div class="m-oben"><h2>Deine Party</h2><span class="m-status'+(n&&tage!==0?'':' gut')+'">'+status+'</span></div>'+
+        '<a class="m-kopf" href="party.html?thema='+tp.id+'">'+miniBogen(l)+'<span style="min-width:0"><b>'+esc(partyName(pa))+'</b>'+
+        '<span class="unter0">'+esc(Party.datumText(Party.datum(pa)))+' · '+esc(pa.start)+' Uhr</span></span></a>'+
+        '<div class="m-chips"><span>'+esc(countdown(pa))+'</span><span>'+fertig+' von '+l.length+' Schritten</span><span id="m-gaeste"'+(gt?'':' hidden')+'>'+esc(gt)+'</span></div>'+
+        '<a class="voll m-weiter" href="party.html?thema='+tp.id+'">'+(tage!=null && tage<0 ? 'Zur Party' : fertig ? 'Weiter planen' : 'Los geht’s')+'</a>'+
+        (n && !(tage<0) ? '<a class="dran0" href="party.html?thema='+tp.id+'#'+schrittAnker(n.id)+'"><span><em>Als Nächstes:</em> <b style="display:inline">'+esc(n.titel)+'</b></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' : '')+
+        '</section>';
     }
     var t=THEMEN.filter(verfuegbar)[0];
-    if(t){
+    if(t && tp){
+      h+='<section class="reihe-bald"><h2>'+(tp.id===t.id?'Dein Abenteuer':'Jetzt spielbar')+'</h2><div class="kompakt"><a href="#/abenteuer/'+t.id+'"><img src="'+t.cover+'" alt=""><span style="min-width:0"><b>'+esc(t.titel)+'</b><span>'+esc(t.untertitel)+'</span><span>'+esc(t.alter)+' · '+esc(t.dauer||'')+'</span></span></a>'+
+        (t.hoerprobe?'<button type="button" class="probeknopf" data-probe="'+t.id+'" aria-label="Hörprobe abspielen">'+PLAY+'</button>':'')+'</div></section>';
+    } else if(t){
       var pa2=party(t.id), tour=TOUR[t.id]||{};
       h+='<section class="buehne" style="--farbe:'+esc(t.farbe||'#7C5BD6')+'"><a href="#/abenteuer/'+t.id+'" aria-label="'+esc(t.titel)+': mehr erfahren"><img src="'+t.cover+'" alt=""></a><div class="unten">'+
         (t.preis?'<span class="frei">'+esc(t.preis)+'</span>':'')+'<h1>'+esc(t.titel)+'</h1><p>'+esc(t.untertitel)+'. '+esc(t.alter)+', '+(t.orte.indexOf('draussen')>=0?'ab eurer Haustür.':'in der Wohnung.')+'</p>'+
@@ -368,12 +405,12 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
         (t.hoerprobe?'<button type="button" class="probeknopf" data-probe="'+t.id+'" aria-label="Hörprobe abspielen">'+PLAY+'</button><span class="klein0">Hörprobe, 21 Sek.</span>':'')+'</div></div></section>'+
         '<div class="zahlen"><div><b>15 Min.</b><span>zum Planen</span></div><div><b>6</b><span>Schritte bis zur Party</span></div><div><b>'+(tour.dauer&&tour.dauer.minuten||t.minuten)+' Min.</b><span>Abenteuer</span></div></div>';
     }
-    h+='<section class="reihe-bald"><h2>Charaktere</h2>'+figurReihe(figuren())+'</section>';
     var bald=THEMEN.filter(function(x){ return !verfuegbar(x); });
-    if(bald.length) h+='<section class="reihe-bald"><h2>Bald verfügbar</h2><div class="band">'+bald.map(function(x){
+    var baldHtml=bald.length ? '<section class="reihe-bald"><h2>Bald auf Schatzweg</h2><p class="bald-unter">'+bald.length+' weitere Abenteuer sind in Arbeit. Tipp drauf und schau, was kommt.</p><div class="band">'+bald.map(function(x){
       return '<a href="#/abenteuer/'+x.id+'"><img src="'+x.cover+'" alt="" loading="lazy"><b>'+esc(x.titel)+'</b><span>'+esc(x.alter)+'</span></a>';
-    }).join('')+'</div></section>';
-    return '<div class="handy">'+h+'</div>';
+    }).join('')+'</div></section>' : '';
+    var figurHtml='<section class="reihe-bald"><h2>Charaktere</h2>'+figurReihe(figuren())+'</section>';
+    return '<div class="handy">'+h+(tp ? baldHtml+figurHtml : figurHtml+baldHtml)+'</div>';
   }
 
   // ---------- Figurenseite: alle Geschichten mit dieser Figur ----------
@@ -457,12 +494,26 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   $('ton').addEventListener('ended', function(){ probeKnoepfe(PLAY, 'Hörprobe abspielen'); });
   $('suche').addEventListener('input', function(){ suche=this.value.trim().toLowerCase(); if(location.hash.indexOf('#/abenteuer/')===0 || location.hash.indexOf('#/figur/')===0) location.hash='#/'; else startZeigen(); });
   window.addEventListener('hashchange', function(){ $('ton').pause(); zeigen(); });
+  // Kreis oben: „Mein Bereich“ (UNICORN-28). Zeigt den Anfangsbuchstaben der E-Mail, ohne Anmeldung eine Person.
+  function profilZeichnen(){
+    var s=window.Konto && Konto.sitzung ? Konto.sitzung() : null, e=$('profil'); if(!e) return;
+    e.firstChild.innerHTML=s && s.email ? esc(s.email.charAt(0).toUpperCase()) : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.200 1.900 7 5.500"/></svg>';
+  }
+  function meinThema(){ var tp=THEMEN.filter(function(x){ return party(x.id); })[0]; return tp ? tp.id : 'einhorn'; }
+  $('profil').addEventListener('click', function(){ if(window.Konto && Konto.bereich) Konto.bereich(meinThema()); });
+  window.addEventListener('konto', function(){ profilZeichnen(); if(!/^#\/(abenteuer|figur)\//.test(location.hash)) zeigen(); });
+  profilZeichnen();
+  // Gäste-Stand der eigenen Party auffrischen (UNICORN-29)
+  function gaesteHolen(){
+    if(!window.Konto || !Konto.gaeste || !Konto.angemeldet()) return;
+    var id=meinThema(); Konto.gaeste(id).then(function(g){ var e=$('m-gaeste'), t=g?Konto.gaesteKurz(g):''; if(e && t){ e.textContent=t; e.hidden=false; } }, function(){});
+  }
 
   try{ if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js'); }catch(e){}
   j('themen/index.json').then(function(ix){
     THEMEN=ix.themen;
     return Promise.all(THEMEN.filter(verfuegbar).map(function(t){ return j(t.tour).then(function(x){ TOUR[t.id]=x; }); }));
-  }).then(zeigen)['catch'](function(e){ $('haupt').innerHTML='<p class="leer" style="margin:24px">Katalog lässt sich nicht laden: '+esc(e.message)+'</p>'; });
+  }).then(function(){ zeigen(); gaesteHolen(); })['catch'](function(e){ $('haupt').innerHTML='<p class="leer" style="margin:24px">Katalog lässt sich nicht laden: '+esc(e.message)+'</p>'; });
 })();
 </script>
 <script src="recht.js"></script>

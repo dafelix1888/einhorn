@@ -27,6 +27,14 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
 .antwort .ja{font-weight:800;font-size:1.1rem;min-height:56px;border:0;background:var(--gruen);color:#062B12}
 .antwort .nein{font-weight:700;min-height:48px;border:1.5px solid var(--leise);background:none;color:var(--text)}
 .frist{margin:0;text-align:center;color:var(--leise);font-size:.85rem}
+#antwort{display:flex;flex-direction:column;gap:10px}
+.wer label{display:block;font-weight:700;text-align:center;margin:0 0 8px}
+.wer input{font:inherit;font-size:1.1rem;text-align:center;color:var(--text);background:var(--panel);border:2px solid var(--linie);border-radius:14px;padding:12px 14px;width:100%}
+.wer input:focus{outline:none;border-color:var(--akzent)}
+.wer .fehler{margin:6px 0 0;text-align:center;color:var(--gelb);font-size:.88rem}
+.wer .fehler:empty{display:none}
+.antwort button:disabled{opacity:.6}
+.danke .auch{display:block;margin:12px 0 0;color:inherit;opacity:.85;font-size:.92rem}
 .danke{border-radius:16px;padding:16px;text-align:center}
 .danke.gut{background:#123321}
 .danke.gut p{color:#B9E8C9}
@@ -60,6 +68,13 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
       if(!r || r.rolle!=='gast' || !r.daten){ try{ localStorage.removeItem('sj.einladung.'+k); }catch(x){} nichtDa('Der Link wurde ersetzt oder die Party ist vorbei. Bitte die Gastgeber um den neuen Link.'); return; }
       try{ localStorage.setItem('sj.einladung.'+k, JSON.stringify(r.daten)); }catch(x){}
       zeigen(r.daten);
+      try{                                            // Gästeliste (UNICORN-29): gezählt wird jedes Gerät einmal, die Vorschau der Gastgeber nicht
+        var th=String(r.daten.t||'einhorn').replace(/[^a-z0-9-]/gi,''), eigene=window.Party && Party.lesen(th);
+        if(!(eigene && eigene.server && eigene.server.k && eigene.server.k.gast===k) && !localStorage.getItem('sj.gesehen.'+k) && Konto.einladungGesehen){
+          localStorage.setItem('sj.gesehen.'+k, '1');
+          Konto.einladungGesehen(k)['catch'](function(){ try{ localStorage.removeItem('sj.gesehen.'+k); }catch(x){} });
+        }
+      }catch(x){}
     }, function(){ if(gemerkt) zeigen(gemerkt); else nichtDa('Kein Netz. Bitte später noch einmal öffnen.'); });
     return;
   }
@@ -71,7 +86,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
   var name=String(e.n||'').slice(0,30), alter=e.a, start=new Date(e.d+'T'+(e.s||'15:00')+':00'), thema=String(e.t||'einhorn').replace(/[^a-z0-9-]/gi,'');
   var datumLang=start.toLocaleDateString('de-DE',{weekday:'long', day:'numeric', month:'long'});
   var datumKurz=start.toLocaleDateString('de-DE',{weekday:'short', day:'numeric', month:'numeric'});
-  var bis=e.r ? new Date(e.r+'T12:00:00').toLocaleDateString('de-DE',{weekday:'short', day:'numeric', month:'numeric'}) : '';
+  var bis=e.r && new Date(e.r+'T23:59:59')>=new Date() ? new Date(e.r+'T12:00:00').toLocaleDateString('de-DE',{weekday:'short', day:'numeric', month:'numeric'}) : '';   // Frist schon vorbei (kurzfristige Party): weglassen
   var draussen=e.o!=='drinnen';
   var hinweis=typeof e.h==='string' ? e.h : (draussen?'Feste Schuhe und Kleidung für draußen.':'');   // ältere Links ohne Hinweisfeld
   document.title=name+' wird '+alter+'! · Einladung';
@@ -89,16 +104,32 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
       'DTSTART:'+f(start),'DTEND:'+f(ende),'SUMMARY:'+name+'s Einhorn-Party','LOCATION:'+String(e.w||'').replace(/[,;]/g,'\\$&'),'DESCRIPTION:Abholen um '+(e.b||'')+' Uhr'+(hinweis?'. Bitte beachten: '+hinweis.replace(/[,;]/g,'\\$&'):''),'END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';
   }
   var ja=antwortLink(true), nein=antwortLink(false);
+  // Mit geschütztem Link geht die Antwort an den Server, die Gastgeber sehen sie in ihrer Gästeliste (UNICORN-29).
+  // Gespeichert werden nur der Vorname des Kindes und ja/nein. WhatsApp bleibt als Zusatz. Ohne Server wie bisher.
+  var mitServer=!!(k && window.Konto && Konto.aktiv() && Konto.antwortGeben), AKEY='sj.antwort.'+k, meine=null;
+  if(mitServer){ try{ meine=JSON.parse(localStorage.getItem(AKEY)||'null'); }catch(x){} if(meine && !(meine.id && meine.name)) meine=null; }
+  function kennungNeu(){ return Array.prototype.map.call(crypto.getRandomValues(new Uint8Array(16)), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
 
   // Antwort-Bereich: erst die zwei Knöpfe, nach dem Tippen eine Bestätigung. Die Antwort geht nur über WhatsApp oder den kopierten Text an die Gastgeber.
   function antwortZeichnen(stand){
     var h;
-    if(stand==='ja'){
+    if(stand==='ja' && mitServer && meine){
+      h='<div class="danke gut" role="status"><b>Schön, '+esc(meine.name)+' ist dabei!</b><p>Die Gastgeber sehen eure Zusage.</p>'+
+        '<button type="button" class="kal" id="kal">In den Kalender</button>'+(ja?'<a class="auch" href="'+ja+'" target="_blank" rel="noopener">Auch per WhatsApp schreiben</a>':'')+
+        '<button type="button" class="zurueck" data-zurueck>Antwort ändern</button></div>';
+    } else if(stand==='nein' && mitServer && meine){
+      h='<div class="danke schade" role="status"><b>Schade!</b><p class="leise">Die Gastgeber wissen Bescheid.</p>'+
+        (nein?'<a class="auch" href="'+nein+'" target="_blank" rel="noopener">Auch per WhatsApp schreiben</a>':'')+'<button type="button" class="zurueck" data-zurueck>Antwort ändern</button></div>';
+    } else if(stand==='ja'){
       h='<div class="danke gut" role="status"><b>Schön, ihr seid dabei!</b><p>'+(ja?'Schickt die Nachricht in WhatsApp ab, dann wissen die Gastgeber Bescheid.':'Schickt den kopierten Text an die Gastgeber, dann wissen sie Bescheid.')+'</p>'+
         '<button type="button" class="kal" id="kal">In den Kalender</button><button type="button" class="zurueck" data-zurueck>Antwort ändern</button></div>';
     } else if(stand==='nein'){
       h='<div class="danke schade" role="status"><b>Schade!</b><p class="leise">'+(ja?'Schickt die Nachricht in WhatsApp ab, dann wissen die Gastgeber Bescheid.':'Schickt den kopierten Text an die Gastgeber, dann wissen sie Bescheid.')+'</p>'+
         '<button type="button" class="zurueck" data-zurueck>Antwort ändern</button></div>';
+    } else if(mitServer){
+      h='<div class="wer"><label for="kind">Wer ist eingeladen?</label><input id="kind" type="text" maxlength="40" autocomplete="off" autocapitalize="words" placeholder="Vorname eures Kindes" value="'+esc(meine?meine.name:'')+'"><p class="fehler" id="kind-f" role="alert"></p></div>'+
+        '<div class="antwort"><button type="button" class="ja" data-sag="1">Wir kommen!</button><button type="button" class="nein" data-sag="0">Wir können leider nicht</button></div>'+
+        '<p class="frist">'+(bis?'Bitte bis '+esc(bis)+' Bescheid geben. ':'')+'Der Vorname geht nur an die Gastgeber.</p>';
     } else {
       h='<div class="antwort">'+(ja
         ? '<a class="ja" href="'+ja+'" target="_blank" rel="noopener" data-gewaehlt="ja">Wir kommen!</a><a class="nein" href="'+nein+'" target="_blank" rel="noopener" data-gewaehlt="nein">Wir können leider nicht</a>'
@@ -115,9 +146,23 @@ body{background:radial-gradient(ellipse at 50% 0%,#3B2A64 0%,var(--bg) 480px) no
     (hinweis?'<div class="mit"><b>Bitte mitbringen und beachten</b><br>'+esc(hinweis)+'</div>':'')+
     '<div id="antwort"></div>'+
     '<div class="fuss"><p class="leise">Selbst bald eine Party? Funkels Regenbogen plant die Schnitzeljagd für jeden Park und jede Wohnung.</p><a href="landing.html?utm_source=einladung">So funktioniert Schatzweg</a></div>';
-  antwortZeichnen('');
+  antwortZeichnen(mitServer && meine ? (meine.kommt?'ja':'nein') : '');
 
   document.addEventListener('click', function(ev){
+    var sg=ev.target.closest('[data-sag]');
+    if(sg){                                            // Antwort an den Server; klappt das nicht, bleibt der alte Weg über WhatsApp oder Text
+      var feld=$('kind'), nm=feld.value.trim().replace(/\s+/g,' ').slice(0,40), kommt=sg.getAttribute('data-sag')==='1';
+      if(!nm){ $('kind-f').textContent='Bitte den Vornamen eintragen, damit die Gastgeber wissen, wer '+(kommt?'kommt':'absagt')+'.'; feld.focus(); return; }
+      nm=nm.charAt(0).toUpperCase()+nm.slice(1);
+      var kn=(meine && meine.id) || kennungNeu();
+      Array.prototype.forEach.call($('antwort').querySelectorAll('button'), function(x){ x.disabled=true; });
+      Konto.antwortGeben(k, kn, nm, kommt).then(function(okay){
+        if(okay!==true) throw new Error('abgelehnt');
+        meine={id:kn, name:nm, kommt:kommt}; try{ localStorage.setItem(AKEY, JSON.stringify(meine)); }catch(x){}
+        antwortZeichnen(kommt?'ja':'nein');
+      })['catch'](function(){ mitServer=false; antwortZeichnen(''); toast('Das hat gerade nicht geklappt. Bitte schreibt den Gastgebern direkt.'); });
+      return;
+    }
     var g=ev.target.closest('[data-gewaehlt]');
     if(g){ var s=g.getAttribute('data-gewaehlt'); setTimeout(function(){ antwortZeichnen(s); }, 0); return; }   // erst nach dem Öffnen von WhatsApp umbauen
     var b=ev.target.closest('[data-antwort]');
