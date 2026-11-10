@@ -45,7 +45,7 @@ ok(Array.isArray(rb.artikel) && rb.artikel.length>=2 && rb.artikel.every(a=>/^[A
   await p.evaluate(()=>localStorage.setItem('sj.party.einhorn', JSON.stringify({format:1,thema:'einhorn',kind:{name:'Mia',alter:5},datum:'2030-06-01',start:'15:00',kinder:6,helfer:2,vorausgeher:true,ort:'draussen',planB:true,ausdrucke:true,erledigt:{},einkauf:{}})));
   // Rang 1 als nicht verfügbar markieren (wie es Felix in den Daten tun würde)
   await c.route(/themen\/einhorn\/tour\.json/, async r=>{ const res=await r.fetch(); const t=await res.json(); const u=t.utensilien.find(u=>/Regenbogen/.test(u.name)); u.artikel[0].verfuegbar=false; r.fulfill({response:res, json:t}); });
-  await p.reload(); await p.waitForSelector('#einkauf', {timeout:15000});
+  await p.goto(B+'party.html?thema=einhorn#einkauf'); await p.reload(); await p.waitForSelector('#einkauf .ding', {timeout:15000});   // Liste steckt im Schritt „Bestellen“
   const html=await p.content();
   ok(html.includes('dp/'+rb.artikel[1].asin) && !html.includes('dp/'+rb.artikel[0].asin), 'Einkaufsliste zeigt den Link von Rang 2');
   const text=await p.locator('body').innerText();
