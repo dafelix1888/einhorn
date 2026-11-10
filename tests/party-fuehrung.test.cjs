@@ -1,5 +1,5 @@
 // Party-Übersicht (UNICORN-27): Überblick mit Regenbogen und Weg, jeder Schritt als eigene Ansicht mit allem, was er braucht
-const {chromium}=require('/opt/npm-tools/node_modules/playwright');
+const { chromium } = require('playwright');
 const B=process.env.BASIS||'http://localhost:8765/app/';
 let fehler=0; function ok(b, t){ console.log((b?'OK   ':'FEHLER ')+t); if(!b) fehler++; }
 (async()=>{
