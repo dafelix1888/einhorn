@@ -381,7 +381,7 @@
     var dat=Party.datum(p);
     if(dat && Date.now()>dat.getTime()+120*60000) h+='<section class="jetzt-karte" aria-label="Nach der Party" style="margin-bottom:14px"><div class="marke">Nach der Party</div><h2>Danke an die Gäste</h2>'+
       '<p>Schickt den Gast-Eltern ein Danke mit Funkels Urkunde für jedes Kind. Das Gruppenfoto teilt ihr direkt aus dem Spiel („Gruppenfoto mit Rahmen“).</p>'+
-      '<div class="reihe"><button type="button" class="knopf mittel" id="danke-link">Danke-Link schicken</button></div><p class="leise" id="rueckmeldung" style="margin:10px 0 0" hidden></p></section>';
+      '<div class="reihe"><button type="button" class="knopf mittel" id="danke-link">Danke-Link schicken</button>'+(meinungDa()?'<button type="button" class="knopf leer mittel" data-meinung-auf="nach-party">Feedback zur App</button>':'')+'</div><p class="leise" id="rueckmeldung" style="margin:10px 0 0" hidden></p></section>';
     var satz = gefeiert>=0 ? '<b>'+FARBNAMEN[gefeiert%FARBNAMEN.length]+' leuchtet!</b> '+(rest ? 'Noch '+rest+(rest===1?' Bogen':' Bögen')+', dann ist '+wessen+' Regenbogen wieder da.' : wessen+' Regenbogen ist wieder da.')
       : !fertig ? '<b>'+wessen+' Regenbogen ist weg!</b> Mit jedem Schritt holst du einen Bogen zurück.'
       : rest ? '<b>'+fertig+' von '+l.length+' Bögen leuchten.</b> Noch '+rest+', dann ist '+wessen+' Regenbogen wieder da.'
@@ -405,7 +405,9 @@
       '<p class="leise klein" style="margin:10px 2px 0">Die Reihenfolge ist nur ein Vorschlag. Jeder Schritt geht jederzeit.</p>'+
       '<button type="button" class="textknopf klein" id="kalender">Alle Termine in den Kalender</button>';
     var kk=window.Konto?Konto.karte(thema):'';
-    return h+(kk?'<h2>Party sichern</h2>'+kk:'')+'<div class="reihe" style="margin-top:24px"><button type="button" class="knopf leer mittel" id="loeschen">Party löschen</button></div>';
+    return h+(kk?'<h2>Party sichern</h2>'+kk:'')+
+      (meinungDa()?'<p class="leise klein" style="margin:22px 2px 0">Wie gefällt dir Schatzweg? <button type="button" class="textknopf klein" data-meinung-auf="party" style="min-height:44px;padding:0 0 0 4px">Feedback geben</button></p>':'')+
+      '<div class="reihe" style="margin-top:14px"><button type="button" class="knopf leer mittel" id="loeschen">Party löschen</button></div>';
   }
   // Ein Schritt als eigene Ansicht: Leiste mit allen Schritten, wozu, Werkzeuge, Abschluss
   function schrittAnsicht(a, i, l, p, pl, tage){
@@ -469,6 +471,8 @@
     }
     return h;
   }
+  // Feedback zur App (UNICORN-30): nur mit Server
+  function meinungDa(){ return !!(window.Konto && Konto.meinung && Konto.aktiv()); }
   // Gästeliste (UNICORN-29): Zu- und Absagen aus dem Einladungs-Link. Gemerkter Stand sofort, frischer Stand kommt nach.
   var gaesteZeit=0;
   function gaesteHtml(){
@@ -571,6 +575,7 @@
       return;
     }
     if((b=t.closest('[data-oeffne]'))){ zeige(b.getAttribute('data-oeffne')); return; }
+    if((b=t.closest('[data-meinung-auf]'))){ if(meinungDa()) Konto.meinung({wo:b.getAttribute('data-meinung-auf'), thema:thema}); return; }
     if((b=t.closest('[data-gast-weg]'))){
       if(confirm('Eintrag entfernen?')){ b.disabled=true; Konto.gastEntfernen(thema, b.getAttribute('data-gast-weg')).then(function(){ gaesteZeigen(); toast('Entfernt.'); }, function(){ b.disabled=false; toast('Das hat nicht geklappt. Kein Netz?'); }); }
       return;

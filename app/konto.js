@@ -298,7 +298,19 @@
     '.mb-zeile b{display:block}.mb-zeile small{display:block;color:var(--leise,#B3A9C4);font-size:.86rem;line-height:1.3}'+
     '.mb-zeile .pf{width:9px;height:9px;flex:0 0 auto;border-right:2px solid var(--leise,#B3A9C4);border-top:2px solid var(--leise,#B3A9C4);transform:rotate(45deg);margin-right:4px}'+
     '.konto-dlg .mb-klein{padding:7px 13px;min-height:38px;font-size:.88rem;flex:0 0 auto}'+
-    '.mb .mb-fuss{margin:18px 0 0;text-align:center;font-size:.85rem}.mb-fuss a{color:var(--leise,#B3A9C4)}';
+    '.mb .mb-fuss{margin:18px 0 0;text-align:center;font-size:.85rem}.mb-fuss a{color:var(--leise,#B3A9C4)}'+
+    '.konto-dlg button.mb-zeile{width:100%;text-align:left;font-weight:400;border-radius:14px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid var(--linie,#2F2740);color:inherit}'+
+    '.mg h2{margin:0 40px 14px}'+
+    '.mg-sterne{display:flex;justify-content:center;gap:2px}'+
+    '.konto-dlg .mg-sterne button{width:54px;height:54px;min-height:0;padding:5px;background:none;color:#4A4060;border-radius:14px;transition:transform .12s,color .12s}'+
+    '.konto-dlg .mg-sterne button.an{color:#FFD166}.konto-dlg .mg-sterne button:active{transform:scale(1.15)}'+
+    '.mg-sterne svg{display:block;width:100%;height:100%}'+
+    '.mg-wort{min-height:1.4em;margin:4px 0 12px;text-align:center;font-weight:700;color:var(--leise,#B3A9C4)}'+
+    '.konto-dlg textarea{display:block;width:100%;box-sizing:border-box;min-height:6.5em;resize:vertical;font:inherit;line-height:1.4;padding:12px 14px;margin:0 0 8px;border-radius:14px;border:1.5px solid var(--linie,#2F2740);background:var(--karte,#1F1929);color:inherit}'+
+    '.konto-dlg textarea:focus{outline:none;border-color:var(--akzent,#A78BFA);box-shadow:0 0 0 4px rgba(167,139,250,.22)}'+
+    '.konto-dlg textarea::placeholder{color:var(--leise,#B3A9C4);opacity:.9}'+
+    '.konto-dlg textarea:focus::placeholder{color:transparent}'+          // Hinweis verschwindet beim Hineintippen, nicht erst beim Schreiben
+    '.mg-klein{margin:10px 0 0;text-align:center;font-size:.82rem;color:var(--leise,#B3A9C4)}';
   function stilEinmal(){ if(document.getElementById('konto-stil')) return; var s=document.createElement('style'); s.id='konto-stil'; s.textContent=STIL; document.head.appendChild(s); }
   var aktuellesThema=null;
   function karte(thema){
@@ -396,18 +408,29 @@
   // ---------- Mein Bereich (UNICORN-28): das Profil für ein Konto auf Zeit ----------
   // Kein Platz für Einstellungen, denn es gibt nichts einzustellen. Gezeigt wird, was Eltern an einer Stelle sehen wollen:
   // Bin ich angemeldet? Meine Party. Wer kommt? Wer hat welchen Link? Was ist gespeichert und wie lange?
-  var bereichOffen=false;
-  function bereich(thema){
-    stilEinmal(); aktuellesThema=thema;
+  var bereichOffen=false, meinungOffen=false;
+  // Blatt für „Mein Bereich“ und das Feedback: schließt mit ×, mit Tipp daneben und (im Bereich) beim Folgen eines Links
+  function blatt(){
+    stilEinmal();
     if(!dlg){ dlg=document.createElement('dialog'); dlg.className='konto-dlg'; document.body.appendChild(dlg); }
     if(!dlg.__mb){ dlg.__mb=true;
-      dlg.addEventListener('close', function(){ bereichOffen=false; });
+      dlg.addEventListener('close', function(){ bereichOffen=false; meinungOffen=false; });
       dlg.addEventListener('click', function(ev){
-        if(!bereichOffen) return;
+        if(!bereichOffen && !meinungOffen) return;
         var r=dlg.getBoundingClientRect(), draussen=ev.target===dlg && (ev.clientX<r.left || ev.clientX>r.right || ev.clientY<r.top || ev.clientY>r.bottom);
-        if(draussen || ev.target.closest('[data-mb="zu"]') || ev.target.closest('a')) dlg.close();
+        if(draussen || ev.target.closest('[data-mb="zu"]') || (bereichOffen && ev.target.closest('a'))){ dlg.close(); return; }
+        if(ev.target.closest('[data-mb="meinung"]')){ meinung({wo:'bereich', thema:aktuellesThema}); return; }
+        meinungKlick(ev);
+      });
+      dlg.addEventListener('keydown', function(ev){             // Sterne mit den Pfeiltasten
+        var st=meinungOffen && ev.target.closest && ev.target.closest('[data-stern]'), d=ev.key==='ArrowRight'||ev.key==='ArrowUp' ? 1 : ev.key==='ArrowLeft'||ev.key==='ArrowDown' ? -1 : 0;
+        if(st && d){ ev.preventDefault(); sterneSetzen(Math.max(1, Math.min(5, (mg.sterne||+st.getAttribute('data-stern'))+d))); }
       });
     }
+    return dlg;
+  }
+  function bereich(thema){
+    blatt(); aktuellesThema=thema; meinungOffen=false;
     var s=sitzung(), p=root.Party&&Party.lesen(thema), gesichert=!!(s && p && p.server && p.server.id), g=gaesteGemerkt(thema);
     var h='<div class="mb"><button class="kd-zu" type="button" data-mb="zu" aria-label="Schließen">×</button><h2>Mein Bereich</h2>';
     if(!aktiv()) h+='<p>Hier läuft Schatzweg ohne Anmeldung. Alles bleibt auf diesem Gerät.</p>';
@@ -428,6 +451,7 @@
       h+='<h3>Eure Daten</h3><p>'+(gesichert ? 'Ein Konto auf Zeit: Am '+esc(weg)+', 30 Tage nach der Party, löschen wir alles von selbst. Früher geht es in der Party mit „Party löschen“.'
                                            : 'Ohne Anmeldung bleibt eure Party nur auf diesem Gerät.')+'</p>';
     }
+    if(aktiv()) h+='<h3>Feedback</h3><button type="button" class="mb-zeile" data-mb="meinung"><span><b>Feedback geben</b><small>Sterne und ein paar Worte, ohne Namen</small></span><span class="pf"></span></button>';
     h+=(s?'<button type="button" class="leer" data-konto="abmelden">Abmelden</button>':'')+
       '<p class="mb-fuss"><a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a></p></div>';
     dlg.innerHTML=h; bereichOffen=true;
@@ -437,6 +461,49 @@
   root.addEventListener('konto', function(ev){
     if(bereichOffen && dlg && dlg.open && ev.detail && /^(angemeldet|abgemeldet|neuer-link)$/.test(ev.detail.art||'')) bereich(ev.detail.thema||aktuellesThema);
   });
+
+  // ---------- Feedback zur App (UNICORN-30): 1 bis 5 Sterne und freier Text, ohne Namen ----------
+  // Geht auch ohne Anmeldung. Gespeichert werden Sterne, Text, von wo es kam und der Stand der Party, sonst nichts.
+  var STERN='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z"/></svg>';
+  var STERN_WORT=['', 'Gar nicht gut', 'Nicht so gut', 'Geht so', 'Gut', 'Super'];
+  var mg={sterne:0, wo:'', stand:''};
+  function meinungGeben(sterne, text, wo, stand){ return anfrage('/rest/v1/rpc/meinung_geben', {method:'POST', body:{p_sterne:sterne, p_text:text||'', p_wo:wo||'', p_stand:stand||''}}); }
+  function partyStand(thema){ var p=root.Party && thema ? Party.lesen(thema) : null, t=p ? Party.tageBis(p) : null; return !p ? 'ohne-party' : t!=null && t<0 ? 'gefeiert' : 'in-planung'; }
+  function sterneHtml(n){
+    var h=''; for(var i=1;i<=5;i++) h+='<button type="button" role="radio" aria-checked="'+(i===n)+'" class="'+(i<=n?'an':'')+'" data-stern="'+i+'" aria-label="'+i+(i===1?' Stern':' Sterne')+'">'+STERN+'</button>';
+    return h;
+  }
+  function sterneSetzen(n){
+    mg.sterne=n; dlg.querySelector('.mg-sterne').innerHTML=sterneHtml(n); dlg.querySelector('.mg-wort').textContent=STERN_WORT[n]||''; dlg.querySelector('.fehler').textContent='';
+    var f=dlg.querySelector('[data-stern="'+n+'"]'); if(f) f.focus();
+  }
+  function meinung(opt){
+    opt=opt||{}; if(!aktiv()) return;
+    blatt(); bereichOffen=false;
+    mg={sterne:Math.max(0, Math.min(5, Math.round(+opt.sterne||0))), wo:opt.wo||'', stand:opt.stand||partyStand(opt.thema||aktuellesThema)};
+    dlg.innerHTML='<div class="mg"><button class="kd-zu" type="button" data-mb="zu" aria-label="Schließen">×</button><h2>Wie gefällt dir Schatzweg?</h2>'+
+      '<div class="mg-sterne" role="radiogroup" aria-label="Sterne von 1 bis 5">'+sterneHtml(mg.sterne)+'</div><p class="mg-wort" aria-live="polite">'+STERN_WORT[mg.sterne]+'</p>'+
+      '<textarea id="mg-text" rows="4" maxlength="1000" aria-label="Dein Feedback" placeholder="Feedback zu Story-Wünschen, Charakteren usw. gerne hier"></textarea>'+
+      '<p class="fehler" role="alert"></p><button class="los" type="button" data-mg="senden">Abschicken</button>'+
+      '<p class="mg-klein">Ohne Namen. Bitte keine persönlichen Daten hineinschreiben.</p></div>';
+    meinungOffen=true;
+    if(!dlg.open) dlg.showModal();
+  }
+  function meinungKlick(ev){
+    if(!meinungOffen) return;
+    var st=ev.target.closest('[data-stern]'); if(st){ sterneSetzen(+st.getAttribute('data-stern')); return; }
+    var b=ev.target.closest('[data-mg="senden"]'); if(!b) return;
+    var fehler=dlg.querySelector('.fehler'), text=dlg.querySelector('#mg-text').value.trim().slice(0,1000);
+    if(!mg.sterne){ fehler.textContent='Bitte erst Sterne wählen.'; return; }
+    b.disabled=true; fehler.textContent='';
+    meinungGeben(mg.sterne, text, mg.wo, mg.stand).then(function(okay){
+      if(okay!==true) throw new Error('abgelehnt');
+      schreib('sj.meinung', {sterne:mg.sterne, zeit:Date.now()});
+      dlg.innerHTML='<div class="kd-fertig"><div class="haken"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h2>Danke!</h2><p class="unter" style="margin:0">Wir lesen jedes Feedback.</p></div>';
+      melden({art:'meinung', sterne:mg.sterne});
+      setTimeout(function(){ if(dlg.open && meinungOffen) dlg.close(); }, 1600);
+    })['catch'](function(){ b.disabled=false; fehler.textContent='Das hat gerade nicht geklappt. Kein Netz? Bitte später noch einmal.'; });
+  }
 
   // Vor dem Teilen: ohne Server sofort weiter; mit Server erst anmelden und speichern.
   function bereit(thema, weiter){
@@ -464,7 +531,7 @@
 
   root.Konto={notweg:notweg, mkMelden:mkMelden, aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
-    feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen, bereich:bereich,
+    feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen, bereich:bereich, meinung:meinung,
     antwortGeben:antwortGeben, einladungGesehen:einladungGesehen, gaeste:gaeste, gaesteGemerkt:gaesteGemerkt, gastEntfernen:gastEntfernen, gaesteKurz:gaesteKurz, gaesteZeile:gaesteZeile,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,
     linkRolle:linkRolle, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,

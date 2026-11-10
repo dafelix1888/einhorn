@@ -29,6 +29,13 @@
 - Behobene Incidents auf erledigt setzen; die Lösung muss im Ticket stehen, damit man sie beim nächsten Mal findet.
 - Fehler aus der App landen anonym in der Supabase-Tabelle `fehler` (Projekt `zauberspiegel`). Zu Beginn einer Sitzung und auf Nachfrage neue Einträge ansehen (`select * from fehler where ticket is null order by zuletzt desc`), zuerst in PBIM nach der Meldung suchen, sonst einen Incident anlegen und den Schlüssel (z. B. `PBIM-13`) in `fehler.ticket` eintragen. Gleiche Ursache in mehreren Einträgen: Problem anlegen.
 
+## Feedback aus der App (Supabase-Tabelle `meinungen`)
+
+- Eltern geben in der App 1 bis 5 Sterne und freien Text ab (ohne Namen, ohne Bezug zu Konto oder Party). Das landet in der Tabelle `meinungen` (Projekt `zauberspiegel`). Nicht verwechseln mit `feedback`: Das ist die Rückmeldung der Gäste nach der Party.
+- Zu Beginn einer Sitzung und auf Nachfrage neue Einträge ansehen (`select id, erstellt, sterne, text, wo, stand from meinungen where ticket is null order by erstellt`) und Felix kurz berichten: Anzahl, Schnitt, Auffälliges.
+- Wünsche und Kritik als Ticket in UNICORN bündeln (Label `feedback`). Story- und Charakter-Wünsche zusätzlich als Kommentar in UNICORN-16 (zweites Abenteuer). Danach den Ticket-Schlüssel oder `gelesen` in `meinungen.ticket` eintragen.
+- Beschreibt jemand darin einen Fehler: wie einen Incident behandeln (PBIM).
+
 ## Architektur und Wissen (Jira-Projekte ADR und KM)
 
 - **ADR** (https://fepu.atlassian.net/browse/ADR): Architektur- und Technik-Entscheidungen, je Bereich ein Epic. Aufbau: Status, Kontext, Entscheidung, Standard-Konfiguration, Alternativen, Folgen, Quelle. Label `standard` = gilt auch für neue Apps.

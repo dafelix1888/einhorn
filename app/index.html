@@ -194,6 +194,16 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
 .reihe-bald .kompakt span span{display:block;color:var(--leise);font-size:.84rem;line-height:1.3}
 .kompakt .probeknopf{border-color:var(--leise);color:var(--text)}
 .bald-unter{margin:-6px 0 12px;color:var(--leise);font-size:.9rem}
+.meinung-karte{margin:26px 0 6px;padding:18px 16px;border-radius:20px;background:var(--karte);text-align:center}
+.meinung-karte b{display:block;font-size:1.1rem}
+.meinung-karte span{display:block;color:var(--leise);font-size:.9rem}
+.mk-sterne{display:flex;justify-content:center;gap:2px;margin:8px 0 6px}
+.mk-sterne button{width:52px;height:52px;padding:5px;border:0;background:none;color:#4A4060;border-radius:14px;cursor:pointer;transition:transform .12s,color .12s}
+.mk-sterne button.an{color:#FFD166}
+.mk-sterne button:hover,.mk-sterne button:focus-visible{color:#FFE3A1}
+.mk-sterne button:active{transform:scale(1.15)}
+.mk-sterne svg{display:block;width:100%;height:100%}
+.desk .meinung-karte{max-width:420px}
 .buehne{border-radius:18px;overflow:hidden;background:linear-gradient(180deg,var(--farbe,#7C5BD6),#2A2140)}
 .buehne > a img{width:100%;aspect-ratio:1/1;max-height:340px;object-fit:cover;display:block}
 .buehne .unten{padding:16px}
@@ -369,6 +379,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       (l.length?'<h2 class="abschnitt">Alle Abenteuer</h2><div class="kacheln">'+da.concat(bald).map(kachel).join('')+'</div>':'')+
       (!l.length?'<p class="leer" style="margin-top:20px"><b>Nichts gefunden</b>Andere Suche oder anderen Filter versuchen.</p>':'')+
       '<div class="mobil-jetzt" style="margin-top:30px">'+jetztHtml()+'</div>'+
+      (!suche?meinungKarte():'')+
     '</div></div>';
   }
   // Handy-Start (UNICORN-28). Mit Party: „Deine Party“ als Hauptblock (Status, Regenbogen, Gäste, weiter planen),
@@ -410,7 +421,16 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       return '<a href="#/abenteuer/'+x.id+'"><img src="'+x.cover+'" alt="" loading="lazy"><b>'+esc(x.titel)+'</b><span>'+esc(x.alter)+'</span></a>';
     }).join('')+'</div></section>' : '';
     var figurHtml='<section class="reihe-bald"><h2>Charaktere</h2>'+figurReihe(figuren())+'</section>';
-    return '<div class="handy">'+h+(tp ? baldHtml+figurHtml : figurHtml+baldHtml)+'</div>';
+    return '<div class="handy">'+h+(tp ? baldHtml+figurHtml : figurHtml+baldHtml)+meinungKarte()+'</div>';
+  }
+  // Feedback zur App (UNICORN-30): Tipp auf einen Stern öffnet das Fenster mit dieser Wahl
+  var STERN='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z"/></svg>';
+  function meinungKarte(){
+    if(!window.Konto || !Konto.meinung || !Konto.aktiv()) return '';
+    var alt=lies('sj.meinung'), n=alt && alt.sterne || 0, h='';
+    for(var i=1;i<=5;i++) h+='<button type="button" data-meinung="'+i+'" class="'+(i<=n?'an':'')+'" aria-label="'+i+(i===1?' Stern':' Sterne')+' geben">'+STERN+'</button>';
+    return '<section class="meinung-karte" aria-label="Feedback"><b>'+(alt?'Danke für dein Feedback!':'Wie gefällt dir Schatzweg?')+'</b><div class="mk-sterne">'+h+'</div>'+
+      '<span>'+(alt?'Noch ein Wunsch? Tipp auf einen Stern.':'Tipp auf einen Stern und sag uns, was du dir wünschst.')+'</span></section>';
   }
 
   // ---------- Figurenseite: alle Geschichten mit dieser Figur ----------
@@ -480,6 +500,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   document.addEventListener('click', function(e){
     var b=e.target.closest('[data-f]'); if(b){ filter=b.getAttribute('data-f'); startZeigen(); return; }
     b=e.target.closest('[data-bf]'); if(b){ bibFilter=b.getAttribute('data-bf'); bibZeichnen(); return; }
+    b=e.target.closest('[data-meinung]'); if(b){ if(window.Konto && Konto.meinung) Konto.meinung({wo:'start', sterne:+b.getAttribute('data-meinung'), thema:meinThema()}); return; }
     b=e.target.closest('[data-los]'); if(b){ e.preventDefault(); location.href=zielLink(thema(b.getAttribute('data-los'))); return; }
     b=e.target.closest('[data-merken]'); if(b){ var id=b.getAttribute('data-merken'), l=merkliste(), i=l.indexOf(id); if(i>=0) l.splice(i,1); else l.push(id); try{ localStorage.setItem(MERK, JSON.stringify(l)); }catch(x){} zeigen(); return; }
     if(e.target.closest('#mehr')){ var inf=$('info'), zu=inf.classList.toggle('zu'); e.target.closest('#mehr').textContent=zu?'… Mehr anzeigen':'Weniger anzeigen'; return; }
