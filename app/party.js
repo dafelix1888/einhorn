@@ -93,13 +93,23 @@
     return p;
   }
 
+  // Kauflink je Utensil (UNICORN-11): „artikel“ ist eine Liste in fester Rangfolge. Gezeigt wird der erste, der nicht
+  // als „verfuegbar: false“ markiert ist – für Eltern ein ganz normaler Link, ohne Hinweis auf Rang oder Ersatz.
+  // Alte Form (asin/link/packung/preis direkt am Utensil) gilt als Liste mit einem Eintrag. Sind alle aus: kein Kauflink.
+  function artikelWahl(u){
+    var liste=Array.isArray(u.artikel) && u.artikel.length ? u.artikel : (u.asin||u.link ? [{asin:u.asin, link:u.link, packung:u.packung, preis:u.preis}] : []);
+    for(var i=0;i<liste.length;i++){ var a=liste[i]; if(a && a.verfuegbar!==false && (a.asin||a.link)) return a; }
+    return null;
+  }
   function einkauf(p, tour){
     return tour.utensilien.map(function(u, i){
       var m=String(u.menge), n=/je Kind \+ ?(\d+)/.test(m) ? p.kinder+(+RegExp.$1) : /je Kind/.test(m) ? p.kinder : +m||1;
-      var id=u.id||'u'+i, packungen=u.asin ? Math.max(1, Math.ceil(n/(u.packung||n))) : 0;
-      return {id:id, name:u.name, menge:n, wann:u.wann, link:u.link, asin:u.asin, packung:u.packung, packungen:packungen,
-        preis:u.preis, summe:u.preis!=null ? u.preis*packungen : null, zuHause:!!u.zuHause, hinweis:u.hinweis, fertig:!!(p.einkauf||{})[id],
-        lieferbar:!!u.asin && u.preis!=null, gewaehlt:!(p.einkaufAus||{})[id]};
+      var a=artikelWahl(u)||{}, preis=a.asin ? (a.preis!==undefined ? a.preis : null) : undefined;
+      var link=a.link || (a.asin ? 'https://www.amazon.de/dp/'+a.asin : undefined);
+      var id=u.id||'u'+i, packungen=a.asin ? Math.max(1, Math.ceil(n/(a.packung||n))) : 0;
+      return {id:id, name:a.name||u.name, menge:n, wann:u.wann, link:link, asin:a.asin, packung:a.packung, packungen:packungen,
+        preis:preis, summe:preis!=null ? preis*packungen : null, zuHause:!!u.zuHause, hinweis:u.hinweis, fertig:!!(p.einkauf||{})[id],
+        lieferbar:!!a.asin && preis!=null, gewaehlt:!(p.einkaufAus||{})[id]};
     });
   }
   // Summe der noch offenen Artikel mit bekanntem Preis
@@ -170,5 +180,5 @@
     delete o.party; schreib('sj.plan.'+thema, o); return o;
   }
 
-  root.Party={imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
+  root.Party={artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
 })(this);
