@@ -1,7 +1,10 @@
 # Browser-Tests (Playwright) bei jedem Pull Request und auf main.
+# Eigene Pull Requests gehen danach von selbst live: Sind die Tests grün, mergt der Job „mergen“ per Squash
+# und stößt die Veröffentlichung an (Entscheidung vom 11.11.2026, AM-2). Entwürfe (Draft) bleiben liegen.
 name: Tests
 on:
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
   push:
     branches: [main]
   workflow_dispatch:
@@ -29,3 +32,49 @@ jobs:
         env:
           TZ: Europe/Berlin
         run: node tests/alle.cjs
+
+  # Mergt nur Pull Requests aus diesem Repo, die der Besitzer geöffnet hat. Forks und Entwürfe nie.
+  mergen:
+    name: Von selbst mergen
+    needs: browser
+    if: >-
+      github.event_name == 'pull_request'
+      && github.event.pull_request.draft == false
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && github.event.pull_request.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+      pages: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number }}
+      SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Mergen (Squash)
+        id: merge
+        run: |
+          STAND=$(gh api "repos/$REPO/pulls/$PR" --jq '"\(.state) \(.merged)"')
+          if [ "$STAND" != "open false" ]; then
+            echo "Pull Request ist schon gemergt oder geschlossen ($STAND). Nichts zu tun."
+            echo "getan=nein" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # sha: nur genau den getesteten Stand mergen
+          gh api -X PUT "repos/$REPO/pulls/$PR/merge" -f merge_method=squash -f sha="$SHA" --jq .message
+          echo "getan=ja" >> "$GITHUB_OUTPUT"
+      - name: Veröffentlichung anstoßen
+        if: steps.merge.outputs.getan == 'ja'
+        run: |
+          # Ein Merge durch diesen Workflow löst keine Push-Workflows aus. Darum hier ausdrücklich starten,
+          # was ein Push auf main gestartet hätte. Neue Push-Workflows hier nachtragen.
+          gh workflow run cloudflare.yml --repo "$REPO" --ref main
+          DATEIEN=$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename')
+          if echo "$DATEIEN" | grep -qE '^(original\.html$|stimmen/|\.github/workflows/stimmen\.yml$)'; then
+            gh workflow run stimmen.yml --repo "$REPO" --ref main
+          fi
+          gh api -X POST "repos/$REPO/pages/builds" >/dev/null 2>&1 || echo "Pages-Neubau nicht angestoßen."
