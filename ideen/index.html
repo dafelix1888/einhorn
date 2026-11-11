@@ -46,6 +46,9 @@ main>header,main>section:not(.show){max-width:720px;margin-left:auto;margin-righ
 main{max-width:1040px}
 .marke{max-width:1040px;margin:0 auto;padding:16px 16px 0;font-weight:700;letter-spacing:.02em;color:var(--leise)}
 .marke b{color:var(--text)}
+.marke{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mein{color:var(--text);text-decoration:none;font-size:14px;font-weight:600;letter-spacing:0;border:1px solid var(--linie);border-radius:999px;padding:8px 14px;min-height:36px}
+.mein:hover,.mein:focus-visible{border-color:var(--akzent)}
 .leise{color:var(--leise)}
 /* Screenshots im Handy-Rahmen, wechseln beim Scrollen (MAR-9) */
 .show h2{text-align:center}
@@ -84,6 +87,15 @@ html:not(.js) .dots,html:not(.js) .steps{display:none}
 .stimme{margin-top:8px;background:none;border:1px solid var(--linie);color:var(--text);border-radius:999px;padding:8px 16px;font:inherit;font-size:15px;cursor:pointer;min-height:44px}
 .stimme.spielt{background:var(--akzent-tief);border-color:var(--akzent-tief)}
 @media (min-width:860px){.reihe{display:grid;grid-template-columns:repeat(3,1fr);overflow:visible;margin:0}}
+/* Warteliste (MAR-15) */
+.warteliste{background:var(--panel);border:1px solid var(--linie);border-radius:18px;padding:20px;margin-top:40px}
+.warteliste h2{margin-top:0}
+.wl{display:grid;gap:12px;min-width:0}.wl label{display:grid;gap:4px;min-width:0;font-size:15px;color:var(--leise)}
+.wl input,.wl select{width:100%;min-width:0;font:inherit;color:var(--text);background:var(--karte);border:1px solid var(--linie);border-radius:10px;padding:12px;min-height:48px}
+.wl .ok{display:flex;gap:10px;align-items:flex-start}.wl .ok input{width:auto;min-height:auto;margin-top:4px}
+.wl .ok a{color:var(--leise)}.wl .cta{border:0;cursor:pointer;justify-self:start}
+.wl .falle{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.wl-meldung{margin:0;color:var(--text)}.wl-meldung.fehler{color:#FCA5A5}
 /* sanftes Einblenden beim Scrollen */
 html.js .zeig,html.js .figur{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
 html.js .zeig.sichtbar,html.js .figur.sichtbar{opacity:1;transform:none}
