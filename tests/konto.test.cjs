@@ -79,19 +79,28 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   const links=await a.evaluate(()=>{ const p=Party.lesen('einhorn'), pl=Party.plan('einhorn'); return {e:Party.einladungsLink(p,pl), v:Party.vorausgeherLink(p,pl), s:Party.spielLink(p,pl)}; });
   pruefe(/einladung\.html\?k=[\w-]{24}$/.test(links.e) && /&k=/.test(links.v) && /&k=/.test(links.s) && !/plan=|e=/.test(links.e+links.v+links.s), 'Links nur mit Schlüssel');
 
-  // Funkel kennt das Kind (steht im Schritt „iPad startklar machen“)
-  await a.click('[data-oeffne="geraet"]');
-  await a.waitForSelector('#namen-name', {timeout:5000});
+  // Funkel kennt das Kind (UNICORN-33): im Überblick sichtbar, Karte oben im Schritt „iPad startklar machen“
+  pruefe(/Funkel sagt „Emma“/.test(await a.locator('.namen-pille').innerText()) && /ausprobieren/.test(await a.locator('.namen-pille').innerText()), 'Überblick: Hinweis „Funkel sagt „Emma“ · jetzt ausprobieren“');
+  await a.click('.namen-pille');
+  await a.waitForSelector('#namen-name', {timeout:5000}); await a.waitForTimeout(200);
+  pruefe(/#s-geraet$/.test(a.url()) && await a.locator('#namen').evaluate(e=>{ const r=e.getBoundingClientRect(); const n=document.querySelector('.leiste-oben'), u=n?n.getBoundingClientRect().bottom:0; return r.top>=u-2 && r.top<window.innerHeight/2; }), 'Tipp führt direkt zur Namens-Karte');
+  pruefe(await a.evaluate(()=>{ const s=document.querySelector('.schritt-ansicht'), k=document.getElementById('namen-karte'), kn=s.querySelector('.kachel'); return !!k && (!kn || (k.compareDocumentPosition(kn) & Node.DOCUMENT_POSITION_FOLLOWING)); }), 'Namens-Karte steht oben im Schritt');
+  pruefe(/Funkel kennt Emma/.test(await a.locator('.teile').innerText()) && await a.locator('[data-teil="namen"]').getAttribute('aria-pressed')==='false', 'Teilschritt „Funkel kennt Emma“ sichtbar, noch offen');
   pruefe(await a.inputValue('#namen-name')==='Emma', 'Namens-Karte mit Vorname');
   await a.click('#namen-los'); await a.waitForSelector('.namen-fehler', {timeout:5000});
   pruefe(/noch nicht eingerichtet/.test(await a.locator('#namen-karte').innerText()) && /Noch 3 von 3/.test(await a.locator('#namen-karte').innerText()), 'Ohne Schlüssel: verständliche Meldung, nichts verbraucht');
   stimmeAus=false;
   await a.click('#namen-los'); await a.waitForSelector('[data-namen-hoeren="gruss"]', {timeout:5000});
   pruefe(/Emma hat Geburtstag/.test(await a.locator('#namen-karte').innerText()) && /Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()), 'Sätze erzeugt, noch 2 übrig');
+  await a.waitForFunction(()=>(document.querySelector('[data-teil="namen"]')||{}).getAttribute && document.querySelector('[data-teil="namen"]').getAttribute('aria-pressed')==='true', null, {timeout:5000}).catch(()=>{});
+  pruefe(await a.locator('[data-teil="namen"]').getAttribute('aria-pressed')==='true', 'Nach dem Einsprechen ist „Funkel kennt Emma“ abgehakt');
+  pruefe(!(await a.evaluate(()=>Party.aufgaben(Party.lesen('einhorn'), null, null).filter(x=>x.id==='geraet')[0].fertig)), 'Extra-Teil hakt den Schritt nicht allein ab');
   await a.click('#namen-los'); await a.waitForFunction(()=>!document.querySelector('#namen-los') || !document.querySelector('#namen-los').disabled);
   await a.waitForTimeout(300);
   pruefe(/Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()) && db.namen[Object.keys(db.namen)[0]].erzeugungen===1, 'Gleicher Name noch einmal: zählt nicht');
   await a.locator('#namen-karte').screenshot({path:'namen-karte.png'});
+  await a.click('#zum-ueberblick'); await a.waitForSelector('.namen-pille.da', {timeout:3000}).catch(()=>{});
+  pruefe(/Funkel kennt Emma/.test(await a.locator('.namen-pille').innerText()) && /anhören/.test(await a.locator('.namen-pille').innerText()), 'Überblick danach: „Funkel kennt Emma · Anhören“');
   // Änderung wird nachgespeichert
   await a.click('[data-oeffne="einladen"]');
   await a.fill('#gh','Regenhose und Mütze'); await a.locator('#gh').blur(); await a.waitForTimeout(2000);
