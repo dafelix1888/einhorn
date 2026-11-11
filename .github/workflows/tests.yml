@@ -23,7 +23,10 @@ jobs:
         working-directory: tests
         run: |
           npm install --no-audit --no-fund
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
+          # Systembibliotheken: Das Runner-Image hat sie meist schon. Ist der Ubuntu-Spiegel nicht erreichbar
+          # (PBIM, 11. November: DNS-Fehler bei apt), laufen die Tests trotzdem weiter.
+          timeout 300 npx playwright install-deps chromium || echo "::warning::Playwright-Abhängigkeiten nicht nachinstalliert (apt nicht erreichbar)"
       - name: Seite lokal starten
         run: |
           python3 -m http.server 8765 >/tmp/server.log 2>&1 &
