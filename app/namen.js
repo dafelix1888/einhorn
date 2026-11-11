@@ -34,8 +34,10 @@
     thema=th; var p=party();
     if(!root.Konto || !Konto.aktiv() || !p) return '';
     setTimeout(laden, 0);
-    return '<h2>Funkel kennt '+esc(vorname()||'das Kind')+'</h2><div class="konto namen" id="namen-karte">'+innen()+'</div>';
+    return '<h2 id="namen">Funkel kennt '+esc(vorname()||'das Kind')+'</h2><div class="konto namen" id="namen-karte">'+innen()+'</div>';
   }
+  // Sätze sind da: die Party-Seite hakt „Funkel kennt …“ ab (UNICORN-33)
+  function melden(){ try{ root.dispatchEvent(new CustomEvent('namen', {detail:{thema:thema}})); }catch(e){} }
   function zeichnen(){ var e=document.getElementById('namen-karte'); if(e) e.innerHTML=innen(); }
   function audioAus(saetze){ audio={}; Object.keys(saetze||{}).forEach(function(k){ if(saetze[k] && saetze[k].b64) audio[k]=saetze[k].b64; }); }
   function laden(){
@@ -43,12 +45,13 @@
     Konto.namenStand(thema).then(function(s){
       if(!s) return; stand=s; fehler='';
       zeichnen();
+      if(s.hash){ melden(); }
       if(s.hash) Konto.namenHolen(thema).then(function(r){ if(r && r.saetze){ audioAus(r.saetze); zeichnen(); } }, function(){});
     }, function(e){ fehler=e.message||'Laden ging nicht.'; zeichnen(); });
   }
   function hoeren(k){
     if(!audio[k]) return;
-    try{ if(spieler) spieler.pause(); spieler=new Audio('data:audio/mpeg;base64,'+audio[k]); spieler.play(); }catch(e){}
+    try{ if(spieler) spieler.pause(); spieler=new Audio('data:audio/mpeg;base64,'+audio[k]); var pr=spieler.play(); if(pr && pr['catch']) pr['catch'](function(){}); }catch(e){}
   }
   function erzeugen(){
     var name=(document.getElementById('namen-name')||{}).value||'', aus=(document.getElementById('namen-aussprache')||{}).value||'';
@@ -58,7 +61,7 @@
     Konto.namenErzeugen(thema, name, aus, p.kind && p.kind.alter).then(function(r){
       laeuft=false; stand.uebrig=r.uebrig; stand.max=r.max; stand.hash=r.hash;
       stand.texte={}; Object.keys(r.saetze||{}).forEach(function(k){ stand.texte[k]=r.saetze[k].text; });
-      audioAus(r.saetze); zeichnen(); hoeren('gruss');
+      audioAus(r.saetze); zeichnen(); hoeren('gruss'); melden();
     }, function(e){ laeuft=false; fehler=e.message||'Das ging nicht.'; if(e.daten && typeof e.daten.uebrig==='number') stand.uebrig=e.daten.uebrig; zeichnen(); });
   }
   document.addEventListener('click', function(ev){
@@ -71,7 +74,7 @@
   stil.textContent='.namen .zeile{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--linie,#2F2740)}.namen .zeile:first-child{border-top:0}'+
     '.namen .zeile .leise{font-size:.9rem}.namen .zeile button{white-space:nowrap;flex:none}.namen-saetze{margin-bottom:12px}.namen-feld{display:block;margin:0 0 10px;font-weight:700;font-size:.92rem}'+
     '.namen-feld input{display:block;width:100%;box-sizing:border-box;margin-top:6px;font:inherit;font-weight:400;font-size:1.05rem;padding:11px 13px;border-radius:12px;border:1.5px solid var(--linie,#2F2740);background:var(--panel,#17121F);color:inherit}'+
-    '.namen-fehler{color:var(--rot,#F87171);margin:4px 0 10px}';
+    '.namen-fehler{color:var(--rot,#F87171);margin:4px 0 10px}#namen{scroll-margin-top:84px}';
   document.head.appendChild(stil);
   root.Namen={karte:karte};
 })(this);

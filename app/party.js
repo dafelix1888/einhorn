@@ -41,6 +41,8 @@
   function aufgaben(p, tour, pl){
     var draussen=p.ort!=='drinnen', v=variante(p), route=!!(pl && pl.stationen && pl.stationen.length), t=p.thema;
     var erledigt=p.erledigt||{};
+    // Namens-Sätze gibt es nur mit Server (Konto) und Vornamen
+    var name=p.kind && p.kind.name ? String(p.kind.name) : '', mitNamen=!!(name && root.Konto && root.Konto.aktiv && root.Konto.aktiv());
     var ek=tour && tour.utensilien ? einkauf(p, tour) : [], allesGekauft=ek.length>0 && ek.every(function(x){ return x.fertig; });
     var km=pl && pl.strecke ? (pl.strecke>=1000 ? (pl.strecke/1000).toFixed(1).replace('.',',')+' km' : Math.round(pl.strecke)+' m') : '';
     var wetter=!draussen ? '' : p.planB ? ' Regen gemeldet? Dann schaltest du mit einem Tipp auf drinnen um.' : ' Ohne Plan B: bei Regen Termin oder Ort überlegen.';
@@ -64,9 +66,10 @@
         text:'Etwa eine Stunde: Schatzkiste bekleben, Fuchsbau grau anmalen, Sticker in '+p.kinder+' Stücke schneiden. '+(v==='a'?'Dazu Urkunden und die schlafende Wolke (A3) drucken.':'Dazu die Urkunden drucken.'),
         knopf:'Druckvorlagen öffnen', link:'druck.html?thema='+t, neben:{text:'Bastelliste im Spiel', link:'spiel.html?thema='+t+'#einrichten'},
         teile:[{id:'basteln', titel:'Gebastelt'}, {id:'drucken', titel:'Gedruckt'}]},
-      {id:'geraet', tag:-1, titel:'iPad startklar machen', kurz:'Stimmen laden, Ton'+(draussen?' und GPS':'')+' prüfen',
-        text:'Fünf Minuten im WLAN: Stimmen laden, Ton'+(draussen?', GPS':'')+' und Akku prüfen.'+wetter, knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
-        teile:[{id:'geraet', titel:'iPad ist startklar'}]},
+      {id:'geraet', tag:-1, titel:'iPad startklar machen', kurz:(mitNamen?'Funkel lernt den Namen, ':'')+'Stimmen laden, Ton'+(draussen?' und GPS':'')+' prüfen',
+        text:(mitNamen?'Zuerst lernt Funkel den Namen: Er sagt „'+name+'“ an der Haustür, beim Schatz und zum Abschied. Dann ':'')+(mitNamen?'f':'F')+'ünf Minuten im WLAN: Stimmen laden, Ton'+(draussen?', GPS':'')+' und Akku prüfen.'+wetter, knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
+        // „Funkel kennt …“ (UNICORN-33) steht sichtbar im Ablauf, zählt aber nicht für den Haken des Schritts (Extra, später bezahlt)
+        teile:(mitNamen?[{id:'namen', titel:'Funkel kennt '+name, text:'Einmal einsprechen und anhören', extra:true}]:[]).concat([{id:'geraet', titel:'iPad ist startklar'}])},
       {id:'partytag', tag:0, titel:'Partytag', kurz:[draussen&&v!=='c'?'Kreidespur':'', p.vorausgeher?'Vorausgeher':'', 'Spiegel starten'].filter(Boolean).join(', '),
         text:[draussen&&v!=='c'?'Eine Stunde vorher die Kreidespur malen.':'', p.vorausgeher?'20 Minuten vorher geht der Vorausgeher los.':'', draussen?'Dann alle an die Haustür und den Zauberspiegel starten.':'Dann alle zusammenholen und den Zauberspiegel starten.'].filter(Boolean).join(' '),
         knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
@@ -82,7 +85,7 @@
         x.auto=!!x.nurAuto; x.fertig=!!x.erkannt || (!x.nurAuto && !!erledigt[x.id]);
         if(x.minuten!=null) x.uhr=uhr(p, x.minuten);
       });
-      a.fertig=!!erledigt['schritt.'+a.id] || a.teile.every(function(x){ return x.fertig; });
+      a.fertig=!!erledigt['schritt.'+a.id] || a.teile.every(function(x){ return x.fertig || x.extra; });
       a.auto=false;
     });
     return l;
@@ -91,7 +94,7 @@
   // Haken für einen ganzen Schritt setzen oder lösen (alle Teile, die man von Hand abhaken kann)
   function abhaken(p, a, an){
     p.erledigt=p.erledigt||{};
-    a.teile.forEach(function(x){ if(!x.nurAuto) p.erledigt[x.id]=!!an; });
+    a.teile.forEach(function(x){ if(!x.nurAuto && !x.extra) p.erledigt[x.id]=!!an; });
     p.erledigt['schritt.'+a.id]=!!an;
     return p;
   }

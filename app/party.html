@@ -34,6 +34,12 @@
 @keyframes funke{0%{opacity:0;transform:scale(.2)}40%{opacity:1;transform:scale(1.3) rotate(40deg)}100%{opacity:0;transform:scale(.6) rotate(90deg) translateY(-8px)}}
 .sprech{margin:8px 0 0;text-align:center;color:#D9D2E8;font-size:.98rem;line-height:1.35}
 .sprech b{color:var(--text)}
+.namen-pille{display:flex;align-items:center;gap:12px;width:100%;margin:12px 0 0;padding:8px 12px;border-radius:14px;border:1.5px solid rgba(167,139,250,.55);background:rgba(139,92,246,.16);color:var(--text);font:inherit;text-align:left;cursor:pointer;min-height:52px}
+.namen-pille .ton{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#8B5CF6;color:#fff}
+.namen-pille .ton svg{width:18px;height:18px}
+.namen-pille .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;line-height:1.25}.namen-pille b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.namen-pille small{color:#C4B5FD;font-size:.84rem;font-weight:700}
+.namen-pille .weiter{flex:none;font-size:1.5rem;line-height:1;color:#C4B5FD}
+.namen-pille.da{background:transparent;border-color:var(--linie,#2F2740)}.namen-pille.da .ton{background:#3FB950}.namen-pille.da small{color:var(--leise);font-weight:400}
 .weg-titel{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--leise);margin:14px 2px 2px}
 .weg{list-style:none;margin:0;padding:0}
 .station{position:relative}
@@ -185,9 +191,10 @@
   var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
   var tour=null, info=null, party=null, entwurf=null, schritt=0, vgVonHand=false, voreinOffen=false;
   // offene Ansicht der Übersicht: '' = Überblick, sonst ein Schritt. Aus der Adresse: #einkauf, #einladung, #s-route …
-  function ausAnker(h){ h=String(h||'').replace(/^#/,''); return {einkauf:'bestellen', einladung:'einladen'}[h] || (/^s-[a-z]+$/.test(h)?h.slice(2):''); }
-  var offen=ausAnker(location.hash);
+  function ausAnker(h){ h=String(h||'').replace(/^#/,''); return {einkauf:'bestellen', einladung:'einladen', namen:'geraet'}[h] || (/^s-[a-z]+$/.test(h)?h.slice(2):''); }
+  var offen=ausAnker(location.hash), namenSprung=location.hash==='#namen';
   var SCHRITTE=3;
+  var TON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
   var HAKEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   var BAUM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0-5.6 8.2A4.5 4.5 0 0 0 9 19h6a4.5 4.5 0 0 0 2.6-7.8A6 6 0 0 0 12 3z"/><path d="M12 13v8"/></svg>';
   var HAUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>';
@@ -366,6 +373,7 @@
     var wechsel=gezeigt!==offen; gezeigt=offen;
     $('seite').innerHTML='<div class="ansicht'+(wechsel?' neu':'')+'">'+(nr<0 ? ueberblick(l, n, tage, p) : schrittAnsicht(l[nr], nr, l, p, pl, tage))+'</div>';
     gefeiert=-1; rueckmeldungZeigen(); feldPassen(); gaesteLaden();
+    if(namenSprung && offen==='geraet'){ namenSprung=false; setTimeout(zuNamen, 30); }
   }
   // Regenbogen: außen der erste Schritt, innen der Partytag. Erledigte Bögen leuchten, der neueste zeichnet sich ein.
   function bogen(l){
@@ -391,7 +399,7 @@
       '<div class="bogen'+(gefeiert>=0?' feier':'')+'">'+bogen(l)+
         (info.hoerprobe ? '<button type="button" class="figur" id="held-hoeren" aria-label="'+esc(held.name||'Funkel')+' anhören"><img src="'+esc(bild)+'" alt=""></button>' : '<span class="figur"><img src="'+esc(bild)+'" alt=""></span>')+
         (gefeiert>=0?FUNKEN:'')+'</div>'+
-      '<p class="sprech" aria-live="polite">'+satz+'</p>'+
+      '<p class="sprech" aria-live="polite">'+satz+'</p>'+namenPille(l, p)+
       (n ? '' : '<a class="knopf breit" href="bereit.html?thema='+thema+'" style="margin-top:12px">Startklar öffnen</a>')+'</section>';
     var gz=window.Konto && Konto.gaesteGemerkt ? Konto.gaesteGemerkt(thema) : null, gt=gz?Konto.gaesteKurz(gz):'';
     h+='<h2 class="weg-titel">Deine '+l.length+' Schritte</h2><ol class="weg">'+l.map(function(a, i){
@@ -409,6 +417,17 @@
       (meinungDa()?'<p class="leise klein" style="margin:22px 2px 0">Wie gefällt dir Schatzweg? <button type="button" class="textknopf klein" data-meinung-auf="party" style="min-height:44px;padding:0 0 0 4px">Feedback geben</button></p>':'')+
       '<div class="reihe" style="margin-top:14px"><button type="button" class="knopf leer mittel" id="loeschen">Party löschen</button></div>';
   }
+  // „Funkel kennt …“ im Überblick (UNICORN-33): sichtbar, sobald es Namens-Sätze geben kann
+  function namenPille(l, p){
+    var x=null; l.forEach(function(a){ a.teile.forEach(function(t){ if(t.id==='namen') x=t; }); });
+    if(!x || !window.Namen) return '';
+    var n=esc(p.kind.name);
+    return '<button type="button" class="namen-pille'+(x.fertig?' da':'')+'" data-namen-auf>'+
+      '<span class="ton" aria-hidden="true">'+(x.fertig?HAKEN:TON)+'</span>'+
+      '<span class="t">'+(x.fertig?'<b>Funkel kennt '+n+'</b><small>Sagt den Namen an drei Stellen · anhören</small>':'<b>Funkel sagt „'+n+'“</b><small>Neu: jetzt ausprobieren</small>')+'</span>'+
+      '<span class="weiter" aria-hidden="true">›</span></button>';
+  }
+  function zuNamen(){ var e=$('namen'); if(e) try{ e.scrollIntoView({block:'start'}); }catch(x){ e.scrollIntoView(); } }
   // Ein Schritt als eigene Ansicht: Leiste mit allen Schritten, wozu, Werkzeuge, Abschluss
   function schrittAnsicht(a, i, l, p, pl, tage){
     var vor=l[i-1], nach=l[i+1], z=a.fertig?'erledigt':zeit(a, tage), loesbar=a.teile.some(function(x){ return !x.erkannt && !x.nurAuto; });
@@ -458,9 +477,8 @@
       kachel({href:'spiel.html?thema='+thema+'#einrichten', haupt:true, symbol:'liste', titel:'Liste öffnen', text:'Zeigt, welche Station in welchen Raum kommt und was dort hingehört.'});
     if(a.id==='basteln') return kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden'+(Party.variante(p)==='a'?', Wolke':'')+' und Einladungen.'})+
       kachel({href:'spiel.html?thema='+thema+'#einrichten', symbol:'liste', titel:'Bastelliste öffnen', text:'Was in welche Station gehört. Dort hakst du ab, was fertig ist.'});
-    if(a.id==='geraet') return kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
-      kachel({id:'teilen', symbol:'geraet', titel:'Link fürs iPad', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl und Variante schon drin.'})+
-      (window.Namen ? Namen.karte(thema) : '');
+    if(a.id==='geraet') return (window.Namen ? Namen.karte(thema) : '')+kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
+      kachel({id:'teilen', symbol:'geraet', titel:'Link fürs iPad', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl und Variante schon drin.'});
     if(a.id==='partytag'){
       if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.uhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das iPad sieht seine Haken live.':'')});
       h+=kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem iPad: letzter Check, dann weckt ihr den Zauberspiegel.'});
@@ -569,11 +587,13 @@
     if((b=t.closest('[data-teil]'))){
       var sid=b.getAttribute('data-in'), tid=b.getAttribute('data-teil'), war=schritt_(sid).fertig;
       party.erledigt=party.erledigt||{};
-      if(party.erledigt[tid]){ party.erledigt[tid]=false; party.erledigt['schritt.'+sid]=false; } else party.erledigt[tid]=true;
+      var istExtra=schritt_(sid).teile.some(function(x){ return x.id===tid && x.extra; });
+      if(party.erledigt[tid]){ party.erledigt[tid]=false; if(!istExtra) party.erledigt['schritt.'+sid]=false; } else party.erledigt[tid]=true;
       party=Party.speichern(party);
       if(schritt_(sid).fertig && !war) feiern(sid); else { var ty=window.scrollY; uebersicht(); window.scrollTo(0,ty); var nt=$('seite').querySelector('[data-teil="'+tid+'"]'); if(nt) try{ nt.focus({preventScroll:true}); }catch(e){} }
       return;
     }
+    if(t.closest('[data-namen-auf]')){ zeige('geraet'); setTimeout(zuNamen, 30); return; }
     if((b=t.closest('[data-oeffne]'))){ zeige(b.getAttribute('data-oeffne')); return; }
     if((b=t.closest('[data-meinung-auf]'))){ if(meinungDa()) Konto.meinung({wo:b.getAttribute('data-meinung-auf'), thema:thema}); return; }
     if((b=t.closest('[data-gast-weg]'))){
@@ -631,6 +651,13 @@
     if(ev.target.id!=='vorein') return;
     voreinOffen=ev.target.open; var m=ev.target.querySelector('summary em'); if(m) m.textContent=voreinOffen?'Fertig':'Ändern';
   }, true);
+  // Namens-Sätze eingesprochen (UNICORN-33): Teilschritt „Funkel kennt …“ abhaken
+  window.addEventListener('namen', function(ev){
+    var d=ev.detail||{}; if(d.thema!==thema || entwurf || !party) return;
+    party.erledigt=party.erledigt||{}; if(party.erledigt.namen) return;
+    party.erledigt.namen=true; party=Party.speichern(party);
+    var y=window.scrollY; uebersicht(); window.scrollTo(0,y);
+  });
   // Konto: nach Anmelden, neuem Link oder Abmelden die Übersicht neu zeichnen
   window.addEventListener('konto', function(ev){
     var d=ev.detail||{}; if(d.thema!==thema) return;
