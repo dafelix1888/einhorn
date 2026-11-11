@@ -108,6 +108,7 @@ Punkte mit dem Handy gesetzt, gespielt mit dem iPad: Stationen öffneten mal zu 
 
 - Texte in der App auf Deutsch, kurz und ohne Fachwörter. Kein echter Ort oder Name aus Felix' Umfeld im öffentlichen Repo.
 - Änderungen per Branch und Pull Request, Felix möchte, dass PRs direkt in `main` gemergt werden.
+- Seit 11. November mergt GitHub eigene Pull Requests von selbst per Squash, sobald die Tests grün sind, und startet danach die Veröffentlichung (Job „Von selbst mergen“ in `.github/workflows/tests.yml`, AM-2). Entwürfe (Draft) bleiben liegen, Pull Requests aus Forks werden nie gemergt.
 - `app/spiel.html` wurde einmalig aus dem entschlüsselten Original erzeugt und wird jetzt direkt bearbeitet.
 - Die Stimmen-Action läuft bei Änderungen an `original.html` oder `stimmen/**` und teilt danach die Pakete neu auf. Geänderte Story-Texte kosten ElevenLabs-Credits.
 - Testen: `tests/` im Repo (Playwright). Lokal `python3 -m http.server 8765` im Repo starten, dann `node tests/alle.cjs`. Die GitHub Action „Tests“ läuft bei jedem Pull Request und auf main. Enthalten: Rauchtest aller Seiten (keine JS-Fehler, keine Google-Fonts, Rechtslinks; fremde Server blockiert), Konto und geschützte Links gegen nachgebautes Supabase, Danke-Seite, Marketer-Ereignisse, Fehlermeldungen. Neue Funktionen bekommen eine `*.test.cjs` dazu. Der Planer-Test baut seine Nachbarschaft selbst (`tests/planer.test.cjs`).

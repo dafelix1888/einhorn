@@ -48,7 +48,6 @@ jobs:
       contents: write
       pull-requests: write
       actions: write
-      pages: write
     env:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
@@ -64,8 +63,10 @@ jobs:
             echo "getan=nein" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # sha: nur genau den getesteten Stand mergen
-          gh api -X PUT "repos/$REPO/pulls/$PR/merge" -f merge_method=squash -f sha="$SHA" --jq .message
+          # sha: nur genau den getesteten Stand mergen. Commit-Titel = PR-Titel, damit der Ticket-Schlüssel auf main steht.
+          TITEL=$(gh api "repos/$REPO/pulls/$PR" --jq .title)
+          gh api -X PUT "repos/$REPO/pulls/$PR/merge" -f merge_method=squash -f sha="$SHA" \
+            -f commit_title="$TITEL (#$PR)" --jq .message
           echo "getan=ja" >> "$GITHUB_OUTPUT"
       - name: Veröffentlichung anstoßen
         if: steps.merge.outputs.getan == 'ja'
@@ -77,4 +78,4 @@ jobs:
           if echo "$DATEIEN" | grep -qE '^(original\.html$|stimmen/|\.github/workflows/stimmen\.yml$)'; then
             gh workflow run stimmen.yml --repo "$REPO" --ref main
           fi
-          gh api -X POST "repos/$REPO/pages/builds" >/dev/null 2>&1 || echo "Pages-Neubau nicht angestoßen."
+          # GitHub Pages baut nach dem Merge von selbst neu, das braucht keinen Anstoß.
