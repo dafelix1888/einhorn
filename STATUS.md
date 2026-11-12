@@ -10,6 +10,8 @@ Ziel: fremde Eltern planen und spielen ohne Hilfe; Gate bis 6. Dezember 2026: 20
 3. UNICORN-8 Namens-Sätze: startklar, Verbrauch je Monat messbar (wartet auf ElevenLabs-Secret).
 4. UNICORN-12 Bezahlung: Konzept und Anbietervergleich (STRAT-8), Messung bei Marketer (MAR-61); Bau erst nach STRAT-8 und STRAT-12.
 
+**12. November:** UNICORN-35 Landingpage mit wischbaren Bildern von Marketer übernommen (PR #144, live). UNICORN-37 Planer: Die gewählte Himmelsrichtung zählt bei der Auswahl der Route deutlich mehr (Ziel mitten in der Richtung schlägt ein Ziel am Rand, auch wenn dort mehr Stationen ihren Ort finden); die Karte nennt die Richtung der gezeigten Route („Richtung Osten · Rundkurs · ab …“); der Kartenausschnitt wird nur wiederverwendet, wenn er groß genug ist. Test `tests/richtung.test.cjs`.
+
 ## Rollen und Jira-Projekte
 
 | Rolle | Jira | Aufgabe |
