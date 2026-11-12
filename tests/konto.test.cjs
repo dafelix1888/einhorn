@@ -137,6 +137,22 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='end'; const a=__zs.akt(); return a.zweit && a.zweit.key==='n.schatz' && a.zweit.zweit.key==='ende.b'; }), 'Schatz: Namens-Satz in der Kette');
   pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='scene'; st.idx=0; st.step=0; const a=__zs.akt(); return a.zweit.key==='n.gruss' && a.zweit.zweit.key==='s0.b'; }), 'Begrüßung: Namens-Satz zwischen Teil 1 und 2');
   pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='heim'; st.step=1; return __zs.akt().zweit.key==='n.abschied'; }), 'Abschied: Namens-Satz am Ende');
+  // UNICORN-38: Ein neuer Haken kommt ohne Neuladen in wenigen Sekunden an, auf dem Tablet und auf der Party-Seite der Eltern
+  await a.goto(B+'party.html?thema=einhorn#s-partytag'); await a.waitForSelector('#vg-stand:not([hidden])', {timeout:13000}).catch(()=>{});
+  pruefe(/1 Station steht/.test(await a.locator('#vg-stand').innerText().catch(()=>'')), 'Party-Seite zeigt den Aufbau-Stand');
+  const pid38=Object.keys(db.aufbau)[0], lade38={a:0, s:0};
+  a.on('load', ()=>lade38.a++); s.on('load', ()=>lade38.s++);
+  db.aufbau[pid38]={stationen:{1:true, 2:true}, aktualisiert:new Date().toISOString()};
+  const t38=Date.now();
+  await Promise.all([
+    a.waitForFunction(()=>/2 Stationen stehen/.test((document.getElementById('vg-stand')||{}).textContent||''), null, {timeout:9000}).catch(()=>{}),
+    s.waitForFunction(()=>/bis Station 3 aufgebaut|alles aufgebaut/.test((document.getElementById('aufbau-live')||{}).textContent||''), null, {timeout:9000}).catch(()=>{})]);
+  const dauer38=Date.now()-t38;
+  console.log('   neuer Haken sichtbar nach', dauer38, 'ms');
+  pruefe(/2 Stationen stehen/.test(await a.locator('#vg-stand').innerText()), 'Party-Seite: neuer Haken ohne Neuladen');
+  pruefe(/bis Station 3 aufgebaut|alles aufgebaut/.test(await s.locator('#aufbau-live').innerText()), 'Tablet: neuer Haken ohne Neuladen');
+  pruefe(dauer38<8000 && lade38.a===0 && lade38.s===0, 'in wenigen Sekunden, keine Seite neu geladen');
+  await a.goto(B+'party.html?thema=einhorn#s-einladen'); await a.waitForTimeout(600);
   const g3=await geraet(); await g3.goto(B); const gastLiest=await g3.evaluate(async(t)=>{ const r=await fetch('https://test.supabase.co/rest/v1/rpc/aufbau_lesen',{method:'POST',headers:{apikey:'anon','Content-Type':'application/json'},body:JSON.stringify({t})}); return r.json(); }, links.e.split('k=')[1]);
   pruefe(gastLiest===null, 'Gast-Link liest keinen Aufbau');
 

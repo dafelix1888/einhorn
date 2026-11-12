@@ -10,6 +10,8 @@ Ziel: fremde Eltern planen und spielen ohne Hilfe; Gate bis 6. Dezember 2026: 20
 3. UNICORN-8 Namens-Sätze: startklar, Verbrauch je Monat messbar (wartet auf ElevenLabs-Secret).
 4. UNICORN-12 Bezahlung: Konzept und Anbietervergleich (STRAT-8), Messung bei Marketer (MAR-61); Bau erst nach STRAT-8 und STRAT-12.
 
+**12. November (spät):** UNICORN-38 Vorausgeher-Stand ohne Neuladen: Startklar, Tablet und neu auch die Party-Seite (Schritt „Partytag“, unter „Link für den Vorausgeher“) sehen am Partytag und solange gerade aufgebaut wird alle 5 Sekunden nach, sonst alle 10 (vorher 20 bis 30, Party-Seite gar nicht); beim Zurückkehren auf die Seite und sobald wieder Netz da ist sofort. Zwischenschritt laut STRAT-33, 0 €, keine Änderung an der Datenbank. Echter Push (Supabase Realtime) ist nicht gebaut (Service Worker v55).
+
 **12. November abends:** UNICORN-40: In der App heißt es überall „Tablet“ statt „iPad“; Bildschirmsperre und Ton im Startklar-Check für iPad und Android erklärt (Service Worker v53). Landingpage und Themenseiten gehören Marketer (eigenes MAR-Ticket). Gesprochene Sätze unverändert, Funkel sagt nirgends „iPad“.
 
 **12. November:** UNICORN-35 Landingpage mit wischbaren Bildern von Marketer übernommen (PR #144, live). UNICORN-37 Planer: Die gewählte Himmelsrichtung zählt bei der Auswahl der Route deutlich mehr (Ziel mitten in der Richtung schlägt ein Ziel am Rand, auch wenn dort mehr Stationen ihren Ort finden); die Karte nennt die Richtung der gezeigten Route („Richtung Osten · Rundkurs · ab …“); der Kartenausschnitt wird nur wiederverwendet, wenn er groß genug ist. Test `tests/richtung.test.cjs`.

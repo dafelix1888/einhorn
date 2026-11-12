@@ -373,6 +373,7 @@
     var wechsel=gezeigt!==offen; gezeigt=offen;
     $('seite').innerHTML='<div class="ansicht'+(wechsel?' neu':'')+'">'+(nr<0 ? ueberblick(l, n, tage, p) : schrittAnsicht(l[nr], nr, l, p, pl, tage))+'</div>';
     gefeiert=-1; rueckmeldungZeigen(); feldPassen(); gaesteLaden();
+    vgStandZeigen(); vgBeobachten();
     if(namenSprung && offen==='geraet'){ namenSprung=false; setTimeout(zuNamen, 30); }
   }
   // Regenbogen: außen der erste Schritt, innen der Partytag. Erledigte Bögen leuchten, der neueste zeichnet sich ein.
@@ -454,6 +455,19 @@
     }).join('')+'</ul>';
   }
   // Kachel: großer Knopf mit Titel und ein, zwei Sätzen (für wen, wann, wie)
+  // Vorausgeher live: Wie viele Stationen stehen schon? Ohne Neuladen (UNICORN-38).
+  var vgStand=null, vgAus=null;
+  function vgStandZeigen(){
+    var e=$('vg-stand'); if(!e) return;
+    if(!vgStand || !vgStand.aktualisiert){ e.hidden=true; return; }
+    var n=Object.keys(vgStand.stationen||{}).length;
+    e.textContent='Live: '+n+(n===1?' Station steht':' Stationen stehen')+' (Stand '+new Date(vgStand.aktualisiert).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr)';
+    e.hidden=false;
+  }
+  function vgBeobachten(){
+    if(vgAus || !party || !party.vorausgeher || !window.Konto || !Konto.aufbauBeobachten) return;
+    vgAus=Konto.aufbauBeobachten(thema, function(r){ vgStand=r; vgStandZeigen(); });
+  }
   function kachel(o){
     var innen='<span class="k-symbol">'+symbol(o.symbol)+'</span><span class="k-text"><b>'+esc(o.titel)+'</b><span>'+esc(o.text)+'</span></span><span class="pfeil" aria-hidden="true"></span>', kl='kachel'+(o.haupt?' haupt':'');
     return o.href ? '<a class="'+kl+'" href="'+esc(o.href)+'">'+innen+'</a>' : '<button type="button" class="'+kl+'" id="'+o.id+'">'+innen+'</button>';
@@ -480,7 +494,7 @@
     if(a.id==='geraet') return (window.Namen ? Namen.karte(thema) : '')+kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
       kachel({id:'teilen', symbol:'geraet', titel:'Link fürs Tablet', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl und Variante schon drin.'});
     if(a.id==='partytag'){
-      if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.uhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das Tablet sieht seine Haken live.':'')});
+      if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.uhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das Tablet sieht seine Haken live.':'')})+'<p class="leise" id="vg-stand" role="status" hidden style="margin:6px 0 0;font-weight:700"></p>';
       h+=kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Tablet: letzter Check, dann weckt ihr den Zauberspiegel.'});
       if(p.planB || p.ort==='drinnen' && p.warDraussen){
         var drin=p.ort==='drinnen';
