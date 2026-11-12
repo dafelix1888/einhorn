@@ -318,7 +318,8 @@
       '<text x="10" y="20" font-size="15" fill="#B3A9C4">Höhe '+Math.round(lo)+' bis '+Math.round(hi)+' m</text>';
   }
   function startTextZeigen(){
-    $('start-text').textContent='Ab: '+(plan.adresse||'eure Haustür')+' · '+(plan.rundkurs?'Rundkurs':'Hin und zurück');
+    var form=plan.rundkurs?'Rundkurs':'Hin und zurück', ab=plan.adresse||'eure Haustür';   // Richtung zuerst, damit sie auf dem Handy nicht abgeschnitten wird
+    $('start-text').textContent=HIMMEL[plan.richtung] ? 'Richtung '+HIMMEL[plan.richtung]+' · '+form+' · ab '+ab : 'Ab: '+ab+' · '+form;
   }
   function heimNachrechnen(){ var r=neuRechnen(); if(r && !r.luft){ plan.heimweg=r.heim; plan.heimRoute=r.heimRoute; plan.heimGleich=r.heimGleich; } }
   function ergebnisZeigen(){
@@ -335,7 +336,7 @@
     var radius=umkreis(plan.distanz||wahl.distanz, plan.rundkurs);
     netzLaedt=true;
     overpass(PlanerKern.overpassAbfrage(plan.start.lat, plan.start.lng, radius)).then(function(osm){
-      osmCache={osm:osm, start:plan.start, distanz:plan.distanz||wahl.distanz}; wahl.start=plan.start;
+      osmCache={osm:osm, start:plan.start, distanz:plan.distanz||wahl.distanz, radius:radius}; wahl.start=plan.start;
       netz=PlanerKern.netzBauen(osm);
       if(plan.heimweg==null || (plan.rundkurs && !plan.heimRoute)){ heimNachrechnen(); speichern(); kartenZeichnen(false); }
       kennzahlenZeigen(plan.strecke, plan.heimweg, false);
@@ -353,11 +354,11 @@
     $('planen').disabled=true; versuch=0;
     var startHolen = (wahl.start && (!text || text===wahl.adresse)) ? Promise.resolve(wahl.start) : (status('Adresse wird gesucht …'), adresseSuchen(text).then(function(a){ wahl.start={lat:a.lat,lng:a.lng}; wahl.adresse=text; $('start-info').textContent=a.name; return wahl.start; }));
     startHolen.then(function(start){
-      if(osmCache && osmCache.start===start && wahl.distanz<=osmCache.distanz) return rechnen();   // gleiche Gegend: Daten wiederverwenden
+      if(osmCache && osmCache.start===start && umkreis(wahl.distanz, wahl.rundkurs)<=osmCache.radius) return rechnen();   // gleiche Gegend: Daten wiederverwenden
       status('Wege, Bänke, Zäune und Kreuzungen werden geladen …');
       var geduld=setTimeout(function(){ status('Die Kartendienste sind gerade gut besucht. Noch einen Moment, das kann bis zu einer Minute dauern …'); geduld=setTimeout(function(){ status('Fast geschafft, die Karte sucht noch Wege in eurer Gegend …'); }, 30000); }, 12000);
       var radius=umkreis(wahl.distanz, wahl.rundkurs);
-      return overpass(PlanerKern.overpassAbfrage(start.lat, start.lng, radius)).then(function(osm){ clearTimeout(geduld); osmCache={osm:osm, start:start, distanz:wahl.distanz}; netz=null; return rechnen(); }, function(e){ clearTimeout(geduld); throw e; });
+      return overpass(PlanerKern.overpassAbfrage(start.lat, start.lng, radius)).then(function(osm){ clearTimeout(geduld); osmCache={osm:osm, start:start, distanz:wahl.distanz, radius:radius}; netz=null; return rechnen(); }, function(e){ clearTimeout(geduld); throw e; });
     })['catch'](function(e){ status(String(e.message||e), true); })
     .then(function(){ $('planen').disabled=false; });
   }

@@ -168,7 +168,7 @@
       var baum=baeumeNah(netz,p,25), fl=flaecheNah(netz,p,120);
       if(baum) s*=1+Math.min(0.3,baum*0.05);
       if(fl && /park|wood|forest|playground|recreation/.test(fl.art)) s*=1.2;
-      liste.push({punkt:{lat:p.lat,lng:p.lng}, knoten:n.id, art:art, name:name||null, flaeche:fl, weg:weg, score:s});
+      liste.push({punkt:{lat:p.lat,lng:p.lng}, knoten:n.id, art:art, name:name||null, flaeche:fl, weg:weg, score:s, richtungOk:richtungOk});
     }
     var typ=spec.typ;
     if(typ==='bank'){ netz.baenke.forEach(function(b){ rein(b,'Bank',b.tags.name,1); }); netz.gipfel.forEach(function(g){ rein(g,'Aussichtspunkt',g.tags.name,0.7); }); netz.spielplaetze.forEach(function(s){ rein(s,'Spielplatz',s.tags.name,0.6); }); }
@@ -227,6 +227,12 @@
     return {name:basis+(strasse?' '+(praeposition(strasse)||{an:strasse}).an:''), strasse:strasse};
   }
 
+  function schwerpunkt(netz, hin, rueck){         // Mitte aller Wegpunkte von Hin- und Rückweg
+    var a=0, b=0, n=0;
+    [hin, rueck||[]].forEach(function(ids){ ids.forEach(function(id){ var k=netz.knoten[id]; a+=k.lat; b+=k.lng; n++; }); });
+    return {lat:a/n, lng:b/n};
+  }
+
   // ---------- alles zusammen ----------
   // opt: {start:{lat,lng}, richtung:'N'…|'egal', distanz:m, stationen:[…aus tour.json], hoehen:function(punkte)->Promise, versuch:n}
   function planen(osm, opt){
@@ -237,6 +243,7 @@
     var zielSpec=(opt.stationen[opt.stationen.length-1].ort)||{typ:'bank'};
     var zielOpt={distanz:opt.rundkurs ? opt.distanz*0.5 : opt.distanz, richtung:opt.richtung};   // Rundkurs: Regler gilt für die ganze Runde
     var kand=zielKandidaten(netz, dj, opt.start, zielSpec, zielOpt);
+    var soll=RICHTUNG[opt.richtung];
     if(!kand.length) return Promise.reject(new Error('In dieser Richtung und Entfernung gibt es keine passenden Wege. Andere Richtung oder Strecke versuchen.'));
     // jede Kandidaten-Route bewerten: wie viele Stationen finden ihren Ort?
     var routen=kand.map(function(z){ var ids=pfad(dj, z.knoten); return {ziel:z, ids:ids, strecke:streckeAuf(netz, ids)}; })
@@ -259,6 +266,11 @@
         if(opt.rundkurs && r.rueck){
           var runde=r.strecke[r.strecke.length-1]+r.rueck.laenge;
           r.wert+=(1-r.rueck.gleich)*15 - Math.min(10, Math.abs(runde-opt.distanz)/opt.distanz*10);
+        }
+        if(soll!==undefined){                    // gewählte Richtung zählt mehr als ein einzelner passender Ort (UNICORN-37)
+          r.wert+=r.ziel.richtungOk*24;          // Ziel mitten in der Richtung schlägt ein Ziel am Rand
+          var mitte=schwerpunkt(netz, r.ids, r.rueck && r.rueck.ids);
+          if(meter(opt.start, mitte)>10){ var ab=winkelDiff(peilung(opt.start, mitte), soll); r.wert-=ab>90 ? 12 : ab/90*6; }   // Strecke, die überwiegend woanders verläuft, fällt zurück
         }
       });
       routen.sort(function(a,b){ return b.wert-a.wert; });
