@@ -32,6 +32,7 @@
 </main>
 <div class="toast" id="toast" hidden></div>
 <script src="weg.js"></script>
+<script src="einfuehrung.js"></script>
 <script src="party.js"></script>
 <script src="konto.js"></script>
 <script>
@@ -188,6 +189,7 @@
       if(window.Konto) Konto.bereit(thema, los); else los(); }
   });
   ablauf();
+  if(window.Einfuehrung) Einfuehrung.anbieten({ziel:document.querySelector('.start')});   // UNICORN-39: einmal anbieten, leicht zu überspringen
   fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }).then(function(t){
     tour=t; zeichnen(); stimmenPruefen(); offlinePruefen(); akkuPruefen(); if(draussen) gps();
   })['catch'](function(){ $('liste').innerHTML='<p style="padding:12px 0">Thema lässt sich nicht laden. Einmal mit Netz öffnen.</p>'; });
