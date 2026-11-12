@@ -66,10 +66,16 @@
   }
   function codePruefen(email, code){
     return anfrage('/auth/v1/verify', {method:'POST', body:{type:'email', email:email, token:code}}).then(function(j){
-      var neu=j.user && j.user.created_at && Date.now()-Date.parse(j.user.created_at)<30*60000;
-      if(neu) mkMelden('signup');                      // Marketer: Stufe „Anmeldung“ (nur das Ereignis, keine E-Mail)
+      neuMelden(j.user);
       return sitzungMerken(j, email);
     });
+  }
+  // Marketer: Stufe „Anmeldung“ (nur das Ereignis, keine E-Mail). Gilt für beide Wege, Code und Link aus der Mail,
+  // und je Konto und Gerät nur einmal. Vorher fehlte der Link-Weg: neue Konten kamen an, `signup` nie (UNICORN-36, STRAT-34).
+  function neuMelden(u){
+    if(!u || !u.id || !u.created_at || Date.now()-Date.parse(u.created_at)>=30*60000) return;
+    if(lies('sj.konto.signup')===u.id) return;
+    schreib('sj.konto.signup', u.id); mkMelden('signup');
   }
   // Ereignis an Marketer (gleiche Schnittstelle wie m.js, ohne Cookies, nichts auf dem Gerät).
   // Seiten mit m.js nutzen dessen track(); das Spiel lädt m.js bewusst nicht und schickt nur seine wenigen Ereignisse direkt.
@@ -91,7 +97,7 @@
     try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
     if(!j.refresh_token) return null;
     sitzungMerken(j);
-    return anfrage('/auth/v1/user', {token:j.access_token}).then(function(u){ var s=sitzung(); s.email=u.email; s.id=u.id; schreib(SITZUNG, s); return s; }, function(){ return sitzung(); });
+    return anfrage('/auth/v1/user', {token:j.access_token}).then(function(u){ var s=sitzung(); s.email=u.email; s.id=u.id; schreib(SITZUNG, s); neuMelden(u); return s; }, function(){ return sitzung(); });
   }
 
   // ---------- Party speichern ----------
@@ -368,7 +374,7 @@
     }
     function schritt2(fehler){
       dlg.innerHTML='<form method="dialog" id="kd2"><div class="kd-held" style="width:72px;height:72px"><span class="ic" style="color:#fff">'+IC.brief.replace(/20/g,'34')+'</span></div><h2>Code eingeben</h2>'+
-        '<p class="unter">Gerade an <span class="mail">'+esc(email)+'</span> geschickt.<br>Nichts da? Schau im Spam-Ordner nach.</p>'+
+        '<p class="unter">Gerade an <span class="mail">'+esc(email)+'</span> geschickt.<br>Nichts da? Schau im Spam-Ordner nach.<br>Steht in der Mail nur ein Link? Tipp ihn an und komm dann hierher zurück.</p>'+
         '<input class="code" id="kd-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code" aria-label="Code aus der E-Mail" required>'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+
         '<button class="los" id="kd-ok" type="submit">Anmelden</button><button class="neben" type="button" id="kd-zurueck">Andere E-Mail</button></form>';
@@ -387,6 +393,15 @@
             dlg.querySelector('#kd-f').textContent='Der Code stimmt nicht oder ist abgelaufen.'; });
       };
       setTimeout(function(){ feld.focus(); }, 60);
+      // Anmeldung über den Link in der Mail (anderer Tab, gleicher Browser): hier von selbst weitermachen,
+      // damit die Party gespeichert wird und niemand vor dem Code-Feld hängen bleibt (Fund von Felix, 12. November).
+      var durch=false, schauen=function(){
+        if(durch || !dlg.open || !dlg.querySelector('#kd2')){ if(!dlg.open || !dlg.querySelector('#kd2')) aufraeumen(); return; }
+        if(!angemeldet()) return;
+        durch=true; aufraeumen(); var b=dlg.querySelector('#kd-ok'); b.disabled=true; b.textContent='Angemeldet …';
+        angemeldetWeiter(thema).then(function(){ fertig(); }, function(){ fertig(); });
+      }, aufraeumen=function(){ root.removeEventListener('storage', schauen); root.removeEventListener('focus', schauen); document.removeEventListener('visibilitychange', schauen); };
+      root.addEventListener('storage', schauen); root.addEventListener('focus', schauen); document.addEventListener('visibilitychange', schauen);
     }
     function stoerung(e){
       try{ if(root.FehlerMelden) root.FehlerMelden('Anmeldung gestört: '+((e&&e.status)||'kein Netz')+' '+((e&&(e.code||e.message))||''), 'konto.js'); }catch(x){}
@@ -570,8 +585,13 @@
     }
   });
 
-  var mailLink=null;
+  var mailLink=null, mailLinkGenutzt=false;
   try{ mailLink=linkAusMail(); }catch(e){}
+  // Kommt jemand über den Mail-Link auf einer Seite an, die danach nicht selbst speichert (Spiel, Planer): Party trotzdem sichern.
+  if(mailLink) mailLink.then(function(){ setTimeout(function(){
+    if(mailLinkGenutzt || !root.Party) return;
+    var th=(new URLSearchParams(location.search).get('thema')||'').replace(/[^a-z0-9-]/gi,''); if(th) sync(th, true)['catch'](function(){});
+  }, 1500); }, function(){});
 
   root.Konto={eigeneOeffnen:eigeneOeffnen, fremdHinweis:fremdHinweis, notweg:notweg, mkMelden:mkMelden, aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
@@ -579,5 +599,5 @@
     antwortGeben:antwortGeben, einladungGesehen:einladungGesehen, gaeste:gaeste, gaesteGemerkt:gaesteGemerkt, gastEntfernen:gastEntfernen, gaesteKurz:gaesteKurz, gaesteZeile:gaesteZeile,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,
     linkRolle:linkRolle, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
-    codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};
+    codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ mailLinkGenutzt=true; return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};
 })(this);
