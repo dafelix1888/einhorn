@@ -11,8 +11,8 @@ Damit Eltern ihre Party geschützt speichern und teilen können. Ohne diese Schr
 - Jede Rolle bekommt einen eigenen Link mit langem Zufallsschlüssel. Der Link zeigt nur, was die Rolle braucht:
   - **Einladung** (`einladung.html?k=…`): Termin, Treffpunkt, Abholen, Hinweis. Keine Route.
   - **Vorausgeher** (`vorausgeher.html?k=…`): Route und Stationen.
-  - **iPad** (`spiel.html?k=…`): die ganze Tour. Danach läuft das Spiel offline.
-- Gäste, Vorausgeher und iPad brauchen kein Konto. In der Party-Übersicht unter „Link sperren“ ersetzt „Neuer Link“ einen Link. Der alte geht dann nicht mehr.
+  - **Tablet** (`spiel.html?k=…`): die ganze Tour. Danach läuft das Spiel offline.
+- Gäste, Vorausgeher und Tablet brauchen kein Konto. In der Party-Übersicht unter „Link sperren“ ersetzt „Neuer Link“ einen Link. Der alte geht dann nicht mehr.
 - 30 Tage nach der Party sind die Links tot, und die Daten werden gelöscht.
 
 ## Schritte

@@ -23,9 +23,9 @@
 .fazit{text-align:center;margin:10px 0 0;font-size:.92rem}
 </style></head><body>
 <main class="seite">
-  <div class="oben"><a class="textknopf" href="#" id="zurueck">← Zur Party</a><span class="leise" style="font-size:.9rem;margin-left:auto">auf dem iPad öffnen</span><a class="heim-link" data-heim href="./" aria-label="Zur Übersicht"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></a></div>
+  <div class="oben"><a class="textknopf" href="#" id="zurueck">← Zur Party</a><span class="leise" style="font-size:.9rem;margin-left:auto">auf dem Tablet öffnen</span><a class="heim-link" data-heim href="./" aria-label="Zur Übersicht"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></a></div>
   <h1>Startklar</h1>
-  <p class="leise" id="intro">Das iPad prüft sich selbst, du bestätigst nur zwei Dinge.</p>
+  <p class="leise" id="intro">Das Tablet prüft sich selbst, du bestätigst nur zwei Dinge.</p>
   <div class="checks" id="liste" style="margin-top:16px"></div>
   <section id="ablauf" hidden><h2 id="ablauf-titel">Heute</h2><div class="heute" id="heute"></div></section>
   <div class="start"><a class="knopf breit still" id="los" href="#">Zauberspiegel starten</a><p id="fazit" class="fazit leise" aria-live="polite"></p></div>
@@ -57,7 +57,7 @@
   }
   function zeichnen(){
     var h='';
-    // prüft das iPad selbst
+    // prüft das Tablet selbst
     var stimmenKnopf=zustand.stimmen===false && !details.keinNetz;
     h+=zeile('stimmen','Stimmen geladen', details.stimmenText||'Wird geprüft …',
       stimmenKnopf ? '<button type="button" class="knopf klein mittel" id="laden"'+(details.laedt?' disabled':'')+'>'+(details.laedt?'Lädt …':'Laden')+'</button>' : '',
@@ -68,15 +68,15 @@
     h+=zeile('akku','Akku', details.akkuText||'Mindestens halb voll für eine Stunde Spiel.',
       details.akkuAuto || zustand.akku===true ? '' : '<button type="button" class="knopf klein mittel" id="akku">Ist halb voll</button>');
     // bestätigt der Mensch
-    h+=zeile('ton','Ton', details.klang?'Gut zu hören? Sonst Stummschalter aus und lauter.':'Stummschalter aus, Lautstärke hoch.',
+    h+=zeile('ton','Ton', details.klang?'Gut zu hören? Sonst lauter stellen und „Stumm“ ausschalten.':'Ton an (nicht stumm), Lautstärke hoch.',
       zustand.ton===true ? '' : details.klang ? '<button type="button" class="knopf klein mittel" id="gehoert">Gut zu hören</button>' : '<button type="button" class="knopf klein mittel" id="klang">Testklang</button>');
-    h+=zeile('sperre','Bildschirm bleibt an','Automatische Sperre auf „Nie“: Einstellungen, Anzeige & Helligkeit, Automatische Sperre.',
+    h+=zeile('sperre','Bildschirm bleibt an','Bildschirmsperre ausschalten. iPad: Einstellungen, Anzeige & Helligkeit, Automatische Sperre „Nie“. Android: Einstellungen, Display, Bildschirm-Timeout auf die längste Zeit.',
       zustand.sperre===true ? '' : '<button type="button" class="knopf klein mittel" id="sperre">Ist so</button>');
     $('liste').innerHTML=h;
     var offen=Object.keys(zustand).filter(function(k){ return aktiv(k) && zustand[k]!==true; }).length;
     $('los').className='knopf breit'+(offen?' still':'');
     $('fazit').textContent=offen ? 'Noch '+offen+' Punkt'+(offen>1?'e':'')+' offen. Spielen geht trotzdem, aber besser alles grün.' : 'Alles bereit. Viel Spaß!';
-    if(!offen && party && !gemeldet){                       // Schritt „iPad startklar machen“ in der Party abhaken
+    if(!offen && party && !gemeldet){                       // Schritt „Tablet startklar machen“ in der Party abhaken
       gemeldet=true; var p=Party.lesen(thema)||party; p.erledigt=p.erledigt||{};
       if(!p.erledigt.geraet){ p.erledigt.geraet=true; party=Party.speichern(p); }
     }
@@ -86,7 +86,7 @@
   function ablauf(){
     if(!party || !party.datum) return;
     var t=Party.tageBis(party), v=Party.variante(party);
-    $('intro').textContent=(t===0?'Heute':t===1?'Morgen':'Am '+Party.datumText(Party.datum(party)))+' um '+party.start+' Uhr geht’s los. Das iPad prüft sich selbst, du bestätigst nur zwei Dinge.';
+    $('intro').textContent=(t===0?'Heute':t===1?'Morgen':'Am '+Party.datumText(Party.datum(party)))+' um '+party.start+' Uhr geht’s los. Das Tablet prüft sich selbst, du bestätigst nur zwei Dinge.';
     $('ablauf-titel').textContent=t===0?'Heute':'Am Partytag';
     var l=[];
     if(draussen && v!=='c') l.push([-60,'Kreidespur malen','Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.','']);
@@ -118,7 +118,7 @@
         details.fehlendePakete=pakete.filter(function(p){ return Object.keys(ix[p]||{}).some(function(k){ return !da[k]; }); });
         zustand.stimmen=fehlt.length===0; details.keinNetz=false;
         details.anteil=Math.round((noetig.length-fehlt.length)/Math.max(1,noetig.length)*100);
-        details.stimmenText=fehlt.length ? (noetig.length-fehlt.length)+' von '+noetig.length+' Sätzen sind da. Im WLAN laden, das sind einige Megabyte.' : 'Alle '+noetig.length+' Sätze sind auf dem iPad, auch ohne Netz.';
+        details.stimmenText=fehlt.length ? (noetig.length-fehlt.length)+' von '+noetig.length+' Sätzen sind da. Im WLAN laden, das sind einige Megabyte.' : 'Alle '+noetig.length+' Sätze sind auf dem Tablet, auch ohne Netz.';
         zeichnen();
       });
     })['catch'](function(){ details.stimmenText='Prüfung braucht einmal Netz.'; details.keinNetz=true; zustand.stimmen=false; zeichnen(); });
@@ -144,7 +144,7 @@
     if(location.protocol==='https:') try{ navigator.serviceWorker.register('sw.js'); }catch(e){}
     caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return caches.open(k).then(function(c){ return c.match('spiel.html',{ignoreSearch:true}); }); })); }).then(function(l){
       zustand.offline=l.some(Boolean);
-      details.offlineText=zustand.offline ? 'Das Spiel ist auf dem iPad gespeichert und läuft auch ohne Empfang.' : 'Einmal das Spiel öffnen, solange Netz da ist, dann hier neu laden.';
+      details.offlineText=zustand.offline ? 'Das Spiel ist auf dem Tablet gespeichert und läuft auch ohne Empfang.' : 'Einmal das Spiel öffnen, solange Netz da ist, dann hier neu laden.';
       zeichnen();
     })['catch'](function(){ zustand.offline=false; zeichnen(); });
   }
@@ -166,10 +166,10 @@
       best=Math.min(best, p.coords.accuracy); n++;
       zustand.gps=best<=25;
       details.gpsText='Genauigkeit '+Math.round(best)+' m'+(best<=25?'. Passt.':best<=50?'. Stationen öffnen sich dann nicht von selbst: Der Spiegel meldet „Fast da“ und ein Erwachsener tippt „Wir sind da“. Unter freiem Himmel nochmal messen.':
-        '. Das ist zu ungenau für die Stationen. Ein iPad ohne Mobilfunk hat kein GPS und schätzt den Ort nur über WLAN. Besser ein Handy oder ein iPad mit Mobilfunk als Spiegel nehmen. Sonst die Stationen von Hand öffnen.');
+        '. Das ist zu ungenau für die Stationen. Ein Tablet ohne Mobilfunk hat oft kein GPS und schätzt den Ort nur über WLAN. Besser ein Handy oder ein Tablet mit Mobilfunk als Spiegel nehmen. Sonst die Stationen von Hand öffnen.');
       if(n>=4 || best<=10){ navigator.geolocation.clearWatch(w); details.gpsLaeuft=false; }
       zeichnen();
-    }, function(){ navigator.geolocation.clearWatch(w); details.gpsLaeuft=false; zustand.gps=false; details.gpsText='Standort nicht erlaubt. In den Einstellungen für Safari freigeben.'; zeichnen(); }, {enableHighAccuracy:true, maximumAge:0, timeout:20000});
+    }, function(){ navigator.geolocation.clearWatch(w); details.gpsLaeuft=false; zustand.gps=false; details.gpsText='Standort nicht erlaubt. In den Einstellungen für den Browser freigeben.'; zeichnen(); }, {enableHighAccuracy:true, maximumAge:0, timeout:20000});
     setTimeout(function(){ navigator.geolocation.clearWatch(w); if(details.gpsLaeuft){ details.gpsLaeuft=false; if(zustand.gps==null){ zustand.gps=false; details.gpsText='Kein Signal. Draußen nochmal messen.'; } zeichnen(); } }, 25000);
   }
   function teilen(link, titel, ok){

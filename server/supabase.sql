@@ -4,7 +4,7 @@
 --
 -- Prinzip:
 --  * Eltern, die feiern, melden sich per E-Mail-Code an. Nur sie sehen und ändern ihre Partys (Row Level Security).
---  * Gäste, Vorausgeher und iPad brauchen kein Konto. Sie bekommen einen Link mit einem langen Zufallsschlüssel.
+--  * Gäste, Vorausgeher und Tablet brauchen kein Konto. Sie bekommen einen Link mit einem langen Zufallsschlüssel.
 --    Der Schlüssel zeigt nur das, was die Rolle braucht (die Daten legt die App beim Speichern pro Rolle ab).
 --  * Ein Link lässt sich sperren, indem die Eltern einen neuen erzeugen (alte Zeile wird gelöscht).
 --  * 30 Tage nach der Party werden die Daten gelöscht.
@@ -55,7 +55,7 @@ create policy "eigene Links" on public.links for all to authenticated
 revoke all on public.parties, public.links from anon;
 grant select, insert, update, delete on public.parties, public.links to authenticated;
 
--- Link einlösen: einziger Weg für Gäste, Vorausgeher und iPad. Gibt nur die Daten dieses einen Links zurück.
+-- Link einlösen: einziger Weg für Gäste, Vorausgeher und Tablet. Gibt nur die Daten dieses einen Links zurück.
 create or replace function public.link_lesen(t text) returns jsonb
 language sql stable security definer set search_path = public as $$
   select jsonb_build_object('rolle', l.rolle, 'daten', l.daten)
@@ -85,8 +85,8 @@ begin
   end if;
 end $$;
 
--- Vorausgeher live: Haken „Station steht“ für iPad und Eltern. Schreiben darf nur der Vorausgeher-Link,
--- lesen dürfen Vorausgeher- und iPad-Link (und die Eltern über ihre Party). Gäste sehen nichts.
+-- Vorausgeher live: Haken „Station steht“ für Tablet und Eltern. Schreiben darf nur der Vorausgeher-Link,
+-- lesen dürfen Vorausgeher- und Tablet-Link (und die Eltern über ihre Party). Gäste sehen nichts.
 create table if not exists public.aufbau (
   party_id     uuid primary key references public.parties(id) on delete cascade,
   stationen    jsonb not null default '{}',

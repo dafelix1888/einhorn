@@ -81,7 +81,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   const links=await a.evaluate(()=>{ const p=Party.lesen('einhorn'), pl=Party.plan('einhorn'); return {e:Party.einladungsLink(p,pl), v:Party.vorausgeherLink(p,pl), s:Party.spielLink(p,pl)}; });
   pruefe(/einladung\.html\?k=[\w-]{24}$/.test(links.e) && /&k=/.test(links.v) && /&k=/.test(links.s) && !/plan=|e=/.test(links.e+links.v+links.s), 'Links nur mit Schlüssel');
 
-  // Funkel kennt das Kind (UNICORN-33): im Überblick sichtbar, Karte oben im Schritt „iPad startklar machen“
+  // Funkel kennt das Kind (UNICORN-33): im Überblick sichtbar, Karte oben im Schritt „Tablet startklar machen“
   pruefe(/Funkel sagt „Emma“/.test(await a.locator('.namen-pille').innerText()) && /ausprobieren/.test(await a.locator('.namen-pille').innerText()), 'Überblick: Hinweis „Funkel sagt „Emma“ · jetzt ausprobieren“');
   await a.click('.namen-pille');
   await a.waitForSelector('#namen-name', {timeout:5000}); await a.waitForTimeout(200);
@@ -124,16 +124,16 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(/live/.test(await v.locator('#live-hinweis').innerText()), 'Vorausgeher: Hinweis live');
   await v.locator('[data-weiter]').first().click(); await v.waitForTimeout(800);
   pruefe(Object.values(db.aufbau)[0] && Object.keys(Object.values(db.aufbau)[0].stationen).length===1, 'Haken landet auf dem Server');
-  // iPad
+  // Tablet
   const s=await geraet(); await s.goto(links.s); await s.waitForURL(u=>!/k=/.test(u.toString()), {timeout:8000}); await s.waitForTimeout(1500);
-  pruefe(await s.evaluate(()=>JSON.parse(localStorage.getItem('sj.plan.einhorn')).stationen[1].name==='Ecke'), 'iPad hat die Tour');
+  pruefe(await s.evaluate(()=>JSON.parse(localStorage.getItem('sj.plan.einhorn')).stationen[1].name==='Ecke'), 'Tablet hat die Tour');
   await s.waitForTimeout(1000);
   const live=await s.locator('#aufbau-live').innerText().catch(()=> '');
-  console.log('   iPad zeigt:', live); pruefe(/bis Station 2 aufgebaut|alles aufgebaut/.test(live), 'iPad sieht den Aufbau live');
-  await s.screenshot({path:'konto-ipad.png'});
+  console.log('   Tablet zeigt:', live); pruefe(/bis Station 2 aufgebaut|alles aufgebaut/.test(live), 'Tablet sieht den Aufbau live');
+  await s.screenshot({path:'konto-tablet.png'});
   await s.waitForTimeout(800);
   const nk=await s.evaluate(()=>{ const k=__zs.clips(); return ['n.gruss','n.schatz','n.abschied'].map(x=>k.includes(x)); });
-  pruefe(nk.every(Boolean), 'iPad hat die drei Namens-Sätze');
+  pruefe(nk.every(Boolean), 'Tablet hat die drei Namens-Sätze');
   pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='end'; const a=__zs.akt(); return a.zweit && a.zweit.key==='n.schatz' && a.zweit.zweit.key==='ende.b'; }), 'Schatz: Namens-Satz in der Kette');
   pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='scene'; st.idx=0; st.step=0; const a=__zs.akt(); return a.zweit.key==='n.gruss' && a.zweit.zweit.key==='s0.b'; }), 'Begrüßung: Namens-Satz zwischen Teil 1 und 2');
   pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='heim'; st.step=1; return __zs.akt().zweit.key==='n.abschied'; }), 'Abschied: Namens-Satz am Ende');

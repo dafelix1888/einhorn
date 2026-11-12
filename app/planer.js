@@ -419,7 +419,7 @@
     $('teilen').addEventListener('click', function(){
       speichern(); var link=spielLink(plan);
       if(navigator.share){ navigator.share({title:tour.titel, text:'Unsere Schnitzeljagd', url:link})['catch'](function(){}); return; }
-      try{ navigator.clipboard.writeText(link).then(function(){ toast('Link kopiert. Auf dem iPad öffnen, dann ist die Tour dort.'); }, function(){ prompt('Link kopieren:', link); }); }catch(e){ prompt('Link kopieren:', link); }
+      try{ navigator.clipboard.writeText(link).then(function(){ toast('Link kopiert. Auf dem Tablet öffnen, dann ist die Tour dort.'); }, function(){ prompt('Link kopieren:', link); }); }catch(e){ prompt('Link kopieren:', link); }
     });
   }
 
