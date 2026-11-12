@@ -105,12 +105,12 @@
  "varianten": {
   "a": {
    "name": "Outdoor, voll",
-   "kurz": "Draußen mit allen Ausdrucken",
+   "kurz": "Draußen, wenig Aufbau: Bilder zeigt der Spiegel",
    "draussen": true
   },
   "b": {
-   "name": "Outdoor ohne Ausdrucke",
-   "kurz": "Draußen, Bilder nur im Spiegel",
+   "name": "Outdoor mit Bändern",
+   "kurz": "Draußen, mit Bändern am Zaun und Laken",
    "st": {
     "1": {
      "wo": "Am Ende der Kreidespur, roter Kreidekreis",
@@ -156,7 +156,7 @@
     },
     "5": {
      "wo": "Kissenberg im Toberaum",
-     "vorOrt": "Vorausgeher: Kissenberg mit Wolke und grünen Bögen aufbauen, Toberaum-Tür kurz zu.",
+     "vorOrt": "Vorausgeher: Kissenberg mit grünen Bögen aufbauen, Toberaum-Tür kurz zu.",
      "dann": "Leise über den Kissenberg klettern und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen."
     },
     "6": {
@@ -328,7 +328,8 @@
    "title": "Der lila Frosch",
    "say": "Psst, die Wolke schläft. Schaut leise in den Spiegel. Was stimmt hier nicht?",
    "after": "Richtig, Frösche sind grün! Schleicht zur Wolke und sucht etwas Grünes. Aber weckt sie nicht!",
-   "dann": "Leise zur Wolke schleichen und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen.",
+   "dann": "Die Wolke schläft nur im Spiegel. Leise losschleichen und die grünen Bögen suchen. Danach „Bögen gefunden, weiter“ tippen.",
+   "deko": "wolke",
    "ort": {
     "typ": "huegel_unten",
     "anteil": 0.8
@@ -419,13 +420,6 @@
   "variante": {
    "a": [
     {
-     "t": "Drucken",
-     "items": [
-      "A3: schlafende Wolke",
-      "Bei Regenwetter: in eine Klarsichthülle"
-     ]
-    },
-    {
      "t": "GPS",
      "items": [
       "Tour im Planer erstellt und einmal abgelaufen, Punkte bei Bedarf im Planer verschoben"
@@ -437,7 +431,7 @@
       "Rote Bögen (Station 2)",
       "Gelbe und orange Bögen und die Tüte mit {kinder} Glückssteinen, irgendwo am Zaun verstecken (Station 4)",
       "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
-      "Wolken-Ausdruck, grüne Bögen (Station 6)",
+      "Grüne Bögen (Station 6). Die Wolke schläft nur im Spiegel. Wer mag, legt etwas Weißes dazu (Laken, Kissen, Watte)",
       "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
       "Schatzkiste (Station 7)"
      ]
@@ -490,7 +484,7 @@
       "Blaues Handtuch als Fluss (Flur)",
       "Vier Bänder (Blau, Pink, Grün, Rot-Weiß), Schüssel mit den gelben und orangen Bögen und {kinder} Glückssteinen (Treppe)",
       "Drei Zettel mit gemalten Spuren (Hase, Ente, Fuchs), die eine Zaubertafel (Türen)",
-      "Weißes Kissen oder Laken als Wolke, grüne Bögen (Kissenberg)",
+      "Grüne Bögen (Kissenberg). Wer mag, legt ein weißes Kissen als Wolke dazu",
       "Grauer Karton mit Fridolin, blaue Bögen, buntes Band (Sofa)",
       "Schatzkiste"
      ]
