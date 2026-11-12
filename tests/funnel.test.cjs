@@ -8,6 +8,7 @@ async function mock(route){
   const j=(s,o)=>route.fulfill({status:s, contentType:'application/json', body:o===undefined?'':JSON.stringify(o)});
   if(u.pathname==='/auth/v1/otp') return j(200,{});
   if(u.pathname==='/auth/v1/verify') return j(200,{access_token:'AT-x', refresh_token:'RT-x', expires_in:3600, user:{id:'U1', email:body.email, created_at:new Date().toISOString()}});
+  if(u.pathname==='/auth/v1/user') return j(200,{id:'U2', email:'neu@example.org', created_at:new Date(Date.now()-3*864e5).toISOString(), email_confirmed_at:new Date().toISOString()});
   if(u.pathname==='/rest/v1/rpc/link_lesen'){ const l=links[body.t]; return j(200, l||null); }
   if(u.pathname==='/rest/v1/parties' && req.method()==='GET') return j(200, []);
   if(u.pathname.startsWith('/rest/v1/rpc/') || u.pathname.startsWith('/functions/')) return j(200, null);
@@ -91,6 +92,28 @@ async function mock(route){
   ok(meldungen.some(m=>/Anmeldung gestört: 400 email_address_not_authorized/.test(m)), 'Störung wird als Fehler gemeldet (PBIM)');
   await g.goto(B+'party.html?thema=einhorn'); await g.waitForTimeout(600);
   ok(await g.evaluate(()=>/einladung\.html\?e=/.test(Party.einladungsLink(Party.lesen('einhorn'), Party.plan('einhorn'))||'')), 'Notweg: Einladungslink mit Daten wie früher');
+
+  // 6b. Neues Konto über den Link aus der Mail (statt Code): signup geht trotzdem an Marketer, einmal (UNICORN-36)
+  const l=await geraet();
+  await l.goto(B+'party.html?thema=einhorn'); await l.evaluate(([p,pl])=>{ localStorage.clear(); localStorage.setItem('sj.party.einhorn', JSON.stringify(p)); localStorage.setItem('sj.plan.einhorn', JSON.stringify(pl)); }, [party, plan]);
+  await l.goto('about:blank'); await l.goto(B+'party.html?thema=einhorn#access_token=AT-l&refresh_token=RT-l&expires_in=3600&token_type=bearer&type=signup'); await l.waitForTimeout(1200);
+  ok(await l.evaluate(()=>Konto.angemeldet()) && !/access_token/.test(l.url()), 'Link aus der Mail: angemeldet, Adresse aufgeräumt');
+  ok((await l.evaluate(()=>__ev)).filter(x=>x==='signup').length===1, 'Link aus der Mail: Marketer bekommt signup');
+  ok(await l.evaluate(()=>!!((Party.lesen('einhorn')||{}).server||{}).k), 'Link aus der Mail: Party ist gespeichert');
+  await l.goto('about:blank'); await l.goto(B+'party.html?thema=einhorn#access_token=AT-l&refresh_token=RT-l&expires_in=3600&token_type=bearer&type=signup'); await l.waitForTimeout(900);
+  ok((await l.evaluate(()=>__ev)).filter(x=>x==='signup').length===0, 'Link noch einmal geöffnet: kein zweites signup');
+  // Code-Fenster wartet, der Link wird in einem zweiten Tab angetippt: das Fenster schließt sich von selbst
+  const w=await geraet();
+  await w.goto(B+'party.html?thema=einhorn'); await w.evaluate(([p,pl])=>{ localStorage.clear(); localStorage.setItem('sj.party.einhorn', JSON.stringify(p)); localStorage.setItem('sj.plan.einhorn', JSON.stringify(pl)); }, [party, plan]);
+  await w.goto(B+'party.html?thema=einhorn'); await w.waitForTimeout(600);
+  await w.evaluate(()=>Konto.bereit('einhorn')); await w.fill('#kd-mail','neu@example.org'); await w.click('#kd-los'); await w.waitForTimeout(300);
+  ok(/nur ein Link/.test(await w.locator('dialog.konto-dlg').innerText()), 'Code-Fenster erklärt den Link aus der Mail');
+  const w2=await w.context().newPage(); w2.on('pageerror',e=>errs.push(e.message));
+  await w2.goto(B+'party.html?thema=einhorn#access_token=AT-w&refresh_token=RT-w&expires_in=3600&token_type=bearer&type=signup'); await w2.waitForTimeout(1500);
+  await w.waitForFunction(()=>!document.querySelector('dialog.konto-dlg[open] #kd2'), null, {timeout:8000}).catch(()=>{});
+  ok(!(await w.locator('dialog.konto-dlg[open] #kd2').count()) && await w.evaluate(()=>Konto.angemeldet()), 'Link im zweiten Tab: Code-Fenster zieht nach');
+  const ids=[await w.evaluate(()=>Party.lesen('einhorn').server.id), await w2.evaluate(()=>Party.lesen('einhorn').server.id)];
+  ok(ids[0] && ids[0]===ids[1], 'Beide Tabs speichern dieselbe Party (keine Doppelte)');
 
   // 7. Startadresse: neu → Landingpage (mit utm), mit Party → Party-Übersicht, alter #tour-Link → Spiel
   const r=await geraet(); await r.goto(B.replace(/app\/$/,'')); await r.evaluate(()=>localStorage.clear());

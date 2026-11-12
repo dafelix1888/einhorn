@@ -66,10 +66,18 @@
   }
   function codePruefen(email, code){
     return anfrage('/auth/v1/verify', {method:'POST', body:{type:'email', email:email, token:code}}).then(function(j){
-      var neu=j.user && j.user.created_at && Date.now()-Date.parse(j.user.created_at)<30*60000;
-      if(neu) mkMelden('signup');                      // Marketer: Stufe „Anmeldung“ (nur das Ereignis, keine E-Mail)
+      neuMelden(j.user);
       return sitzungMerken(j, email);
     });
+  }
+  // Neues Konto: einmal `signup` an Marketer (Stufe „Anmeldung“; nur das Ereignis, keine E-Mail).
+  // Gilt für beide Wege: Code eingetippt oder Link aus der Mail angetippt (UNICORN-36: der Link-Weg meldete bisher nichts).
+  function neuMelden(u, sicherNeu){
+    if(!u || !u.id) return;
+    var jetzt=Date.now(), frisch=function(t){ t=Date.parse(t||''); return !!t && jetzt-t<30*60000; };
+    if(!(sicherNeu || frisch(u.created_at) || frisch(u.email_confirmed_at||u.confirmed_at))) return;
+    if(lies('sj.konto.signup')===u.id) return;         // je Konto und Gerät nur einmal
+    schreib('sj.konto.signup', u.id); mkMelden('signup');
   }
   // Ereignis an Marketer (gleiche Schnittstelle wie m.js, ohne Cookies, nichts auf dem Gerät).
   // Seiten mit m.js nutzen dessen track(); das Spiel lädt m.js bewusst nicht und schickt nur seine wenigen Ereignisse direkt.
@@ -88,10 +96,11 @@
   function linkAusMail(){
     if(!aktiv() || !/access_token=/.test(location.hash)) return null;
     var h=new URLSearchParams(location.hash.slice(1)), j={access_token:h.get('access_token'), refresh_token:h.get('refresh_token'), expires_in:+h.get('expires_in')||3600};
+    var neu=h.get('type')==='signup';                  // Bestätigungs-Link eines neuen Kontos
     try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
     if(!j.refresh_token) return null;
     sitzungMerken(j);
-    return anfrage('/auth/v1/user', {token:j.access_token}).then(function(u){ var s=sitzung(); s.email=u.email; s.id=u.id; schreib(SITZUNG, s); return s; }, function(){ return sitzung(); });
+    return anfrage('/auth/v1/user', {token:j.access_token}).then(function(u){ var s=sitzung(); s.email=u.email; s.id=u.id; schreib(SITZUNG, s); neuMelden(u, neu); return s; }, function(){ return sitzung(); });
   }
 
   // ---------- Party speichern ----------
@@ -333,7 +342,7 @@
   function zeichnen(thema){ var e=document.getElementById('konto-karte'); if(e && thema===aktuellesThema){ var d=document.createElement('div'); d.innerHTML=karte(thema); e.replaceWith(d.firstChild); } }
   function melden(t){ try{ root.dispatchEvent(new CustomEvent('konto', {detail:t})); }catch(e){} }
 
-  var dlg=null;
+  var dlg=null, anderswo=null;
   function fenster(thema, opt){
     opt=opt||{}; bereichOffen=false;
     stilEinmal(); aktuellesThema=thema;
@@ -369,6 +378,7 @@
     function schritt2(fehler){
       dlg.innerHTML='<form method="dialog" id="kd2"><div class="kd-held" style="width:72px;height:72px"><span class="ic" style="color:#fff">'+IC.brief.replace(/20/g,'34')+'</span></div><h2>Code eingeben</h2>'+
         '<p class="unter">Gerade an <span class="mail">'+esc(email)+'</span> geschickt.<br>Nichts da? Schau im Spam-Ordner nach.</p>'+
+        '<p class="unter kd-link">Steht in der Mail nur ein Link? Dann tippe dort auf den Link, am besten auf diesem Gerät.</p>'+
         '<input class="code" id="kd-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code" aria-label="Code aus der E-Mail" required>'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+
         '<button class="los" id="kd-ok" type="submit">Anmelden</button><button class="neben" type="button" id="kd-zurueck">Andere E-Mail</button></form>';
@@ -387,6 +397,15 @@
             dlg.querySelector('#kd-f').textContent='Der Code stimmt nicht oder ist abgelaufen.'; });
       };
       setTimeout(function(){ feld.focus(); }, 60);
+      // Link aus der Mail in einem anderen Tab angetippt: Der neue Tab speichert die Party, dieses Fenster zieht kurz danach nach.
+      if(anderswo) root.removeEventListener('storage', anderswo);
+      anderswo=function(ev){
+        if(ev.key!==SITZUNG || !sitzung() || !dlg.open || !dlg.querySelector('#kd2')) return;
+        root.removeEventListener('storage', anderswo); anderswo=null;
+        var b=dlg.querySelector('#kd-ok'); if(b){ b.disabled=true; b.textContent='Angemeldet …'; }
+        setTimeout(function(){ angemeldetWeiter(thema).then(function(){ if(dlg.open) fertig(); }); }, root.KONTO_TEST?300:4000);
+      };
+      root.addEventListener('storage', anderswo);
     }
     function stoerung(e){
       try{ if(root.FehlerMelden) root.FehlerMelden('Anmeldung gestört: '+((e&&e.status)||'kein Netz')+' '+((e&&(e.code||e.message))||''), 'konto.js'); }catch(x){}
