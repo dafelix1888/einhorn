@@ -60,11 +60,15 @@ main{max-width:1040px}
 .cap{grid-area:1/1;opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .cap.on{opacity:1;transform:none}
 .cap b{display:block;font-size:22px;margin-bottom:6px}.cap span{color:var(--leise)}
-.dots{display:flex;justify-content:center;gap:6px;margin-top:14px}
-.dots i{width:6px;height:6px;border-radius:3px;background:var(--linie);transition:width .3s ease,background .3s ease}
-.dots i.on{width:18px;background:var(--akzent)}
+.dots{display:flex;justify-content:center;margin-top:2px}
+.dots button{-webkit-appearance:none;appearance:none;border:0;background:none;margin:0;padding:14px 7px;line-height:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dots button::before{content:"";display:block;width:10px;height:10px;border-radius:5px;background:var(--linie);transition:width .3s ease,background .3s ease}
+.dots button.on::before{width:24px;background:var(--akzent)}
+.dots button:focus-visible{outline:2px solid var(--akzent);outline-offset:-8px;border-radius:12px}
 .hinweis{margin:10px 0 0;font-size:13px;color:var(--leise)}
 html.js .show{position:relative}
+html.js .phone{touch-action:pan-y;cursor:grab;-webkit-user-select:none;user-select:none}
+html.js .phone img{pointer-events:none;-webkit-user-drag:none}
 html.js .show-buehne{position:sticky;top:0;height:100svh;justify-content:center}
 html.js .steps{margin-top:-100svh}
 html.js .step{height:85svh}
@@ -77,7 +81,7 @@ html:not(.js) .dots,html:not(.js) .steps{display:none}
   .show-buehne{flex-direction:row;justify-content:center;gap:72px}
   .phone{height:min(80svh,700px)}
   .caps{text-align:left}.cap b{font-size:28px}
-  .dots{justify-content:flex-start}
+  .dots{justify-content:flex-start;margin-left:-7px}
 }
 /* Erzähler mit Hörprobe */
 .reihe{list-style:none;margin:0 -16px;padding:4px 16px 12px;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin}
@@ -117,7 +121,7 @@ html.js .zeig.sichtbar,html.js .figur.sichtbar{opacity:1;transform:none}
   
   <section class="show" style="--n:3">
     <h2>So einfach geht&#x27;s</h2>
-    <div class="show-buehne"><div class="phone"><img src="landing/1-planer.webp" alt="Planer: Route mit sieben Stationen auf einer Karte" data-i="0" class="on" width="390" height="844" decoding="async"><img src="landing/2-party.webp" alt="Party-Übersicht: Regenbogen und sechs Schritte vom Bestellen bis zum Partytag" data-i="1" width="390" height="844" decoding="async" loading="lazy"><img src="landing/3-spiegel.webp" alt="Zauberspiegel mit Funkel dem Einhorn" data-i="2" width="390" height="844" decoding="async" loading="lazy"></div><div class="caps"><div class="cap on" data-i="0"><b>Eure Straße wird zur Schatzkarte</b><span>Adresse eingeben: Schatzweg legt 7 Stationen auf echte Orte in eurer Nähe, etwa Ecken, Bänke und Spielplätze. Jede Station lässt sich mit dem Finger verschieben.</span></div><div class="cap" data-i="1"><b>Party anlegen in einem Rutsch</b><span>Name, Alter, Datum: Daraus entsteht euer Plan in sechs Schritten, vom Bestellen bis zum Partytag. Die Einladung geht als Link raus, und ihr seht, wer kommt.</span></div><div class="cap" data-i="2"><b>Am Partytag führt der Zauberspiegel</b><span>Ein Handy oder Tablet reicht: Funkel spricht aus dem Spiegel und führt die Kinder per GPS von Station zu Station. Lesen müssen sie nicht.</span></div><div class="dots"><i class="on"></i><i></i><i></i></div><p class="hinweis">Bilder aus der App mit Beispieldaten</p></div></div>
+    <div class="show-buehne"><div class="phone"><img src="landing/1-planer.webp" alt="Planer: Route mit sieben Stationen auf einer Karte" data-i="0" class="on" width="390" height="844" decoding="async"><img src="landing/2-party.webp" alt="Party-Übersicht: Regenbogen und sechs Schritte vom Bestellen bis zum Partytag" data-i="1" width="390" height="844" decoding="async" loading="lazy"><img src="landing/3-spiegel.webp" alt="Zauberspiegel mit Funkel dem Einhorn" data-i="2" width="390" height="844" decoding="async" loading="lazy"></div><div class="caps"><div class="cap on" data-i="0"><b>Eure Straße wird zur Schatzkarte</b><span>Adresse eingeben: Schatzweg legt 7 Stationen auf echte Orte in eurer Nähe, etwa Ecken, Bänke und Spielplätze. Jede Station lässt sich mit dem Finger verschieben.</span></div><div class="cap" data-i="1"><b>Party anlegen in einem Rutsch</b><span>Name, Alter, Datum: Daraus entsteht euer Plan in sechs Schritten, vom Bestellen bis zum Partytag. Die Einladung geht als Link raus, und ihr seht, wer kommt.</span></div><div class="cap" data-i="2"><b>Am Partytag führt der Zauberspiegel</b><span>Ein Handy oder Tablet reicht: Funkel spricht aus dem Spiegel und führt die Kinder per GPS von Station zu Station. Lesen müssen sie nicht.</span></div><div class="dots" role="group" aria-label="Bild auswählen"><button type="button" data-i="0" aria-label="Bild 1 von 3" class="on" aria-current="true"></button><button type="button" data-i="1" aria-label="Bild 2 von 3" aria-current="false"></button><button type="button" data-i="2" aria-label="Bild 3 von 3" aria-current="false"></button></div><p class="hinweis">Bilder aus der App mit Beispieldaten</p></div></div>
     <div class="steps" aria-hidden="true"><div class="step" data-i="0"></div><div class="step" data-i="1"></div><div class="step" data-i="2"></div></div>
   </section>
   
@@ -143,7 +147,7 @@ html.js .zeig.sichtbar,html.js .figur.sichtbar{opacity:1;transform:none}
   
   <section class="show" style="--n:3">
     <h2>So einfach geht&#x27;s</h2>
-    <div class="show-buehne"><div class="phone"><img src="landing/1-planer.webp" alt="Planer: Route mit sieben Stationen auf einer Karte" data-i="0" class="on" width="390" height="844" decoding="async"><img src="landing/2-party.webp" alt="Party-Übersicht: Regenbogen und sechs Schritte vom Bestellen bis zum Partytag" data-i="1" width="390" height="844" decoding="async" loading="lazy"><img src="landing/3-spiegel.webp" alt="Zauberspiegel mit Funkel dem Einhorn" data-i="2" width="390" height="844" decoding="async" loading="lazy"></div><div class="caps"><div class="cap on" data-i="0"><b>Eure Straße wird zur Schatzkarte</b><span>Adresse eingeben: Schatzweg legt 7 Stationen auf echte Orte in eurer Nähe, etwa Ecken, Bänke und Spielplätze. Jede Station lässt sich mit dem Finger verschieben.</span></div><div class="cap" data-i="1"><b>Party anlegen in einem Rutsch</b><span>Name, Alter, Datum: Daraus entsteht euer Plan in sechs Schritten, vom Bestellen bis zum Partytag. Die Einladung geht als Link raus, und ihr seht, wer kommt.</span></div><div class="cap" data-i="2"><b>Am Partytag führt der Zauberspiegel</b><span>Ein Handy oder Tablet reicht: Funkel spricht aus dem Spiegel und führt die Kinder per GPS von Station zu Station. Lesen müssen sie nicht.</span></div><div class="dots"><i class="on"></i><i></i><i></i></div><p class="hinweis">Bilder aus der App mit Beispieldaten</p></div></div>
+    <div class="show-buehne"><div class="phone"><img src="landing/1-planer.webp" alt="Planer: Route mit sieben Stationen auf einer Karte" data-i="0" class="on" width="390" height="844" decoding="async"><img src="landing/2-party.webp" alt="Party-Übersicht: Regenbogen und sechs Schritte vom Bestellen bis zum Partytag" data-i="1" width="390" height="844" decoding="async" loading="lazy"><img src="landing/3-spiegel.webp" alt="Zauberspiegel mit Funkel dem Einhorn" data-i="2" width="390" height="844" decoding="async" loading="lazy"></div><div class="caps"><div class="cap on" data-i="0"><b>Eure Straße wird zur Schatzkarte</b><span>Adresse eingeben: Schatzweg legt 7 Stationen auf echte Orte in eurer Nähe, etwa Ecken, Bänke und Spielplätze. Jede Station lässt sich mit dem Finger verschieben.</span></div><div class="cap" data-i="1"><b>Party anlegen in einem Rutsch</b><span>Name, Alter, Datum: Daraus entsteht euer Plan in sechs Schritten, vom Bestellen bis zum Partytag. Die Einladung geht als Link raus, und ihr seht, wer kommt.</span></div><div class="cap" data-i="2"><b>Am Partytag führt der Zauberspiegel</b><span>Ein Handy oder Tablet reicht: Funkel spricht aus dem Spiegel und führt die Kinder per GPS von Station zu Station. Lesen müssen sie nicht.</span></div><div class="dots" role="group" aria-label="Bild auswählen"><button type="button" data-i="0" aria-label="Bild 1 von 3" class="on" aria-current="true"></button><button type="button" data-i="1" aria-label="Bild 2 von 3" aria-current="false"></button><button type="button" data-i="2" aria-label="Bild 3 von 3" aria-current="false"></button></div><p class="hinweis">Bilder aus der App mit Beispieldaten</p></div></div>
     <div class="steps" aria-hidden="true"><div class="step" data-i="0"></div><div class="step" data-i="1"></div><div class="step" data-i="2"></div></div>
   </section>
   
@@ -193,14 +197,39 @@ html.js .zeig.sichtbar,html.js .figur.sichtbar{opacity:1;transform:none}
         .catch(function(){ btn.disabled=false; msg.classList.add('fehler'); msg.textContent='Das hat nicht geklappt. Bitte später noch einmal versuchen.'; });
     });
   });
-  if(!('IntersectionObserver' in window)) return;
-  // Screenshots: Schritt in der Bildschirmmitte bestimmt Bild und Text
+  // Screenshots: Der Schritt in der Bildschirmmitte bestimmt Bild und Text. Wischen, Ziehen, Punkte und Pfeiltasten
+  // wechseln auch; diese Auswahl bleibt, bis beim Scrollen der nächste Schritt die Mitte erreicht (MAR-64).
+  var shows=[];
   main.querySelectorAll('.show').forEach(function(sh){
-    var parts=sh.querySelectorAll('.phone img,.cap,.dots i');
-    function zeige(i){ parts.forEach(function(el,j){ var k=el.dataset.i!==undefined?el.dataset.i:Array.prototype.indexOf.call(el.parentNode.children,el); el.classList.toggle('on',String(k)===String(i)); }); }
-    var io=new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting) zeige(x.target.dataset.i); }); },{rootMargin:'-50% 0px -50% 0px'});
-    sh.querySelectorAll('.step').forEach(function(st){ io.observe(st); });
+    var ph=sh.querySelector('.phone'), dots=sh.querySelector('.dots'); if(!ph) return;
+    var parts=sh.querySelectorAll('.phone img,.cap,.dots button'), n=ph.querySelectorAll('img').length, akt=0;
+    function zeige(i){ akt=Number(i); parts.forEach(function(el){ var an=el.dataset.i===String(akt); el.classList.toggle('on',an);
+      if(el.tagName==='BUTTON') el.setAttribute('aria-current',an?'true':'false'); }); }
+    function weiter(d){ var z=akt+d; if(z>=0&&z<n) zeige(z); }
+    if(dots) dots.addEventListener('click',function(e){ var b=e.target.closest('button'); if(b) zeige(b.dataset.i); });
+    var x0=null, y0=0;
+    ph.addEventListener('pointerdown',function(e){ if(e.pointerType==='mouse'&&e.button!==0) return; x0=e.clientX; y0=e.clientY;
+      if(e.pointerType==='mouse'){ try{ ph.setPointerCapture(e.pointerId); }catch(_){} } });
+    ph.addEventListener('pointerup',function(e){ if(x0===null) return; var dx=e.clientX-x0, dy=e.clientY-y0; x0=null;
+      if(Math.abs(dx)>30&&Math.abs(dx)>Math.abs(dy)*1.2) weiter(dx<0?1:-1); });
+    ph.addEventListener('pointercancel',function(){ x0=null; });
+    ph.addEventListener('dragstart',function(e){ e.preventDefault(); });
+    var wsum=0, wlast=0, wzu=false;   // Trackpad: eine Wischbewegung = ein Bild, Nachlauf zählt nicht
+    ph.addEventListener('wheel',function(e){ if(Math.abs(e.deltaX)<=Math.abs(e.deltaY)) return; e.preventDefault();
+      var t=Date.now(); if(t-wlast>160){ wsum=0; wzu=false; } wlast=t; if(wzu) return;
+      wsum+=e.deltaX; if(Math.abs(wsum)>40){ weiter(wsum>0?1:-1); wzu=true; } },{passive:false});
+    shows.push({ph:ph,weiter:weiter});
+    if('IntersectionObserver' in window){
+      var io=new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting) zeige(x.target.dataset.i); }); },{rootMargin:'-50% 0px -50% 0px'});
+      sh.querySelectorAll('.step').forEach(function(st){ io.observe(st); });
+    }
   });
+  document.addEventListener('keydown',function(e){
+    if((e.key!=='ArrowLeft'&&e.key!=='ArrowRight')||e.altKey||e.ctrlKey||e.metaKey||e.shiftKey) return;
+    if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    shows.forEach(function(s){ var r=s.ph.getBoundingClientRect(); if(r.bottom>0&&r.top<innerHeight) s.weiter(e.key==='ArrowRight'?1:-1); });
+  });
+  if(!('IntersectionObserver' in window)) return;
   var rein=new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('sichtbar'); rein.unobserve(x.target); } }); },{rootMargin:'0px 0px -10% 0px'});
   main.querySelectorAll('.zeig,.figur').forEach(function(el){ rein.observe(el); });
 })();
