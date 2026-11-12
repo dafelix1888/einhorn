@@ -51,12 +51,12 @@ async function mock(route){
   ok((await a.evaluate(()=>__zs.state().phase))!=='start', 'Nach der Anmeldung startet die Tour');
   ok((await a.evaluate(()=>__ev)).filter(x=>x==='activated').length===1, 'Marketer bekommt activated (einmal)');
 
-  // 3. iPad mit geheimem Link: kein Konto nötig
+  // 3. Tablet mit geheimem Link: kein Konto nötig
   links['SPIELTOKENSPIELTOKEN1234']={rolle:'spiel', daten:Object.assign({}, plan, {party:{thema:'einhorn', kind:{name:'Emma',alter:5}, ort:'draussen'}})};
   const i=await geraet();
   await i.goto(B+'spiel.html?thema=einhorn&k=SPIELTOKENSPIELTOKEN1234'); await i.waitForURL(u=>!/k=/.test(String(u))); await i.waitForTimeout(1200);
   await i.evaluate(()=>document.getElementById('btn-main').click()); await i.waitForTimeout(300);
-  ok(!(await i.locator('dialog.konto-dlg[open]').count()) && (await i.evaluate(()=>__zs.state().phase))!=='start', 'iPad mit geheimem Link startet ohne Anmeldung');
+  ok(!(await i.locator('dialog.konto-dlg[open]').count()) && (await i.evaluate(()=>__zs.state().phase))!=='start', 'Tablet mit geheimem Link startet ohne Anmeldung');
 
   // 4. Spiel ohne m.js: activated geht direkt an Marketers Schnittstelle
   const c4=await b.newContext(); const gesendet=[];

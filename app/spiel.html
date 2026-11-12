@@ -1405,7 +1405,7 @@ function huelleAus(buf){
   for(var k=0;k<n;k++) h[k]=Math.pow(Math.max(0,(h[k]-ruhe)/Math.max(1e-6,max*0.7-ruhe)),0.8);
   return h;
 }
-function huelleHolen(key, c){            // einmal pro Satz aus der Aufnahme berechnen, auch auf dem iPad
+function huelleHolen(key, c){            // einmal pro Satz aus der Aufnahme berechnen, auch auf dem Tablet
   if(huellen[key] || huellen[key]===false) return;
   huellen[key]=false;
   try{
@@ -1562,7 +1562,7 @@ function mikroAus(){ try{ if(strom){ strom.getTracks().forEach(function(t){ t.st
 function stoppAufnahme(){ try{ if(rec && rec.state!=='inactive') rec.stop(); }catch(e){} }
 function aufnehmen(key){
   if(rec){ stoppAufnahme(); return; }
-  if(!kannAufnehmen()){ toast('Aufnehmen geht in dieser Ansicht nicht. In der https-Version auf dem iPad funktioniert es.'); return; }
+  if(!kannAufnehmen()){ toast('Aufnehmen geht in dieser Ansicht nicht. In der https-Version auf dem Tablet funktioniert es.'); return; }
   still();
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(s){
     strom=s;
@@ -1585,7 +1585,7 @@ function aufnehmen(key){
       };
       r.start(); recTimer=setTimeout(stoppAufnahme, 30000); renderClips();
     }catch(e){ rec=null; recKey=null; mikroAus(); toast('Die Aufnahme ließ sich nicht starten.'); renderClips(); }
-  }, function(){ toast('Kein Zugriff aufs Mikrofon. In der https-Version auf dem iPad den Zugriff erlauben.'); });
+  }, function(){ toast('Kein Zugriff aufs Mikrofon. In der https-Version auf dem Tablet den Zugriff erlauben.'); });
 }
 var wake=null;
 function wachBleiben(){
@@ -1978,8 +1978,8 @@ function verzaubern(){
   if(svg){ var m=svg.querySelector('.main'); if(m) m.style.fill=css(st.richtig); svg.classList.add('pop'); }
   render(true); konfetti(50, .5, .4);
 }
-// Vor dem ersten Aufwecken: Eltern melden sich einmal an (Tour gesichert, iPad-Link möglich).
-// Mit geheimem Link (iPad, Vorausgeher) oder ohne Server geht es sofort los.
+// Vor dem ersten Aufwecken: Eltern melden sich einmal an (Tour gesichert, Tablet-Link möglich).
+// Mit geheimem Link (Tablet, Vorausgeher) oder ohne Server geht es sofort los.
 var startGemeldet=false;
 function startPruefen(weiter){
   var K=window.Konto, th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
@@ -2313,7 +2313,7 @@ function render(keepPic){
   }
   $('stage').classList.toggle('atmet', uw && !ankunft && !wartet);
   $('btn-foto').hidden = !(ph==='end' || ph==='heim');
-  $('btn-portal').hidden = !(ph==='heim' && state.step>=1) || !hatParty();   // nach der Tour zurück zur Party (nur wo es eine gibt, nicht auf dem iPad per Link)
+  $('btn-portal').hidden = !(ph==='heim' && state.step>=1) || !hatParty();   // nach der Tour zurück zur Party (nur wo es eine gibt, nicht auf dem Tablet per Link)
   if(alt!==null && k!==alt && k!=='start' && ph!=='seek' && state.autoSag && beruehrt && view==='tour') sagen();   // unterwegs nie von selbst: erst sammeln, dann tippen
 }
 function chipText(){
@@ -2496,7 +2496,7 @@ function renderClips(){
   $('clips').innerHTML=h;
   var note=$('rec-note'); note.className='chip '+(kann?(n?'on':''):'off');
   $('sum-stimme').textContent = n ? n+' von '+TEXTE.length+' Sätzen aufgenommen' : 'Noch keine Aufnahme, Computerstimme';
-  note.textContent = kann ? n+' von '+TEXTE.length+' Sätzen aufgenommen' : 'Aufnehmen geht in dieser Ansicht nicht. In der https-Version auf dem iPad funktioniert es.';
+  note.textContent = kann ? n+' von '+TEXTE.length+' Sätzen aufgenommen' : 'Aufnehmen geht in dieser Ansicht nicht. In der https-Version auf dem Tablet funktioniert es.';
 }
 function zeige(v){
   if(v==='tour') stoppAufnahme();
@@ -2567,7 +2567,7 @@ $('variante').addEventListener('click', function(e){ var b=e.target.closest ? e.
 $('kamera-an').addEventListener('change', function(){
   var box=this;
   if(!box.checked){ state.kamera=false; save(); kameraAus(); render(); return; }
-  function nein(){ box.checked=false; toast('Kein Zugriff auf die Kamera. In der Vorschau ist sie gesperrt, in der https-Version auf dem iPad den Zugriff erlauben.'); }
+  function nein(){ box.checked=false; toast('Kein Zugriff auf die Kamera. In der Vorschau ist sie gesperrt, in der https-Version auf dem Tablet den Zugriff erlauben.'); }
   if(!kannKamera()){ nein(); return; }
   navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}, audio:false}).then(function(st){
     st.getTracks().forEach(function(t){ t.stop(); });
@@ -2632,7 +2632,7 @@ $('pitch').addEventListener('click', function(e){ var b=e.target.closest ? e.tar
 $('voice').addEventListener('change', function(){ state.voice=this.value||null; save(); });
 $('btn-probe').addEventListener('click', function(){ tonAn(); still(); sprich('Hallo, ich bin Funkel, das Einhorn! Folgt den Hufspuren.'); });
 $('btn-restart').addEventListener('click', vonVorn);
-// „Zur Party“ nur auf Geräten mit eigener Party (UNICORN-25); iPad per Link sieht keinen Weg in die Plattform
+// „Zur Party“ nur auf Geräten mit eigener Party (UNICORN-25); Tablet per Link sieht keinen Weg in die Plattform
 function hatParty(){ var t=new URLSearchParams(location.search).get('thema')||'einhorn'; return !!(window.Weg && Weg.party(t)); }
 (function(){ var t=new URLSearchParams(location.search).get('thema')||'einhorn'; ['erw-portal','btn-portal'].forEach(function(id){ if(window.Weg) $(id).href=Weg.heim(t); }); if(!hatParty()) $('erw-portal').hidden=true; })();
 ['erw-portal','btn-portal'].forEach(function(id){ $(id).addEventListener('click', function(){ save(); }); });   // Stand sichern, bevor es zur Party geht

@@ -9,7 +9,7 @@ Das Repo enthält zwei Fassungen:
 
 | Datei | Zweck |
 |---|---|
-| `party.html`, `party.js` | Party-Assistent (Kind, Termin, Gäste, Ort mit Plan B) und Party-Übersicht: nächster Schritt, Zeitplan mit Kalender-Export, Einkaufsliste mit Mengen, Link fürs iPad |
+| `party.html`, `party.js` | Party-Assistent (Kind, Termin, Gäste, Ort mit Plan B) und Party-Übersicht: nächster Schritt, Zeitplan mit Kalender-Export, Einkaufsliste mit Mengen, Link fürs Tablet |
 | `druck.html` | Druckvorlagen mit Namen und Datum: Einladung (auch als Text für WhatsApp), Urkunden für alle Kinder, schlafende Wolke |
 | `einladung.html` | Einladung für Gast-Eltern als Link (Daten stecken im Link): Termin, Treffpunkt, Abholzeit, Zusage per WhatsApp, Kalender, Hörprobe |
 | `vorausgeher.html` | Ansicht für den Vorausgeher: Startzeit, Karte mit Stationen und eigenem Standort, was wo hingelegt wird, Haken „aufgebaut“ (bisher nur auf dem eigenen Handy) |
@@ -34,7 +34,7 @@ Alle Dienste sind frei und brauchen keinen API-Schlüssel: Nominatim, Overpass, 
 
 ### Plan aufs Spiel-Gerät bringen
 
-Der Planer speichert den Plan im Browser. „Link fürs Spiel-Gerät“ erzeugt einen Link der Form `spiel.html?thema=einhorn&plan=…`. Öffnet man ihn auf dem iPad, ist die Tour dort gespeichert.
+Der Planer speichert den Plan im Browser. „Link fürs Spiel-Gerät“ erzeugt einen Link der Form `spiel.html?thema=einhorn&plan=…`. Öffnet man ihn auf dem Tablet, ist die Tour dort gespeichert.
 
 ## Stimmen
 

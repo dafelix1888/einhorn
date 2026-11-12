@@ -21,13 +21,13 @@
       return '<div class="zeile"><span><b>'+s[1]+'</b><br><span class="leise">„'+esc(t[s[0]]||'')+'“</span></span>'+
         (audio[s[0]]?'<button type="button" class="knopf klein leer" data-namen-hoeren="'+s[0]+'" aria-label="'+s[1]+' anhören">▶ Anhören</button>':'')+'</div>';
     }).join('')+'</div>';
-    else h+='<p>Funkel sagt '+(n?esc(n):'den Namen')+' an drei Stellen: bei der Begrüßung, beim Schatz und zum Abschied. Vorher anhören, dann aufs iPad.</p>';
+    else h+='<p>Funkel sagt '+(n?esc(n):'den Namen')+' an drei Stellen: bei der Begrüßung, beim Schatz und zum Abschied. Vorher anhören, dann aufs Tablet.</p>';
     h+='<label class="namen-feld">Vorname<input id="namen-name" maxlength="30" autocomplete="off" value="'+esc(stand.name||n)+'"></label>'+
        '<label class="namen-feld">So spricht man ihn <span class="leise">(nur wenn Funkel ihn falsch sagt, z. B. „Mija“ für Mia)</span><input id="namen-aussprache" maxlength="30" autocomplete="off" value="'+esc(stand.aussprache||'')+'"></label>';
     if(fehler) h+='<p class="namen-fehler">'+esc(fehler)+'</p>';
     if(stand.uebrig>0) h+='<button type="button" class="knopf mittel" id="namen-los"'+(laeuft?' disabled':'')+'>'+(laeuft?'Funkel spricht ein …':t?'Neu einsprechen':'Sätze einsprechen')+'</button>';
     h+='<p class="leise" style="margin-top:8px">'+(stand.uebrig>0?'Noch '+stand.uebrig+' von '+stand.max+' Mal einsprechen möglich. Gleicher Name zählt nicht neu.':'Alle '+stand.max+' Mal eingesprochen.')+
-       (t?' Das iPad holt die Sätze beim nächsten Öffnen mit Internet.':'')+'</p>';
+       (t?' Das Tablet holt die Sätze beim nächsten Öffnen mit Internet.':'')+'</p>';
     return h;
   }
   function karte(th){

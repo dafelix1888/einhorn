@@ -216,7 +216,7 @@
    "seek": "Weiter bis zur Straße. Dort wartet die Regenbogenbrücke.",
    "title": "Die Regenbogenbrücke",
    "say": "Über die Regenbogenbrücke gehen Einhörner nur zusammen. Auf der anderen Seite beginnt mein Wald. Alle ans Seil! Beim Gehen rufen wir: klipp, klopp!",
-   "task": "iPad einstecken, alle Hände ans Seil. Drüben angekommen „Alle sind drüben“ tippen.",
+   "task": "Tablet einstecken, alle Hände ans Seil. Drüben angekommen „Alle sind drüben“ tippen.",
    "go": "Alle sind drüben",
    "ort": {
     "typ": "strassenquerung",
@@ -392,9 +392,9 @@
    {
     "t": "Spiegel",
     "items": [
-     "funkel-stimme.json liegt neben der Seite, iPad spielt alle Sätze dieser Variante",
-     "iPad: Einstellungen → Anzeige → Automatische Sperre auf „Nie“",
-     "Am Morgen: iPad voll geladen, Stummschalter auf laut"
+     "funkel-stimme.json liegt neben der Seite, Tablet spielt alle Sätze dieser Variante",
+     "Bildschirmsperre ausschalten (iPad: Einstellungen → Anzeige & Helligkeit → Automatische Sperre „Nie“; Android: Einstellungen → Display → Bildschirm-Timeout, längste Zeit)",
+     "Am Morgen: Tablet voll geladen, Ton an und laut"
     ]
    },
    {
@@ -404,7 +404,7 @@
      "{kinder} Haarreifen, die zwei kleinsten Bögen (Station 1)",
      "Seil (Station 3)",
      "Sticker-Stücke (Station 7)",
-     "iPad"
+     "Tablet"
     ]
    },
    {
@@ -1163,7 +1163,7 @@
    "a": [
     [
      "Tun",
-     "iPad einstecken, alle Hände ans Seil"
+     "Tablet einstecken, alle Hände ans Seil"
     ],
     [
      "Tun",

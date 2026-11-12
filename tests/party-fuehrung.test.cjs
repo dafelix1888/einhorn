@@ -40,7 +40,7 @@ let fehler=0; function ok(b, t){ console.log((b?'OK   ':'FEHLER ')+t); if(!b) fe
   ok(await p.locator('#vg-link').isVisible() && /vorgeht/.test(await p.locator('#vg-link').innerText()), 'Partytag: Vorausgeher-Link mit Erklärung');
   ok(await p.locator('#umschalten').isVisible() && await anzahl('.teile [data-teil]')===3, 'Partytag: Plan B und drei Teilschritte zum Abhaken');
   await p.click('.blaettern [data-oeffne="geraet"]'); await p.waitForSelector('#s-geraet');
-  ok(await p.locator('#teilen').isVisible() && /anderen Gerät/.test(await p.locator('#teilen').innerText()), 'Blättern zum iPad-Schritt, iPad-Link erklärt');
+  ok(await p.locator('#teilen').isVisible() && /anderen Gerät/.test(await p.locator('#teilen').innerText()), 'Blättern zum Tablet-Schritt, Tablet-Link erklärt');
   await p.goBack(); await p.waitForSelector('.held');
   ok(!/#/.test(p.url()), 'Browser-Zurück führt aus dem Schritt zum Überblick');
 

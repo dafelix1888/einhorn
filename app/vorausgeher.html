@@ -125,7 +125,7 @@ details.alle[open] summary svg{transform:rotate(180deg)}
       '<p class="unter">'+esc(party.kind&&party.kind.name?party.kind.name+'s Party · ':'')+'Losgehen um '+Party.uhr(party,-20)+' Uhr. '+(drinnen?'Station 6 und 7 bei geschlossener Tür aufbauen.':'Mit der Tasche vorgehen und Station für Station aufbauen.')+'</p>'+
       '<div id="fokus"></div>'+
       '<details class="alle" id="alle"><summary><span id="alleTitel">Alle Stationen</span>'+PFEIL+'</summary><div class="alle-innen">'+(drinnen?'':'<div id="karte"></div>')+'<div id="liste"></div></div></details>'+
-      '<p class="hinweis" id="live-hinweis">'+(window.Konto && Konto.linkRolle(thema)==='vorausgeher' ? 'Das iPad sieht deine Haken live.' : 'Die Haken sieht nur dieses Handy.')+'</p>'+
+      '<p class="hinweis" id="live-hinweis">'+(window.Konto && Konto.linkRolle(thema)==='vorausgeher' ? 'Das Tablet sieht deine Haken live.' : 'Die Haken sieht nur dieses Handy.')+'</p>'+
       '<p class="hinweis"><a href="landing.html?utm_source=vorausgeher">Was ist Schatzweg?</a></p>';
     $('alle').addEventListener('toggle', function(){ if($('alle').open && !drinnen){ if(karte===null) karteBauen(); else if(karte) karte.invalidateSize(); } });
   }
@@ -183,13 +183,13 @@ details.alle[open] summary svg{transform:rotate(180deg)}
   function setzen(i, an){
     party.aufgebaut[i]=an;
     try{ var alt=Party.lesen(thema)||party; alt.aufgebaut=party.aufgebaut; localStorage.setItem('sj.party.'+thema, JSON.stringify(alt)); }catch(x){}
-    if(window.Konto) Konto.aufbauMelden(thema, party.aufgebaut);   // geschützter Link: iPad sieht es live
+    if(window.Konto) Konto.aufbauMelden(thema, party.aufgebaut);   // geschützter Link: Tablet sieht es live
     if(an) toast('Station '+(+i+1)+' steht.');
     zeichnen();
   }
   window.addEventListener('konto', function(ev){
     var d=ev.detail||{}, h=$('live-hinweis'); if(d.thema!==thema || !h) return;
-    if(d.art==='aufbau-gesendet') h.textContent='Das iPad sieht deine Haken live.';
+    if(d.art==='aufbau-gesendet') h.textContent='Das Tablet sieht deine Haken live.';
     else if(d.art==='aufbau-wartet') h.textContent='Kein Netz. Die Haken gehen raus, sobald du wieder Empfang hast.';
     else if(d.art==='aufbau-abgelehnt') h.textContent='Dieser Link wurde ersetzt. Die Haken sieht nur dieses Handy.';
   });

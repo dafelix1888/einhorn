@@ -353,7 +353,7 @@
     start:'<circle cx="12" cy="12" r="9"/><path d="M10 8.3v7.4l5.6-3.7z"/>'
   };
   function symbol(id){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(SYMBOL[id]||'')+'</svg>'; }
-  var FERTIG_TEXT={bestellen:'Alles da oder bestellt', einladen:'Einladung ist raus', route:'Route passt', basteln:'Gebastelt und gedruckt', geraet:'iPad ist startklar', partytag:'Alles erledigt'};
+  var FERTIG_TEXT={bestellen:'Alles da oder bestellt', einladen:'Einladung ist raus', route:'Route passt', basteln:'Gebastelt und gedruckt', geraet:'Tablet ist startklar', partytag:'Alles erledigt'};
   var FUNKEN=[[4,36,0],[22,8,.15],[50,-6,.3],[78,8,.45],[96,36,.6]].map(function(f){ return '<i class="funke" style="left:'+f[0]+'%;top:'+f[1]+'%;animation-delay:'+(0.9+f[2]).toFixed(2)+'s">✦</i>'; }).join('');
   var gezeigt=null, gefeiert=-1, ueberblickY=0, schrittImVerlauf=false, hoer=null;
   function anker(id){ return {einladen:'einladung', bestellen:'einkauf'}[id] || 's-'+id; }
@@ -478,10 +478,10 @@
     if(a.id==='basteln') return kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden'+(Party.variante(p)==='a'?', Wolke':'')+' und Einladungen.'})+
       kachel({href:'spiel.html?thema='+thema+'#einrichten', symbol:'liste', titel:'Bastelliste öffnen', text:'Was in welche Station gehört. Dort hakst du ab, was fertig ist.'});
     if(a.id==='geraet') return (window.Namen ? Namen.karte(thema) : '')+kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
-      kachel({id:'teilen', symbol:'geraet', titel:'Link fürs iPad', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl und Variante schon drin.'});
+      kachel({id:'teilen', symbol:'geraet', titel:'Link fürs Tablet', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl und Variante schon drin.'});
     if(a.id==='partytag'){
-      if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.uhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das iPad sieht seine Haken live.':'')});
-      h+=kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem iPad: letzter Check, dann weckt ihr den Zauberspiegel.'});
+      if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.uhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das Tablet sieht seine Haken live.':'')});
+      h+=kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Tablet: letzter Check, dann weckt ihr den Zauberspiegel.'});
       if(p.planB || p.ort==='drinnen' && p.warDraussen){
         var drin=p.ort==='drinnen';
         h+='<div class="karte planb"><div><b>'+(drin?'Plan B aktiv: drinnen':'Plan B bereit')+'</b><br><span class="leise">'+(drin?'Zurück nach draußen mit der geplanten Route.':'Regen? Ein Tipp, und das Spiel läuft drinnen.')+'</span></div><button type="button" class="knopf mittel '+(drin?'':'leer')+'" id="umschalten">'+(drin?'Nach draußen':'Drinnen spielen')+'</button></div>';
@@ -539,7 +539,7 @@
   // Textfeld so hoch wie sein Text
   function feldPassen(){ var f=$('gh'); if(f){ f.style.height='auto'; f.style.height=(f.scrollHeight+4)+'px'; } }
 
-  function linkFuersIpad(){ return Party.spielLink(party, Party.plan(thema)); }
+  function linkFuersTablet(){ return Party.spielLink(party, Party.plan(thema)); }
   function teilen(link, titel, ok){
     if(navigator.share){ navigator.share({title:titel, url:link})['catch'](function(){}); return; }
     try{ navigator.clipboard.writeText(link).then(function(){ toast(ok); }, function(){ prompt('Link kopieren:', link); }); }catch(x){ prompt('Link kopieren:', link); }
@@ -612,7 +612,7 @@
       var blob=new Blob([Party.ics(party, tour, Party.plan(thema))],{type:'text/calendar'}), el=document.createElement('a');
       el.href=URL.createObjectURL(blob); el.download=thema+'-party.ics'; document.body.appendChild(el); el.click(); el.remove(); toast('Kalenderdatei erstellt. Öffnen, dann landen alle Termine im Kalender.'); return;
     }
-    if(t.closest('#teilen')){ bereit(function(){ teilen(linkFuersIpad(), partyTitel(party), 'Link kopiert. Auf dem iPad öffnen.'); }); return; }
+    if(t.closest('#teilen')){ bereit(function(){ teilen(linkFuersTablet(), partyTitel(party), 'Link kopiert. Auf dem Tablet öffnen.'); }); return; }
     if(t.closest('#danke-link')){ dankeLink(); return; }
     if(t.closest('#ansehen')){ bereit(function(){ location.href=Party.einladungsLink(party, Party.plan(thema)); }); return; }
     if(t.closest('#vg-link')){ bereit(function(){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+partyTitel(party), 'Link kopiert. An den Vorausgeher schicken.'); }); return; }

@@ -5,8 +5,8 @@
 //    geschützt auf dem Server, und jede Rolle bekommt einen eigenen Link mit langem Zufallsschlüssel:
 //      gast         einladung.html?k=…    Termin, Treffpunkt, Abholen, Hinweis (keine Route)
 //      vorausgeher  vorausgeher.html?k=…  Route und Stationen
-//      spiel        spiel.html?k=…        ganze Tour fürs iPad
-//    Gäste, Vorausgeher und iPad brauchen kein Konto. Ein Link lässt sich durch einen neuen ersetzen (sperren).
+//      spiel        spiel.html?k=…        ganze Tour fürs Tablet
+//    Gäste, Vorausgeher und Tablet brauchen kein Konto. Ein Link lässt sich durch einen neuen ersetzen (sperren).
 //  * Ohne Eintrag unten (URL leer) läuft alles wie bisher: Daten stecken im Link.
 //
 // Der Schlüssel unten ist der öffentliche „anon“-Schlüssel von Supabase. Er darf im Code stehen; geschützt wird
@@ -146,7 +146,7 @@
     return token().then(function(t){ return anfrage('/rest/v1/parties?id=eq.'+p.server.id, {method:'DELETE', token:t}); })['catch'](function(){});
   }
 
-  // ---------- Links einlösen (Gäste, Vorausgeher, iPad: ohne Konto) ----------
+  // ---------- Links einlösen (Gäste, Vorausgeher, Tablet: ohne Konto) ----------
   function linkLesen(k){
     if(!aktiv() || !/^[A-Za-z0-9_-]{22,64}$/.test(k||'')) return Promise.resolve(null);
     return anfrage('/rest/v1/rpc/link_lesen', {method:'POST', body:{t:k}});
@@ -173,7 +173,7 @@
   }
 
   // ---------- Vorausgeher live: Haken „Station steht“ ----------
-  // Schreiben nur mit Vorausgeher-Link; lesen mit Vorausgeher- oder iPad-Link, Eltern über ihren eigenen iPad-Schlüssel.
+  // Schreiben nur mit Vorausgeher-Link; lesen mit Vorausgeher- oder Tablet-Link, Eltern über ihren eigenen Tablet-Schlüssel.
   function linkRolle(thema){ var l=lies('sj.link.'+thema); return aktiv() && l && l.k ? l.rolle : null; }
   function aufbauSchluessel(thema){
     var l=lies('sj.link.'+thema); if(l && l.k) return l.k;
@@ -223,7 +223,7 @@
     var id=partyId(thema); if(!angemeldet() || !id) return Promise.reject(new Error('Bitte zuerst speichern.'));
     return sync(thema)['catch'](function(){}).then(function(){ return namenAnfrage({aktion:'erzeugen', party_id:id, name:name, aussprache:aussprache, alter:alter}, true); });
   }
-  // Fürs Spiel: Sätze mit dem iPad-Schlüssel holen (eigener Link oder der Schlüssel der eigenen Party)
+  // Fürs Spiel: Sätze mit dem Tablet-Schlüssel holen (eigener Link oder der Schlüssel der eigenen Party)
   function namenHolen(thema, hash){
     var l=lies('sj.link.'+thema), p=root.Party && Party.lesen(thema);
     var t=(l && l.k && l.rolle==='spiel') ? l.k : (p && p.server && p.server.k && p.server.k.spiel);
@@ -325,9 +325,9 @@
     var st=z==='speichert'?'<span class="stand">Speichert …</span>':z==='fehler'?'<span class="stand schlecht">Nicht gespeichert, kein Netz?</span>':'<span class="stand gut">Gespeichert</span>';
     function zeile(r, n){ return '<div class="zeile"><span>'+n+'</span><button type="button" class="knopf klein leer" data-konto-neu="'+r+'">Neuer Link</button></div>'; }
     return '<div class="konto" id="konto-karte"><div class="zeile" style="border:0;padding-top:0"><b>Geschützt gespeichert</b>'+st+'</div>'+
-      '<p>Angemeldet als '+esc(s.email)+'. Jeder Link zeigt nur, was er braucht: die Einladung Termin und Treffpunkt, Vorausgeher und iPad die Route. 30 Tage nach der Party wird alles gelöscht.</p>'+
+      '<p>Angemeldet als '+esc(s.email)+'. Jeder Link zeigt nur, was er braucht: die Einladung Termin und Treffpunkt, Vorausgeher und Tablet die Route. 30 Tage nach der Party wird alles gelöscht.</p>'+
       '<details><summary>Link sperren</summary><p>Ein neuer Link ersetzt den alten, der geht dann nicht mehr. Den neuen noch einmal schicken.</p>'+
-      zeile('gast','Einladung')+zeile('vorausgeher','Vorausgeher')+zeile('spiel','iPad')+'</details>'+
+      zeile('gast','Einladung')+zeile('vorausgeher','Vorausgeher')+zeile('spiel','Tablet')+'</details>'+
       '<div class="reihe" style="margin-top:12px"><button type="button" class="knopf klein leer" data-konto="abmelden">Abmelden</button></div></div>';
   }
   function zeichnen(thema){ var e=document.getElementById('konto-karte'); if(e && thema===aktuellesThema){ var d=document.createElement('div'); d.innerHTML=karte(thema); e.replaceWith(d.firstChild); } }
@@ -349,7 +349,7 @@
         '<p class="unter">'+esc(opt.text||'Mit deiner eigenen E-Mail-Adresse. Den Link zum Weiterschicken bekommst du gleich danach.')+'</p>'+
         '<ul class="kd-vorteile">'+
           '<li><span class="ic">'+IC.schloss+'</span><span><b>Eure Tour ist geschützt</b><small>Route und Treffpunkt sieht nur, wer euren Link hat.</small></span></li>'+
-          '<li><span class="ic">'+IC.teilen+'</span><span><b>Links für iPad und Gäste</b><small>Die brauchen kein Konto, ein Tipp auf den Link reicht.</small></span></li>'+
+          '<li><span class="ic">'+IC.teilen+'</span><span><b>Links für Tablet und Gäste</b><small>Die brauchen kein Konto, ein Tipp auf den Link reicht.</small></span></li>'+
           '<li><span class="ic">'+IC.brief+'</span><span><b>Code statt Passwort</b><small>Wir schicken dir einen Code per E-Mail.</small></span></li></ul>'+
         '<label class="kd-wer" for="kd-mail"><b>Deine</b> E-Mail-Adresse, nicht die vom Empfänger. Dorthin kommt der Code.</label>'+
         '<input type="email" id="kd-mail" autocomplete="email" inputmode="email" placeholder="deine@email.de" aria-label="Deine eigene E-Mail-Adresse" required value="'+esc(email)+'">'+
@@ -456,7 +456,7 @@
       if(gesichert){
         h+='<a class="mb-zeile" href="party.html?thema='+thema+'#einladung"><span><b>Gäste</b><small id="mb-gaeste">'+esc(gaesteZeile(g))+'</small></span><span class="pf"></span></a>'+
           '<h3>Links</h3><p>Jeder Link zeigt nur, was er braucht. Ein neuer Link sperrt den alten.</p>'+
-          [['gast','Einladung','für die Gast-Eltern, ohne Route'],['vorausgeher','Vorausgeher','Route und Stationen'],['spiel','iPad','die ganze Tour']].map(function(z){
+          [['gast','Einladung','für die Gast-Eltern, ohne Route'],['vorausgeher','Vorausgeher','Route und Stationen'],['spiel','Tablet','die ganze Tour']].map(function(z){
             return '<div class="mb-zeile"><span><b>'+z[1]+'</b><small>'+z[2]+'</small></span><button type="button" class="leer mb-klein" data-konto-neu="'+z[0]+'">Neuer Link</button></div>'; }).join('');
       }
       var weg=new Date(d.getTime()+30*864e5).toLocaleDateString('de-DE',{day:'numeric', month:'long'});
