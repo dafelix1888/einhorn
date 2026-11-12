@@ -102,7 +102,7 @@
   function stand(o){ var s=JSON.stringify(o), h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return s.length+':'+h; }
   function sync(thema, erzwingen){
     if(!angemeldet() || !root.Party) return Promise.resolve(false);
-    var p=Party.lesen(thema); if(!p) return Promise.resolve(false);
+    var p=Party.lesen(thema); if(!p || p.fremd) return Promise.resolve(false);   // fremde Party (aus einem Link) gehört nicht diesem Konto (PBIM-24)
     var pl=Party.plan(thema);
     if(schluessel(p)) schreib('sj.party.'+thema, p);
     var daten={gast:Party.einladungsDaten(p, pl), vorausgeher:Party.planKern(pl, p), spiel:Party.planKern(pl, p)};
@@ -135,8 +135,9 @@
     });
   }
   function neuerLink(thema, rolle){                   // alten Link sperren: Schlüssel ersetzen, alte Zeile löschen
-    var p=Party.lesen(thema); if(!p || !p.server) return Promise.reject(new Error('nicht gespeichert'));
+    var p=Party.lesen(thema); if(!p || p.fremd || !p.server) return Promise.reject(new Error('nicht gespeichert'));
     var alt=p.server.k[rolle]; p.server.k[rolle]=zufall(18); schreib('sj.party.'+thema, p);
+    var l=lies('sj.link.'+thema); if(l && l.k===alt){ l.k=p.server.k[rolle]; schreib('sj.link.'+thema, l); }   // eigener Link auf diesem Gerät bleibt gültig
     return token().then(function(t){ return anfrage('/rest/v1/links?token=eq.'+encodeURIComponent(alt), {method:'DELETE', token:t}); }).then(function(){ return sync(thema, true); });
   }
   function serverLoeschen(thema, p){
@@ -164,7 +165,7 @@
     linkLesen(k).then(function(r){
       if(!r || (r.rolle!=='spiel' && r.rolle!=='vorausgeher') || !r.daten || r.daten.thema!==thema){
         meldung('Dieser Link geht nicht mehr', 'Er wurde ersetzt oder die Party ist vorbei. Bitte die Eltern um einen neuen Link.'); return; }
-      Party.ausLinkUebernehmen(thema, r.daten);
+      Party.ausLinkUebernehmen(thema, r.daten, k);
       schreib('sj.link.'+thema, {k:k, rolle:r.rolle});         // für die Live-Haken des Vorausgehers
       q.delete('k'); location.replace(location.pathname+'?'+q.toString()+location.hash);
     }, function(){ meldung('Kein Netz', 'Zum ersten Öffnen braucht der Link Internet. Danach geht die Tour auch ohne.'); });
@@ -213,7 +214,7 @@
     var los=function(t){ return anfrage('/functions/v1/namen', {method:'POST', token:t, body:body}); };
     return mitAnmeldung ? token().then(los) : los(null);
   }
-  function partyId(thema){ var p=root.Party && Party.lesen(thema); return p && p.server && p.server.id; }
+  function partyId(thema){ var p=root.Party && Party.lesen(thema); return p && !p.fremd && p.server && p.server.id; }
   function namenStand(thema){
     var id=partyId(thema); if(!angemeldet() || !id) return Promise.resolve(null);
     return sync(thema)['catch'](function(){}).then(function(){ return namenAnfrage({aktion:'stand', party_id:id}, true); });
@@ -289,6 +290,7 @@
     '.konto-dlg .los{width:100%;padding:15px 18px;font-size:1.05rem;background:linear-gradient(135deg,#B79CFF,#7C5BD6);box-shadow:0 10px 26px rgba(124,91,214,.45)}'+
     '.konto-dlg .neben{display:block;margin:12px auto 0;background:none;color:var(--leise,#B3A9C4);font-weight:600;min-height:40px;padding:8px 14px}'+
     '.konto-dlg .mail{display:inline-block;background:rgba(167,139,250,.14);color:var(--text,#F5F2FA);border-radius:999px;padding:3px 10px;font-weight:700}'+
+    '.kd-wer{display:block;margin:14px 0 6px;font-size:.92rem;color:#B3A9C4;text-align:left}.kd-wer b{color:#F5F2FA}'+
     '.kd-fertig{text-align:center;padding:10px 0 6px}.kd-fertig .haken{width:72px;height:72px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#4ADE80,#16A34A);color:#fff;animation:kd-plopp .5s cubic-bezier(.2,1.6,.4,1)}'+
     '@keyframes kd-plopp{from{transform:scale(.3);opacity:0}}'+
     '.konto-dlg .kd-zu{position:absolute;top:12px;right:12px;width:44px;height:44px;padding:0;background:none;color:var(--leise,#B3A9C4);font-size:1.7rem;line-height:1;font-weight:400}'+
@@ -343,13 +345,14 @@
       haken:'<svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>'};
     var held=thema==='einhorn' ? '<div class="kd-held"><img alt="" src="themen/einhorn/figuren/funkel.svg"></div>' : '';
     function schritt1(fehler){
-      dlg.innerHTML='<form method="dialog" id="kd1">'+held+'<h2>'+esc(opt.titel||'Party speichern und teilen')+'</h2>'+
-        '<p class="unter">'+esc(opt.text||'Einmal anmelden, dann kann es losgehen.')+'</p>'+
+      dlg.innerHTML='<form method="dialog" id="kd1">'+held+'<h2>'+esc(opt.titel||'Erst deine Party speichern')+'</h2>'+
+        '<p class="unter">'+esc(opt.text||'Mit deiner eigenen E-Mail-Adresse. Den Link zum Weiterschicken bekommst du gleich danach.')+'</p>'+
         '<ul class="kd-vorteile">'+
           '<li><span class="ic">'+IC.schloss+'</span><span><b>Eure Tour ist geschützt</b><small>Route und Treffpunkt sieht nur, wer euren Link hat.</small></span></li>'+
           '<li><span class="ic">'+IC.teilen+'</span><span><b>Links für iPad und Gäste</b><small>Die brauchen kein Konto, ein Tipp auf den Link reicht.</small></span></li>'+
           '<li><span class="ic">'+IC.brief+'</span><span><b>Code statt Passwort</b><small>Wir schicken dir einen Code per E-Mail.</small></span></li></ul>'+
-        '<input type="email" id="kd-mail" autocomplete="email" inputmode="email" placeholder="deine@email.de" aria-label="E-Mail-Adresse" required value="'+esc(email)+'">'+
+        '<label class="kd-wer" for="kd-mail"><b>Deine</b> E-Mail-Adresse, nicht die vom Empfänger. Dorthin kommt der Code.</label>'+
+        '<input type="email" id="kd-mail" autocomplete="email" inputmode="email" placeholder="deine@email.de" aria-label="Deine eigene E-Mail-Adresse" required value="'+esc(email)+'">'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+
         '<button class="los" id="kd-los" type="submit">Code schicken</button><button class="neben" type="button" id="kd-zu">Später</button></form>';
       dlg.querySelector('#kd-zu').onclick=function(){ dlg.close(); };
@@ -394,6 +397,7 @@
       dlg.querySelector('#kd-ohne').onclick=function(){ schreib(NOTWEG, Date.now()); dlg.close(); melden({art:'notweg', thema:thema}); if(opt.weiter) opt.weiter(); };
     }
     function fertig(){
+      if(opt.teilen && opt.weiter && root.Party && (Party.lesen(thema)||{}).server){ jetztTeilen(thema, opt.weiter); return; }   // gespeichert: jetzt mit eigenem Tipp teilen (UNICORN-36)
       dlg.innerHTML='<div class="kd-fertig"><div class="haken">'+IC.haken+'</div><h2>Geschafft!</h2><p class="unter" style="margin:0">'+esc(opt.fertig||'Eure Party ist gesichert.')+'</p></div>';
       setTimeout(function(){ if(dlg.open) dlg.close(); }, 1400);
     }
@@ -431,13 +435,21 @@
   }
   function bereich(thema){
     blatt(); aktuellesThema=thema; meinungOffen=false;
-    var s=sitzung(), p=root.Party&&Party.lesen(thema), gesichert=!!(s && p && p.server && p.server.id), g=gaesteGemerkt(thema);
+    var s=sitzung(), p=root.Party&&Party.lesen(thema), fp=null;
+    if(p && p.fremd){ fp=p; p=null; }                                  // fremde Party: nicht als „eure“ zeigen (PBIM-24)
+    var gesichert=!!(s && p && p.server && p.server.id), g=gesichert ? gaesteGemerkt(thema) : null;
     var h='<div class="mb"><button class="kd-zu" type="button" data-mb="zu" aria-label="Schließen">×</button><h2>Mein Bereich</h2>';
     if(!aktiv()) h+='<p>Hier läuft Schatzweg ohne Anmeldung. Alles bleibt auf diesem Gerät.</p>';
     else if(s) h+='<p>Angemeldet als <span class="mail">'+esc(s.email)+'</span></p>'+(p && !gesichert ? '<p>Eure Party liegt noch nur auf diesem Gerät.</p><button class="los" type="button" data-konto="anmelden">Party sichern</button>' : '');
     else h+='<p>'+(p ? 'Ihr seid nicht angemeldet, eure Party liegt nur auf diesem Gerät. Mit Anmeldung ist sie gesichert, und ihr könnt Einladung und Links teilen.'
                     : 'Zum Ausprobieren braucht ihr kein Konto. Schon eine Party auf einem anderen Gerät? Meldet euch an, dann holen wir sie hierher.')+'</p>'+
       '<button class="los" type="button" data-konto="anmelden">'+(p?'Anmelden und sichern':'Anmelden')+'</button>';
+    if(fp){
+      var fd=Party.datum(fp);
+      h+='<h3>Über einen Link geöffnet</h3><div class="mb-zeile"><span><b>'+esc(parteiName(fp))+'</b><small>'+esc(Party.datumText(fd))+', '+esc(fp.start)+' Uhr · gehört jemand anderem</small></span></div>'+
+        '<p>Ansehen und spielen geht. Speichern und Links teilen kann nur, wer die Party angelegt hat.</p>'+
+        ((Party.eigeneGesichert(thema) || s) ? '<button class="los" type="button" data-konto="eigene">Meine eigene Party öffnen</button>' : '');
+    }
     if(p){
       var d=Party.datum(p), n=p.kind&&p.kind.name ? p.kind.name+(/[sßxz]$/i.test(p.kind.name)?'’':'s')+' Party' : 'Eure Party';
       h+='<h3>Eure Party</h3><a class="mb-zeile" href="party.html?thema='+thema+'"><span><b>'+esc(n)+'</b><small>'+esc(Party.datumText(d))+', '+esc(p.start)+' Uhr</small></span><span class="pf"></span></a>';
@@ -506,19 +518,51 @@
   }
 
   // Vor dem Teilen: ohne Server sofort weiter; mit Server erst anmelden und speichern.
-  function bereit(thema, weiter){
+  // ---------- Fremde Party auf diesem Gerät (PBIM-24) ----------
+  // Über einen Tablet- oder Vorausgeher-Link geöffnet: ansehen und spielen ja, speichern und teilen nein.
+  function parteiName(p){ return p && p.kind && p.kind.name ? p.kind.name+(/[sßxz]$/i.test(p.kind.name)?'’':'s')+' Party' : 'Diese Party'; }
+  function fremdHinweis(thema){
+    blatt(); aktuellesThema=thema; bereichOffen=false;
+    var p=root.Party&&Party.lesen(thema), zurueck=(root.Party&&Party.eigeneGesichert(thema)) || angemeldet();
+    dlg.innerHTML='<div class="kd-fertig"><h2>'+esc(parteiName(p))+' gehört jemand anderem</h2>'+
+      '<p class="unter">Sie ist über einen Link auf diesem Gerät. Ansehen und spielen geht, speichern und Links teilen kann nur, wer sie angelegt hat.</p>'+
+      (zurueck ? '<button class="los" type="button" data-konto="eigene">Meine eigene Party öffnen</button>' : '')+
+      '<button class="neben" type="button" id="kd-zu">Schließen</button></div>';
+    dlg.querySelector('#kd-zu').onclick=function(){ dlg.close(); };
+    if(!dlg.open) dlg.showModal();
+  }
+  // Fremde Party weglegen, eigene zurückholen (gesicherte Fassung vom Gerät, sonst vom Server)
+  function eigeneOeffnen(thema){
+    var da=root.Party && Party.eigeneZurueck(thema);
+    var weiter=da || !angemeldet() ? Promise.resolve() : holen()['catch'](function(){ return 0; });
+    return weiter.then(function(){ zeichnen(thema); melden({art:'eigene', thema:thema}); });
+  }
+  // Nach dem Speichern: Teilen braucht einen eigenen Tipp (Browser erlauben Teilen nur direkt nach einem Tipp)
+  function jetztTeilen(thema, weiter, text){
+    blatt(); bereichOffen=false;
+    dlg.innerHTML='<div class="kd-fertig"><div class="haken"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>'+
+      '<h2>Eure Party ist gespeichert</h2><p class="unter">'+esc(text||'Jetzt kannst du den Link weiterschicken.')+'</p>'+
+      '<button class="los" type="button" id="kd-teilen">Link jetzt teilen</button><button class="neben" type="button" id="kd-zu">Später</button></div>';
+    dlg.querySelector('#kd-teilen').onclick=function(){ dlg.close(); weiter(); };
+    dlg.querySelector('#kd-zu').onclick=function(){ dlg.close(); };
+    if(!dlg.open) dlg.showModal();
+  }
+  function bereit(thema, weiter){                       // weiter = Teilen nach dem Speichern; leer = nur speichern
+    var teilen=typeof weiter==='function'; if(!teilen) weiter=function(){};
     if(!aktiv()){ weiter(); return; }
     var p=root.Party&&Party.lesen(thema);
+    if(p && p.fremd){ fremdHinweis(thema); return; }                  // fremde Party: nicht speichern, nicht teilen
     if(angemeldet() && p && p.server && p.server.k){ sync(thema)['catch'](function(){}); weiter(); return; }
-    if(angemeldet()){ angemeldetWeiter(thema); return; }
-    fenster(thema, {weiter:weiter});
+    if(angemeldet()){ angemeldetWeiter(thema).then(function(){ var q=root.Party&&Party.lesen(thema); if(q && q.server && teilen) jetztTeilen(thema, weiter); }); return; }
+    fenster(thema, {weiter:weiter, teilen:teilen});
   }
 
   document.addEventListener('click', function(ev){
     var b=ev.target.closest && ev.target.closest('[data-konto],[data-konto-neu]'); if(!b) return;
     var th=aktuellesThema; if(!th) return;
     var a=b.getAttribute('data-konto');
-    if(a==='anmelden'){ bereit(th, function(){}); return; }
+    if(a==='anmelden'){ bereit(th); return; }
+    if(a==='eigene'){ b.disabled=true; if(dlg && dlg.open) dlg.close(); eigeneOeffnen(th); return; }
     if(a==='abmelden'){ if(confirm('Abmelden? Die Party bleibt auf diesem Gerät und auf dem Server.')){ abmelden(); zeichnen(th); melden({art:'abgemeldet', thema:th}); } return; }
     var r=b.getAttribute('data-konto-neu');
     if(r && confirm('Neuen Link erzeugen? Der alte geht dann nicht mehr.')){
@@ -529,7 +573,7 @@
   var mailLink=null;
   try{ mailLink=linkAusMail(); }catch(e){}
 
-  root.Konto={notweg:notweg, mkMelden:mkMelden, aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
+  root.Konto={eigeneOeffnen:eigeneOeffnen, fremdHinweis:fremdHinweis, notweg:notweg, mkMelden:mkMelden, aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
     feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen, bereich:bereich, meinung:meinung,
     antwortGeben:antwortGeben, einladungGesehen:einladungGesehen, gaeste:gaeste, gaesteGemerkt:gaesteGemerkt, gastEntfernen:gastEntfernen, gaesteKurz:gaesteKurz, gaesteZeile:gaesteZeile,

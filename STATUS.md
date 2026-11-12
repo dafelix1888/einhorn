@@ -12,6 +12,8 @@ Ziel: fremde Eltern planen und spielen ohne Hilfe; Gate bis 6. Dezember 2026: 20
 
 **12. November:** UNICORN-35 Landingpage mit wischbaren Bildern von Marketer übernommen (PR #144, live). UNICORN-37 Planer: Die gewählte Himmelsrichtung zählt bei der Auswahl der Route deutlich mehr (Ziel mitten in der Richtung schlägt ein Ziel am Rand, auch wenn dort mehr Stationen ihren Ort finden); die Karte nennt die Richtung der gezeigten Route („Richtung Osten · Rundkurs · ab …“); der Kartenausschnitt wird nur wiederverwendet, wenn er groß genug ist. Test `tests/richtung.test.cjs`.
 
+**12. November (abends):** PBIM-25/PBIM-24 Fremde Party: Öffnete ein angemeldetes Gerät mit eigener Party den Tablet- oder Vorausgeher-Link einer fremden Party, wurde die eigene Party auf dem Gerät überschrieben und die fremde bekam die eigene Server-ID (nächstes Speichern hätte die eigene Party auf dem Server überschrieben). Jetzt: Partys aus fremden Links sind `fremd:true` ohne `server`, die eigene liegt in `sj.eigen.<thema>`; Speichern, Teilen und „Neuer Link“ sind für fremde Partys gesperrt; Party-Seite und Mein Bereich zeigen „gehört jemand anderem“ mit „Meine eigene Party öffnen“ (Gerät, sonst Server); vermischte Geräte werden beim Laden repariert. UNICORN-36: Anmeldefenster heißt „Erst deine Party speichern“ und sagt „Deine E-Mail-Adresse, nicht die vom Empfänger“; nach dem Speichern kommt „Link jetzt teilen“. Test `tests/fremde-party.test.cjs`.
+
 ## Rollen und Jira-Projekte
 
 | Rolle | Jira | Aufgabe |
@@ -71,6 +73,7 @@ Aus der Einhorn-Schnitzeljagd vom Geburtstag wird eine Plattform für Schnitzelj
 - Kartendaten von OpenStreetMap (Overpass, Nominatim), Höhen von Open-Meteo, Adressvorschläge beim Tippen über Photon (komoot), alles ohne Schlüssel. Nominatim erlaubt keine Vorschläge beim Tippen, deshalb Photon dafür.
 - Architektur vorerst statisch: Jedes Abenteuer ist eine `tour.json`, Daten der Eltern liegen im Gerät (`localStorage`: `sj.party.<thema>`, `sj.plan.<thema>`), Teilen läuft über Links mit eingebetteten Daten.
 - Server: Supabase in Frankfurt (Login per E-Mail-Code, Datenbank mit Zugriffsregeln, Daten in der EU). Stimmen bleiben beim Cloudflare Worker.
+- Eine Party aus einem fremden Link (Tablet, Vorausgeher) ist auf dem Gerät nur Gast: ansehen und spielen ja, speichern und teilen nein; sie verdrängt die eigene Party nie (PBIM-24, 12. November).
 - Konto nur für die Eltern, die feiern: beim ersten Teilen, spätestens vor dem Tour-Start (Entscheidung 7. November, MAR-53). Planen und die Route um die eigene Adresse ansehen geht ohne Konto. Gast-Eltern, Vorausgeher und iPad brauchen kein Konto, nur ihren Link. Das iPad bekommt kein Zauberwort, der geheime Link reicht.
 - „Einmal gratis“ wird nicht gezählt (ohne Konto nicht sicher möglich); die Grenze ist „Speichern und teilen“ bzw. „Spiegel aufwecken“.
 - Anpassen kostet künftig Geld: Paket mit 3 Neuerzeugungen, ein Prompt zählt als eine Neuerzeugung. Grenze je Prompt: so lang wie eine WhatsApp-Nachricht, höchstens 3 Stationen oder 2 Figuren, höchstens 2.000 gesprochene Zeichen. Höchstens 2 Bonus-Stationen je Party. Fest bleiben Reihenfolge, Rätsel, Utensilien und Sicherheit.

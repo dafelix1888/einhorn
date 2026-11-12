@@ -120,7 +120,7 @@
   });
   $('drucken').addEventListener('click', function(){ window.print(); });
   $('link').addEventListener('click', function(){
-    if(window.Konto && !Party.einladungsLink(party, plan)){ Konto.bereit(thema, function(){}); return; }   // erst geschützt speichern
+    if(window.Konto && !Party.einladungsLink(party, plan)){ Konto.bereit(thema); return; }   // erst geschützt speichern
     var l=Party.einladungsLink(party, plan);
     if(navigator.share){ navigator.share({title:name+' wird '+alter+'!', text:'Einladung zu '+name+'s Einhorn-Party', url:l})['catch'](function(){}); return; }
     try{ navigator.clipboard.writeText(l).then(function(){ toast('Link kopiert. In die Eltern-Gruppe schicken.'); }, function(){ prompt('Link kopieren:', l); }); }catch(x){ prompt('Link kopieren:', l); }
