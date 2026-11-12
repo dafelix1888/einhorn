@@ -211,7 +211,7 @@
   function ortText(e){ return e.ort==='drinnen' ? 'drinnen' : 'draußen'+(e.planB?', Plan B drinnen':''); }
   function voreinText(e){
     var l=[];
-    if(e.ort==='draussen'){ l.push(e.planB?'Plan B bei Regen an':'Ohne Plan B'); l.push(e.ausdrucke!==false?'Mit Ausdrucken':'Ohne Ausdrucke'); }
+    if(e.ort==='draussen'){ l.push(e.planB?'Plan B bei Regen an':'Ohne Plan B'); l.push(e.ausdrucke!==false?'Wenig Aufbau':'Mit Bändern am Zaun'); }
     l.push(e.helfer<2?'Alles wird vorher aufgebaut':e.vorausgeher?'Ein Erwachsener geht voraus':'Kein Vorausgeher');
     return l.join(' · ');
   }
@@ -252,7 +252,7 @@
         '<button type="button" data-ort="drinnen" aria-pressed="'+(!d)+'">'+HAUS+'<b>Drinnen</b><span>in der Wohnung</span></button></div>'+
         '<details class="vorein" id="vorein"'+(voreinOffen?' open':'')+'><summary><b>Schon voreingestellt <em>'+(voreinOffen?'Fertig':'Ändern')+'</em></b><span>'+esc(voreinText(e))+'. Alles später änderbar.</span></summary>'+
           (d?'<div class="schalter"><label for="planb"><b>Plan B bei Regen</b><span>Drinnen-Variante mit vorbereiten, am Partytag mit einem Tipp umschalten.</span></label><input type="checkbox" id="planb"'+(e.planB?' checked':'')+'></div>'+
-             '<div class="schalter"><label for="ausdrucke"><b>Mit Ausdrucken</b><span>Eine A3-Wolke zum Aufhängen. Ohne: Bilder nur im Spiegel, dafür ein weißes Laken.</span></label><input type="checkbox" id="ausdrucke"'+(e.ausdrucke!==false?' checked':'')+'></div>':'')+
+             '<div class="schalter"><label for="ausdrucke"><b>Wenig Aufbau</b><span>Alle Bilder zeigt der Spiegel, unterwegs hängt nichts. Ohne Haken: mit vier bunten Bändern am Zaun, Kreidekreis und einem weißen Laken.</span></label><input type="checkbox" id="ausdrucke"'+(e.ausdrucke!==false?' checked':'')+'></div>':'')+
           '<div class="schalter"><label for="vorausgeher"><b>Ein Erwachsener geht voraus</b><span>'+(e.helfer<2?'Geht ab zwei Erwachsenen. Mit nur einem wird alles vorher aufgebaut.':'Baut die Stationen kurz vorher auf. Ohne liegt alles schon vorher bereit.')+'</span></label><input type="checkbox" id="vorausgeher"'+(e.vorausgeher?' checked':'')+(e.helfer<2?' disabled':'')+'></div>'+
         '</details>';
     } else {
@@ -475,7 +475,7 @@
       '<p class="leise klein">Schon anders eingeladen? Dann hak den Schritt unten einfach ab.</p>';
     if(a.id==='route') return draussen ? routeKarte(p, pl) :
       kachel({href:'spiel.html?thema='+thema+'#einrichten', haupt:true, symbol:'liste', titel:'Liste öffnen', text:'Zeigt, welche Station in welchen Raum kommt und was dort hingehört.'});
-    if(a.id==='basteln') return kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden'+(Party.variante(p)==='a'?', Wolke':'')+' und Einladungen.'})+
+    if(a.id==='basteln') return kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden und Einladungen.'})+
       kachel({href:'spiel.html?thema='+thema+'#einrichten', symbol:'liste', titel:'Bastelliste öffnen', text:'Was in welche Station gehört. Dort hakst du ab, was fertig ist.'});
     if(a.id==='geraet') return (window.Namen ? Namen.karte(thema) : '')+kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
       kachel({id:'teilen', symbol:'geraet', titel:'Link fürs Tablet', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl und Variante schon drin.'});

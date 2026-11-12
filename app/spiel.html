@@ -106,6 +106,10 @@ button{font:inherit;color:inherit;touch-action:manipulation}
 .mirror-pic{width:76%;height:76%;display:grid;place-items:center}
 .mirror-pic svg{width:100%;height:100%;display:block}
 .mirror-pic.tap{cursor:pointer}
+.mirror-pic{position:relative}
+.mirror-pic svg.deko-wolke{position:absolute;top:-11%;right:16%;width:40%;height:auto;animation:wolkeSchlaf 4.5s ease-in-out infinite;filter:drop-shadow(0 3px 5px rgba(36,26,61,.18))}
+@keyframes wolkeSchlaf{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(3px) scale(1.04)}}
+@media (prefers-reduced-motion:reduce){ .mirror-pic svg.deko-wolke{animation:none} }
 .mirror-read{display:flex;align-items:baseline;justify-content:center;gap:12px;pointer-events:none}
 .mirror-read .big{font-family:var(--font-display);font-weight:800;font-size:2.3rem;line-height:1;font-variant-numeric:tabular-nums}
 .mirror-read .lab{font-family:var(--font-display);font-weight:600;font-size:1.3rem;color:var(--ink-soft)}
@@ -774,7 +778,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         <p class="lead">Geschichte, Mitbringsel und Funkels Sätze sind in allen drei gleich. Die Variante ändert die Hinweise „Für Erwachsene“, die Orte und die Vorbereitungsliste. Indoor läuft ohne GPS.</p>
         <div class="seg" id="variante" role="group" aria-label="Variante">
           <button type="button" data-v="a">Outdoor, voll</button>
-          <button type="button" data-v="b">Outdoor ohne Ausdrucke</button>
+          <button type="button" data-v="b">Outdoor mit Bändern</button>
           <button type="button" data-v="c">Indoor</button>
         </div>
         <p class="lead" id="variante-note"></p>
@@ -1381,6 +1385,7 @@ function clipsVomServer(){                 // Stimmen-Pakete: Geschichte plus nu
   })['catch'](function(){});
 }
 function dbDel(key){ delete clips[key]; delete puffer[key]; try{ if(idb) idb.transaction('clips','readwrite').objectStore('clips')['delete'](key); }catch(e){} }
+var DEKO_WOLKE='<svg class="deko-wolke" viewBox="0 0 1000 620" role="img" aria-label="Schlafende Wolke"><path d="M220 520 Q90 520 90 420 Q90 320 200 310 Q200 180 340 170 Q400 70 520 90 Q640 60 700 170 Q840 160 860 290 Q960 310 950 410 Q940 520 820 520 Z" fill="#fff" stroke="#7A8CA8" stroke-width="14" stroke-linejoin="round"/><path d="M370 360 q40 30 80 0 M560 360 q40 30 80 0" fill="none" stroke="#241A3D" stroke-width="14" stroke-linecap="round"/><ellipse cx="330" cy="420" rx="34" ry="18" fill="#F4B6D2"/><ellipse cx="680" cy="420" rx="34" ry="18" fill="#F4B6D2"/><path d="M470 450 q35 22 70 0" fill="none" stroke="#241A3D" stroke-width="12" stroke-linecap="round"/><text x="790" y="150" font-family="Trebuchet MS, Arial" font-weight="800" font-size="70" fill="#7A8CA8">z</text><text x="850" y="90" font-family="Trebuchet MS, Arial" font-weight="800" font-size="96" fill="#7A8CA8">Z</text></svg>';
 var IOS=/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
 var clipUrl=null;
 function stopClip(){
@@ -2273,6 +2278,7 @@ function render(keepPic){
   $('btn-speak').hidden=!(kannSprechen || Object.keys(clips).length);
   sprechKnopf();
 
+  if(ph==='scene' && st && st.deko==='wolke' && pic) pic+=DEKO_WOLKE;   // die Wolke schläft nur im Spiegel, kein Requisit nötig (UNICORN-41)
   var mp=$('mirror-pic');
   if(!keepPic) mp.innerHTML=pic;
   var uw=unterwegs();
@@ -2464,7 +2470,7 @@ function renderSetup(){
   $('show-test').checked=state.showTest; $('auto-sag').checked=state.autoSag; $('kamera-an').checked=state.kamera;
   var vb=document.querySelectorAll('#variante button'); for(var vi=0;vi<vb.length;vi++) vb[vi].setAttribute('aria-pressed', String(vb[vi].getAttribute('data-v')===state.variante));
   $('sum-variante').textContent=VARIANTEN[state.variante].name+': '+VARIANTEN[state.variante].kurz;
-  $('variante-note').textContent = state.variante==='a' ? 'Mit Ausdrucken an einigen Stationen. Die Quatschbilder am Zaun und die Spuren an der Kreuzung zeigt nur der Spiegel, dort hängt und liegt nichts. Das GPS öffnet die Stationen.' : state.variante==='b' ? 'Bilder zeigt nur der Spiegel. Am Zaun hängen vier bunte Bänder, die Spuren an der Kreuzung zeigt nur der Spiegel, die Wolke ist ein Bettlaken. Das GPS öffnet die Stationen.' : 'Die Stationen sind Räume, der Vorausgeher legt sie nach. Jede Station öffnest du von Hand, das GPS bleibt aus.';
+  $('variante-note').textContent = state.variante==='a' ? 'Wenig Aufbau: Alle Bilder zeigt der Spiegel, auch die schlafende Wolke. Am Zaun und an der Kreuzung hängt und liegt nichts. Das GPS öffnet die Stationen.' : state.variante==='b' ? 'Am Zaun hängen vier bunte Bänder, am Hügel liegt ein weißes Laken als Wolke. Die Spuren an der Kreuzung zeigt nur der Spiegel. Das GPS öffnet die Stationen.' : 'Die Stationen sind Räume, der Vorausgeher legt sie nach. Jede Station öffnest du von Hand, das GPS bleibt aus.';
   $('sum-tour').textContent=(state.autoSag?'Funkel spricht von selbst':'Funkel spricht auf Tipp')+(state.showTest?', Testknopf an':'');
   $('sum-kamera').textContent = state.kamera ? 'An: Kamerabild und Zauberlinse' : 'Aus';
   $('sum-punkte').textContent = gesetzt()+' von '+(N-1)+' Punkten gesetzt, öffnet bei '+state.radius+' m';
