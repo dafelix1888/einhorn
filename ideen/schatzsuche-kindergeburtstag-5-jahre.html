@@ -61,11 +61,15 @@ main{max-width:1040px}
 .cap{grid-area:1/1;opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
 .cap.on{opacity:1;transform:none}
 .cap b{display:block;font-size:22px;margin-bottom:6px}.cap span{color:var(--leise)}
-.dots{display:flex;justify-content:center;gap:6px;margin-top:14px}
-.dots i{width:6px;height:6px;border-radius:3px;background:var(--linie);transition:width .3s ease,background .3s ease}
-.dots i.on{width:18px;background:var(--akzent)}
+.dots{display:flex;justify-content:center;margin-top:2px}
+.dots button{-webkit-appearance:none;appearance:none;border:0;background:none;margin:0;padding:14px 7px;line-height:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dots button::before{content:"";display:block;width:10px;height:10px;border-radius:5px;background:var(--linie);transition:width .3s ease,background .3s ease}
+.dots button.on::before{width:24px;background:var(--akzent)}
+.dots button:focus-visible{outline:2px solid var(--akzent);outline-offset:-8px;border-radius:12px}
 .hinweis{margin:10px 0 0;font-size:13px;color:var(--leise)}
 html.js .show{position:relative}
+html.js .phone{touch-action:pan-y;cursor:grab;-webkit-user-select:none;user-select:none}
+html.js .phone img{pointer-events:none;-webkit-user-drag:none}
 html.js .show-buehne{position:sticky;top:0;height:100svh;justify-content:center}
 html.js .steps{margin-top:-100svh}
 html.js .step{height:85svh}
@@ -78,7 +82,7 @@ html:not(.js) .dots,html:not(.js) .steps{display:none}
   .show-buehne{flex-direction:row;justify-content:center;gap:72px}
   .phone{height:min(80svh,700px)}
   .caps{text-align:left}.cap b{font-size:28px}
-  .dots{justify-content:flex-start}
+  .dots{justify-content:flex-start;margin-left:-7px}
 }
 /* Erzähler mit Hörprobe */
 .reihe{list-style:none;margin:0 -16px;padding:4px 16px 12px;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin}
