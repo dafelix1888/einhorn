@@ -16,6 +16,7 @@
   // Party speichern und den Tourplan angleichen (neuer Stand = Spiel übernimmt Variante und Punkte einmal neu)
   function speichern(p){
     var alt=lies('sj.party.'+p.thema); if(alt && alt.server) p.server=alt.server; else delete p.server;   // „server“ gehört konto.js (Schlüssel der Links)
+    if(alt && alt.fremd && !p.fremd){ try{ localStorage.removeItem('sj.link.'+p.thema); }catch(e){} }   // neue eigene Party ersetzt die fremde: deren Link vergessen
     if(!alt && root.marketer){ try{ root.marketer.track('party_created'); }catch(e){} }    // Marketer: nur beim ersten Anlegen, Name nicht ändern
     p.geaendert=new Date().toISOString(); schreib('sj.party.'+p.thema, p);
     if(root.Konto) root.Konto.merken(p.thema);                                // angemeldet: kurz danach geschützt speichern
@@ -179,12 +180,52 @@
   // Nach der Party: Danke-Seite für die Gast-Eltern (Urkunde, Rückmeldung), gleicher Schlüssel wie die Einladung
   function dankeLink(p, pl){ var l=einladungsLink(p, pl); return l ? l.replace('/einladung.html?', '/danke.html?') : null; }
   // geteilten Plan (aus einem Link) auf diesem Gerät ablegen; Haken des Geräts bleiben
-  function ausLinkUebernehmen(thema, c){
+  // ---------- Party aus einem Link (Tablet, Vorausgeher) übernehmen (PBIM-24) ----------
+  // Ein Link kann zur eigenen Party gehören (Schlüssel steckt in server.k) oder zu der von jemand anderem.
+  // Fremde Partys bekommen fremd:true und nie die server-Angaben der eigenen Party, sonst würde das Speichern
+  // die fremden Daten in die eigene Party auf dem Server schreiben. Die eigene Party wird vorher beiseitegelegt.
+  function eigenerSchluessel(p, k){ var s=p && p.server && p.server.k; return !!(s && k && Object.keys(s).some(function(r){ return s[r]===k; })); }
+  function ausLinkUebernehmen(thema, c, k){
     var o=typeof c==='string' ? decode(c) : JSON.parse(JSON.stringify(c||null)); if(!o || o.thema!==thema) return null;
-    if(o.party){ var alt=lesen(thema); o.party.erledigt=(alt&&alt.erledigt)||{}; o.party.einkauf=(alt&&alt.einkauf)||{}; o.party.aufgebaut=(alt&&alt.aufgebaut)||{};
-      if(alt&&alt.server) o.party.server=alt.server; if(alt&&alt.telefon&&!o.party.telefon) o.party.telefon=alt.telefon; schreib('sj.party.'+thema, o.party); }
+    var alt=lesen(thema), eigen=eigenerSchluessel(alt, k), vorher=lies('sj.link.'+thema);
+    var gleich=eigen || !!(alt && alt.fremd && (!k || (vorher && vorher.k===k)));     // dieselbe Party wie bisher: Haken behalten
+    if(alt && !alt.fremd && !eigen) schreib('sj.eigen.'+thema, {party:alt, plan:plan(thema)});   // eigene Party sichern, nicht überschreiben
+    if(o.party){
+      o.party.erledigt=(gleich&&alt.erledigt)||{}; o.party.einkauf=(gleich&&alt.einkauf)||{}; o.party.aufgebaut=(gleich&&alt.aufgebaut)||{};
+      delete o.party.server; delete o.party.fremd;
+      if(eigen) o.party.server=alt.server; else o.party.fremd=true;
+      if(gleich&&alt.telefon&&!o.party.telefon) o.party.telefon=alt.telefon;
+      schreib('sj.party.'+thema, o.party);
+    }
     delete o.party; schreib('sj.plan.'+thema, o); return o;
   }
+  function fremd(thema){ var p=lesen(thema); return !!(p && p.fremd); }
+  function eigeneGesichert(thema){ var e=lies('sj.eigen.'+thema); return !!(e && e.party && e.party.thema===thema); }
+  // Zur eigenen Party zurück: gesicherte Fassung zurücklegen. false = keine da, dann holt konto.js sie vom Server.
+  function eigeneZurueck(thema){
+    var e=lies('sj.eigen.'+thema);
+    ['sj.party.','sj.plan.','sj.link.','sj.eigen.','sj.konto.stand.','sj.gaeste.'].forEach(function(k){ try{ localStorage.removeItem(k+thema); }catch(x){} });
+    if(!e || !e.party || e.party.thema!==thema) return false;
+    schreib('sj.party.'+thema, e.party); if(e.plan) schreib('sj.plan.'+thema, e.plan);
+    return true;
+  }
+  // Reparatur für Geräte, auf denen eine fremde Party schon mit den eigenen server-Angaben vermischt wurde
+  // (alter Stand von ausLinkUebernehmen): Link-Schlüssel gehört nicht zur Party → server entfernen, als fremd markieren.
+  // Die eigene Party liegt unverändert auf dem Server und kommt über „Meine Party öffnen“ zurück.
+  function reparieren(){
+    try{
+      var keys=[]; for(var i=0;i<localStorage.length;i++) keys.push(localStorage.key(i));
+      keys.forEach(function(key){
+        var m=/^sj\.party\.([a-z0-9-]+)$/.exec(key||''); if(!m) return;
+        var th=m[1], p=lies(key), l=lies('sj.link.'+th);
+        if(p && p.server && !p.fremd && l && l.k && !eigenerSchluessel(p, l.k)){
+          delete p.server; p.fremd=true; schreib(key, p);
+          localStorage.removeItem('sj.konto.stand.'+th); localStorage.removeItem('sj.gaeste.'+th);
+        }
+      });
+    }catch(e){}
+  }
+  reparieren();
 
-  root.Party={artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
+  root.Party={artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
 })(this);

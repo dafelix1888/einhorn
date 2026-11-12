@@ -633,7 +633,7 @@
   // zurück aus WhatsApp oder vom anderen Tab: Gästeliste auffrischen
   document.addEventListener('visibilitychange', function(){ if(!document.hidden && party && !entwurf) gaesteLaden(); });
   // zurück aus dem Planer oder der Druckseite (Seite kam aus dem Zwischenspeicher): Stand neu lesen
-  window.addEventListener('pageshow', function(ev){ if(ev.persisted && party && !entwurf){ party=Party.lesen(thema)||party; uebersicht(); } });
+  window.addEventListener('pageshow', function(ev){ if(ev.persisted && party && !entwurf){ party=Party.lesen(thema)||party; if(party.fremd) fremdAnsicht(); else uebersicht(); } });
   document.addEventListener('change', function(ev){
     var t=ev.target;
     if(!entwurf && t.id==='gh'){ party.gaesteHinweis=t.value.trim().slice(0,200); party=Party.speichern(party); toast('Hinweis für die Einladung gespeichert.'); return; }
@@ -664,9 +664,10 @@
     if(d.art==='fehler'){ toast('Das ging nicht. Ist das Internet an?'); return; }
     if(d.art==='notweg') toast('Weiter ohne Anmeldung. Die Links enthalten jetzt die Party-Daten.');
     if(entwurf) return;
-    party=Party.lesen(thema); if(!party){ waehlen(d.art==='angemeldet'); return; }
+    party=Party.lesen(thema); if(!party){ waehlen(d.art==='angemeldet'||d.art==='eigene'); return; }
+    if(party.fremd){ fremdAnsicht(); return; }
     var y=window.scrollY; uebersicht(); window.scrollTo(0,y);
-    toast(d.art==='angemeldet'?'Gespeichert. Jetzt könnt ihr die Links teilen.':d.art==='neuer-link'?'Neuer Link erstellt. Der alte geht nicht mehr.':'Abgemeldet.');
+    toast(d.art==='eigene'?'Deine eigene Party ist wieder da.':d.art==='angemeldet'?'Gespeichert. Jetzt könnt ihr die Links teilen.':d.art==='neuer-link'?'Neuer Link erstellt. Der alte geht nicht mehr.':'Abgemeldet.');
   });
   // ---------- Klickwege (UNICORN-25): Assistent im Browser-Verlauf, Entwurf überlebt Zurück und Neuladen ----------
   var gepusht=0, nachRueck=false, EKEY='sj.entwurf.'+thema;
@@ -683,6 +684,21 @@
     var m=location.hash.match(/schritt-(\d)/), s=ev.state && ev.state.schritt!=null ? ev.state.schritt : (m ? +m[1]-1 : 0);
     schritt=Math.max(0, Math.min(s, SCHRITTE-1)); gepusht=schritt; assistent(); window.scrollTo(0,0);
   });
+  // Fremde Party (über einen Link geöffnet, PBIM-24): hier nichts bearbeiten oder teilen, nur zurück zur eigenen
+  function fremdAnsicht(){
+    entwurf=null;
+    var n=party.kind&&party.kind.name ? party.kind.name+(/[sßxz]$/i.test(party.kind.name)?'’':'s')+' Party' : 'Diese Party';
+    $('seite').innerHTML='<div class="oben"><a class="textknopf" href="landing.html" data-zurueck="landing.html">← Zurück</a><span class="marke-sw">Schatzweg</span></div>'+
+      '<div class="stapel"><h1>'+esc(n)+'</h1>'+
+      '<p class="leise">Diese Party ist über einen Link auf diesem Gerät und gehört jemand anderem. Ansehen und spielen geht, bearbeiten und Links teilen kann nur, wer sie angelegt hat.</p>'+
+      '<a class="knopf breit" href="spiel.html?thema='+thema+'">Zur Tour</a>'+
+      '<button type="button" class="knopf leer breit" id="eigene-oeffnen">Meine eigene Party öffnen</button></div>';
+    $('eigene-oeffnen').onclick=function(){
+      this.disabled=true;
+      if(window.Konto && Konto.aktiv()){ Konto.eigeneOeffnen(thema); return; }
+      Party.eigeneZurueck(thema); location.reload();
+    };
+  }
   // Neues Gerät ohne Party und ohne Route: erst fragen, ob es schon eine Party gibt (anmelden und holen)
   function waehlen(nichtsGefunden){
     entwurf=null;
@@ -703,10 +719,11 @@
   Promise.all([fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }), fetch('themen/index.json').then(function(r){ return r.json(); })]).then(function(r){
     tour=r[0]; info=r[1].themen.filter(function(t){ return t.id===thema; })[0];
     party=Party.lesen(thema);
-    if(party && !q.has('neu')) uebersicht();
+    if(party && party.fremd && !q.has('neu')) fremdAnsicht();
+    else if(party && !q.has('neu')) uebersicht();
     else if(!party && !q.has('neu') && !Weg.plan(thema) && window.Konto && Konto.aktiv()) waehlen(false);
     else { neu(); var gm=entwurfLesen(); if(gm && !party){ entwurf=gm.e; schritt=Math.min(gm.s, SCHRITTE-1); assistent(); } }
-    if(window.Konto){ if(!Konto.nachMailLink(thema) && party) Konto.merken(thema); }
+    if(window.Konto){ if(!Konto.nachMailLink(thema) && party && !party.fremd) Konto.merken(thema); }
   })['catch'](function(e){ $('seite').innerHTML='<p>Die Party lässt sich nicht laden: '+esc(e.message)+'</p>'; });
 })();
 </script>
