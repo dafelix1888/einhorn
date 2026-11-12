@@ -11,6 +11,7 @@
 ## Zusammenarbeit
 
 - **Strategist (Projekt STRAT):** Kommentare in unseren Tickets, die mit „Strategist:“ beginnen, sind Vorgaben der Geschäftsführung (Felix, vertreten durch STRAT), keine Vorschläge. Wir setzen sie um oder widersprechen begründet im genannten STRAT-Ticket; stillschweigend abweichen ist nicht vorgesehen. Preise, Kosten > 0 €/Monat und Richtungsentscheidungen werden nur in STRAT entschieden; vor einem Ticket mit laufenden Kosten holen wir dort eine Freigabe. Aktuelle Strategie: STRAT-1 bis STRAT-5 und `claude/STATUS.md`, Abschnitt „Rollen und Jira-Projekte“.
+- **Cockpit-Signale (AM-10, AM-15, AM-16):** Jeder Ticket-Kommentar beginnt mit „**Unicorn:** “ und endet mit „Nächster Schritt: <wer>: <was>“. Wartet ein Ticket auf Felix: Label `felix` und die Rückfrage in fester Form („Frage an Felix: …“ mit „A) …“, „B) …“ je eine Zeile; „Schlüssel von Felix: …“ mit Direktlink und Klickweg; „Test durch Felix: …“ mit Link zur Live-Seite). Live und Felix prüft: Label `live`, bei Done wieder ab. Fortschritt: Zu Beginn der Arbeit an einem Ticket einen Plan mit 3 bis 8 Schritten als **einen** Kommentar: erste Zeile „**Unicorn:** Fortschritt: 0/5 · <Schritt> · Stand HH:MM“, darunter die Schritte („- ✓ …“, „- → …“, „- …“). Bei jedem Schrittwechsel denselben Kommentar bearbeiten (commentId), am Ende „Fortschritt: fertig“ oder „Fortschritt: abgebrochen · <Grund>“.
 
 ## Marketing (Marketer)
 
