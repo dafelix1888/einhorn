@@ -756,6 +756,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         <button type="button" class="btn primary haupt" id="btn-main"></button>
         <button type="button" class="btn ghost" id="btn-speak">Noch einmal hören</button>
       </div>
+      <div id="einf-platz"></div>
     </div>
     <div class="foot">
       <p class="chip" id="gps-chip"></p>
@@ -786,6 +787,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         <label class="schalter" for="auto-sag"><span class="st"><b>Funkel spricht von selbst</b><span>Aufgaben und Lösungen werden vorgelesen, sobald sie erscheinen. Die Sätze für unterwegs nie, die startest du immer selbst.</span></span><input type="checkbox" id="auto-sag"><span class="knopf"></span></label>
         <label class="schalter" for="show-test"><span class="st"><b>Testknopf immer zeigen</b><span>Auch wenn das GPS läuft. Ohne GPS erscheint er sowieso.</span></span><input type="checkbox" id="show-test"><span class="knopf"></span></label>
         <p class="lead">Zu einem bestimmten Schritt springst du über „Erwachsene“ oben rechts, dann „Ablauf“.</p>
+        <div class="row"><button type="button" class="btn ghost small" id="btn-einf">Einführung noch einmal zeigen</button></div>
         <div class="row"><button type="button" class="btn ghost small" id="btn-restart">Tour von vorn beginnen</button><button type="button" class="btn ghost small" id="btn-foto-2">Gruppenfoto mit Rahmen</button></div>
         <p class="lead">Das Gruppenfoto am besten mit dem Handy machen, das hat die bessere Kamera: dieselbe Seite dort öffnen, Knopf drücken.</p>
       </div>
@@ -1942,7 +1944,7 @@ function konfSchritt(){
 }
 
 /* ---------- Ablauf ---------- */
-function aufwecken(){ tonAn(); wachBleiben(); gpsStart(); state.phase='scene'; state.idx=0; state.step=0; state.startZeit=jetztMs(); state.heim=null; protoNeu(); klang(KLANG_DA); save(); render(); toast('Jetzt erklingt ein Zauberklang. Bleibt es still: Stummschalter und Lautstärke prüfen.'); }
+function aufwecken(){ tonAn(); wachBleiben(); gpsStart(); state.phase='scene'; state.idx=0; state.step=0; state.startZeit=jetztMs(); state.heim=null; protoNeu(); klang(KLANG_DA); save(); render(); toast('Jetzt erklingt ein Zauberklang. Bleibt es still: Stummschalter und Lautstärke prüfen.'); if(window.Einfuehrung) Einfuehrung.hinweis(); }
 var ankunft=false, ankunftT=null, wartet=false, wartetSeit=0, popTimer=null;
 function popAus(){ if(popTimer){ clearInterval(popTimer); popTimer=null; } $('pop-seit').textContent=''; }   // wartet: angekommen, Kinder sammeln sich, Station öffnet erst auf „Weiter“
 function ankommen(modus){               // drei Sekunden blinken, dann das Pop mit „Weiter“
@@ -2689,11 +2691,16 @@ function namenHolen(){                   // Namens-Sätze vom Server (nur mit ge
 }
 if(state.phase!=='start') gpsStart();
 
+/* Kurze Einführung für Erwachsene (UNICORN-39): vor dem ersten Start anbieten, in „Einrichten“ erneut zeigen */
+$('btn-einf').addEventListener('click', function(){ if(window.Einfuehrung) Einfuehrung.zeigen(); });
+if(window.Einfuehrung && state.phase==='start') Einfuehrung.anbieten({ziel:$('einf-platz')});
+
 /* Für den Selbsttest: reine Funktionen */
 window.__zs={proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, state:function(){ return state; }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};
 };
 </script>
 
+<script src="einfuehrung.js"></script>
 <script src="party.js"></script>
 <script src="konto.js"></script>
 <script src="tour-laden.js"></script>
