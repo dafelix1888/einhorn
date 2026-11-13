@@ -539,6 +539,17 @@
  "preisStand": "2026-11-04",
  "utensilien": [
   {
+   "id": "u12",
+   "name": "Geschenktüten (Einhorn, mit Griffen)",
+   "menge": "je Kind",
+   "wann": "Schatz",
+   "asin": "B0GVMKLS6L",
+   "packung": 12,
+   "preis": 7.49,
+   "link": "https://www.amazon.de/dp/B0GVMKLS6L",
+   "hinweis": "Zum Verpacken der Geschenke: In jede Tüte kommt, was ein Kind am Ende aus dem Schatz bekommt."
+  },
+  {
    "id": "u0",
    "name": "Haarreif mit Einhorn-Horn",
    "menge": "je Kind",
