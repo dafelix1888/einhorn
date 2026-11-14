@@ -34,6 +34,7 @@
     var kinder=(plan && plan.kinder) || tour.kinder.standard;
     function liste(l){ return l.map(function(g){ return {t:g.t, items:g.items.map(function(x){ return fuellen(x,{kinder:kinder}); })}; }); }
     tour.vorbereitung.gemeinsam=liste(tour.vorbereitung.gemeinsam);
+    var pl=tour.vorbereitung.packliste||{}; Object.keys(pl).forEach(function(k){ (pl[k].stationen||[]).forEach(function(r){ r.d=r.d.map(function(x){ return fuellen(x,{kinder:kinder}); }); }); });
     ['noetig','extras'].forEach(function(k){ (tour.vorbereitung[k]||[]).forEach(function(x){ x.x=fuellen(x.x,{kinder:kinder}); }); });
     Object.keys(tour.vorbereitung.variante).forEach(function(k){ tour.vorbereitung.variante[k]=liste(tour.vorbereitung.variante[k]); });
     tour.gaben.forEach(function(g){ g.wie=fuellen(g.wie,{kinder:kinder}); });

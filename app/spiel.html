@@ -197,9 +197,15 @@ details.karte.achtung{border-color:#F0C6C9}
 .haken .notfalls{display:block;color:var(--ink-soft);font-size:.86rem;margin-top:2px;text-decoration:none}
 .haken input:checked+span .notfalls{display:none}
 .liste details.mehr{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
-.liste details.mehr summary{cursor:pointer;font-weight:700;padding:6px 0;list-style:none}.liste details.mehr summary::-webkit-details-marker{display:none}
-.liste details.mehr summary::after{content:" ›"}.liste details.mehr[open] summary::after{content:" ⌄"}
-.liste details.mehr summary small{font-weight:400;color:var(--ink-soft);margin-left:6px}
+.liste details.mehr summary{cursor:pointer;font-weight:700;padding:6px 0;list-style:none;display:flex;align-items:baseline;gap:8px}.liste details.mehr summary::-webkit-details-marker{display:none}
+.liste details.mehr summary::after{content:"›";margin-left:auto;font-size:1.2rem;transition:transform .2s}.liste details.mehr[open] summary::after{transform:rotate(90deg)}
+.liste details.mehr summary small{font-weight:400;color:var(--ink-soft)}
+.liste .pk-vorher{margin:6px 0 8px;font-size:.92rem;color:var(--ink-soft)}.liste .pk-vorher b{color:var(--ink)}
+.liste ol.pk{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.liste ol.pk li{display:grid;grid-template-columns:30px 92px 1fr;gap:10px;align-items:start;padding:8px 0;border-bottom:1px solid var(--line)}
+.liste .pk-nr{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:.9rem}
+.liste .pk-ort{font-weight:700;line-height:1.2;padding-top:4px}.liste .pk-ort small{display:block;font-weight:400;font-size:.78rem;color:var(--ink-soft)}
+.liste .pk-dinge{display:flex;flex-wrap:wrap;gap:5px}.liste .pk-dinge i{font-style:normal;font-size:.88rem;padding:4px 9px;border-radius:999px;background:var(--surface);border:1px solid var(--line);line-height:1.25}
 .liste h4{margin:10px 0 2px;font-size:.95rem}.liste ul.pack{margin:0;padding-left:20px;line-height:1.4}
 .haken{display:flex;align-items:flex-start;gap:12px;padding:7px 0;cursor:pointer;line-height:1.35}
 .haken input{appearance:none;-webkit-appearance:none;flex:none;width:26px;height:26px;border:2px solid var(--line);border-radius:8px;background:var(--surface);display:grid;place-items:center;margin-top:1px}
@@ -825,7 +831,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
     <details class="karte" id="k-vorbereitung">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="tt"><b>Vorbereitung</b><span id="sum-vorbereitung"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Oben steht nur, was die Tour wirklich braucht, jeweils mit einer Notlösung. Was an den Stationen selbst zu tun ist, zeigt die Tour unter „Für Erwachsene“, wenn es so weit ist. Haken bleiben auf diesem Gerät gespeichert.</p>
+        <p class="lead">Nur das Nötige, jeweils mit Notlösung.</p>
         <div class="liste" id="liste"></div>
         <div class="zwischen"><span class="chip" id="liste-note"></span><button type="button" class="btn quiet small" id="btn-liste-reset">Alle Haken entfernen</button></div>
       </div>
@@ -999,18 +1005,22 @@ function renderGaben(){
 function fuerVariante(l){ return (l||[]).filter(function(x){ return !x.nur || x.nur.indexOf(state.variante)>=0; }); }
 function hakenZeile(text, notfalls){
   var id=state.variante+'|'+text, an=!!haken[id];
-  return '<label class="haken"><input type="checkbox" data-haken="'+esc(id)+'"'+(an?' checked':'')+'><span>'+esc(text)+(notfalls?'<small class="notfalls">Notfalls: '+esc(notfalls)+'</small>':'')+'</span></label>';
+  return '<label class="haken"><input type="checkbox" data-haken="'+esc(id)+'"'+(an?' checked':'')+'><span>'+esc(text)+(notfalls?'<small class="notfalls">Sonst: '+esc(notfalls)+'</small>':'')+'</span></label>';
 }
+function pkFarbe(s){ return ['#8B5CF6','#EF4444','#F97316','#EAB308','#22C55E','#16A34A','#3B82F6'][s-1]||'#8B5CF6'; }
 function renderListe(){
   var VB=TOUR.vorbereitung, noetig=fuerVariante(VB.noetig), extras=fuerVariante(VB.extras), offen=$('liste').querySelectorAll('details[open]'), auf={};
   Array.prototype.forEach.call(offen, function(d){ auf[d.id]=true; });
   var n=noetig.filter(function(x){ return haken[state.variante+'|'+x.x]; }).length, g=noetig.length;
   var ne=extras.filter(function(x){ return haken[state.variante+'|'+x.x]; }).length;
-  var h='<h3>Das braucht die Tour wirklich <small>'+g+' Dinge</small></h3>'+noetig.map(function(x){ return hakenZeile(x.x, x.notfalls); }).join('');
-  if(extras.length) h+='<details class="mehr" id="vb-extras"'+(auf['vb-extras']?' open':'')+'><summary>Schön, wenn Zeit ist <small>'+extras.length+' Extras'+(ne?', '+ne+' erledigt':'')+'</small></summary>'+extras.map(function(x){ return hakenZeile(x.x); }).join('')+'</details>';
-  var pack=LISTE_AKTUELL();
-  if(pack.length) h+='<details class="mehr" id="vb-packen"'+(auf['vb-packen']?' open':'')+'><summary>Packliste für den Tag <small>was wohin kommt</small></summary>'+
-    pack.map(function(grp){ return '<h4>'+esc(grp.t)+'</h4><ul class="pack">'+grp.items.map(function(it){ return '<li>'+esc(it)+'</li>'; }).join('')+'</ul>'; }).join('')+'</details>';
+  var h='<h3>Das braucht die Tour <small>'+g+' Dinge</small></h3>'+noetig.map(function(x){ return hakenZeile(x.x, x.notfalls); }).join('');
+  if(extras.length) h+='<details class="mehr" id="vb-extras"'+(auf['vb-extras']?' open':'')+'><summary>Extras, wenn Zeit ist <small>'+extras.length+' Extras'+(ne?', '+ne+' erledigt':'')+'</small></summary>'+extras.map(function(x){ return hakenZeile(x.x); }).join('')+'</details>';
+  // Packliste nach Station: je Zeile Nummer, Ort, Dinge als Stichworte, wer es hinbringt
+  var pk=(VB.packliste||{})[state.variante]||(VB.packliste||{}).a;
+  if(pk) h+='<details class="mehr" id="vb-packen"'+(auf['vb-packen']?' open':'')+'><summary>Packliste nach Station</summary>'+
+    (pk.vorher&&pk.vorher.length?'<p class="pk-vorher"><b>Vorher:</b> '+pk.vorher.map(esc).join(' · ')+'</p>':'')+
+    '<ol class="pk">'+pk.stationen.map(function(r){ return '<li><span class="pk-nr" style="background:'+pkFarbe(r.s)+'">'+r.s+'</span><span class="pk-ort">'+esc(r.ort)+'<small>'+esc(r.wer)+'</small></span><span class="pk-dinge">'+r.d.map(function(x){ return '<i>'+esc(x)+'</i>'; }).join('')+'</span></li>'; }).join('')+'</ol>'+
+    (pk.mit&&pk.mit.length?'<p class="pk-vorher"><b>Mitnehmen:</b> '+pk.mit.map(esc).join(' · ')+'</p>':'')+'</details>';
   $('liste').innerHTML=h;
   $('liste-note').textContent=n+' von '+g+' nötigen erledigt'; $('liste-note').className='chip '+(n===g?'on':'');
   $('sum-vorbereitung').textContent = n+' von '+g+' nötigen Dingen erledigt';
