@@ -450,6 +450,14 @@ body.m-tour .zur-tour{display:none}
 .erw-menu button svg,.erw-menu a svg{width:22px;height:22px;flex:none;color:var(--magic-deep)}
 .erw-menu b{display:block;font-family:var(--font-display);font-weight:800;font-size:1.1rem;line-height:1.2}
 .erw-menu small{display:block;color:var(--ink-soft);font-size:.85rem;line-height:1.3}
+.erw-menu .recht{margin:6px 0 2px;font-size:.8rem;text-align:center;color:var(--ink-soft)}
+.erw-menu .recht a{display:inline;padding:4px 2px;min-height:0;color:inherit;text-decoration:underline;text-underline-offset:2px}
+/* Einrichten in drei Gruppen (UNICORN-54): das Wichtige zuerst, Seltenes am Ende */
+.setup .gruppe{font-family:var(--font-display);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin:18px 4px 2px}
+.setup .gruppe:first-child{margin-top:2px}
+.setup .gruppe small{display:block;font-family:var(--font-body,inherit);text-transform:none;letter-spacing:0;font-weight:400;font-size:.9rem;margin-top:1px}
+/* Hinweis für Erwachsene bei der ersten Ankunft: steht klein in der Plakette */
+.pop-karte .pop-tipp{display:block;max-width:13em;font-size:.8rem;line-height:1.3;font-weight:400;color:var(--ink-soft)}
 @media (max-width:480px){
   .app{padding-inline:16px}
   .fortschritt{width:72px}
@@ -505,6 +513,8 @@ body.m-tour:not(.bogen-inline):not(.mehr) #bogen-wrap:not(.schwebt), body.m-star
 body.m-start .pillen{display:none!important}
 body.m-start #mirror-pic{opacity:0}
 body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
+/* Erster Bildschirm quer (Tablet): Spiegel so groß, dass Titel und Startknopf ohne Scrollen zu sehen sind (UNICORN-54) */
+@media (orientation:landscape) and (min-width:700px){ body.m-start .mirror, body.m-start .spiegel-ecke{flex-basis:clamp(260px, calc(100vh - 385px), 560px)} }
 .count.spaet{color:var(--danger)} .count.frueh{color:var(--ok)}
 .proto{width:100%;border-collapse:collapse;font-size:.92rem}
 .proto th,.proto td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -547,13 +557,17 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         </button>
         <button type="button" id="tab-setup" aria-pressed="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-          <span><b>Einrichten</b><small>Variante, Stimme, GPS, Vorbereitung</small></span>
+          <span><b>Einrichten</b><small>Spielart, Erzähler, GPS, Vorbereitung</small></span>
+        </button>
+        <button type="button" id="btn-hilfe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.7 2.2c-.8.5-1.3 1-1.3 2"/><path d="M12 17v.2"/></svg>
+          <span><b>Hilfe</b><small>Kurz erklärt, und was tun, wenn etwas hakt</small></span>
         </button>
         <a href="./" id="erw-portal">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg>
           <span><b>Zur Party</b><small>Checkliste, Links und Einkauf. Die Tour bleibt gespeichert.</small></span>
         </a>
-        <p style="margin:6px 0 0;font-size:.8rem;text-align:center"><a href="impressum.html" style="color:inherit">Impressum</a> · <a href="datenschutz.html" style="color:inherit">Datenschutz</a></p>
+        <p class="recht"><a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a></p>
       </div>
     </div>
   </header>
@@ -570,7 +584,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         <canvas id="funkeln" aria-hidden="true"></canvas>
         <div class="mirror-pic" id="mirror-pic"></div>
         <div class="kompass" id="kompass" hidden></div>
-        <div class="pop-karte" id="pop" hidden><b>Angekommen!</b><button type="button" class="btn primary" id="btn-pop">Weiter</button><span class="seit" id="pop-seit"></span></div>
+        <div class="pop-karte" id="pop" hidden><b>Angekommen!</b><button type="button" class="btn primary" id="btn-pop">Weiter</button><span class="seit" id="pop-seit"></span><span class="pop-tipp" id="pop-tipp" hidden>Zu früh? Erst zur Stelle laufen, dann tippen.</span></div>
       </div>
       <div class="funkel3d" id="funkel3d" aria-hidden="true"></div>
       <div class="kaka" id="kaka" aria-hidden="true" hidden>
@@ -773,7 +787,6 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         <button type="button" class="btn primary haupt" id="btn-main"></button>
         <button type="button" class="btn ghost" id="btn-speak">Noch einmal hören</button>
       </div>
-      <div id="einf-platz"></div>
     </div>
     <div class="foot">
       <p class="chip" id="gps-chip"></p>
@@ -785,7 +798,8 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
   </div>
 
   <div class="setup" id="view-setup" hidden>
-    <details class="karte" id="k-variante" open>
+    <h2 class="gruppe">So spielt ihr<small>Das Wichtige zuerst.</small></h2>
+    <details class="karte" id="k-variante">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h12M3 17h8"/></svg></span><span class="tt"><b>Spielart</b><span id="sum-variante"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
         <p class="lead">Geschichte, Mitbringsel und Funkels Sätze bleiben gleich. Drinnen läuft ohne GPS, die Stationen öffnest du von Hand.</p>
@@ -795,22 +809,10 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       </div>
     </details>
 
-    <details class="karte" id="k-tour">
-      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg></span><span class="tt"><b>Tour</b><span id="sum-tour"></span></span><span class="pf"></span></summary>
-      <div class="inhalt">
-        <label class="schalter" for="auto-sag"><span class="st"><b>Funkel spricht von selbst</b><span>Aufgaben und Lösungen werden vorgelesen, sobald sie erscheinen. Die Sätze für unterwegs nie, die startest du immer selbst.</span></span><input type="checkbox" id="auto-sag"><span class="knopf"></span></label>
-        <label class="schalter" for="show-test"><span class="st"><b>Testknopf immer zeigen</b><span>Auch wenn das GPS läuft. Ohne GPS erscheint er sowieso.</span></span><input type="checkbox" id="show-test"><span class="knopf"></span></label>
-        <p class="lead">Zu einem bestimmten Schritt springst du über „Erwachsene“ oben rechts, dann „Ablauf“.</p>
-        <div class="row"><button type="button" class="btn ghost small" id="btn-einf">Einführung noch einmal zeigen</button></div>
-        <div class="row"><button type="button" class="btn ghost small" id="btn-restart">Tour von vorn beginnen</button><button type="button" class="btn ghost small" id="btn-foto-2">Gruppenfoto mit Rahmen</button></div>
-        <p class="lead">Das Gruppenfoto am besten mit dem Handy machen, das hat die bessere Kamera: dieselbe Seite dort öffnen, Knopf drücken.</p>
-      </div>
-    </details>
-
     <details class="karte" id="k-erz">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/><path d="M19 4l2-2M21 8h2"/></svg></span><span class="tt"><b>Erzähler für die Aufgaben</b><span id="sum-erz"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Wer den Kindern nach Funkel die Aufgabe vorliest. Die Wahl gilt für alle Aufgaben; einzelne kannst du darunter anders besetzen. „Anhören“ spielt die Begrüßung der Figur.</p>
+        <p class="lead">Funkel erzählt die Geschichte, die Aufgaben liest eine zweite Figur vor. Die Wahl gilt für alle Aufgaben; einzelne kannst du darunter anders besetzen. „Anhören“ spielt die Begrüßung der Figur.</p>
         <div class="erz-wahl" id="erz-wahl"></div>
         <details class="box" id="erz-je-box">
           <summary>Einzelne Aufgaben anders besetzen</summary>
@@ -818,13 +820,21 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         </details>
       </div>
     </details>
-    <details class="karte" id="k-gaben">
-      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S10 8 12 8zM12 8c2-4 6-4 6-1.5S14 8 12 8z"/></svg></span><span class="tt"><b>Wer bekommt was wo</b><span>Unterwegs nur der Glücksstein, die Geschenke am Ende</span></span><span class="pf"></span></summary>
+
+    <details class="karte" id="k-tour">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg></span><span class="tt"><b>Tour</b><span id="sum-tour"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Was die Kinder an welcher Station in die Hand bekommen, für die gewählte Variante. Tattoo und Haarreif sind Verkleidung und gehören in die Geschichte, deshalb kommen sie am Anfang.</p>
-        <ol class="points gaben" id="gaben"></ol>
+        <label class="schalter" for="auto-sag"><span class="st"><b>Funkel spricht von selbst</b><span>Aufgaben und Lösungen werden vorgelesen, sobald sie erscheinen. Die Sätze für unterwegs nie, die startest du immer selbst.</span></span><input type="checkbox" id="auto-sag"><span class="knopf"></span></label>
+        <label class="schalter" for="show-test"><span class="st"><b>„Station von Hand öffnen“ immer zeigen</b><span>Auch wenn das GPS läuft. So hilfst du nach, wenn eine Station nicht von selbst öffnet. Ohne GPS erscheint der Knopf sowieso.</span></span><input type="checkbox" id="show-test"><span class="knopf"></span></label>
+        <label class="schalter" for="tipps-an"><span class="st"><b>Tipps für Erwachsene</b><span>Kurze Hinweise beim ersten Mal, zum Beispiel wenn eine Station nicht von selbst öffnet. Jeder Tipp kommt nur einmal.</span></span><input type="checkbox" id="tipps-an"><span class="knopf"></span></label>
+        <p class="lead">Zu einem bestimmten Schritt springst du über „Erwachsene“ oben rechts, dann „Ablauf“.</p>
+        <div class="row"><button type="button" class="btn ghost small" id="btn-einf">Einführung noch einmal zeigen</button><button type="button" class="btn ghost small" id="btn-hilfe-2">Hilfe öffnen</button></div>
+        <div class="row"><button type="button" class="btn ghost small" id="btn-restart">Tour von vorn beginnen</button><button type="button" class="btn ghost small" id="btn-foto-2">Gruppenfoto mit Rahmen</button></div>
+        <p class="lead">Das Gruppenfoto am besten mit dem Handy machen, das hat die bessere Kamera: dieselbe Seite dort öffnen, Knopf drücken.</p>
       </div>
     </details>
+
+    <h2 class="gruppe">Vorbereiten<small>Was vor der Party fertig sein soll.</small></h2>
     <details class="karte" id="k-vorbereitung">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="tt"><b>Vorbereitung</b><span id="sum-vorbereitung"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
@@ -834,6 +844,42 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       </div>
     </details>
 
+    <details class="karte" id="k-gaben">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S10 8 12 8zM12 8c2-4 6-4 6-1.5S14 8 12 8z"/></svg></span><span class="tt"><b>Wer bekommt was wo</b><span>Unterwegs nur der Glücksstein, die Geschenke am Ende</span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead">Was die Kinder an welcher Station in die Hand bekommen, für die gewählte Variante. Tattoo und Haarreif sind Verkleidung und gehören in die Geschichte, deshalb kommen sie am Anfang.</p>
+        <ol class="points gaben" id="gaben"></ol>
+      </div>
+    </details>
+
+    <details class="karte" id="k-punkte">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="tt"><b>GPS-Punkte</b><span id="sum-punkte"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead"><a href="#" id="planer-link">Tour im Planer öffnen</a>: dort Adresse, Richtung und Strecke wählen, die Stationen kommen dann von selbst hierher.</p>
+        <p class="lead">Feinschliff vor Ort: Beim Probelauf an jeder Station stehen bleiben, warten bis das GPS genau ist, und den Punkt setzen. Die Haustür braucht keinen Punkt.</p>
+        <div class="row">
+          <button type="button" class="btn ghost small" id="btn-gps">GPS starten</button>
+          <p class="chip" id="gps-chip-2"></p>
+        </div>
+        <ol class="points" id="points"></ol>
+        <h3>Wie nah ist nah genug?</h3>
+        <p class="lead">Die Station öffnet sich, sobald das Gerät so nah am Punkt ist. Unter Bäumen lieber 25 m.</p>
+        <div class="seg" id="radius" role="group" aria-label="Abstand zum Öffnen">
+          <button type="button" data-r="10">10 m</button>
+          <button type="button" data-r="15">15 m</button>
+          <button type="button" data-r="25">25 m</button>
+        </div>
+        <h3>Punkte als Code</h3>
+        <p class="lead">Notlösung ohne Netz: Code kopieren und auf einem anderen Gerät einlesen.</p>
+        <textarea id="code" spellcheck="false" aria-label="Punkte-Code"></textarea>
+        <div class="row">
+          <button type="button" class="btn ghost small" id="btn-copy">Code kopieren</button>
+          <button type="button" class="btn ghost small" id="btn-import">Code einlesen</button>
+        </div>
+      </div>
+    </details>
+
+    <h2 class="gruppe">Mehr<small>Selten nötig.</small></h2>
     <details class="karte" id="k-protokoll">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="tt"><b>Probelauf-Protokoll</b><span id="sum-protokoll"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
@@ -889,33 +935,6 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
           </div>
         </div>
         <p class="lead" id="voice-note" hidden></p>
-      </div>
-    </details>
-
-    <details class="karte" id="k-punkte">
-      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="tt"><b>GPS-Punkte</b><span id="sum-punkte"></span></span><span class="pf"></span></summary>
-      <div class="inhalt">
-        <p class="lead"><a href="#" id="planer-link">Tour im Planer öffnen</a>: dort Adresse, Richtung und Strecke wählen, die Stationen kommen dann von selbst hierher.</p>
-        <p class="lead">Feinschliff vor Ort: Beim Probelauf an jeder Station stehen bleiben, warten bis das GPS genau ist, und den Punkt setzen. Die Haustür braucht keinen Punkt.</p>
-        <div class="row">
-          <button type="button" class="btn ghost small" id="btn-gps">GPS starten</button>
-          <p class="chip" id="gps-chip-2"></p>
-        </div>
-        <ol class="points" id="points"></ol>
-        <h3>Wie nah ist nah genug?</h3>
-        <p class="lead">Die Station öffnet sich, sobald das Gerät so nah am Punkt ist. Unter Bäumen lieber 25 m.</p>
-        <div class="seg" id="radius" role="group" aria-label="Abstand zum Öffnen">
-          <button type="button" data-r="10">10 m</button>
-          <button type="button" data-r="15">15 m</button>
-          <button type="button" data-r="25">25 m</button>
-        </div>
-        <h3>Punkte als Code</h3>
-        <p class="lead">Notlösung ohne Netz: Code kopieren und auf einem anderen Gerät einlesen.</p>
-        <textarea id="code" spellcheck="false" aria-label="Punkte-Code"></textarea>
-        <div class="row">
-          <button type="button" class="btn ghost small" id="btn-copy">Code kopieren</button>
-          <button type="button" class="btn ghost small" id="btn-import">Code einlesen</button>
-        </div>
       </div>
     </details>
 
@@ -1026,7 +1045,7 @@ function renderListe(){
 }
 
 /* ---------- Zustand ---------- */
-function frisch(){ return {points:STATIONS.map(function(){ return null; }), idx:0, phase:'start', step:0, radius:15, showTest:true, autoSag:true, kamera:false, variante:TPLAN.variante||'a', startZeit:null, heim:null, voice:null, pitch:1.15, recRate:1.15, erz:'kakapups', erzJe:{}}; }
+function frisch(){ return {points:STATIONS.map(function(){ return null; }), idx:0, phase:'start', step:0, radius:15, showTest:true, autoSag:true, kamera:false, variante:TPLAN.variante||'a', startZeit:null, heim:null, voice:null, pitch:1.15, recRate:1.15, erz:'kakapups', erzJe:{}, erzStand:''}; }
 var PUNKTE_CODE=TPLAN.punkteCode||null;   // Stationen 2 bis N aus dem Tourplaner
 var PUNKTE_STAND=TPLAN.stand||'';   // neuer Plan: jedes Gerät übernimmt die Punkte einmal
 function load(){
@@ -1055,6 +1074,10 @@ function load(){
   }catch(e){}
   if(!o || o.punkteStand!==PUNKTE_STAND){ if(PUNKTE_CODE){ try{ s.points=codeEin(PUNKTE_CODE); }catch(e){} } if(TPLAN.variante && VARIANTEN[TPLAN.variante]) s.variante=TPLAN.variante; }   // neuer Plan: Punkte und Variante einmal übernehmen   // hinterlegte Punkte einmal übernehmen
   s.punkteStand=PUNKTE_STAND;
+  // Erzähler aus der Party (UNICORN-54): gilt, bis hier unter „Einrichten“ ein anderer gewählt wird oder die Party ihn wieder ändert
+  if(o && typeof o.erzStand==='string') s.erzStand=o.erzStand;
+  if(TPLAN.erz && TOUR.erzaehler.reihe.indexOf(TPLAN.erz)>=0 && s.erzStand!==(TPLAN.erzStand||'')) s.erz=TPLAN.erz;
+  s.erzStand=TPLAN.erzStand||'';
   s.points[0]=null;
   return s;
 }
@@ -1114,7 +1137,8 @@ function sprechEndeFokus(){              // aus sprechKnopf: alle sind fertig
 /* ---------- Mitscrollen Ende ---------- */
 function modusZeigen(){
   var m=modus(), b=document.body;
-  if(m!==letzterModus){ var vorher=letzterModus; mehrAn=false; letzterModus=m; if(vorher) fokusPlanen(); }
+  if(m!==letzterModus){ var vorher=letzterModus; mehrAn=false; letzterModus=m; if(vorher) fokusPlanen();
+    if(m==='laufen' && view==='tour' && state.phase==='seek' && !manuell() && state.showTest && window.Einfuehrung) Einfuehrung.tipp('unterwegs'); }
   ['start','ende','da','laufen','sammeln','szene'].forEach(function(x){ b.classList.toggle('m-'+x, x===m && view==='tour'); });
   b.classList.toggle('m-tour', view==='tour');
   b.classList.toggle('mehr', mehrAn);
@@ -1972,16 +1996,17 @@ function konfSchritt(){
 
 /* ---------- Ablauf ---------- */
 function aufwecken(){ tonAn(); wachBleiben(); gpsStart(); state.phase='scene'; state.idx=0; state.step=0; state.startZeit=jetztMs(); state.heim=null; protoNeu(); klang(KLANG_DA); save(); render(); toast('Jetzt erklingt ein Zauberklang. Bleibt es still: Stummschalter und Lautstärke prüfen.'); if(window.Einfuehrung) Einfuehrung.hinweis(); }
-var ankunft=false, ankunftT=null, wartet=false, wartetSeit=0, popTimer=null;
+var ankunft=false, ankunftT=null, wartet=false, wartetSeit=0, popTimer=null, ankunftPerGps=false;
 function popAus(){ if(popTimer){ clearInterval(popTimer); popTimer=null; } $('pop-seit').textContent=''; }   // wartet: angekommen, Kinder sammeln sich, Station öffnet erst auf „Weiter“
 function ankommen(modus){               // drei Sekunden blinken, dann das Pop mit „Weiter“
   if(ankunft || wartet || state.phase!=='seek') return;
-  ankunft=true; naeheZiel=1; funkelZiel=1;
+  ankunft=true; naeheZiel=1; funkelZiel=1; ankunftPerGps=modus==='gps';
   protoEintrag({i:state.idx, modus:modus||'hand', acc:fix?Math.round(fix.acc):null, dauer:Math.round((jetztMs()-seekSeit)/1000), zeit:jetztMs()});
   klang(KLANG_DA); try{ if(navigator.vibrate) navigator.vibrate([120,80,120,80,300]); }catch(e){}
   $('stage').classList.add('da'); live(); funkelStart();
   ankunftT=setTimeout(function(){
     ankunftT=null; ankunft=false; wartet=true; wartetSeit=jetztMs();
+    $('pop-tipp').hidden=!(ankunftPerGps && window.Einfuehrung && Einfuehrung.tippOffen('ankunft'));   // nur beim ersten Mal
     klang(KLANG_ZAUBER); render(); konfetti(90, .5, .4);
     popTimer=setInterval(function(){ var sek=Math.round((jetztMs()-wartetSeit)/1000); $('pop-seit').textContent = sek>=5 ? 'Alle da? Seit '+sek+' s' : ''; }, 1000);
   }, ruhig ? 700 : 3000);
@@ -1989,10 +2014,11 @@ function ankommen(modus){               // drei Sekunden blinken, dann das Pop m
 function stationOeffnen(){               // „Weiter“ im Pop: jetzt liest Funkel die Aufgabe vor
   if(!wartet) return;
   tonAn(); wartet=false; popAus();
+  if(!$('pop-tipp').hidden){ $('pop-tipp').hidden=true; if(window.Einfuehrung) Einfuehrung.tippMerken('ankunft'); }
   protoWarte(Math.round((jetztMs()-wartetSeit)/1000));
   state.phase='scene'; state.step=0; trackTaps={}; galN=0; trackMsg=''; save(); render();
 }
-function ankunftAbbrechen(){ if(ankunftT){ clearTimeout(ankunftT); ankunftT=null; } ankunft=false; wartet=false; popAus(); }
+function ankunftAbbrechen(){ if(ankunftT){ clearTimeout(ankunftT); ankunftT=null; } ankunft=false; wartet=false; popAus(); $('pop-tipp').hidden=true; }
 function weiter(){
   still();
   if(state.idx>=N-1){ state.phase='end'; state.step=0; klang(KLANG_ENDE); konfetti(160, .5, .3); setTimeout(function(){ konfetti(120, .2, .35); konfetti(120, .8, .35); }, 500); }
@@ -2382,7 +2408,7 @@ function fadenZeigen(an){
   fadenOffen=an;
   $('faden').hidden=!an; $('backdrop').hidden=!an;
   document.body.classList.toggle('faden-offen', an);
-  $('btn-ablauf').setAttribute('aria-expanded', String(an));
+  $('btn-ablauf').setAttribute('aria-expanded', String(an)); angebotPflegen();
   if(an){
     renderFaden();
     var sc=$('faden-scroll'), c=sc.querySelector('[aria-current="step"]');
@@ -2490,13 +2516,14 @@ function renderSetup(){
   var rb=document.querySelectorAll('#radius button');
   for(var r=0;r<rb.length;r++) rb[r].setAttribute('aria-pressed', String(+rb[r].getAttribute('data-r')===state.radius));
   $('show-test').checked=state.showTest; $('auto-sag').checked=state.autoSag; $('kamera-an').checked=state.kamera;
+  $('tipps-an').checked=!window.Einfuehrung || Einfuehrung.tippsAn();
   if($('variante').getAttribute('data-v')!==state.variante){            // Spielart (UNICORN-47): Draußen/Drinnen, draußen das Extra
     $('variante').setAttribute('data-v', state.variante);
     $('variante').innerHTML=Spielart.karten(TOUR, state.variante);
     $('variante-extra').innerHTML=indoor() ? '' : Spielart.extraKarte(TOUR, state.variante==='b', 'extra-hinweise');
   }
   $('sum-variante').textContent=VARIANTEN[state.variante].name+': '+VARIANTEN[state.variante].kurz;
-  $('sum-tour').textContent=(state.autoSag?'Funkel spricht von selbst':'Funkel spricht auf Tipp')+(state.showTest?', Testknopf an':'');
+  $('sum-tour').textContent=(state.autoSag?'Funkel spricht von selbst':'Funkel spricht auf Tipp')+', Tipps '+(!window.Einfuehrung || Einfuehrung.tippsAn()?'an':'aus');
   $('sum-kamera').textContent = state.kamera ? 'An: Kamerabild und Zauberlinse' : 'Aus';
   $('sum-punkte').textContent = gesetzt()+' von '+(N-1)+' Punkten gesetzt, öffnet bei '+state.radius+' m';
   seg('rec-rate', state.recRate); seg('pitch', state.pitch);
@@ -2539,6 +2566,7 @@ function zeige(v){
   $('tab-tour').setAttribute('aria-pressed', String(v==='tour')); $('tab-setup').setAttribute('aria-pressed', String(v==='setup'));
   try{ modusZeigen(); }catch(e){}
   try{ if(location.hash!=='#'+(v==='setup'?'einrichten':'tour')) history.replaceState(null,'','#'+(v==='setup'?'einrichten':'tour')); }catch(e){}
+  angebotPflegen();
   funkelStart();
 }
 var toastT=null;
@@ -2605,7 +2633,7 @@ function spielartSetzen(v){
     if(p && !p.fremd){ p.ort=Spielart.ort(v); p.ausdrucke=!Spielart.hinweise(v); Party.speichern(p); var pl=Party.plan(TOUR.id); if(pl && pl.stand) state.punkteStand=pl.stand; }   // eigene Punkte behalten
   }catch(e){}
   save(); renderListe(); render();
-  $('variante-note').innerHTML=Spielart.wechsel(TOUR, alt, v);
+  $('variante-note').innerHTML=Spielart.wechsel(TOUR, alt, v); $('k-variante').open=true;
   toast('Spielart: '+VARIANTEN[v].name);
 }
 $('variante').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-spielart]') : null; if(!b) return; var o=b.getAttribute('data-spielart'); spielartSetzen(Spielart.aus(o, o==='draussen' && state.variante==='b')); });
@@ -2624,7 +2652,12 @@ $('erz-wahl').addEventListener('click', function(e){
   var h=e.target.closest ? e.target.closest('[data-hoer]') : null;
   if(h){ e.stopPropagation(); tonAn(); still(); var f=h.getAttribute('data-hoer'), t=erzSatz(f, 0, 0, 'a'); if(t){ t.fig=f; kakaAuftritt(t); } return; }
   var b=e.target.closest ? e.target.closest('[data-erz]') : null; if(!b) return;
-  state.erz=b.getAttribute('data-erz'); save(); renderErz(); clipsVomServer();
+  state.erz=b.getAttribute('data-erz');
+  try{
+    var p=window.Party && Party.lesen(TOUR.id);
+    if(p && !p.fremd && p.erz!==state.erz){ p.erz=state.erz; Party.speichern(p); var pl=Party.plan(TOUR.id); if(pl && pl.erzStand) state.erzStand=pl.erzStand; }
+  }catch(e){}
+  save(); renderErz(); clipsVomServer();
 });
 $('erz-wahl').addEventListener('keydown', function(e){ if((e.key==='Enter'||e.key===' ') && e.target.hasAttribute && e.target.hasAttribute('data-erz')){ e.preventDefault(); e.target.click(); } });
 $('erz-je').addEventListener('click', function(e){
@@ -2649,8 +2682,18 @@ $('foto-teilen').addEventListener('click', fotoTeilen);
 $('btn-proto-reset').addEventListener('click', function(){ proto=[]; protoSave(); renderProtokoll(); toast('Protokoll gelöscht.'); });
 $('btn-linse').addEventListener('click', function(){ state.kamera=false; save(); kameraAus(); render(); toast('Kamera ist aus. Unter „Einrichten“ lässt sie sich wieder einschalten.'); });
 $('btn-ablauf').addEventListener('click', function(){ erwMenu(false); fadenZeigen(!fadenOffen); });
+function spielOrt(){ return indoor() ? 'drinnen' : 'draussen'; }
+// „Zum ersten Mal hier?“ hängt unter „Erwachsene“: nur auf dem ersten Bildschirm, und nie über dem offenen Menü oder dem Ablauf
+function angebotPflegen(){
+  if(!window.Einfuehrung) return;
+  if(view==='tour' && state.phase==='start' && $('erw-menu').hidden && !fadenOffen) Einfuehrung.anbieten({ort:spielOrt()}); else Einfuehrung.angebotWeg();
+}
+function hilfeAuf(){ erwMenu(false); if(window.Einfuehrung) Einfuehrung.hilfe({ort:spielOrt()}); }
+$('btn-hilfe').addEventListener('click', hilfeAuf); $('btn-hilfe-2').addEventListener('click', hilfeAuf);
+$('tipps-an').addEventListener('change', function(){ if(window.Einfuehrung) Einfuehrung.tippsSetzen(this.checked); toast(this.checked ? 'Tipps sind an.' : 'Tipps sind aus.'); });
+document.addEventListener('einfuehrung', function(){ $('tipps-an').checked=Einfuehrung.tippsAn(); toast('Keine Tipps mehr. Unter „Einrichten“ → „Tour“ schaltest du sie wieder ein.'); });
 /* Menü für Erwachsene: Ablauf und Einrichten liegen dahinter, damit Kinder nicht versehentlich hineintippen */
-function erwMenu(an){ $('erw-menu').hidden=!an; $('btn-erw').setAttribute('aria-expanded', String(an)); if(an){ try{ $('btn-ablauf').focus({preventScroll:true}); }catch(e){} } }
+function erwMenu(an){ $('erw-menu').hidden=!an; $('btn-erw').setAttribute('aria-expanded', String(an)); angebotPflegen(); if(an){ try{ $('btn-ablauf').focus({preventScroll:true}); }catch(e){} } }
 $('btn-erw').addEventListener('click', function(e){ e.stopPropagation(); erwMenu($('erw-menu').hidden); });
 $('tab-setup').addEventListener('click', function(){ erwMenu(false); });
 document.addEventListener('click', function(e){ if(!$('erw-menu').hidden && !(e.target.closest && e.target.closest('.erw-wrap'))){ e.preventDefault(); e.stopPropagation(); erwMenu(false); } }, true);   // Tipp daneben schließt nur das Menü, löst nichts darunter aus
@@ -2735,9 +2778,9 @@ function namenHolen(){                   // Namens-Sätze vom Server (nur mit ge
 }
 if(state.phase!=='start') gpsStart();
 
-/* Kurze Einführung für Erwachsene (UNICORN-39): vor dem ersten Start anbieten, in „Einrichten“ erneut zeigen */
-$('btn-einf').addEventListener('click', function(){ if(window.Einfuehrung) Einfuehrung.zeigen(); });
-if(window.Einfuehrung && state.phase==='start') Einfuehrung.anbieten({ziel:$('einf-platz')});
+/* Führung für Erwachsene (UNICORN-39, UNICORN-54): vor dem ersten Start anbieten, in „Einrichten“ und über „Hilfe“ jederzeit */
+$('btn-einf').addEventListener('click', function(){ if(window.Einfuehrung) Einfuehrung.zeigen({ort:spielOrt()}); });
+// Erster Bildschirm: Die Karte „Zum ersten Mal hier?“ schwebt unten, so ist sie auf Handy und Tablet ohne Scrollen zu sehen (UNICORN-54); zeige() bietet sie an
 
 /* Für den Selbsttest: reine Funktionen */
 window.__zs={proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, state:function(){ return state; }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};

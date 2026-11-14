@@ -21,11 +21,17 @@
 .termin div span{color:var(--leise);font-size:.88rem}
 .start{margin-top:22px}
 .fazit{text-align:center;margin:10px 0 0;font-size:.92rem}
+/* So spielt ihr (UNICORN-54): Spielart und Erzähler, bevor die Stimmen geladen werden */
+.so-spielt{display:flex;align-items:center;gap:12px;background:var(--karte);border-radius:16px;padding:8px 14px 8px 8px;margin-top:14px;color:inherit;text-decoration:none}
+.so-spielt img{flex:none;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.92);object-fit:contain}
+.so-spielt .t{flex:1;min-width:0;line-height:1.25}.so-spielt b{display:block}.so-spielt small{display:block;color:var(--leise);font-size:.85rem}
+.so-spielt em{flex:none;font-style:normal;font-weight:700;color:var(--akzent);font-size:.92rem}
 </style></head><body>
 <main class="seite">
   <div class="oben"><a class="textknopf" href="#" id="zurueck">← Zur Party</a><span class="leise" style="font-size:.9rem;margin-left:auto">auf dem Tablet öffnen</span><a class="heim-link" data-heim href="./" aria-label="Zur Übersicht"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></a></div>
   <h1>Startklar</h1>
   <p class="leise" id="intro">Das Tablet prüft sich selbst, du bestätigst nur zwei Dinge.</p>
+  <a class="so-spielt" id="so-spielt" href="#" hidden></a>
   <div class="checks" id="liste" style="margin-top:16px"></div>
   <section id="ablauf" hidden><h2 id="ablauf-titel">Heute</h2><div class="heute" id="heute"></div></section>
   <div class="start"><a class="knopf breit still" id="los" href="#">Zauberspiegel starten</a><p id="fazit" class="fazit leise" aria-live="polite"></p></div>
@@ -34,6 +40,8 @@
 <script src="weg.js"></script>
 <script src="einfuehrung.js"></script>
 <script src="party.js"></script>
+<script src="spielart.js"></script>
+<script src="erzaehler.js"></script>
 <script src="konto.js"></script>
 <script>
 (function(){
@@ -104,10 +112,25 @@
   }
 
   // ---------- Stimmen: Pakete wie im Spiel in IndexedDB ----------
+  // Welcher Erzähler gilt: wie im Spiel. Die Wahl aus der Party zählt, bis das Spiel sie übernommen hat oder dort ein anderer gewählt wurde (UNICORN-54).
+  function spielStand(){ try{ return JSON.parse(localStorage.getItem(tour.speicher+'.v1')||'null'); }catch(e){ return null; } }
+  function erzaehler(){
+    var st=spielStand(), r=Erzaehler.reihe(tour), e=(st && r.indexOf(st.erz)>=0 && st.erz) || r[0] || 'kakapups';
+    if(plan && r.indexOf(plan.erz)>=0 && (!st || (st.erzStand||'')!==(plan.erzStand||''))) e=plan.erz;
+    return e;
+  }
   function benoetigt(){
-    var st=null; try{ st=JSON.parse(localStorage.getItem(tour.speicher+'.v1')||'null'); }catch(e){}
-    var f={}; f[(st&&st.erz)||'kakapups']=1; if(st && st.erzJe) Object.keys(st.erzJe).forEach(function(k){ f[st.erzJe[k]]=1; });
+    var st=spielStand(), f={}; f[erzaehler()]=1; if(st && st.erzJe) Object.keys(st.erzJe).forEach(function(k){ f[st.erzJe[k]]=1; });
     return ['basis'].concat(Object.keys(f));
+  }
+  // Zeile „So spielt ihr“: Spielart und Erzähler. Eltern ändern es in der Party, das Tablet mit Link im Spiel unter „Einrichten“.
+  function soSpielt(){
+    var e=$('so-spielt'), v=party ? Party.variante(party) : ((plan && plan.variante) || 'a'), f=erzaehler(), eigen=party && !party.fremd;
+    if(!tour.varianten || !tour.varianten[v]) return;
+    e.href=eigen ? 'party.html?thema='+thema+'#so-spielt-ihr' : 'spiel.html?thema='+thema+'#einrichten';
+    e.innerHTML=(Erzaehler.gibt(tour)?'<img src="'+esc(Erzaehler.bild(tour, f))+'" alt="">':'')+
+      '<span class="t"><b>So spielt ihr</b><small>'+esc(Spielart.name(tour, v)+(Erzaehler.gibt(tour)?' · '+Erzaehler.kurz(tour, f)+' liest vor':''))+'</small></span><em>ändern</em>';
+    e.hidden=false;
   }
   function db(cb){ var rq=indexedDB.open(tour.speicher,1); rq.onupgradeneeded=function(){ rq.result.createObjectStore('clips'); }; rq.onsuccess=function(){ cb(rq.result); }; rq.onerror=function(){ cb(null); }; }
   function vorhanden(cb){ db(function(d){ if(!d) return cb({}); var r=d.transaction('clips').objectStore('clips').getAllKeys(); r.onsuccess=function(){ var o={}; r.result.forEach(function(k){ o[k]=1; }); cb(o); }; r.onerror=function(){ cb({}); }; }); }
@@ -189,9 +212,9 @@
       if(window.Konto) Konto.bereit(thema, los); else los(); }
   });
   ablauf();
-  if(window.Einfuehrung) Einfuehrung.anbieten({ziel:document.querySelector('.start')});   // UNICORN-39: einmal anbieten, leicht zu überspringen
+  if(window.Einfuehrung) Einfuehrung.anbieten({ziel:document.querySelector('.start'), wo:'bereit', ort:draussen?'draussen':'drinnen'});   // UNICORN-39: einmal anbieten, leicht zu überspringen; das Spiel bietet sie danach noch einmal an
   fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }).then(function(t){
-    tour=t; zeichnen(); stimmenPruefen(); offlinePruefen(); akkuPruefen(); if(draussen) gps();
+    tour=t; soSpielt(); zeichnen(); stimmenPruefen(); offlinePruefen(); akkuPruefen(); if(draussen) gps();
   })['catch'](function(){ $('liste').innerHTML='<p style="padding:12px 0">Thema lässt sich nicht laden. Einmal mit Netz öffnen.</p>'; });
 })();
 </script>

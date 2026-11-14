@@ -30,7 +30,7 @@
   function fuellen(t, w){ return String(t).replace(/\{(\w+)\}/g, function(m,k){ return w[k]!=null ? w[k] : m; }); }
 
   function anwenden(tour, plan, config){
-    var tp={stand:'', punkteCode:null, variante:null, liveUrl:config.liveUrl||''};
+    var tp={stand:'', punkteCode:null, variante:null, erz:null, erzStand:'', liveUrl:config.liveUrl||''};
     var kinder=(plan && plan.kinder) || tour.kinder.standard;
     function liste(l){ return l.map(function(g){ return {t:g.t, items:g.items.map(function(x){ return fuellen(x,{kinder:kinder}); })}; }); }
     tour.vorbereitung.gemeinsam=liste(tour.vorbereitung.gemeinsam);
@@ -40,6 +40,7 @@
     tour.gaben.forEach(function(g){ g.wie=fuellen(g.wie,{kinder:kinder}); });
     if(plan){
       tp.stand=plan.stand||''; tp.variante=plan.variante||null; if(plan.liveUrl) tp.liveUrl=plan.liveUrl;
+      tp.erz=plan.erz||null; tp.erzStand=plan.erzStand||'';        // Erzähler aus der Party (UNICORN-54)
       var st=plan.stationen||[], code=[];
       tour.stationen.forEach(function(s,i){
         var p=st[i]; if(i===0) return;

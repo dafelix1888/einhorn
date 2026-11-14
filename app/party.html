@@ -42,6 +42,17 @@
 .namen-pille .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;line-height:1.25}.namen-pille b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.namen-pille small{color:#C4B5FD;font-size:.84rem;font-weight:700}
 .namen-pille .weiter{flex:none;font-size:1.5rem;line-height:1;color:#C4B5FD}
 .namen-pille.da{background:transparent;border-color:var(--linie,#2F2740)}.namen-pille.da .ton{background:#3FB950}.namen-pille.da small{color:var(--leise);font-weight:400}
+/* „So spielt ihr“ (UNICORN-54): Zeile im Überblick, dahinter Spielart, Erzähler und der Ablauf der Tour */
+.spiel-zeile{display:grid;grid-template-columns:40px 1fr 12px;gap:12px;align-items:center;width:100%;min-height:54px;margin:10px 0 0;padding:6px 14px 6px 8px;background:var(--karte);border:0;border-radius:16px;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.spiel-zeile .sz-bild{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;overflow:hidden;color:#160C2B}
+.spiel-zeile .sz-bild img{width:100%;height:100%;object-fit:contain}.spiel-zeile .sz-bild svg{width:22px;height:22px}
+.spiel-zeile b{display:block;line-height:1.2}.spiel-zeile small{display:block;color:var(--leise);font-size:.85rem;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spiel-zeile .t{min-width:0}
+.spiel-ansicht h2:first-of-type{margin-top:6px}
+.lauf{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}
+.lauf li{display:flex;gap:12px;align-items:flex-start;background:var(--karte);border-radius:14px;padding:11px 14px}
+.lauf .punkt{width:26px;height:26px;margin-top:1px;background:var(--f);color:#160C2B}
+.lauf b{display:block;line-height:1.25}.lauf span.x{display:block;color:var(--leise);font-size:.9rem;line-height:1.35;margin-top:2px}
 .weg-titel{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--leise);margin:14px 2px 2px}
 .weg{list-style:none;margin:0;padding:0}
 .station{position:relative}
@@ -187,6 +198,8 @@
 <script src="planer-kern.js"></script>
 <script src="party.js"></script>
 <script src="spielart.js"></script>
+<script src="erzaehler.js"></script>
+<script src="einfuehrung.js"></script>
 <script src="weg.js"></script>
 <script src="konto.js"></script>
 <script src="namen.js"></script>
@@ -196,9 +209,11 @@
   var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
   var tour=null, info=null, party=null, entwurf=null, schritt=0, vgVonHand=false, voreinOffen=false;
   // offene Ansicht der Übersicht: '' = Überblick, sonst ein Schritt. Aus der Adresse: #einkauf, #einladung, #s-route …
-  function ausAnker(h){ h=String(h||'').replace(/^#/,''); return {einkauf:'bestellen', einladung:'einladen', namen:'geraet'}[h] || (/^s-[a-z]+$/.test(h)?h.slice(2):''); }
+  function ausAnker(h){ h=String(h||'').replace(/^#/,''); return {einkauf:'bestellen', einladung:'einladen', namen:'geraet', 'so-spielt-ihr':'spiel'}[h] || (/^s-[a-z]+$/.test(h)?h.slice(2):''); }
   var offen=ausAnker(location.hash), namenSprung=location.hash==='#namen';
-  var SCHRITTE=3;
+  // Assistent: vier kurze Schritte; „Wer liest vor?“ gibt es nur bei Themen mit mehreren Erzählern (UNICORN-54)
+  var FOLGE=['wer','wo','erz','fertig'], SCHRITTE=FOLGE.length;
+  function sid(){ return FOLGE[schritt]; }
   var TON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
   var HAKEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   var BAUM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0-5.6 8.2A4.5 4.5 0 0 0 9 19h6a4.5 4.5 0 0 0 2.6-7.8A6 6 0 0 0 12 3z"/><path d="M12 13v8"/></svg>';
@@ -212,11 +227,11 @@
   function tageAb(d){ var h=new Date(); h.setHours(0,0,0,0); var x=new Date(d); x.setHours(0,0,0,0); return Math.round((x-h)/864e5); }
   function kurzDatum(d){ return d.toLocaleDateString('de-DE',{day:'numeric', month:'numeric'}); }
 
-  // ---------- Assistent (3 Schritte) ----------
+  // ---------- Assistent (4 Schritte, siehe FOLGE) ----------
   function ortText(e){ return e.ort==='drinnen' ? 'drinnen' : 'draußen'+(e.planB?', Plan B drinnen':''); }
   function voreinText(e){
     var l=[];
-    if(e.ort==='draussen'){ l.push(e.planB?'Plan B bei Regen an':'Ohne Plan B'); if(e.ausdrucke===false) l.push('Extra: Hinweise am Weg'); }
+    if(e.ort==='draussen'){ l.push(e.planB?'Plan B bei Regen an':'Ohne Plan B'); l.push(e.ausdrucke===false?'Extra: Hinweise am Weg':'ohne Extra'); }
     l.push(e.helfer<2?'Alles wird vorher aufgebaut':e.vorausgeher?'Ein Erwachsener geht voraus':'Kein Vorausgeher');
     return l.join(' · ');
   }
@@ -245,9 +260,9 @@
     var e=entwurf, zurueck=schritt>0 ? '<button type="button" class="textknopf" id="zurueck">← Zurück</button>' :
       (party ? '<a class="textknopf" href="party.html?thema='+thema+'">← Zur Party</a>'
              : '<a class="textknopf" href="'+(Weg.plan(thema)?'planer.html?thema='+thema:'landing.html')+'" data-zurueck="'+(Weg.plan(thema)?'planer.html?thema='+thema:'landing.html')+'">← Zurück</a>');
-    var h='<div class="oben">'+zurueck+'<span class="leise">Schritt '+(schritt+1)+' von '+SCHRITTE+'</span></div>'+
-      '<div class="fortschritt">'+[0,1,2].map(function(i){ return '<i class="'+(i<=schritt?'an':'')+'"></i>'; }).join('')+'</div><div class="stapel">';
-    if(schritt===0){
+    var h=(party ? '' : Weg.pfad('party'))+'<div class="oben">'+zurueck+'<span class="leise">Schritt '+(schritt+1)+' von '+SCHRITTE+'</span></div>'+
+      '<div class="fortschritt">'+FOLGE.map(function(x, i){ return '<i class="'+(i<=schritt?'an':'')+'"></i>'; }).join('')+'</div><div class="stapel">';
+    if(sid()==='wer'){
       var pl0=Party.plan(thema), mitRoute=!party && pl0 && pl0.stationen && pl0.stationen.length>1;
       h+=(mitRoute?routeGeschafft(pl0):'')+'<h1>Für wen und wann?</h1>'+
         '<label class="feld"><span>Vorname</span><input id="name" type="text" autocomplete="off" value="'+esc(e.kind.name)+'" placeholder="z. B. Emma"></label>'+
@@ -255,17 +270,22 @@
         '<label class="feld"><span>Start</span><input id="start" type="time" step="900" value="'+esc(e.start||'15:00')+'"></label></div>'+
         '<label class="feld"><span>Datum</span><input id="datum" type="date" min="'+heute()+'" value="'+esc(e.datum||'')+'"></label>'+
         '<p class="leise" style="font-size:.92rem">Die Jagd dauert etwa '+tour.dauer.minuten+' Minuten. Name und Alter stehen auf Einladung und Urkunden. Der Name bleibt auf diesem Gerät.</p>';
-    } else if(schritt===1){
-      var d=e.ort==='draussen';
+    } else if(sid()==='wo'){
+      var d=e.ort==='draussen', ex=tour.extra;
       h+='<h1>Wer ist dabei, wo spielt ihr?</h1>'+
         '<div class="zaehlzeile"><b>Kinder</b><div class="zaehler"><button type="button" data-z="kinder" data-d="-1" aria-label="Weniger Kinder">–</button><b aria-live="polite">'+e.kinder+'</b><button type="button" data-z="kinder" data-d="1" aria-label="Mehr Kinder">+</button></div></div>'+
         '<div class="zaehlzeile"><b>Erwachsene</b><div class="zaehler"><button type="button" data-z="helfer" data-d="-1" aria-label="Weniger Erwachsene">–</button><b aria-live="polite">'+e.helfer+'</b><button type="button" data-z="helfer" data-d="1" aria-label="Mehr Erwachsene">+</button></div></div>'+
         spielartWahl(e)+
         '<details class="vorein" id="vorein"'+(voreinOffen?' open':'')+'><summary><b>Schon voreingestellt <em>'+(voreinOffen?'Fertig':'Ändern')+'</em></b><span>'+esc(voreinText(e))+'. Alles später änderbar.</span></summary>'+
           (d?'<div class="schalter"><label for="planb"><b>Plan B bei Regen</b><span>Drinnen-Variante mit vorbereiten, am Partytag mit einem Tipp umschalten.</span></label><input type="checkbox" id="planb"'+(e.planB?' checked':'')+'></div>'+
-             '':'')+
+             (ex?'<div class="schalter"><label for="extra-assistent"><b>Extra: '+esc(ex.titel)+'</b><span>'+esc(ex.text)+(ex.braucht?' Dazu brauchst du: '+esc(ex.braucht)+'.':'')+'</span></label><input type="checkbox" id="extra-assistent"'+(e.ausdrucke===false?' checked':'')+'></div>':''):'')+
           '<div class="schalter"><label for="vorausgeher"><b>Ein Erwachsener geht voraus</b><span>'+(e.helfer<2?'Geht ab zwei Erwachsenen. Mit nur einem wird alles vorher aufgebaut.':'Baut die Stationen kurz vorher auf. Ohne liegt alles schon vorher bereit.')+'</span></label><input type="checkbox" id="vorausgeher"'+(e.vorausgeher?' checked':'')+(e.helfer<2?' disabled':'')+'></div>'+
         '</details>';
+    } else if(sid()==='erz'){
+      h+='<h1>Wer liest die Aufgaben vor?</h1>'+
+        '<p class="leise">Funkel erzählt die Geschichte. An jeder Station liest eine zweite Figur den Kindern die Aufgabe vor. Hör rein und such eine aus.</p>'+
+        Erzaehler.zeilen(tour, Erzaehler.wahl(tour, e))+
+        '<p class="leise klein">Später änderbar: in der Party unter „So spielt ihr“ und im Spiel unter „Erwachsene“.</p>';
     } else {
       var vName=tour.varianten[Party.variante(e)].name;
       h+='<h1>Fertig! So sieht’s aus</h1>'+
@@ -273,18 +293,20 @@
         '<div class="karte summe" style="margin:0">'+
           '<div><span>Geburtstagskind</span><b>'+esc(e.kind.name)+', wird '+esc(e.kind.alter)+'</b></div>'+
           '<div><span>Erwachsene</span><b>'+e.helfer+(e.vorausgeher?', einer geht voraus':'')+'</b></div>'+
-          '<div><span>Spielart</span><b>'+esc(vName)+'</b></div></div>'+
+          '<div><span>Spielart</span><b>'+esc(vName)+'</b></div>'+
+          (Erzaehler.gibt(tour)?'<div><span>Liest die Aufgaben vor</span><b>'+esc(Erzaehler.name(tour, Erzaehler.wahl(tour, e)))+'</b></div>':'')+'</div>'+
         '<div class="karte" style="margin:0"><b style="display:block;margin-bottom:6px">Dein Plan: 6 Schritte in 2 Wochen</b><span class="leise" style="font-size:.92rem">Jeden Schritt siehst du genau dann, wenn er dran ist. Was die App selbst erkennt, hakt sie selbst ab.</span></div>';
     }
     h+='</div><div style="margin-top:22px"><button type="button" class="knopf breit" id="weiter">'+(schritt<SCHRITTE-1?'Weiter':party?'Speichern':'Plan erstellen')+'</button></div><p class="fehler" id="fehler" role="alert" style="color:var(--rot);margin-top:10px"></p>';
     $('seite').innerHTML=h;
-    var f=$('seite').querySelector('input'); if(f && schritt===0 && !party) try{ f.focus(); }catch(x){}
+    var f=$('seite').querySelector('input'); if(f && sid()==='wer' && !party) try{ f.focus(); }catch(x){}
   }
   function uebernehmen(){                         // Felder des aktuellen Schritts in den Entwurf
     var e=entwurf;
-    if(schritt===0){ e.kind.name=$('name').value.trim().replace(/\s+/g,' ').slice(0,30); if(e.kind.name) e.kind.name=e.kind.name.charAt(0).toUpperCase()+e.kind.name.slice(1); e.kind.alter=+$('alter').value||null; e.datum=$('datum').value; e.start=$('start').value||'15:00';
+    if(sid()==='wer'){ e.kind.name=$('name').value.trim().replace(/\s+/g,' ').slice(0,30); if(e.kind.name) e.kind.name=e.kind.name.charAt(0).toUpperCase()+e.kind.name.slice(1); e.kind.alter=+$('alter').value||null; e.datum=$('datum').value; e.start=$('start').value||'15:00';
       if(!e.kind.name) return 'Bitte den Vornamen eingeben.'; if(!e.kind.alter || e.kind.alter<2 || e.kind.alter>12) return 'Bitte ein Alter zwischen 2 und 12 eingeben.'; if(!e.datum) return 'Bitte ein Datum wählen.'; }
-    if(schritt===1){ e.vorausgeher=!!(e.vorausgeher && e.helfer>=2); }
+    if(sid()==='wo'){ e.vorausgeher=!!(e.vorausgeher && e.helfer>=2); }
+    if(sid()==='erz'){ e.erz=Erzaehler.wahl(tour, e); Erzaehler.still(); }
     return '';
   }
 
@@ -392,7 +414,7 @@
   var FERTIG_TEXT={bestellen:'Alles da oder bestellt', einladen:'Einladung ist raus', route:'Route passt', basteln:'Gebastelt und gedruckt', geraet:'Tablet ist startklar', partytag:'Alles erledigt'};
   var FUNKEN=[[4,36,0],[22,8,.15],[50,-6,.3],[78,8,.45],[96,36,.6]].map(function(f){ return '<i class="funke" style="left:'+f[0]+'%;top:'+f[1]+'%;animation-delay:'+(0.9+f[2]).toFixed(2)+'s">✦</i>'; }).join('');
   var gezeigt=null, gefeiert=-1, ueberblickY=0, schrittImVerlauf=false, hoer=null;
-  function anker(id){ return {einladen:'einladung', bestellen:'einkauf'}[id] || 's-'+id; }
+  function anker(id){ return {einladen:'einladung', bestellen:'einkauf', spiel:'so-spielt-ihr'}[id] || 's-'+id; }
   // Zeithinweis je Schritt: freundlich statt „fällig“. Gelb wird es nur, wenn die Lieferzeit knapp wird.
   function zeit(a, tage){
     if(tage!=null && tage<0) return '';
@@ -405,9 +427,9 @@
   function uebersicht(){
     var p=party, pl=Party.plan(thema), l=Party.aufgaben(p, tour, pl), n=Party.naechste(l), tage=Party.tageBis(p), nr=-1;
     l.forEach(function(a, i){ if(a.id===offen) nr=i; });
-    if(nr<0) offen='';
+    if(nr<0 && offen!=='spiel') offen='';
     var wechsel=gezeigt!==offen; gezeigt=offen;
-    $('seite').innerHTML='<div class="ansicht'+(wechsel?' neu':'')+'">'+(nr<0 ? ueberblick(l, n, tage, p) : schrittAnsicht(l[nr], nr, l, p, pl, tage))+'</div>';
+    $('seite').innerHTML='<div class="ansicht'+(wechsel?' neu':'')+'">'+(offen==='spiel' ? spielAnsicht(l, p) : nr<0 ? ueberblick(l, n, tage, p) : schrittAnsicht(l[nr], nr, l, p, pl, tage))+'</div>';
     gefeiert=-1; rueckmeldungZeigen(); feldPassen(); gaesteLaden();
     if(namenSprung && offen==='geraet'){ namenSprung=false; setTimeout(zuNamen, 30); }
   }
@@ -438,7 +460,7 @@
       '<p class="sprech" aria-live="polite">'+satz+'</p>'+namenPille(l, p)+
       (n ? '' : '<a class="knopf breit" href="bereit.html?thema='+thema+'" style="margin-top:12px">Startklar öffnen</a>')+'</section>';
     var gz=window.Konto && Konto.gaesteGemerkt ? Konto.gaesteGemerkt(thema) : null, gt=gz?Konto.gaesteKurz(gz):'';
-    h+='<h2 class="weg-titel">Deine '+l.length+' Schritte</h2><ol class="weg">'+l.map(function(a, i){
+    h+=spielZeile(p)+'<h2 class="weg-titel">Deine '+l.length+' Schritte</h2><ol class="weg">'+l.map(function(a, i){
       var z=a.fertig?'erledigt':zeit(a, tage);
       if(a.id==='einladen' && gt) z=gt;
       return '<li class="station'+(a.fertig?' fertig':'')+(a===n?' dran':'')+'" style="--f:'+FARBEN[i%FARBEN.length]+'"><button type="button" data-oeffne="'+a.id+'">'+
@@ -453,6 +475,42 @@
       (meinungDa()?'<p class="leise klein" style="margin:22px 2px 0">Wie gefällt dir Schatzweg? <button type="button" class="textknopf klein" data-meinung-auf="party" style="min-height:44px;padding:0 0 0 4px">Feedback geben</button></p>':'')+
       '<div class="reihe" style="margin-top:14px"><button type="button" class="knopf leer mittel" id="loeschen">Party löschen</button></div>';
   }
+  // „So spielt ihr“ (UNICORN-54): das Wichtige zur Tour früh und an einer Stelle. Die Zeile steht im Überblick,
+  // die Ansicht dahinter bündelt Spielart mit Extra, Erzähler, „Funkel kennt …“ und den Ablauf der Tour.
+  // Dasselbe steht weiter im Spiel unter „Erwachsene“ → „Einrichten“; beide Stellen schreiben in dieselbe Party.
+  var spielWechsel='';
+  function spielKurz(p){ var l=[Spielart.name(tour, Party.variante(p))]; if(Erzaehler.gibt(tour)) l.push(Erzaehler.satz(tour, p)); return l.join(' · '); }
+  function spielZeile(p){
+    var f=Erzaehler.gibt(tour) ? Erzaehler.wahl(tour, p) : null;
+    return '<button type="button" class="spiel-zeile" data-oeffne="spiel"><span class="sz-bild">'+(f?'<img src="'+esc(Erzaehler.bild(tour, f))+'" alt="">':symbol('start'))+'</span>'+
+      '<span class="t"><b>So spielt ihr</b><small>'+esc(spielKurz(p))+'</small></span><span class="pfeil" aria-hidden="true"></span></button>';
+  }
+  function spielAnsicht(l, p){
+    var v=Party.variante(p), draussen=p.ort!=='drinnen';
+    var lauf=draussen ? [
+        ['Funkel führt per GPS', 'Der Spiegel zeigt, wie nah die nächste Station ist. Am Ziel öffnet sie sich von selbst.'],
+        ['Erst sammeln, dann hören', 'Unterwegs und an jeder Station spricht Funkel erst, wenn du tippst. So verpasst kein Kind etwas.'],
+        ['Du kannst jederzeit eingreifen', 'Über „Erwachsene“ springst du zu jedem Schritt. Hakt das GPS, öffnest du die Station von Hand.']
+      ] : [
+        ['Jeder Raum ist eine Station', 'Drinnen gibt es kein GPS. Im nächsten Raum tippst du „Station öffnen“.'],
+        ['Erst sammeln, dann hören', 'Unterwegs und an jeder Station spricht Funkel erst, wenn du tippst. So verpasst kein Kind etwas.'],
+        ['Du kannst jederzeit eingreifen', 'Über „Erwachsene“ springst du zu jedem Schritt, vor und zurück.']
+      ];
+    return '<nav class="leiste-oben" aria-label="So spielt ihr"><button type="button" class="textknopf" data-oeffne="" id="zum-ueberblick"><span aria-hidden="true">‹</span><span class="wort">Überblick</span></button></nav>'+
+      '<section class="schritt-ansicht spiel-ansicht" id="so-spielt-ihr" style="--f:#A78BFA">'+
+      '<header class="schritt-kopf"><span class="kreis gross">'+symbol('start')+'</span><div><div class="marke">Eure Tour</div><h1 tabindex="-1">So spielt ihr</h1></div></header>'+
+      '<p class="wozu">Das Wichtige zur Tour an einer Stelle. Alles lässt sich bis zum Start ändern, auch im Spiel unter „Erwachsene“.</p>'+
+      '<h2>Wo spielt ihr?</h2>'+Spielart.karten(tour, v)+
+      (draussen && tour.extra ? '<div style="margin-top:10px">'+Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise')+'</div>' : '')+
+      '<div id="spiel-wechsel">'+spielWechsel+'</div>'+
+      (Erzaehler.gibt(tour) ? '<h2 id="erzaehler">Wer liest die Aufgaben vor?</h2><p class="leise klein" style="margin:-4px 0 10px">Funkel erzählt die Geschichte. An jeder Station liest eine zweite Figur den Kindern die Aufgabe vor.</p>'+Erzaehler.zeilen(tour, Erzaehler.wahl(tour, p)) : '')+
+      namenPille(l, p)+
+      '<h2>So läuft die Tour</h2><ol class="lauf">'+lauf.map(function(x, i){ return '<li><span class="punkt">'+(i+1)+'</span><span><b>'+x[0]+'</b><span class="x">'+x[1]+'</span></span></li>'; }).join('')+'</ol>'+
+      kachel({id:'einf-zeigen', symbol:'auge', titel:'Kurz erklärt in einer Minute', text:draussen?'Dein Menü im Spiel und was hilft, wenn eine Station zu früh oder gar nicht öffnet.':'Dein Menü im Spiel und wie du drinnen die Stationen öffnest.'})+
+      '<div class="schritt-fuss"><button type="button" class="knopf breit" data-oeffne="">Fertig</button></div></section>';
+  }
+  // Hörprobe eines Erzählers; ohne Netz ein kurzer Hinweis statt Stille
+  function erzHoeren(f){ Erzaehler.hoeren(tour, f, function(){ toast('Die Hörprobe braucht Internet.'); }); }
   // „Funkel kennt …“ im Überblick (UNICORN-33): sichtbar, sobald es Namens-Sätze geben kann
   function namenPille(l, p){
     var x=null; l.forEach(function(a){ a.teile.forEach(function(t){ if(t.id==='namen') x=t; }); });
@@ -492,7 +550,7 @@
   // Kachel: großer Knopf mit Titel und ein, zwei Sätzen (für wen, wann, wie)
   function kachel(o){
     var innen='<span class="k-symbol">'+symbol(o.symbol)+'</span><span class="k-text"><b>'+esc(o.titel)+'</b><span>'+esc(o.text)+'</span></span><span class="pfeil" aria-hidden="true"></span>', kl='kachel'+(o.haupt?' haupt':'');
-    return o.href ? '<a class="'+kl+'" href="'+esc(o.href)+'">'+innen+'</a>' : '<button type="button" class="'+kl+'" id="'+o.id+'">'+innen+'</button>';
+    return o.href ? '<a class="'+kl+'" href="'+esc(o.href)+'">'+innen+'</a>' : '<button type="button" class="'+kl+'"'+(o.id?' id="'+o.id+'"':'')+(o.oeffne?' data-oeffne="'+o.oeffne+'"':'')+'>'+innen+'</button>';
   }
   function schrittInhalt(a, p, pl){
     var draussen=p.ort!=='drinnen', live=window.Konto && Konto.aktiv && Konto.aktiv(), h='';
@@ -509,12 +567,15 @@
       kachel({href:'druck.html?thema='+thema+'#einladung', symbol:'druck', titel:'Einladung drucken', text:'Dieselbe Einladung auf Papier, zwei Karten pro Blatt.'})+
       '<h2>Wer kommt?</h2><div id="gaeste">'+gaesteHtml()+'</div>'+
       '<p class="leise klein">Schon anders eingeladen? Dann hak den Schritt unten einfach ab.</p>';
-    if(a.id==='route') return draussen ? routeKarte(p, pl) :
+    if(a.id==='route') return draussen ? routeKarte(p, pl)+
+      kachel({id:'einf-gps', symbol:'auge', titel:'So öffnen sich die Stationen', text:'Am Ziel von selbst. Die kurze Einführung zeigt, was du tust, wenn eine Station zu früh oder gar nicht öffnet.'}) :
       kachel({href:'spiel.html?thema='+thema+'#einrichten', haupt:true, symbol:'liste', titel:'Liste öffnen', text:'Zeigt, welche Station in welchen Raum kommt und was dort hingehört.'});
     if(a.id==='basteln') return (draussen ? Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise') : '')+kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden und Einladungen.'})+
       kachel({href:'spiel.html?thema='+thema+'#einrichten', symbol:'liste', titel:'Bastelliste öffnen', text:'Was in welche Station gehört. Dort hakst du ab, was fertig ist.'});
-    if(a.id==='geraet') return (window.Namen ? Namen.karte(thema) : '')+kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
-      kachel({id:'teilen', symbol:'geraet', titel:'Link fürs Tablet', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl und Spielart schon drin.'});
+    if(a.id==='geraet') return (window.Namen ? Namen.karte(thema) : '')+
+      kachel({oeffne:'spiel', symbol:'liste', titel:'So spielt ihr: '+spielKurz(p), text:'Vor dem Laden prüfen. „Startklar“ lädt die Stimme eures Erzählers mit aufs Tablet.'})+
+      kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
+      kachel({id:'teilen', symbol:'geraet', titel:'Link fürs Tablet', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl, Spielart und Erzähler schon drin.'});
     if(a.id==='partytag'){
       if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.uhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das Tablet sieht seine Haken live.':'')});
       h+=kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Tablet: letzter Check, dann weckt ihr den Zauberspiegel.'});
@@ -552,9 +613,12 @@
     Konto.gaeste(thema).then(function(g){ if(g && party && !entwurf) gaesteZeigen(); }, function(){});
   }
   // Ansicht wechseln: '' = Überblick. Vom Überblick in einen Schritt kommt ein Eintrag in den Browser-Verlauf.
+  // Ansicht an gleicher Stelle neu zeichnen und den Fokus zurückgeben
+  function neuZeichnen(fokus){ var y=window.scrollY; uebersicht(); window.scrollTo(0, y); var e=fokus && $('seite').querySelector(fokus); if(e) try{ e.focus({preventScroll:true}); }catch(x){} }
   function zeige(id, oben){
     var vorher=offen; id=id||'';
     if(id===vorher) return;
+    Erzaehler.still(); if(id!=='spiel') spielWechsel='';
     if(!vorher) ueberblickY=window.scrollY;
     offen=id;
     try{
@@ -606,7 +670,9 @@
       }
       if((b=t.closest('[data-spielart]'))){ entwurf.ort=b.getAttribute('data-spielart'); if(entwurf.ort==='draussen') entwurf.warDraussen=true; assistent(); var o=$('seite').querySelector('[data-spielart="'+entwurf.ort+'"]'); if(o) o.focus(); return; }
       if(t.closest('#spielart-aendern')){ spielartOffen=true; assistent(); return; }
-      if(t.closest('#zurueck')){ uebernehmen(); merkeEntwurf(); if(gepusht>0){ history.back(); } else { schritt--; assistent(); } return; }
+      if((b=t.closest('[data-erz-hoer]'))){ erzHoeren(b.getAttribute('data-erz-hoer')); return; }
+      if((b=t.closest('[data-erz]'))){ entwurf.erz=b.getAttribute('data-erz'); var ey=window.scrollY; assistent(); window.scrollTo(0, ey); var eb=$('seite').querySelector('[data-erz="'+entwurf.erz+'"]'); if(eb) try{ eb.focus({preventScroll:true}); }catch(x){} return; }
+      if(t.closest('#zurueck')){ Erzaehler.still(); uebernehmen(); merkeEntwurf(); if(gepusht>0){ history.back(); } else { schritt--; assistent(); } return; }
       if(t.closest('#weiter')){
         var f=uebernehmen(); if(f){ $('fehler').textContent=f; return; }
         if(schritt<SCHRITTE-1){ schritt++; merkeEntwurf(); try{ history.pushState({schritt:schritt},'','#schritt-'+(schritt+1)); gepusht++; }catch(e){} assistent(); window.scrollTo(0,0); return; }
@@ -631,6 +697,21 @@
       return;
     }
     if(t.closest('[data-namen-auf]')){ zeige('geraet'); setTimeout(zuNamen, 30); return; }
+    if((b=t.closest('[data-erz-hoer]'))){ erzHoeren(b.getAttribute('data-erz-hoer')); return; }
+    if((b=t.closest('[data-erz]'))){                  // Erzähler wählen: gilt sofort, wandert mit Tourplan und Tablet-Link ins Spiel
+      var ef=b.getAttribute('data-erz'); if(Erzaehler.wahl(tour, party)!==ef || !party.erz){ party.erz=ef; party=Party.speichern(party); toast(Erzaehler.kurz(tour, ef)+' liest die Aufgaben vor.'); }
+      neuZeichnen('[data-erz="'+ef+'"]'); return;
+    }
+    if((b=t.closest('[data-spielart]')) && offen==='spiel'){
+      var so=b.getAttribute('data-spielart'), valt=Party.variante(party);
+      if((party.ort==='drinnen'?'drinnen':'draussen')!==so){
+        party.ort=so; if(so==='draussen') party.warDraussen=true; party=Party.speichern(party);
+        spielWechsel=Spielart.wechsel(tour, valt, Party.variante(party));
+      }
+      neuZeichnen('[data-spielart="'+so+'"]'); return;
+    }
+    if(t.closest('#einf-zeigen')){ Einfuehrung.zeigen({ort:party.ort==='drinnen'?'drinnen':'draussen'}); return; }
+    if(t.closest('#einf-gps')){ Einfuehrung.zeigen({ort:'draussen', ab:'ankunft'}); return; }
     if((b=t.closest('[data-oeffne]'))){ zeige(b.getAttribute('data-oeffne')); return; }
     if((b=t.closest('[data-meinung-auf]'))){ if(meinungDa()) Konto.meinung({wo:b.getAttribute('data-meinung-auf'), thema:thema}); return; }
     if((b=t.closest('[data-gast-weg]'))){
@@ -679,6 +760,7 @@
     if(!entwurf && t.id==='gh'){ party.gaesteHinweis=t.value.trim().slice(0,200); party=Party.speichern(party); toast('Hinweis für die Einladung gespeichert.'); return; }
     if(entwurf){
       if(t.id==='planb') entwurf.planB=t.checked;
+      else if(t.id==='extra-assistent') entwurf.ausdrucke=!t.checked;
       else if(t.id==='vorausgeher'){ entwurf.vorausgeher=t.checked && entwurf.helfer>=2; vgVonHand=true; }
       else return;
       var s=$('vorein'); if(s) s.querySelector('summary span').textContent=voreinText(entwurf)+'. Alles später änderbar.';
@@ -763,6 +845,7 @@
 
   Promise.all([fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }), fetch('themen/index.json').then(function(r){ return r.json(); })]).then(function(r){
     tour=r[0]; info=r[1].themen.filter(function(t){ return t.id===thema; })[0];
+    if(!Erzaehler.gibt(tour)){ FOLGE=FOLGE.filter(function(x){ return x!=='erz'; }); SCHRITTE=FOLGE.length; }
     party=Party.lesen(thema);
     if(party && party.fremd && !q.has('neu')) fremdAnsicht();
     else if(party && !q.has('neu')) uebersicht();

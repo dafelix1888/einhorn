@@ -31,6 +31,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   ok(await p.locator('#ausdrucke').count()===0, 'Schalter „Wenig Aufbau“ ist weg');
   await p.click('#spielart-aendern');
   ok(await p.locator('[data-spielart="drinnen"][aria-pressed="true"]').count()===1, '„ändern“ zeigt die Karten, Drinnen gewählt');
+  await p.click('#weiter'); await p.waitForSelector('.erz-liste');          // UNICORN-54: dazwischen „Wer liest die Aufgaben vor?“
   await p.click('#weiter'); await p.waitForSelector('.zusammen');
   ok(/Spielart\s*Drinnen/.test(await p.locator('.summe').innerText()), 'Zusammenfassung nennt die Spielart');
 
