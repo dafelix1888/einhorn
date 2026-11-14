@@ -319,9 +319,8 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   function vorbereitung(t, p){
     var tour=TOUR[t.id]; if(!tour) return null;
     var v=(p && p.variante) || 'a', kinder=(p && p.kinder) || tour.kinder.standard;
-    var g=tour.vorbereitung.gemeinsam, l=g.slice(0,1).concat(tour.vorbereitung.variante[v]||[], g.slice(1));
-    var haken=lies(tour.speicher+'.liste')||{}, n=0, fertig=0;
-    l.forEach(function(gr){ gr.items.forEach(function(it){ n++; if(haken[v+'|'+it.replace(/\{kinder\}/g,kinder)]) fertig++; }); });
+    var haken=lies(tour.speicher+'.liste')||{}, n=0, fertig=0;   // gezählt wird nur, was die Tour wirklich braucht
+    (tour.vorbereitung.noetig||[]).forEach(function(x){ if(x.nur && x.nur.indexOf(v)<0) return; n++; if(haken[v+'|'+x.x.replace(/\{kinder\}/g,kinder)]) fertig++; });
     return {n:n, fertig:fertig};
   }
   function jetztHtml(){
@@ -348,7 +347,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
         (p.heimweg!=null?'<div><span>'+(p.rundkurs?'Heimweg (Runde)':'Heimweg')+'</span><b>'+km(p.heimweg)+'</b></div>':'')+
         '<div><span>Kinder</span><b>'+(p.kinder||tour.kinder&&tour.kinder.standard||'–')+'</b></div>'+
       '</div></div>'+
-      (vb?'<div class="box"><h4>Vorbereitung</h4><div class="balken"><i style="width:'+Math.round(vb.fertig/Math.max(1,vb.n)*100)+'%"></i></div><p class="unter" style="margin:0">'+vb.fertig+' von '+vb.n+' Punkten erledigt</p><div class="knopfreihe"><a class="pille" href="spiel.html?thema='+t.id+'#einrichten">Checkliste</a></div></div>':'')+
+      (vb?'<div class="box"><h4>Vorbereitung</h4><div class="balken"><i style="width:'+Math.round(vb.fertig/Math.max(1,vb.n)*100)+'%"></i></div><p class="unter" style="margin:0">'+vb.fertig+' von '+vb.n+' nötigen Dingen erledigt</p><div class="knopfreihe"><a class="pille" href="spiel.html?thema='+t.id+'#einrichten">Checkliste</a></div></div>':'')+
       '<div class="knopfreihe"><a class="voll" href="party.html?thema='+t.id+'">Weiter zur Party</a><a class="pille" href="planer.html?thema='+t.id+'">Route ändern</a></div>';
   }
 
