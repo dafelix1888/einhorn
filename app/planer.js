@@ -227,7 +227,7 @@
     if(r && r.knoten){
       var k=r.knoten[i], o=PlanerKern.ortAm(netz, k.id);
       s.lat=k.lat; s.lng=k.lng;
-      s.name=(tour.stationen[i].name||'Station')+(o.strasse?' '+o.an:''); s.an=o.an; s.zu=o.zu;
+      s.name=(tour.stationen[i].name||'Station')+(o.strasse?' '+o.an:''); s.an=ansageFrei(i)?o.an:null; s.zu=ansageFrei(i)?o.zu:null;
       plan.route=r.route; plan.strecke=r.strecke; plan.heimweg=r.heim; plan.heimRoute=r.heimRoute; plan.heimGleich=r.heimGleich; plan.luft=false;
     } else {
       var p=marker[i].getLatLng(); s.lat=+p.lat.toFixed(6); s.lng=+p.lng.toFixed(6);
@@ -277,7 +277,7 @@
     var r=neuRechnen(); if(marker[i]) marker[i]._ziehen=false;
     if(r && r.knoten){
       var k=r.knoten[i], o=PlanerKern.ortAm(netz, k.id);
-      s.name=(tour.stationen[i].name||'Station')+(o.strasse?' '+o.an:''); s.an=o.an; s.zu=o.zu;
+      s.name=(tour.stationen[i].name||'Station')+(o.strasse?' '+o.an:''); s.an=ansageFrei(i)?o.an:null; s.zu=ansageFrei(i)?o.zu:null;
       plan.route=r.route; plan.strecke=r.strecke; plan.heimweg=r.heim; plan.heimRoute=r.heimRoute; plan.heimGleich=r.heimGleich; plan.luft=false;
     } else if(r) streckeUebernehmen(r);
     s.lat=+lat.toFixed(6); s.lng=+lng.toFixed(6);              // genau der Standort, nicht auf den Weg geschoben: so löst das GPS im Spiel hier aus
@@ -311,6 +311,8 @@
 
   // ---------- Station wählen ----------
   function ersatz(i, s){ return i>0 && !s.gefunden; }
+  // Von Hand gesetzt: Die Ortsansage („Der Zaun beginnt an der …“) nur, wo sie nicht von einem bestimmten Ding abhängt (UNICORN-48)
+  function ansageFrei(i){ var t=((tour.stationen[i]||{}).ort||{}).typ; return t==='weg' || t==='strassenquerung'; }
   function farbe(i){ return FARBEN[i%FARBEN.length]; }
   function stationTitel(i){ var t=tour.stationen[i]||{}; return t.title||(t.steps&&t.steps[0]&&t.steps[0].title)||t.name||'Station'; }
   function stationZeigen(){
@@ -318,7 +320,7 @@
     if(gewaehlt>=st.length) gewaehlt=0;
     var s=st[gewaehlt], t=tour.stationen[gewaehlt]||{}, i=gewaehlt, text;
     if(i===0) text='Start an der Haustür.';
-    else if(ersatz(i,s)) text='<span class="warn">Kein passender Ort gefunden.</span> Gesucht: '+esc(t.wo||'')+'. Auf eine passende Stelle ziehen.';
+    else if(ersatz(i,s)) text='<span class="leise">Einfacher Wegpunkt.</span> Passt so. Gesucht war: '+esc(t.wo||'')+'. Wer mag, zieht die Station dorthin.';
     else text='<span class="ok">'+esc(s.hinweis||'passt')+'</span> · '+esc(s.name)+' · nach '+km(s.nachMeter)+(s.hoehe!=null?' · '+s.hoehe+' m hoch':'');
     $('st-titel').textContent='Station '+(i+1)+': '+stationTitel(i);
     $('st-text').innerHTML=text;
@@ -336,11 +338,11 @@
   // ---------- Liste, Karte, Profil ----------
   function listeZeichnen(){
     var st=plan.stationen, fehlt=st.filter(function(s,i){ return ersatz(i,s); }).length;
-    $('zusammenfassung').textContent=(plan.rundkurs && plan.heimweg!=null ? 'Rundkurs, '+km(plan.strecke+plan.heimweg)+' insgesamt. ' : '')+st.length+' Stationen'+(fehlt?', '+fehlt+' davon mit Ersatzort (gestrichelt).':', alle Orte passen zur Geschichte.');
+    $('zusammenfassung').textContent=(plan.rundkurs && plan.heimweg!=null ? 'Rundkurs, '+km(plan.strecke+plan.heimweg)+' insgesamt. ' : '')+st.length+' Stationen'+(fehlt?', '+fehlt+' davon an einem einfachen Wegpunkt (gestrichelt). Das passt auch so.':', alle Orte passen zur Geschichte.');
     $('liste').innerHTML=st.map(function(s,i){
       var e=ersatz(i,s);
       return '<li><button type="button" data-i="'+i+'" class="'+(e?'ersatz':'')+'"><i style="background:'+farbe(i)+'">'+(i===0?HAUS:i+1)+'</i><span><b>'+esc(stationTitel(i))+'</b>'+
-        '<small>'+(i===0?'Start':(e?'<span class="warn">Ersatzort, bitte verschieben</span>':esc(s.name))+' · nach '+km(s.nachMeter))+'</small></span></button></li>';
+        '<small>'+(i===0?'Start':(e?'Einfacher Wegpunkt':esc(s.name))+' · nach '+km(s.nachMeter))+'</small></span></button></li>';
     }).join('');
     profilZeichnen();
     kennzahlenZeigen(plan.strecke, plan.heimweg, plan.luft);

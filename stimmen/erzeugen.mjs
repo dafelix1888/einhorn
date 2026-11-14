@@ -1,49 +1,45 @@
 // Erzeugt funkel-stimme.json mit ElevenLabs-Stimmen.
-// Liest die Sätze direkt aus der verschlüsselten original.html (Zauberwort als Umgebungsvariable),
-// verteilt sie nach stimmen/rollen.json auf die Figuren und erzeugt nur geänderte Sätze neu.
+// Liest die Sätze aus app/themen/einhorn/tour.json und ermittelt sie mit denselben Funktionen wie das Spiel
+// (texte, kakaTexte, erzTexte aus app/spiel.html), verteilt sie nach stimmen/rollen.json auf die Figuren
+// und erzeugt nur geänderte Sätze neu (UNICORN-48; vorher kamen die Sätze aus der verschlüsselten original.html).
 //
-//   ZAUBERWORT=… ELEVENLABS_API_KEY=… node stimmen/erzeugen.mjs
-//   ZAUBERWORT=… node stimmen/erzeugen.mjs --liste      (nur Sätze und Rollen zeigen, kostet nichts)
+//   ELEVENLABS_API_KEY=… node stimmen/erzeugen.mjs
+//   node stimmen/erzeugen.mjs --liste      (nur Sätze und Rollen zeigen, kostet nichts)
+//   node stimmen/erzeugen.mjs --neu        (nur zeigen, welche Sätze neu erzeugt würden, kostet nichts)
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { createHash, webcrypto } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import vm from 'node:vm';
 
 const WURZEL = new URL('..', import.meta.url).pathname;
 const nurListe = process.argv.includes('--liste');
-const zauberwort = process.env.ZAUBERWORT;
+const nurNeu = process.argv.includes('--neu');
 const apiKey = process.env.ELEVENLABS_API_KEY;
-if (!zauberwort) fehler('ZAUBERWORT fehlt (GitHub: Settings → Secrets and variables → Actions).');
-if (!nurListe && !apiKey) fehler('ELEVENLABS_API_KEY fehlt (GitHub: Settings → Secrets and variables → Actions).');
+if (!nurListe && !nurNeu && !apiKey) fehler('ELEVENLABS_API_KEY fehlt (GitHub: Settings → Secrets and variables → Actions).');
 
 function fehler(t) { console.error('Fehler: ' + t); if (process.env.GITHUB_ACTIONS) console.log('::error title=Stimmen::' + String(t).replace(/\r?\n/g, ' ')); process.exit(1); }
 const b = (s) => Buffer.from(s, 'base64');
 
-// 1) App entschlüsseln
-const huelle = readFileSync(WURZEL + 'original.html', 'utf8');
-const zeile = huelle.split('\n').find((z) => z.includes('var D={'));
-if (!zeile) fehler('Verschlüsselter Block in original.html nicht gefunden.');
-const D = JSON.parse(zeile.slice(zeile.indexOf('{'), zeile.lastIndexOf('}') + 1));
-const { subtle } = webcrypto;
-const roh = await subtle.importKey('raw', new TextEncoder().encode(zauberwort), 'PBKDF2', false, ['deriveKey']);
-const key = await subtle.deriveKey({ name: 'PBKDF2', salt: b(D.s), iterations: D.n, hash: 'SHA-256' }, roh, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-let app;
-try { app = new TextDecoder().decode(await subtle.decrypt({ name: 'AES-GCM', iv: b(D.i) }, key, b(D.c))); }
-catch { fehler('Das Zauberwort passt nicht zu original.html.'); }
+// 1) Tour und Satz-Funktionen des Spiels laden
+const TOUR = JSON.parse(readFileSync(WURZEL + 'app/themen/einhorn/tour.json', 'utf8'));
+const app = readFileSync(WURZEL + 'app/spiel.html', 'utf8');
 
-// 2) Sätze genau so ermitteln wie die App selbst (STATIONS, T_…, texte())
+// 2) Sätze genau so ermitteln wie das Spiel selbst (texte(), kakaTexte(), erzTexte())
 function stueck(von, bis) {
   const a = app.indexOf(von), e = app.indexOf(bis, a);
-  if (a < 0 || e < 0) fehler('Textstelle „' + von + '“ in der App nicht gefunden.');
+  if (a < 0 || e < 0) fehler('Textstelle „' + von + '“ in app/spiel.html nicht gefunden.');
   return app.slice(a, e);
 }
-const code = stueck('var STATIONS=[', '/* ---------- Varianten') + '\n' + stueck('var T_START=', 'var TEXTE=texte();') + '\nTEXTE=texte();'
-  + (app.includes('/* ---------- Kakapups ----------') ? '\n' + stueck('/* ---------- Kakapups ----------', '/* ---------- Kakapups Ende') + '\nKAKATEXTE=kakaTexte();' : '')
-  + (app.includes('/* ---------- Erzähler ----------') ? '\n' + stueck('/* ---------- Erzähler ----------', '/* ---------- Erzähler Ende') + '\nERZTEXTE=erzTexte();' : '');
-const sandbox = { TEXTE: null, KAKATEXTE: [], ERZTEXTE: [] };
+const code = 'var STATIONS=TOUR.stationen; var N=STATIONS.length;\n'
+  + stueck('var T_START=', 'var TEXTE=texte();') + '\nTEXTE=texte();'
+  + '\n' + stueck('/* ---------- Kakapups ----------', '/* ---------- Kakapups Ende') + '\nKAKATEXTE=kakaTexte();'
+  + '\n' + stueck('/* ---------- Erzähler ----------', '/* ---------- Erzähler Ende') + '\nERZTEXTE=erzTexte();';
+const sandbox = { TOUR, TEXTE: null, KAKATEXTE: [], ERZTEXTE: [] };
 vm.runInNewContext(code, sandbox, { timeout: 2000 });
 const saetze = sandbox.TEXTE.concat(sandbox.KAKATEXTE || [], sandbox.ERZTEXTE || []).map((t) => ({ key: t.key, label: t.label, text: t.text }));
+const doppelt = saetze.map((s) => s.key).filter((k, i, l) => l.indexOf(k) !== i);
+if (doppelt.length) fehler('Doppelte Schlüssel: ' + doppelt.join(', '));
 
 // 3) Rollen zuordnen
 const rollen = JSON.parse(readFileSync(WURZEL + 'stimmen/rollen.json', 'utf8'));
@@ -76,6 +72,19 @@ function mitVorlauf(mp3) {
   const r = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', 'pipe:0', '-af', `adelay=${VORLAUF}:all=1`, '-c:a', 'libmp3lame', '-b:a', '64k', '-ar', '44100', '-f', 'mp3', 'pipe:1'], { input: mp3, maxBuffer: 64 * 1024 * 1024 });
   if (r.status !== 0 || !r.stdout || r.stdout.length < 1000) { fehler('ffmpeg fehlt oder scheitert, kein Vorlauf möglich: ' + String(r.error || r.stderr || '').slice(0, 300)); }
   return r.stdout;
+}
+if (nurNeu) {                                   // Trockenlauf: welche Sätze kosten Credits?
+  let zeichen = 0, n = 0;
+  for (const s of saetze) {
+    const f = rollen.figuren[s.rolle];
+    const fassung = createHash('sha256').update(JSON.stringify([s.text, f.voice_id, f.einstellungen || {}, MODELL, FORMAT])).digest('hex').slice(0, 16);
+    const vorher = alt.clips && alt.clips[s.key];
+    if (vorher && vorher.h === fassung) continue;
+    n++; zeichen += s.text.length; console.log(`neu: ${s.key.padEnd(20)} ${s.rolle.padEnd(10)} ${s.text}`);
+  }
+  const weg = Object.keys(alt.clips || {}).filter((k) => !saetze.some((s) => s.key === k) && !(rollen.geraeusche || {})[k]);
+  console.log(`\n${n} Sätze neu, ${zeichen} Zeichen. Nicht mehr gebraucht: ${weg.length ? weg.join(', ') : 'keine'}.`);
+  process.exit(0);
 }
 let neu = 0, behalten = 0;
 const fehlerListe = [];   // Fehler bei einzelnen Sätzen brechen nicht ab: Erzeugtes wird trotzdem gespeichert
