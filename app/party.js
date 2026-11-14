@@ -21,10 +21,15 @@
     p.geaendert=new Date().toISOString(); schreib('sj.party.'+p.thema, p);
     if(root.Konto) root.Konto.merken(p.thema);                                // angemeldet: kurz danach geschützt speichern
     var pl=plan(p.thema) || {format:1, thema:p.thema, stationen:[], strecke:0};
+    var planNeu=false;
     if(pl.variante!==variante(p) || pl.kinder!==p.kinder){                 // nur bei echter Änderung: das Spiel übernimmt dann Variante und Punkte neu
-      pl.variante=variante(p); pl.kinder=p.kinder; pl.stand=new Date().toISOString();
-      schreib('sj.plan.'+p.thema, pl);
+      pl.variante=variante(p); pl.kinder=p.kinder; pl.stand=new Date().toISOString(); planNeu=true;
     }
+    if((p.erz||null)!==(pl.erz||null)){                                    // Erzähler (UNICORN-54): eigener Stand, damit das Spiel nur die Stimme übernimmt und die Punkte bleiben
+      if(p.erz) pl.erz=p.erz; else delete pl.erz;
+      pl.erzStand=new Date().toISOString(); planNeu=true;
+    }
+    if(planNeu) schreib('sj.plan.'+p.thema, pl);
     return p;
   }
   function loeschen(thema){ try{ localStorage.removeItem('sj.party.'+thema); }catch(e){} }
@@ -164,10 +169,10 @@
   function code(o){ var b=new TextEncoder().encode(JSON.stringify(o)), s=''; for(var i=0;i<b.length;i++) s+=String.fromCharCode(b[i]); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
   function decode(c){ var b=c.replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4) b+='='; var bin=atob(b), a=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return JSON.parse(new TextDecoder().decode(a)); }
   function basisUrl(){ return location.href.replace(/[?#].*$/,'').replace(/[^/]*$/,''); }
-  function partyKern(p){ return {thema:p.thema, kind:p.kind, datum:p.datum, start:p.start, kinder:p.kinder, helfer:p.helfer, vorausgeher:p.vorausgeher, ort:p.ort, planB:p.planB, ausdrucke:p.ausdrucke, treffpunkt:p.treffpunkt, abholen:p.abholen, gaesteHinweis:p.gaesteHinweis}; }
+  function partyKern(p){ return {thema:p.thema, kind:p.kind, datum:p.datum, start:p.start, kinder:p.kinder, helfer:p.helfer, vorausgeher:p.vorausgeher, ort:p.ort, planB:p.planB, ausdrucke:p.ausdrucke, erz:p.erz, treffpunkt:p.treffpunkt, abholen:p.abholen, gaesteHinweis:p.gaesteHinweis}; }
   // Hinweis für Gast-Eltern (Mitbringen, bitte beachten); ohne eigenen Text draußen ein Vorschlag
   function gaesteHinweis(p){ if(typeof p.gaesteHinweis==='string') return p.gaesteHinweis.trim(); return p.ort==='drinnen' ? '' : 'Feste Schuhe und Kleidung für draußen, bei Regen Regenjacke und Matschhose.'; }
-  function planKern(pl, p){ pl=pl||{}; return {format:1, thema:p.thema, stand:pl.stand, variante:pl.variante||variante(p), kinder:pl.kinder||p.kinder, adresse:pl.adresse,
+  function planKern(pl, p){ pl=pl||{}; return {format:1, thema:p.thema, stand:pl.stand, variante:pl.variante||variante(p), kinder:pl.kinder||p.kinder, erz:p.erz||pl.erz, erzStand:pl.erzStand, adresse:pl.adresse,
       stationen:(pl.stationen||[]).map(function(s){ return {lat:s.lat, lng:s.lng, name:s.name, an:s.an, zu:s.zu}; }), party:partyKern(p)}; }
   function spielLink(p, pl){ var k=schluessel(p,'spiel'); if(k!==undefined) return k ? basisUrl()+'spiel.html?thema='+p.thema+'&k='+k : null; return basisUrl()+'spiel.html?thema='+p.thema+'&plan='+code(planKern(pl,p)); }
   function vorausgeherLink(p, pl){ var k=schluessel(p,'vorausgeher'); if(k!==undefined) return k ? basisUrl()+'vorausgeher.html?thema='+p.thema+'&k='+k : null; return basisUrl()+'vorausgeher.html?thema='+p.thema+'&plan='+code(planKern(pl,p)); }

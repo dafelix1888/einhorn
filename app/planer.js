@@ -567,6 +567,7 @@
       if(party.kind && party.kind.name) $('titel').firstChild.textContent='Route für '+party.kind.name;
     }
     $('zurueck-eingabe').href=zurueckZiel(); $('zurueck-karte').href=zurueckZiel();
+    if(!party && window.Weg && Weg.pfad) $('wegweiser').innerHTML=Weg.pfad('route');   // Wegweiser nur auf dem ersten Weg (UNICORN-54)
     segZeichnen(); verbinden();
     if(plan && plan.stationen && plan.stationen.length){ ergebnisZeigen(); netzNachladen(); }
   })['catch'](function(e){ status('Thema „'+thema+'“ lässt sich nicht laden: '+e.message, true); });
