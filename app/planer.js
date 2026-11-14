@@ -24,7 +24,7 @@
   var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
   var PLAN_KEY='sj.plan.'+thema;
   var tour=null, plan=null, party=null, osmCache=null, versuch=0, karte=null, ebenen=null, netzLaedt=false, gewaehlt=0;
-  var wahl={variante:'a', rundkurs:false, richtung:'egal', distanz:500, kinder:10, start:null, adresse:''};
+  var wahl={variante:null, rundkurs:false, richtung:'egal', distanz:500, kinder:10, start:null, adresse:''};
 
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
@@ -137,8 +137,8 @@
     return '<b>'+r+'</b><svg class="r-pfeil" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate('+WINKEL[r]+'deg)"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
   }
   function segZeichnen(){
-    $('variante').innerHTML=Object.keys(tour.varianten).map(function(k){ var v=tour.varianten[k]; return '<button type="button" data-v="'+k+'" aria-pressed="'+(wahl.variante===k)+'">'+esc(v.name)+'</button>'; }).join('');
-    $('variante-kurz').textContent=(tour.varianten[wahl.variante]||{}).kurz||'';
+    $('variante').innerHTML=Spielart.karten(tour, wahl.variante);                    // UNICORN-47: zuerst Draußen oder Drinnen
+    $('variante-kurz').hidden=!!wahl.variante;
     $('richtung').innerHTML=RICHTUNGEN.map(function(r){ return '<button type="button" data-r="'+r+'" aria-pressed="'+(wahl.richtung===r)+'" aria-label="'+(r==='egal'?'Richtung egal':'Richtung '+HIMMEL[r])+'">'+richtungKnopf(r)+'</button>'; }).join('');
     $('richtung-text').textContent=wahl.richtung==='egal' ? 'Egal, wo es die schönsten Orte gibt' : 'Richtung '+HIMMEL[wahl.richtung];
     $('form').innerHTML=[[false,'Hin und zurück'],[true,'Rundkurs']].map(function(f){ return '<button type="button" data-f="'+f[0]+'" aria-pressed="'+(wahl.rundkurs===f[0])+'">'+f[1]+'</button>'; }).join('');
@@ -148,8 +148,8 @@
     $('distanz-hinweis').textContent=wahl.rundkurs ? 'Kleine Kinder schaffen gut 1 km.' : 'Kleine Kinder schaffen gut 500 m.';
     d.value=wahl.distanz; $('distanz-wert').textContent=km(wahl.distanz);
     $('kinder').textContent=wahl.kinder;
-    var innen=!draussen() || (party && party.ort==='drinnen');
-    $('draussen').hidden=innen; $('drinnen').hidden=!innen;
+    var innen=!draussen() || (party && party.ort==='drinnen'), offen=!wahl.variante && !party;   // ohne Wahl geht es nicht weiter
+    $('draussen').hidden=innen || offen; $('drinnen').hidden=!innen || offen; $('sek-kinder').hidden=offen || !!party; $('planen').hidden=offen;
     $('planen').textContent=innen ? 'Speichern und spielen' : 'Route planen';
   }
   function zeigeEingabe(){
@@ -501,7 +501,7 @@
   }
 
   function verbinden(){
-    $('variante').addEventListener('click', function(e){ var b=e.target.closest('button[data-v]'); if(!b) return; wahl.variante=b.getAttribute('data-v'); segZeichnen(); });
+    $('variante').addEventListener('click', function(e){ var b=e.target.closest('button[data-spielart]'); if(!b) return; var o=b.getAttribute('data-spielart'); wahl.variante=Spielart.aus(o, wahl.variante==='b'); segZeichnen(); if(o==='draussen') vorladen(); });
     $('form').addEventListener('click', function(e){ var b=e.target.closest('button[data-f]'); if(!b) return; var neu=b.getAttribute('data-f')==='true'; if(neu!==wahl.rundkurs){ wahl.distanz=Math.round(wahl.distanz*(neu?2:0.5)/50)*50; } wahl.rundkurs=neu; segZeichnen(); });
     $('richtung').addEventListener('click', function(e){ var b=e.target.closest('button[data-r]'); if(!b) return; wahl.richtung=b.getAttribute('data-r'); segZeichnen(); });
     $('distanz').addEventListener('input', function(){ wahl.distanz=+this.value; $('distanz-wert').textContent=km(wahl.distanz); });
