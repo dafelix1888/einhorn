@@ -54,6 +54,7 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42
     await c.route('https://tile.openstreetmap.org/**', r=>r.fulfill({status:200, contentType:'image/png', body:PNG}));
     const p=await c.newPage(); p.on('pageerror',e=>errs.push(e.message));
     await p.goto(B+'planer.html?thema=einhorn'); await p.evaluate(()=>localStorage.clear()); await p.reload(); await p.waitForTimeout(600);
+    await p.click('[data-spielart="draussen"]');   // UNICORN-47: zuerst die Spielart
     await p.fill('#adresse','Musterweg 1'); await p.waitForTimeout(700);
     const vorschlag=await p.locator('#vorschlaege li[data-i]').count();
     if(vorschlagNehmen){ await p.click('#vorschlaege li[data-i="0"]'); await p.waitForTimeout(300); }

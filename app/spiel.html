@@ -786,15 +786,12 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
 
   <div class="setup" id="view-setup" hidden>
     <details class="karte" id="k-variante" open>
-      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h12M3 17h8"/></svg></span><span class="tt"><b>Variante</b><span id="sum-variante"></span></span><span class="pf"></span></summary>
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h12M3 17h8"/></svg></span><span class="tt"><b>Spielart</b><span id="sum-variante"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Geschichte, Mitbringsel und Funkels Sätze sind in allen drei gleich. Die Variante ändert die Hinweise „Für Erwachsene“, die Orte und die Vorbereitungsliste. Indoor läuft ohne GPS.</p>
-        <div class="seg" id="variante" role="group" aria-label="Variante">
-          <button type="button" data-v="a">Outdoor, voll</button>
-          <button type="button" data-v="b">Outdoor mit Bändern</button>
-          <button type="button" data-v="c">Indoor</button>
-        </div>
-        <p class="lead" id="variante-note"></p>
+        <p class="lead">Geschichte, Mitbringsel und Funkels Sätze bleiben gleich. Drinnen läuft ohne GPS, die Stationen öffnest du von Hand.</p>
+        <div id="variante"></div>
+        <div id="variante-extra" style="margin-top:12px"></div>
+        <div id="variante-note"></div>
       </div>
     </details>
 
@@ -987,7 +984,7 @@ function LISTE_AKTUELL(){ return (LISTE_VARIANTE[state.variante]||LISTE_VARIANTE
 var LISTE_KEY=TOUR.speicher+'.liste';
 var haken={};
 try{ haken=JSON.parse(localStorage.getItem(LISTE_KEY)||'{}')||{}; }catch(e){ haken={}; }
-(function(){ var um=false; for(var k in haken){ if(/^[abc]\.\d+\.\d+$/.test(k)){ if(haken[k] && LISTE_ALT[k]) haken[LISTE_ALT[k]]=true; delete haken[k]; um=true; } } if(um) hakenSave(); })();
+(function(){ var um=false; for(var k in haken){ if(/^b\|/.test(k)){ if(haken[k]) haken['a'+k.slice(1)]=true; delete haken[k]; um=true; continue; } if(/^[abc]\.\d+\.\d+$/.test(k)){ if(haken[k] && LISTE_ALT[k]) haken[LISTE_ALT[k]]=true; delete haken[k]; um=true; } } if(um) hakenSave(); })();
 function hakenSave(){ try{ localStorage.setItem(LISTE_KEY, JSON.stringify(haken)); }catch(e){} }
 var GABEN=TOUR.gaben;                             // i = Station (0-basiert), 'start' = Ankommen, 'ende' = Schatz
 function renderGaben(){
@@ -1003,18 +1000,20 @@ function renderGaben(){
 }
 // Vorbereitung: zuerst nur, was die Tour wirklich braucht (mit Notlösung), Extras und Packliste aufklappbar
 function fuerVariante(l){ return (l||[]).filter(function(x){ return !x.nur || x.nur.indexOf(state.variante)>=0; }); }
+function hakenVar(){ return state.variante==='b' ? 'a' : state.variante; }   // Extra an oder aus: dieselben Haken
 function hakenZeile(text, notfalls){
-  var id=state.variante+'|'+text, an=!!haken[id];
+  var id=hakenVar()+'|'+text, an=!!haken[id];
   return '<label class="haken"><input type="checkbox" data-haken="'+esc(id)+'"'+(an?' checked':'')+'><span>'+esc(text)+(notfalls?'<small class="notfalls">Sonst: '+esc(notfalls)+'</small>':'')+'</span></label>';
 }
 function pkFarbe(s){ return ['#8B5CF6','#EF4444','#F97316','#EAB308','#22C55E','#16A34A','#3B82F6'][s-1]||'#8B5CF6'; }
 function renderListe(){
   var VB=TOUR.vorbereitung, noetig=fuerVariante(VB.noetig), extras=fuerVariante(VB.extras), offen=$('liste').querySelectorAll('details[open]'), auf={};
   Array.prototype.forEach.call(offen, function(d){ auf[d.id]=true; });
-  var n=noetig.filter(function(x){ return haken[state.variante+'|'+x.x]; }).length, g=noetig.length;
-  var ne=extras.filter(function(x){ return haken[state.variante+'|'+x.x]; }).length;
+  var n=noetig.filter(function(x){ return haken[hakenVar()+'|'+x.x]; }).length, g=noetig.length;
+  var ne=extras.filter(function(x){ return haken[hakenVar()+'|'+x.x]; }).length;
   var h='<h3>Das braucht die Tour <small>'+g+' Dinge</small></h3>'+noetig.map(function(x){ return hakenZeile(x.x, x.notfalls); }).join('');
-  if(extras.length) h+='<details class="mehr" id="vb-extras"'+(auf['vb-extras']?' open':'')+'><summary>Extras, wenn Zeit ist <small>'+extras.length+' Extras'+(ne?', '+ne+' erledigt':'')+'</small></summary>'+extras.map(function(x){ return hakenZeile(x.x); }).join('')+'</details>';
+  if(extras.length) h+='<details class="mehr" id="vb-extras"'+(auf['vb-extras']?' open':'')+'><summary>Extras, wenn Zeit ist <small>'+extras.length+' Extras'+(ne?', '+ne+' erledigt':'')+'</small></summary>'+
+    (indoor() ? '' : Spielart.extraKarte(TOUR, state.variante==='b', 'extra-vb'))+extras.map(function(x){ return hakenZeile(x.x); }).join('')+'</details>';
   // Packliste nach Station: je Zeile Nummer, Ort, Dinge als Stichworte, wer es hinbringt
   var pk=(VB.packliste||{})[state.variante]||(VB.packliste||{}).a;
   if(pk) h+='<details class="mehr" id="vb-packen"'+(auf['vb-packen']?' open':'')+'><summary>Packliste nach Station</summary>'+
@@ -1123,7 +1122,7 @@ function modusZeigen(){
 }
 var trackTaps={};          // angetippte falsche Spuren in der Spuren-Szene
 var trackMsg='';
-var galN=0;                // Zaun-Station, Outdoor voll: welches Bild der Spiegel gerade zeigt (4 = alle gesehen)
+var galN=0;                // Station 4, Draußen ohne Extra: welches Bild der Spiegel gerade zeigt (4 = alle gesehen)
 function galerieAktiv(){
   var st=STATIONS[state.idx];
   return state.variante==='a' && state.phase==='scene' && st.pic==='galerie' && state.step===0 && galN<st.optionen.length;
@@ -2093,7 +2092,7 @@ function texte(){                       // alle Schritte der Tour in Reihenfolge
 var TEXTE=texte();
 /* ---------- Kakapups ---------- */
 // Professor Kakapups liest die Aufgaben für die Kinder vor. Vorher pupst er und legt ein Häufchen.
-// Je Station und Schritt: a = Outdoor voll; b, c nur, wo die Kinder etwas anderes tun sollen.
+// Je Station und Schritt: a = Draußen; b (Extra Hinweise am Weg), c (Drinnen) nur, wo die Kinder etwas anderes tun sollen.
 var KAKA=TOUR.erzaehler.kaka, KAKA_NEIN=TOUR.erzaehler.kakaNein;
 function kakaTexte(){                    // alle Sätze, die Kakapups spricht, mit Schlüssel
   var l=[];
@@ -2129,7 +2128,7 @@ function erzTexte(){                     // alle Sätze der neuen Erzähler, fü
 /* ---------- Kurz-Info ---------- */
 // Was konkret zu tun oder zu finden ist, in Stichpunkten hinter dem Info-Knopf.
 // Schlüssel: 'start', 'w'+Station (unterwegs), Station+'.'+Schritt, 'ende', 'heim', 'heim.ende'.
-// Je Eintrag a = Outdoor voll; b, c nur, wo es abweicht. Jede Zeile: [Stichwort, Text].
+// Je Eintrag a = Draußen; b (Extra Hinweise am Weg), c (Drinnen) nur, wo es abweicht. Jede Zeile: [Stichwort, Text].
 var INFO=TOUR.info;
 function infoKey(){
   var ph=state.phase;
@@ -2194,7 +2193,7 @@ function hauptText(){                   // Beschriftung des einen Hauptknopfs, l
 }
 function jetzt(){                       // was der Erzähler in diesem Moment tun soll
   var ph=state.phase, st=stv(state.idx);
-  if(ph==='start') return indoor() ? 'Variante Indoor: Stationen öffnest du von Hand. Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : gesetzt() ? 'Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : 'Zum Ausprobieren „Spiegel aufwecken“ tippen. Für die echte Tour vorher unter „Einrichten“ die Punkte setzen.';
+  if(ph==='start') return indoor() ? 'Drinnen: Stationen öffnest du von Hand. Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : gesetzt() ? 'Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : 'Zum Ausprobieren „Spiegel aufwecken“ tippen. Für die echte Tour vorher unter „Einrichten“ die Punkte setzen.';
   if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Währenddessen kommt die Schatzkiste zur Parkbank. Darin liegen Kratzbilder, Zaubertafeln und Zeichenschablonen. Nach Schatz und Snack „Heimweg starten“.';
   if(ph==='heim') return state.step>=1 ? 'Geschafft! Tattoos abwischen, den Schatz gibt es nach dem Essen.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
   if(ph==='seek'){
@@ -2491,9 +2490,12 @@ function renderSetup(){
   var rb=document.querySelectorAll('#radius button');
   for(var r=0;r<rb.length;r++) rb[r].setAttribute('aria-pressed', String(+rb[r].getAttribute('data-r')===state.radius));
   $('show-test').checked=state.showTest; $('auto-sag').checked=state.autoSag; $('kamera-an').checked=state.kamera;
-  var vb=document.querySelectorAll('#variante button'); for(var vi=0;vi<vb.length;vi++) vb[vi].setAttribute('aria-pressed', String(vb[vi].getAttribute('data-v')===state.variante));
+  if($('variante').getAttribute('data-v')!==state.variante){            // Spielart (UNICORN-47): Draußen/Drinnen, draußen das Extra
+    $('variante').setAttribute('data-v', state.variante);
+    $('variante').innerHTML=Spielart.karten(TOUR, state.variante);
+    $('variante-extra').innerHTML=indoor() ? '' : Spielart.extraKarte(TOUR, state.variante==='b', 'extra-hinweise');
+  }
   $('sum-variante').textContent=VARIANTEN[state.variante].name+': '+VARIANTEN[state.variante].kurz;
-  $('variante-note').textContent = state.variante==='a' ? 'Wenig Aufbau: Alle Bilder zeigt der Spiegel, auch die schlafende Wolke. Am Zaun und an der Kreuzung hängt und liegt nichts. Das GPS öffnet die Stationen.' : state.variante==='b' ? 'Am Zaun hängen vier bunte Bänder, am Hügel liegt ein weißes Laken als Wolke. Die Spuren an der Kreuzung zeigt nur der Spiegel. Das GPS öffnet die Stationen.' : 'Die Stationen sind Räume, der Vorausgeher legt sie nach. Jede Station öffnest du von Hand, das GPS bleibt aus.';
   $('sum-tour').textContent=(state.autoSag?'Funkel spricht von selbst':'Funkel spricht auf Tipp')+(state.showTest?', Testknopf an':'');
   $('sum-kamera').textContent = state.kamera ? 'An: Kamerabild und Zauberlinse' : 'Aus';
   $('sum-punkte').textContent = gesetzt()+' von '+(N-1)+' Punkten gesetzt, öffnet bei '+state.radius+' m';
@@ -2594,7 +2596,20 @@ $('points').addEventListener('click', function(e){
 });
 $('radius').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-r]') : null; if(!b) return; state.radius=+b.getAttribute('data-r'); save(); render(); });
 $('show-test').addEventListener('change', function(){ state.showTest=this.checked; save(); render(); });
-$('variante').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-v]') : null; if(!b) return; state.variante=b.getAttribute('data-v'); save(); renderListe(); render(); toast('Variante: '+VARIANTEN[state.variante].name); });
+// Spielart wechseln: Spiel, Party auf diesem Gerät und Hinweis, was sich ändert (UNICORN-47)
+function spielartSetzen(v){
+  var alt=state.variante; if(!VARIANTEN[v] || v===alt) return;
+  state.variante=v;
+  try{
+    var p=window.Party && Party.lesen(TOUR.id);
+    if(p && !p.fremd){ p.ort=Spielart.ort(v); p.ausdrucke=!Spielart.hinweise(v); Party.speichern(p); var pl=Party.plan(TOUR.id); if(pl && pl.stand) state.punkteStand=pl.stand; }   // eigene Punkte behalten
+  }catch(e){}
+  save(); renderListe(); render();
+  $('variante-note').innerHTML=Spielart.wechsel(TOUR, alt, v);
+  toast('Spielart: '+VARIANTEN[v].name);
+}
+$('variante').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-spielart]') : null; if(!b) return; var o=b.getAttribute('data-spielart'); spielartSetzen(Spielart.aus(o, o==='draussen' && state.variante==='b')); });
+document.addEventListener('change', function(e){ var t=e.target; if(t && (t.id==='extra-hinweise' || t.id==='extra-vb')) spielartSetzen(t.checked ? 'b' : 'a'); });
 $('kamera-an').addEventListener('change', function(){
   var box=this;
   if(!box.checked){ state.kamera=false; save(); kameraAus(); render(); return; }
@@ -2731,6 +2746,7 @@ window.__zs={proto:function(){ return proto; }, heim:function(){ return state.he
 
 <script src="einfuehrung.js"></script>
 <script src="party.js"></script>
+<script src="spielart.js"></script>
 <script src="konto.js"></script>
 <script src="tour-laden.js"></script>
 <script type="module" src="../funkel3d.js"></script>

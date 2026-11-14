@@ -18,7 +18,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   ok(await p.locator('#vb-packen').count()===1 && /pk-nr/.test(await p.locator('#vb-packen').innerHTML()), 'Packliste nach Station zugeklappt');
   ok(new RegExp('0 von '+n+' nötigen').test(await p.locator('#liste-note').innerText()), 'Zähler zählt nur die nötigen');
   await p.evaluate(()=>{ const d=document.getElementById('vb-extras'); d.open=true; });
-  await p.locator('#vb-extras input').first().check({force:true}); await p.waitForTimeout(150);
+  await p.locator('#vb-extras .haken input').first().check({force:true}); await p.waitForTimeout(150);
   ok(new RegExp('0 von '+n+' nötigen').test(await p.locator('#liste-note').innerText()) && await p.locator('#vb-extras').evaluate(e=>e.open), 'Extra abhaken ändert den Zähler nicht, Extras bleiben offen');
   await p.locator('#liste > .haken input').first().check({force:true}); await p.waitForTimeout(150);
   ok(new RegExp('1 von '+n+' nötigen').test(await p.locator('#liste-note').innerText()), 'Nötiges abhaken zählt');

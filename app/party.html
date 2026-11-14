@@ -152,6 +152,8 @@
 .zaehlzeile .zaehler button{border:0;background:var(--hover);color:var(--text);font-size:1.4rem}
 .zaehlzeile .zaehler b{font-size:1.3rem;min-width:2rem}
 .orte{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.spielart-zeile{display:flex;align-items:baseline;gap:10px;background:var(--karte);border-radius:14px;padding:12px 14px}.spielart-zeile b{flex:1}
+.spielart-titel{font-weight:700;margin:4px 0 -4px}
 .orte button{text-align:left;background:var(--karte);border:2px solid var(--linie);border-radius:14px;padding:14px;min-height:44px}
 .orte button[aria-pressed=true]{border-color:var(--akzent);background:color-mix(in srgb,var(--akzent) 14%,var(--karte))}
 .orte svg{width:26px;height:26px;color:var(--akzent);display:block;margin-bottom:6px}
@@ -184,6 +186,7 @@
 <div class="toast" id="toast" hidden></div>
 <script src="planer-kern.js"></script>
 <script src="party.js"></script>
+<script src="spielart.js"></script>
 <script src="weg.js"></script>
 <script src="konto.js"></script>
 <script src="namen.js"></script>
@@ -213,7 +216,7 @@
   function ortText(e){ return e.ort==='drinnen' ? 'drinnen' : 'draußen'+(e.planB?', Plan B drinnen':''); }
   function voreinText(e){
     var l=[];
-    if(e.ort==='draussen'){ l.push(e.planB?'Plan B bei Regen an':'Ohne Plan B'); l.push(e.ausdrucke!==false?'Wenig Aufbau':'Mit Bändern am Zaun'); }
+    if(e.ort==='draussen'){ l.push(e.planB?'Plan B bei Regen an':'Ohne Plan B'); if(e.ausdrucke===false) l.push('Extra: Hinweise am Weg'); }
     l.push(e.helfer<2?'Alles wird vorher aufgebaut':e.vorausgeher?'Ein Erwachsener geht voraus':'Kein Vorausgeher');
     return l.join(' · ');
   }
@@ -230,6 +233,13 @@
     var km=pl.strecke ? (pl.strecke/1000).toFixed(1).replace('.',',')+' km' : '';
     return '<div class="route-geschafft"><svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" aria-hidden="true"><path class="rg-weg" d="'+weg+'" pathLength="1"/>'+punkte+'</svg>'+
       '<div><span class="rg-marke">✓ Route gespeichert</span><b>Eure Tour steht</b><span class="leise">'+(st.length-1)+' Stationen'+(km?' · '+km:'')+'</span><span class="leise">Jetzt noch kurz zur Party.</span></div></div>';
+  }
+  // Spielart im Assistenten (UNICORN-47): kommt sie schon aus dem Planer, nur anzeigen; sonst zwei Karten, beim Wechsel einer Party mit Hinweis
+  var spielartOffen=false;
+  function spielartWahl(e){
+    var v=Party.variante(e);
+    if(e.ausPlaner && !spielartOffen) return '<div class="spielart-zeile"><span class="leise">Spielart</span><b>'+esc(Spielart.name(tour, v))+'</b><button type="button" class="textknopf" id="spielart-aendern">ändern</button></div>';
+    return '<p class="spielart-titel">Wo spielt ihr?</p>'+Spielart.karten(tour, v)+(party && !party.fremd ? Spielart.wechsel(tour, Party.variante(party), v) : '');
   }
   function assistent(){
     var e=entwurf, zurueck=schritt>0 ? '<button type="button" class="textknopf" id="zurueck">← Zurück</button>' :
@@ -250,11 +260,10 @@
       h+='<h1>Wer ist dabei, wo spielt ihr?</h1>'+
         '<div class="zaehlzeile"><b>Kinder</b><div class="zaehler"><button type="button" data-z="kinder" data-d="-1" aria-label="Weniger Kinder">–</button><b aria-live="polite">'+e.kinder+'</b><button type="button" data-z="kinder" data-d="1" aria-label="Mehr Kinder">+</button></div></div>'+
         '<div class="zaehlzeile"><b>Erwachsene</b><div class="zaehler"><button type="button" data-z="helfer" data-d="-1" aria-label="Weniger Erwachsene">–</button><b aria-live="polite">'+e.helfer+'</b><button type="button" data-z="helfer" data-d="1" aria-label="Mehr Erwachsene">+</button></div></div>'+
-        '<div class="orte"><button type="button" data-ort="draussen" aria-pressed="'+d+'">'+BAUM+'<b>Draußen</b><span>ab der Haustür, mit GPS</span></button>'+
-        '<button type="button" data-ort="drinnen" aria-pressed="'+(!d)+'">'+HAUS+'<b>Drinnen</b><span>in der Wohnung</span></button></div>'+
+        spielartWahl(e)+
         '<details class="vorein" id="vorein"'+(voreinOffen?' open':'')+'><summary><b>Schon voreingestellt <em>'+(voreinOffen?'Fertig':'Ändern')+'</em></b><span>'+esc(voreinText(e))+'. Alles später änderbar.</span></summary>'+
           (d?'<div class="schalter"><label for="planb"><b>Plan B bei Regen</b><span>Drinnen-Variante mit vorbereiten, am Partytag mit einem Tipp umschalten.</span></label><input type="checkbox" id="planb"'+(e.planB?' checked':'')+'></div>'+
-             '<div class="schalter"><label for="ausdrucke"><b>Wenig Aufbau</b><span>Alle Bilder zeigt der Spiegel, unterwegs hängt nichts. Ohne Haken: mit vier bunten Bändern am Zaun, Kreidekreis und einem weißen Laken.</span></label><input type="checkbox" id="ausdrucke"'+(e.ausdrucke!==false?' checked':'')+'></div>':'')+
+             '':'')+
           '<div class="schalter"><label for="vorausgeher"><b>Ein Erwachsener geht voraus</b><span>'+(e.helfer<2?'Geht ab zwei Erwachsenen. Mit nur einem wird alles vorher aufgebaut.':'Baut die Stationen kurz vorher auf. Ohne liegt alles schon vorher bereit.')+'</span></label><input type="checkbox" id="vorausgeher"'+(e.vorausgeher?' checked':'')+(e.helfer<2?' disabled':'')+'></div>'+
         '</details>';
     } else {
@@ -264,7 +273,7 @@
         '<div class="karte summe" style="margin:0">'+
           '<div><span>Geburtstagskind</span><b>'+esc(e.kind.name)+', wird '+esc(e.kind.alter)+'</b></div>'+
           '<div><span>Erwachsene</span><b>'+e.helfer+(e.vorausgeher?', einer geht voraus':'')+'</b></div>'+
-          '<div><span>Variante</span><b>'+esc(vName)+'</b></div></div>'+
+          '<div><span>Spielart</span><b>'+esc(vName)+'</b></div></div>'+
         '<div class="karte" style="margin:0"><b style="display:block;margin-bottom:6px">Dein Plan: 6 Schritte in 2 Wochen</b><span class="leise" style="font-size:.92rem">Jeden Schritt siehst du genau dann, wenn er dran ist. Was die App selbst erkennt, hakt sie selbst ab.</span></div>';
     }
     h+='</div><div style="margin-top:22px"><button type="button" class="knopf breit" id="weiter">'+(schritt<SCHRITTE-1?'Weiter':party?'Speichern':'Plan erstellen')+'</button></div><p class="fehler" id="fehler" role="alert" style="color:var(--rot);margin-top:10px"></p>';
@@ -502,10 +511,10 @@
       '<p class="leise klein">Schon anders eingeladen? Dann hak den Schritt unten einfach ab.</p>';
     if(a.id==='route') return draussen ? routeKarte(p, pl) :
       kachel({href:'spiel.html?thema='+thema+'#einrichten', haupt:true, symbol:'liste', titel:'Liste öffnen', text:'Zeigt, welche Station in welchen Raum kommt und was dort hingehört.'});
-    if(a.id==='basteln') return kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden und Einladungen.'})+
+    if(a.id==='basteln') return (draussen ? Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise') : '')+kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden und Einladungen.'})+
       kachel({href:'spiel.html?thema='+thema+'#einrichten', symbol:'liste', titel:'Bastelliste öffnen', text:'Was in welche Station gehört. Dort hakst du ab, was fertig ist.'});
     if(a.id==='geraet') return (window.Namen ? Namen.karte(thema) : '')+kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
-      kachel({id:'teilen', symbol:'geraet', titel:'Link fürs Tablet', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl und Variante schon drin.'});
+      kachel({id:'teilen', symbol:'geraet', titel:'Link fürs Tablet', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl und Spielart schon drin.'});
     if(a.id==='partytag'){
       if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.uhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das Tablet sieht seine Haken live.':'')});
       h+=kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Tablet: letzter Check, dann weckt ihr den Zauberspiegel.'});
@@ -595,7 +604,8 @@
         else { entwurf.helfer=Math.max(1, Math.min(6, entwurf.helfer+d)); if(entwurf.helfer<2) entwurf.vorausgeher=false; else if(!vgVonHand) entwurf.vorausgeher=true; }
         assistent(); var z=$('seite').querySelector('[data-z="'+k+'"][data-d="'+d+'"]'); if(z) z.focus(); return;
       }
-      if((b=t.closest('[data-ort]'))){ entwurf.ort=b.getAttribute('data-ort'); if(entwurf.ort==='draussen') entwurf.warDraussen=true; assistent(); var o=$('seite').querySelector('[data-ort="'+entwurf.ort+'"]'); if(o) o.focus(); return; }
+      if((b=t.closest('[data-spielart]'))){ entwurf.ort=b.getAttribute('data-spielart'); if(entwurf.ort==='draussen') entwurf.warDraussen=true; assistent(); var o=$('seite').querySelector('[data-spielart="'+entwurf.ort+'"]'); if(o) o.focus(); return; }
+      if(t.closest('#spielart-aendern')){ spielartOffen=true; assistent(); return; }
       if(t.closest('#zurueck')){ uebernehmen(); merkeEntwurf(); if(gepusht>0){ history.back(); } else { schritt--; assistent(); } return; }
       if(t.closest('#weiter')){
         var f=uebernehmen(); if(f){ $('fehler').textContent=f; return; }
@@ -609,7 +619,7 @@
       return;
     }
     if(t.closest('#gast-link-2')){ var gh=$('gh'); if(gh){ party.gaesteHinweis=gh.value.trim().slice(0,200); party=Party.speichern(party); } gastLink(); return; }
-    if(t.closest('#aendern')){ ev.preventDefault(); entwurf=JSON.parse(JSON.stringify(party)); schritt=0; vgVonHand=true; voreinOffen=false; assistent(); window.scrollTo(0,0); return; }
+    if(t.closest('#aendern')){ ev.preventDefault(); entwurf=JSON.parse(JSON.stringify(party)); schritt=0; vgVonHand=true; voreinOffen=false; spielartOffen=false; assistent(); window.scrollTo(0,0); return; }
     if((b=t.closest('[data-fertig]'))){ var fid=b.getAttribute('data-fertig'); party=Party.speichern(Party.abhaken(party, schritt_(fid), true)); feiern(fid); return; }
     if((b=t.closest('[data-teil]'))){
       var sid=b.getAttribute('data-in'), tid=b.getAttribute('data-teil'), war=schritt_(sid).fertig;
@@ -669,12 +679,12 @@
     if(!entwurf && t.id==='gh'){ party.gaesteHinweis=t.value.trim().slice(0,200); party=Party.speichern(party); toast('Hinweis für die Einladung gespeichert.'); return; }
     if(entwurf){
       if(t.id==='planb') entwurf.planB=t.checked;
-      else if(t.id==='ausdrucke') entwurf.ausdrucke=t.checked;
       else if(t.id==='vorausgeher'){ entwurf.vorausgeher=t.checked && entwurf.helfer>=2; vgVonHand=true; }
       else return;
       var s=$('vorein'); if(s) s.querySelector('summary span').textContent=voreinText(entwurf)+'. Alles später änderbar.';
       return;
     }
+    if(t.id==='extra-hinweise'){ party.ausdrucke=!t.checked; party=Party.speichern(party); var y=window.scrollY; uebersicht(); window.scrollTo(0,y); toast(t.checked?'Extra eingeschaltet: Hinweise am Weg.':'Extra ausgeschaltet.'); return; }
     if(t.hasAttribute('data-waehle')){ party.einkaufAus=party.einkaufAus||{}; party.einkaufAus[t.getAttribute('data-waehle')]=!t.checked; einkaufNeu(); }
   });
   document.addEventListener('toggle', function(ev){
@@ -744,7 +754,12 @@
       '<button type="button" class="knopf breit" id="holen">Anmelden und Party holen</button>'+
       '<a class="knopf leer breit" href="planer.html?thema='+thema+'">Neue Party planen</a></div>';
   }
-  function neu(){ entwurf={format:1, thema:thema, kind:{name:'', alter:null}, datum:'', start:'15:00', kinder:tour.kinder.standard, helfer:2, vorausgeher:true, ort:'draussen', planB:true, ausdrucke:true, erledigt:{}, einkauf:{}, erstellt:new Date().toISOString()}; schritt=0; vgVonHand=false; voreinOffen=false; assistent(); }
+  function neu(){
+    entwurf={format:1, thema:thema, kind:{name:'', alter:null}, datum:'', start:'15:00', kinder:tour.kinder.standard, helfer:2, vorausgeher:true, ort:'draussen', planB:true, ausdrucke:true, erledigt:{}, einkauf:{}, erstellt:new Date().toISOString()};
+    var pl=Party.plan(thema);                     // Spielart kommt aus dem Planer (UNICORN-47), nicht noch einmal fragen
+    if(pl && pl.variante){ entwurf.ort=Spielart.ort(pl.variante); entwurf.ausdrucke=!Spielart.hinweise(pl.variante); entwurf.ausPlaner=true; if(pl.kinder) entwurf.kinder=pl.kinder; }
+    schritt=0; vgVonHand=false; voreinOffen=false; spielartOffen=false; assistent();
+  }
 
   Promise.all([fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }), fetch('themen/index.json').then(function(r){ return r.json(); })]).then(function(r){
     tour=r[0]; info=r[1].themen.filter(function(t){ return t.id===thema; })[0];

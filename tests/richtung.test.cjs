@@ -91,6 +91,7 @@ function schwerpunkt(r){ const pk=r.route.concat(r.heimRoute||[]); let a=0,b=0; 
     return planLesen(); };
   const zielGrad=pl=>peil(pl.stationen[pl.stationen.length-1]);
 
+  await p.click('[data-spielart="draussen"]');   // UNICORN-47: zuerst die Spielart
   await p.fill('#adresse','Musterweg 1');
   await p.click('#form button[data-f="true"]');                       // Rundkurs
   await p.click('#richtung button[data-r="S"]');

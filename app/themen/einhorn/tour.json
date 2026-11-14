@@ -104,13 +104,17 @@
  ],
  "varianten": {
   "a": {
-   "name": "Outdoor, voll",
-   "kurz": "Draußen, wenig Aufbau: Bilder zeigt der Spiegel",
+   "name": "Draußen",
+   "kurz": "Ihr lauft durch eure Straße, das Tablet führt per GPS.",
+   "braucht": "Kreide, ein Seil, ein Helfer, der vorausgeht",
+   "bild": "draussen",
    "draussen": true
   },
   "b": {
-   "name": "Outdoor mit Bändern",
-   "kurz": "Draußen, mit Bändern am Zaun und Laken",
+   "name": "Draußen + Hinweise am Weg",
+   "kurz": "Draußen, und an drei Stationen hängen echte Dinge zum Suchen.",
+   "braucht": "Kreide, ein Seil, ein Helfer, 4 Schleifen, ein weißes Laken",
+   "bild": "draussen",
    "st": {
     "1": {
      "wo": "Am Ende der Kreidespur, roter Kreidekreis",
@@ -132,8 +136,10 @@
    "draussen": true
   },
   "c": {
-   "name": "Indoor",
-   "kurz": "Im Haus, Vorausgeher legt nach",
+   "name": "Drinnen",
+   "kurz": "In Wohnung oder Haus, jeder Raum ist eine Station.",
+   "braucht": "4 Bänder, ein blaues Handtuch, Kissen für einen Kissenberg",
+   "bild": "drinnen",
    "st": {
     "1": {
      "wo": "Küche",
@@ -166,6 +172,13 @@
    },
    "draussen": false
   }
+ },
+ "extra": {
+  "titel": "Echte Hinweise am Weg",
+  "text": "Statt nur Bilder im Spiegel finden die Kinder an drei Stationen echte Dinge: 4 bunte Schleifen an einem Zaun oder Geländer, einen roten Kreidekreis und ein weißes Laken als Wolke.",
+  "braucht": "4 Schleifen, 1 weißes Laken, rote Kreide",
+  "bild": "hinweise",
+  "variante": "b"
  },
  "stationen": [
   {
