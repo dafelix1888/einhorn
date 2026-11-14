@@ -95,7 +95,7 @@ body.mit-karte{overflow:hidden;height:100%;overscroll-behavior:none}
 .station .vor-ort{display:inline-flex;align-items:center;gap:6px;margin-top:10px;min-height:44px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--lila,#A78BFA);background:transparent;color:var(--text,#fff);font:inherit;font-weight:700;cursor:pointer}
 .station .vor-ort:disabled{opacity:.7;cursor:wait}
 .station .vor-ort-status{margin:8px 0 0;color:var(--leise);font-size:.88rem}.station .vor-ort-status.warn{color:#F59E0B}
-.station.ersatz{border:2px dashed var(--gelb)}
+.station.ersatz{border:2px dashed var(--linie)}
 .station.ersatz .warn{color:var(--gelb);font-weight:700}
 .tipp{color:var(--leise);font-size:.85rem}
 .haupt{display:flex;gap:10px}

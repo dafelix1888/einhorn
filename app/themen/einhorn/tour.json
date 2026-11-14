@@ -213,7 +213,7 @@
    "arc": null,
    "pic": "hufe",
    "vorOrt": "Seil auspacken. Ein Erwachsener geht vorn, einer hinten.",
-   "seek": "Weiter bis zur Straße. Dort wartet die Regenbogenbrücke.",
+   "seek": "Gleich kommt die Regenbogenbrücke. Bleibt dicht zusammen!",
    "title": "Die Regenbogenbrücke",
    "say": "Über die Regenbogenbrücke gehen Einhörner nur zusammen. Auf der anderen Seite beginnt mein Wald. Alle ans Seil! Beim Gehen rufen wir: klipp, klopp!",
    "task": "Tablet einstecken, alle Hände ans Seil. Drüben angekommen „Alle sind drüben“ tippen.",
@@ -231,14 +231,14 @@
    "arc": "gelb",
    "pic": "galerie",
    "namenOffen": true,
-   "seek": "Hinter der Brücke beginnt der Zaun. Dort zeigt euch mein Spiegel Bilder mit falschen Farben!",
+   "seek": "Hinter der Brücke zeigt euch mein Spiegel Bilder mit falschen Farben!",
    "ohne": {
     "seek": "Hinter der Brücke hat der Dieb vier bunte Bänder verloren. Lauft von Band zu Band und schaut dort in meinen Spiegel!",
     "say": "Schaut in meinen Spiegel! Vier Bilder mit falschen Farben. Bei einem davon liegen mein gelber und mein oranger Bogen. Es ist das Ding, das in echt gelb ist. Findet es heraus!",
     "after": "Richtig, die Sonne ist gelb! Sucht beim grünen Band. Dort liegen mein gelber und mein oranger Bogen, und für jeden ein Glücksstein. Der macht mutig für den Wald."
    },
    "title": "Die Quatschbilder",
-   "say": "Schaut nur, was ohne meinen Regenbogen passiert ist! Mein Spiegel zeigt euch vier Bilder mit falschen Farben, eins nach dem anderen. Lauft dabei am Zaun entlang. Eins davon ist in echt gelb. Findet es heraus!",
+   "say": "Schaut nur, was ohne meinen Regenbogen passiert ist! Mein Spiegel zeigt euch vier Bilder mit falschen Farben, eins nach dem anderen. Lauft dabei langsam weiter. Eins davon ist in echt gelb. Findet es heraus!",
    "frage": "Alle vier Bilder gesehen. Jetzt tippt ein Kind auf das Ding, das in echt gelb ist.",
    "optionen": [
     {
@@ -282,7 +282,7 @@
    "kind": "wahl",
    "arc": null,
    "pic": "pfote",
-   "seek": "Der Dieb ist weitergerannt. Geht bis zur Kreuzung. Dort wartet ein neues Rätsel auf euch!",
+   "seek": "Der Dieb ist weitergerannt. Lauft hinterher, gleich wartet ein neues Rätsel auf euch!",
    "title": "Wer war das?",
    "say": "Schaut in meinen Spiegel! Drei Spuren. Wem gehören die kleinen Pfoten?",
    "frage": "Der Spiegel zeigt drei Spuren. Die Kinder schauen sie genau an, dann tippt ein Kind auf die Spur, die zu den kleinen Pfoten passt.",
@@ -324,7 +324,7 @@
     "von": "lila",
     "zu": "gruen"
    },
-   "seek": "Der Fuchs ist zum Berg gelaufen. Kommt mit! Psst, auf dem Berg schläft eine Regenwolke.",
+   "seek": "Der Fuchs ist weitergelaufen. Kommt mit! Psst, gleich schläft hier eine Regenwolke.",
    "title": "Der lila Frosch",
    "say": "Psst, die Wolke schläft. Schaut leise in den Spiegel. Was stimmt hier nicht?",
    "after": "Richtig, Frösche sind grün! Schleicht zur Wolke und sucht etwas Grünes. Aber weckt sie nicht!",
@@ -342,7 +342,7 @@
    "kind": "finale",
    "arc": "blau",
    "vorOrt": "Sticker-Stücke bereithalten. Der Vorausgeher hat die Schatzkiste in der Tasche.",
-   "seek": "Jetzt den Berg hinauf, zur Parkbank bei den Bäumen. Dort legen wir den Regenbogen.",
+   "seek": "Jetzt geht es zum letzten Ort. Dort legen wir den Regenbogen zusammen.",
    "steps": [
     {
      "title": "Eine Farbe fehlt",
@@ -1021,7 +1021,7 @@
    },
    "3": {
     "0": {
-     "a": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Lauft am Zaun entlang und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Bild für Bild am Zaun entlang, dann das Gelbe antippen!",
+     "a": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Lauft langsam weiter und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Bild für Bild weiterlaufen, dann das Gelbe antippen!",
      "b": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Lauft von Schleife zu Schleife und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Von Schleife zu Schleife, dann das Gelbe antippen!",
      "c": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Geht von Band zu Band am Geländer und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Von Band zu Band, dann das Gelbe antippen!"
     },
@@ -1145,7 +1145,7 @@
    },
    "3": {
     "0": {
-     "a": "Lauft am Zaun entlang und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
+     "a": "Lauft langsam weiter und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
      "b": "Lauft von Schleife zu Schleife und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
      "c": "Geht von Band zu Band am Geländer und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist."
     },
@@ -1205,7 +1205,7 @@
     "c": "Alle ans Seil, über den Fluss!"
    },
    "3.0": {
-    "a": "Bild für Bild am Zaun entlang, dann das Gelbe antippen!",
+    "a": "Bild für Bild weiterlaufen, dann das Gelbe antippen!",
     "b": "Von Schleife zu Schleife, dann das Gelbe antippen!",
     "c": "Von Band zu Band, dann das Gelbe antippen!"
    },
