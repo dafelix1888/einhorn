@@ -378,106 +378,106 @@
  "vorbereitung": {
   "noetig": [
    {
-    "x": "Tablet oder Handy: am Morgen geladen, Ton laut, Bildschirmsperre aus, Stimmen geladen",
-    "notfalls": "Die Seite „Startklar“ prüft das in fünf Minuten. Akku knapp? Eine Powerbank einpacken."
+    "x": "Tablet oder Handy, startklar",
+    "notfalls": "„Startklar“ prüft es. Powerbank einpacken."
    },
    {
-    "x": "Regenbogen-Bögen in Rot, Gelb, Grün und Blau",
-    "notfalls": "Kein Holz-Regenbogen da? Vier Bögen aus Pappe ausschneiden und bunt anmalen."
+    "x": "Bögen in Rot, Gelb, Grün, Blau",
+    "notfalls": "Aus Pappe ausschneiden und anmalen."
    },
    {
-    "x": "Fridolin und sein Bau: ein Kuscheltier und ein grauer Karton",
-    "notfalls": "Jedes Kuscheltier spielt Fridolin. Der Karton darf auch unbemalt sein."
+    "x": "Fridolin (Kuscheltier) und ein grauer Karton",
+    "notfalls": "Jedes Kuscheltier, jeder Karton."
    },
    {
-    "x": "Sticker, für jedes Kind ein Stück",
-    "notfalls": "Ganze Sticker oder ein paar Klebezettel tun es auch."
+    "x": "Sticker, je Kind einer",
+    "notfalls": "Klebezettel."
    },
    {
-    "x": "Eine Zaubertafel für Station 5 zum gemeinsamen Abmalen",
-    "notfalls": "Ein Zettel und ein Stift."
+    "x": "1 Zaubertafel für Station 5",
+    "notfalls": "Zettel und Stift."
    },
    {
-    "x": "Schatzkiste mit einem Geschenk je Kind ({kinder} Kratzbilder und {kinder} Zaubertafeln)",
-    "notfalls": "Jeder Karton oder eine Tasche, darin ein kleines Mitgebsel je Kind, zum Beispiel Süßigkeiten."
+    "x": "Schatzkiste, je Kind ein Geschenk",
+    "notfalls": "Eine Tasche mit Süßigkeiten."
    },
    {
-    "x": "Seil für den Straßenübergang (Station 3)",
-    "notfalls": "Alle fassen sich an den Händen.",
+    "x": "Seil für Station 3",
+    "notfalls": "An den Händen fassen.",
     "nur": [
      "a",
      "b"
     ]
    },
    {
-    "x": "Vier Schleifen (Blau, Pink, Grün, Rot-Weiß) für Station 4 und ein weißes Laken als Wolke (Station 6)",
-    "notfalls": "Papierstreifen statt Schleifen, ein weißes Handtuch statt Laken.",
+    "x": "4 Schleifen und ein weißes Laken",
+    "notfalls": "Papierstreifen, weißes Handtuch.",
     "nur": [
      "b"
     ]
    },
    {
-    "x": "Vier Bänder, ein blaues Handtuch und drei Zettel mit gemalten Spuren (Hase, Ente, Fuchs)",
-    "notfalls": "Papierstreifen statt Bänder, ein blaues Kissen statt Handtuch.",
+    "x": "4 Bänder, blaues Handtuch, 3 Spuren-Zettel",
+    "notfalls": "Papierstreifen, blaues Kissen.",
     "nur": [
      "c"
     ]
    },
    {
-    "x": "Route einmal abgelaufen, Stationen vor Ort gesetzt",
-    "notfalls": "Keine Zeit? Öffnet sich eine Station am Tag nicht von selbst, tippt ein Erwachsener „Wir sind da“.",
+    "x": "Route einmal abgelaufen",
+    "notfalls": "Am Tag „Wir sind da“ tippen.",
     "nur": [
      "a",
      "b"
     ]
    },
    {
-    "x": "Kreidespur von der Haustür bis Station 2 (Hufe und kleine Pfoten)",
-    "notfalls": "Ohne Kreide geht ihr einfach mit dem Spiegel los. Die Kinder suchen die Spuren dann am Weg.",
+    "x": "Kreidespur bis Station 2",
+    "notfalls": "Einfach mit dem Spiegel losgehen.",
     "nur": [
      "a",
      "b"
     ]
    },
    {
-    "x": "Ein Helfer als Vorausgeher, der die Stationen vor der Gruppe auslegt",
-    "notfalls": "Ohne Helfer: die Stationen am Morgen selbst auslegen, den Schatz zuletzt."
+    "x": "Ein Helfer als Vorausgeher",
+    "notfalls": "Morgens selbst auslegen."
    }
   ],
   "extras": [
    {
-    "x": "{kinder} Haarreifen mit Einhorn-Horn (Station 1)"
+    "x": "{kinder} Haarreifen"
    },
    {
-    "x": "{kinder} Kindertattoos und ein feuchter Lappen zum Ankommen"
+    "x": "{kinder} Tattoos"
    },
    {
-    "x": "{kinder} Glückssteine in einer kleinen Tüte (Station 4)"
+    "x": "{kinder} Glückssteine"
    },
    {
-    "x": "Schatzkiste bekleben, Fridolins Bau grau anmalen, eine Plastiktüte als Unterlage"
+    "x": "Kiste bekleben, Karton grau anmalen"
    },
    {
-    "x": "Buntes Band oder Tuch als Markierung für Fridolins Versteck"
+    "x": "Buntes Band am Versteck"
    },
    {
-    "x": "Fridolin bekommt einen Haarreif aus der Reserve"
+    "x": "Haarreif für Fridolin"
    },
    {
-    "x": "Etwas Weißes als Wolke an Station 6 (Laken, Kissen, Watte)",
+    "x": "Etwas Weißes als Wolke",
     "nur": [
      "a",
      "c"
     ]
    },
    {
-    "x": "Regenbogen-Snack: Tomaten, Mandarinen, gelbe Paprika, Gurke, Blaubeeren"
+    "x": "Regenbogen-Snack"
    },
    {
-    "x": "Wasser, Becher, Picknickdecke, feuchte Tücher"
+    "x": "Wasser, Becher, Decke"
    },
    {
-    "x": "Tour einmal zu Hause mit „Station öffnen“ durchgespielt",
+    "x": "Probelauf zu Hause",
     "nur": [
      "c"
     ]
@@ -564,6 +564,244 @@
      ]
     }
    ]
+  },
+  "packliste": {
+   "a": {
+    "vorher": [
+     "Kreidespur bis Station 2",
+     "Vorausgeher geht 20 Min. früher los"
+    ],
+    "stationen": [
+     {
+      "s": 1,
+      "ort": "Haustür",
+      "wer": "Gruppe",
+      "d": [
+       "{kinder} Haarreifen",
+       "2 kleinste Bögen",
+       "Tattoos"
+      ]
+     },
+     {
+      "s": 2,
+      "ort": "Ecke",
+      "wer": "Vorausgeher",
+      "d": [
+       "Rote Bögen"
+      ]
+     },
+     {
+      "s": 3,
+      "ort": "Übergang",
+      "wer": "Gruppe",
+      "d": [
+       "Seil"
+      ]
+     },
+     {
+      "s": 4,
+      "ort": "Zaun",
+      "wer": "Vorausgeher",
+      "d": [
+       "Gelbe + orange Bögen",
+       "{kinder} Glückssteine"
+      ]
+     },
+     {
+      "s": 5,
+      "ort": "Kreuzung",
+      "wer": "Vorausgeher",
+      "d": [
+       "1 Zaubertafel"
+      ]
+     },
+     {
+      "s": 6,
+      "ort": "Wolkenberg",
+      "wer": "Vorausgeher",
+      "d": [
+       "Grüne Bögen"
+      ]
+     },
+     {
+      "s": 7,
+      "ort": "Bank",
+      "wer": "Vorausgeher",
+      "d": [
+       "Fridolin im grauen Karton",
+       "Blaue Bögen",
+       "Buntes Band",
+       "Schatzkiste",
+       "Sticker (Gruppe)"
+      ]
+     }
+    ],
+    "mit": [
+     "Tablet",
+     "Snack",
+     "Wasser",
+     "Decke"
+    ]
+   },
+   "b": {
+    "vorher": [
+     "Kreidespur bis Station 2",
+     "Vorausgeher geht 20 Min. früher los"
+    ],
+    "stationen": [
+     {
+      "s": 1,
+      "ort": "Haustür",
+      "wer": "Gruppe",
+      "d": [
+       "{kinder} Haarreifen",
+       "2 kleinste Bögen",
+       "Tattoos"
+      ]
+     },
+     {
+      "s": 2,
+      "ort": "Ecke",
+      "wer": "Vorausgeher",
+      "d": [
+       "Rote Bögen",
+       "Rote Kreide"
+      ]
+     },
+     {
+      "s": 3,
+      "ort": "Übergang",
+      "wer": "Gruppe",
+      "d": [
+       "Seil"
+      ]
+     },
+     {
+      "s": 4,
+      "ort": "Zaun",
+      "wer": "Vorausgeher",
+      "d": [
+       "4 Schleifen",
+       "Gelbe + orange Bögen",
+       "{kinder} Glückssteine"
+      ]
+     },
+     {
+      "s": 5,
+      "ort": "Kreuzung",
+      "wer": "Vorausgeher",
+      "d": [
+       "1 Zaubertafel"
+      ]
+     },
+     {
+      "s": 6,
+      "ort": "Wolkenberg",
+      "wer": "Vorausgeher",
+      "d": [
+       "Weißes Laken",
+       "Grüne Bögen"
+      ]
+     },
+     {
+      "s": 7,
+      "ort": "Bank",
+      "wer": "Vorausgeher",
+      "d": [
+       "Fridolin im grauen Karton",
+       "Blaue Bögen",
+       "Buntes Band",
+       "Schatzkiste",
+       "Sticker (Gruppe)"
+      ]
+     }
+    ],
+    "mit": [
+     "Tablet",
+     "Snack",
+     "Wasser",
+     "Decke"
+    ]
+   },
+   "c": {
+    "vorher": [
+     "Nichts vorab aufbauen",
+     "Toberaum-Tür zu"
+    ],
+    "stationen": [
+     {
+      "s": 1,
+      "ort": "Start",
+      "wer": "Gruppe",
+      "d": [
+       "{kinder} Haarreifen",
+       "2 kleinste Bögen",
+       "Tattoos"
+      ]
+     },
+     {
+      "s": 2,
+      "ort": "Küche",
+      "wer": "Vorausgeher",
+      "d": [
+       "Rote Bögen"
+      ]
+     },
+     {
+      "s": 3,
+      "ort": "Flur",
+      "wer": "Vorausgeher",
+      "d": [
+       "Blaues Handtuch",
+       "Seil (Gruppe)"
+      ]
+     },
+     {
+      "s": 4,
+      "ort": "Treppe",
+      "wer": "Vorausgeher",
+      "d": [
+       "4 Bänder",
+       "Gelbe + orange Bögen",
+       "{kinder} Glückssteine"
+      ]
+     },
+     {
+      "s": 5,
+      "ort": "Türen",
+      "wer": "Vorausgeher",
+      "d": [
+       "3 Spuren-Zettel",
+       "1 Zaubertafel"
+      ]
+     },
+     {
+      "s": 6,
+      "ort": "Kissenberg",
+      "wer": "Vorausgeher",
+      "d": [
+       "Grüne Bögen"
+      ]
+     },
+     {
+      "s": 7,
+      "ort": "Sofa",
+      "wer": "Vorausgeher",
+      "d": [
+       "Fridolin im grauen Karton",
+       "Blaue Bögen",
+       "Buntes Band",
+       "Schatzkiste",
+       "Sticker (Gruppe)"
+      ]
+     }
+    ],
+    "mit": [
+     "Tablet",
+     "Snack",
+     "Wasser"
+    ]
+   }
   }
  },
  "gaben": [
