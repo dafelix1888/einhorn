@@ -376,28 +376,114 @@
   }
  ],
  "vorbereitung": {
+  "noetig": [
+   {
+    "x": "Tablet oder Handy: am Morgen geladen, Ton laut, Bildschirmsperre aus, Stimmen geladen",
+    "notfalls": "Die Seite „Startklar“ prüft das in fünf Minuten. Akku knapp? Eine Powerbank einpacken."
+   },
+   {
+    "x": "Regenbogen-Bögen in Rot, Gelb, Grün und Blau",
+    "notfalls": "Kein Holz-Regenbogen da? Vier Bögen aus Pappe ausschneiden und bunt anmalen."
+   },
+   {
+    "x": "Fridolin und sein Bau: ein Kuscheltier und ein grauer Karton",
+    "notfalls": "Jedes Kuscheltier spielt Fridolin. Der Karton darf auch unbemalt sein."
+   },
+   {
+    "x": "Sticker, für jedes Kind ein Stück",
+    "notfalls": "Ganze Sticker oder ein paar Klebezettel tun es auch."
+   },
+   {
+    "x": "Eine Zaubertafel für Station 5 zum gemeinsamen Abmalen",
+    "notfalls": "Ein Zettel und ein Stift."
+   },
+   {
+    "x": "Schatzkiste mit einem Geschenk je Kind ({kinder} Kratzbilder und {kinder} Zaubertafeln)",
+    "notfalls": "Jeder Karton oder eine Tasche, darin ein kleines Mitgebsel je Kind, zum Beispiel Süßigkeiten."
+   },
+   {
+    "x": "Seil für den Straßenübergang (Station 3)",
+    "notfalls": "Alle fassen sich an den Händen.",
+    "nur": [
+     "a",
+     "b"
+    ]
+   },
+   {
+    "x": "Vier Schleifen (Blau, Pink, Grün, Rot-Weiß) für Station 4 und ein weißes Laken als Wolke (Station 6)",
+    "notfalls": "Papierstreifen statt Schleifen, ein weißes Handtuch statt Laken.",
+    "nur": [
+     "b"
+    ]
+   },
+   {
+    "x": "Vier Bänder, ein blaues Handtuch und drei Zettel mit gemalten Spuren (Hase, Ente, Fuchs)",
+    "notfalls": "Papierstreifen statt Bänder, ein blaues Kissen statt Handtuch.",
+    "nur": [
+     "c"
+    ]
+   },
+   {
+    "x": "Route einmal abgelaufen, Stationen vor Ort gesetzt",
+    "notfalls": "Keine Zeit? Öffnet sich eine Station am Tag nicht von selbst, tippt ein Erwachsener „Wir sind da“.",
+    "nur": [
+     "a",
+     "b"
+    ]
+   },
+   {
+    "x": "Kreidespur von der Haustür bis Station 2 (Hufe und kleine Pfoten)",
+    "notfalls": "Ohne Kreide geht ihr einfach mit dem Spiegel los. Die Kinder suchen die Spuren dann am Weg.",
+    "nur": [
+     "a",
+     "b"
+    ]
+   },
+   {
+    "x": "Ein Helfer als Vorausgeher, der die Stationen vor der Gruppe auslegt",
+    "notfalls": "Ohne Helfer: die Stationen am Morgen selbst auslegen, den Schatz zuletzt."
+   }
+  ],
+  "extras": [
+   {
+    "x": "{kinder} Haarreifen mit Einhorn-Horn (Station 1)"
+   },
+   {
+    "x": "{kinder} Kindertattoos und ein feuchter Lappen zum Ankommen"
+   },
+   {
+    "x": "{kinder} Glückssteine in einer kleinen Tüte (Station 4)"
+   },
+   {
+    "x": "Schatzkiste bekleben, Fridolins Bau grau anmalen, eine Plastiktüte als Unterlage"
+   },
+   {
+    "x": "Buntes Band oder Tuch als Markierung für Fridolins Versteck"
+   },
+   {
+    "x": "Fridolin bekommt einen Haarreif aus der Reserve"
+   },
+   {
+    "x": "Etwas Weißes als Wolke an Station 6 (Laken, Kissen, Watte)",
+    "nur": [
+     "a",
+     "c"
+    ]
+   },
+   {
+    "x": "Regenbogen-Snack: Tomaten, Mandarinen, gelbe Paprika, Gurke, Blaubeeren"
+   },
+   {
+    "x": "Wasser, Becher, Picknickdecke, feuchte Tücher"
+   },
+   {
+    "x": "Tour einmal zu Hause mit „Station öffnen“ durchgespielt",
+    "nur": [
+     "c"
+    ]
+   }
+  ],
   "gemeinsam": [
-   {
-    "t": "Besorgen und basteln",
-    "items": [
-     "Schatzkiste: ein beklebter Schuhkarton",
-     "Fridolins Bau: Karton grau anmalen, dazu eine Plastiktüte als Unterlage",
-     "Buntes Band oder Tuch als Markierung für Fridolins Versteck",
-     "Sticker in {kinder} Stücke schneiden",
-     "Fridolin (Kuscheltier) mit Haarreif aus der Reserve",
-     "Schatzkiste füllen: {kinder} Kratzbilder mit Zeichenschablonen und {kinder} Zaubertafeln",
-     "Eine der Zaubertafeln für Station 5 beiseitelegen (zum gemeinsamen Abmalen), danach einsammeln und am Ende einem Kind in die Tüte legen",
-     "{kinder} Glückssteine in eine kleine Tüte, getrennt von den Geschenken"
-    ]
-   },
-   {
-    "t": "Spiegel",
-    "items": [
-     "funkel-stimme.json liegt neben der Seite, Tablet spielt alle Sätze dieser Variante",
-     "Bildschirmsperre ausschalten (iPad: Einstellungen → Anzeige & Helligkeit → Automatische Sperre „Nie“; Android: Einstellungen → Display → Bildschirm-Timeout, längste Zeit)",
-     "Am Morgen: Tablet voll geladen, Ton an und laut"
-    ]
-   },
    {
     "t": "Packen: bei der Gruppe",
     "items": [
@@ -420,12 +506,6 @@
   "variante": {
    "a": [
     {
-     "t": "GPS",
-     "items": [
-      "Tour im Planer erstellt und einmal abgelaufen, Punkte bei Bedarf im Planer verschoben"
-     ]
-    },
-    {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
       "Rote Bögen (Station 2)",
@@ -446,12 +526,6 @@
    ],
    "b": [
     {
-     "t": "GPS",
-     "items": [
-      "Tour im Planer erstellt und einmal abgelaufen, Punkte bei Bedarf im Planer verschoben"
-     ]
-    },
-    {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
       "Rote Bögen, rote Kreide für den Kreidekreis (Station 2)",
@@ -471,12 +545,6 @@
     }
    ],
    "c": [
-    {
-     "t": "Spiegel",
-     "items": [
-      "Tour einmal zu Hause mit „Station öffnen“ durchgespielt"
-     ]
-    },
     {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
