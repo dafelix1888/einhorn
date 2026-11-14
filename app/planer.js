@@ -225,6 +225,62 @@
     toast('Station '+(i+1)+' gespeichert · '+km(plan.strecke)+' · ca. '+PlanerKern.dauer(tour, plan.strecke).gesamt+' min');
     if(r && r.route) hoehenNeu();
   }
+  // ---------- Vor Ort setzen: Station auf den echten Standort legen (Probelauf) ----------
+  // Wartet, bis das GPS genau ist (3 Messungen ≤ 12 m, Mittelwert), höchstens 25 s; danach die beste Messung mit Rückfrage.
+  var vorOrt=null;
+  function vorOrtStopp(){ if(vorOrt){ try{ navigator.geolocation.clearWatch(vorOrt.w); }catch(e){} clearTimeout(vorOrt.t); vorOrt=null; } }
+  function vorOrtStatus(text, warn){ var e=$('vor-ort-status'); if(e){ e.hidden=!text; e.textContent=text||''; e.className='vor-ort-status'+(warn?' warn':''); } }
+  function vorOrtStart(i){
+    if(!navigator.geolocation){ toast('Dieses Gerät kann den Standort nicht bestimmen.'); return; }
+    vorOrtStopp();
+    var gut=[], beste=null;
+    vorOrt={i:i, w:null, t:null};
+    $('hier-setzen').disabled=true; $('hier-setzen').textContent='GPS sucht …';
+    vorOrtStatus('Bitte kurz stehen bleiben. Das GPS wird genauer …');
+    function fertig(lat, lng, acc){ vorOrtStopp(); vorOrtSetzen(i, lat, lng, acc); }
+    vorOrt.w=navigator.geolocation.watchPosition(function(p){
+      var c=p.coords; if(!vorOrt) return;
+      if(!beste || c.accuracy<beste.acc) beste={lat:c.latitude, lng:c.longitude, acc:c.accuracy};
+      vorOrtStatus('GPS-Genauigkeit gerade ±'+Math.round(c.accuracy)+' m'+(c.accuracy>12?' · noch warten …':' · gleich fertig'));
+      if(c.accuracy<=12){ gut.push(c); if(gut.length>=3){ var n=gut.slice(-3); fertig(n.reduce(function(s,x){ return s+x.latitude; },0)/3, n.reduce(function(s,x){ return s+x.longitude; },0)/3, Math.max.apply(null, n.map(function(x){ return x.accuracy; }))); } }
+      else gut=[];
+    }, function(err){
+      if(!(err && err.code===1)) return;              // kurz kein Signal: weiter warten, die 25 s regeln den Rest
+      vorOrtStopp(); zeichneVorOrtKnopf();
+      vorOrtStatus('Standort nicht erlaubt. In den Einstellungen des Browsers den Standort für schatzweg.de erlauben.', true);
+    }, {enableHighAccuracy:true, maximumAge:0});
+    vorOrt.t=setTimeout(function(){
+      if(!vorOrt) return;
+      var b=beste; vorOrtStopp(); zeichneVorOrtKnopf();
+      if(!b){ vorOrtStatus('Kein GPS-Signal. Unter freiem Himmel nochmal versuchen.', true); return; }
+      if(b.acc>25 && !confirm('Das GPS ist gerade ungenau (±'+Math.round(b.acc)+' m). Trotzdem hier setzen?')){ vorOrtStatus('Nicht gesetzt. Ein paar Schritte ins Freie gehen und nochmal versuchen.', true); return; }
+      vorOrtSetzen(i, b.lat, b.lng, b.acc);
+    }, 25000);
+  }
+  function vorOrtSetzen(i, lat, lng, acc){
+    var s=plan.stationen[i]; if(!s) return;
+    if(marker[i]){ marker[i].setLatLng([lat,lng]); marker[i]._ziehen=true; }
+    var r=neuRechnen(); if(marker[i]) marker[i]._ziehen=false;
+    if(r && r.knoten){
+      var k=r.knoten[i], o=PlanerKern.ortAm(netz, k.id);
+      s.name=(tour.stationen[i].name||'Station')+(o.strasse?' '+o.an:''); s.an=o.an; s.zu=o.zu;
+      plan.route=r.route; plan.strecke=r.strecke; plan.heimweg=r.heim; plan.heimRoute=r.heimRoute; plan.heimGleich=r.heimGleich;
+    } else if(r){ plan.strecke=r.strecke; plan.heimweg=r.heim; }
+    s.lat=+lat.toFixed(6); s.lng=+lng.toFixed(6);              // genau der Standort, nicht auf den Weg geschoben: so löst das GPS im Spiel hier aus
+    s.gefunden=true; s.verschoben=true; s.vorOrt=Math.round(acc); s.hinweis='vor Ort gesetzt (±'+Math.round(acc)+' m)';
+    if(r) plan.stationen.forEach(function(x,j){ x.nachMeter=r.nach[j]; });
+    var weiter=i+1<plan.stationen.length ? i+1 : i;
+    gewaehlt=weiter; speichern(); listeZeichnen(); kartenZeichnen(false);
+    try{ if(karte && karte._loaded) karte.panTo([lat,lng]); }catch(e){}
+    vorOrtStatus('Station '+(i+1)+' sitzt jetzt genau hier (±'+Math.round(acc)+' m).'+(weiter!==i?' Weiter zu Station '+(weiter+1)+'.':' Das war die letzte Station.'));
+    toast('Station '+(i+1)+' vor Ort gesetzt');
+    if(r && r.route) hoehenNeu();
+  }
+  function zeichneVorOrtKnopf(){
+    var b=$('hier-setzen'); if(!b) return;
+    var i=gewaehlt; b.hidden=!(i>0); b.disabled=false;
+    b.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg> Station '+(i+1)+' hier setzen';
+  }
   function hoehenNeu(){                          // Höhenprofil zur neuen Route nachladen
     var route=plan.route, m=[0];
     for(var i=1;i<route.length;i++) m.push(m[i-1]+PlanerKern.meter({lat:route[i-1][0],lng:route[i-1][1]},{lat:route[i][0],lng:route[i][1]}));
@@ -255,8 +311,10 @@
     $('station').className='station'+(ersatz(i,s)?' ersatz':'');
     marker.forEach(function(m,j){ var e=m.getElement(); if(e) e.classList.toggle('gewaehlt', j===i); m.setZIndexOffset(j===i?1000:0); });
     Array.prototype.forEach.call($('liste').querySelectorAll('button[data-i]'), function(b){ b.setAttribute('aria-current', String(+b.getAttribute('data-i')===i)); });
+    if(!vorOrt) zeichneVorOrtKnopf();
   }
   function waehle(i, hinfahren){
+    if(vorOrt && vorOrt.i!==i){ vorOrtStopp(); vorOrtStatus(''); }
     gewaehlt=i; stationZeigen();
     if(hinfahren && karte && marker[i]) karte.panInside(marker[i].getLatLng(), {paddingTopLeft:[30,90], paddingBottomRight:[30, $('sheet').offsetHeight+30]});
   }
@@ -402,6 +460,7 @@
         $('start-info').textContent='Genauigkeit etwa '+Math.round(p.coords.accuracy)+' m'; status('');
       }, function(){ status('Standort nicht erlaubt. Bitte die Adresse eintippen.', true); }, {enableHighAccuracy:true, timeout:15000});
     });
+    $('hier-setzen').addEventListener('click', function(){ vorOrtStart(gewaehlt); });
     $('planen').addEventListener('click', planenKlick);
     $('zur-route').addEventListener('click', ergebnisZeigen);
     $('zurueck-eingabe').addEventListener('click', function(e){ e.preventDefault(); if(plan && plan.stationen && plan.stationen.length){ ergebnisZeigen(); return; } Weg.zurueck(zurueckZiel()); });
