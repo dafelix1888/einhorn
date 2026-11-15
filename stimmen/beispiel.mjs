@@ -19,7 +19,7 @@ const f = rollen.figuren.funkel;
 const ns = TOUR.namenSaetze;
 const satz = (id) => ns.stellen.find((s) => s.id === id).varianten[0].split('{name}').join(NAME);
 // Begrüßung, Geburtstagsgruß mit Alter, Abschied: so wie in der Tour, nur kürzer hintereinander
-const text = [satz('gruss'), satz('schatz'), ns.alter.varianten[0].split('{alter}').join('fünf'), satz('abschied')].join(' ');
+const text = [satz('gruss'), satz('schatz'), ns.alter.varianten[0].split('{alter}').join('Fünf'), satz('abschied')].join(' ');
 const fassung = createHash('sha256').update(JSON.stringify([text, f.voice_id, f.einstellungen, rollen.modell])).digest('hex').slice(0, 16);
 
 const alt = existsSync(STAND) ? JSON.parse(readFileSync(STAND, 'utf8')) : {};
