@@ -12,4 +12,18 @@ const treffer = zeilen.filter((z) => verboten.test(z.replace(/Riesenberg|Kissenb
 ok(!treffer.length, 'Kein Satz nennt Zaun, Berg, Parkbank, Straße oder Kreuzung' + (treffer.length ? ':\n  ' + treffer.join('\n  ') : ''));
 const neu = execFileSync('node', ['stimmen/erzeugen.mjs', '--neu'], { cwd: wurzel, encoding: 'utf8' });
 ok(/Sätze neu/.test(neu), 'Trockenlauf „--neu“ zeigt, was Credits kosten würde');
+// Einschübe (UNICORN-64): Der Satz nach dem Namens-Gruß passt mit und ohne Gruß, Ortsansagen stehen im Worker
+const fs = require('fs');
+const tour = JSON.parse(fs.readFileSync(path.join(wurzel, 'app/themen/einhorn/tour.json'), 'utf8'));
+const nach = tour.stationen[0].say2;
+ok(!/^(Aber|Doch|Trotzdem|Dann)\b/.test(nach), 'Satz nach dem Namens-Gruß beginnt nicht mit Aber/Doch: „' + nach.slice(0, 40) + '…“');
+const worker = fs.readFileSync(path.join(wurzel, 'worker/stimmen.js'), 'utf8');
+const fehlt = tour.stationen.map((s) => s.ansage).filter(Boolean).filter((a) => !worker.includes("'" + a + "'"));
+ok(!fehlt.length, 'Jede Ortsansage ist im Stimmen-Worker erlaubt' + (fehlt.length ? ': ' + fehlt.join(' | ') : ''));
+const ortsWoerter = /\b(Zaun|Wolkenberg|Parkbank|Kreuzung)\b/;
+ok(!tour.stationen.some((s) => s.ansage && ortsWoerter.test(s.ansage)), 'Ortsansagen nennen nur, was der Satz davor eingeführt hat');
+const namen = JSON.stringify(tour.namenSaetze);
+ok(!/wunderbares Abenteuer/.test(namen), 'Abschied wiederholt nicht „Abenteuer“ direkt nach „Bis zum nächsten Abenteuer!“');
+const spiel = fs.readFileSync(path.join(wurzel, 'app/spiel.html'), 'utf8');
+ok(/dbPut\('n\.'\+k, \{[^}]*rate:1\}/.test(spiel), 'Namens-Sätze laufen im Tempo 1 wie Funkels feste Sätze');
 console.log(fehler ? fehler + ' FEHLER' : 'ALLES OK'); process.exit(fehler ? 1 : 0);

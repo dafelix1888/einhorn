@@ -2913,6 +2913,7 @@ render();
 zeige(location.hash==='#einrichten'?'setup':'tour');
 dbOpen(function(){ dbLoad(function(){ renderClips(); render(); clipsVomServer(); liveVorbereiten(); namenHolen(); }); });
 function namenHolen(){                   // Namens-Sätze vom Server (nur mit geschütztem Link), danach offline im Gerät
+  Object.keys(clips).forEach(function(k){ if(/^n\./.test(k) && typeof clips[k].rate!=='number') clips[k].rate=1; });   // ältere Namens-Sätze ohne Tempo liefen mit dem Tempo eigener Aufnahmen (1,15)
   if(!window.Konto) return;
   var th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), hk='sj.namen.'+th, alt=null;
   try{ alt=localStorage.getItem(hk); }catch(e){}
@@ -2920,7 +2921,7 @@ function namenHolen(){                   // Namens-Sätze vom Server (nur mit ge
     if(!r || r.gleich) return;
     ['gruss','schatz','alter','abschied'].forEach(function(k){
       var s=r.saetze && r.saetze[k];
-      if(s && s.b64) dbPut('n.'+k, {type:'audio/mpeg', buf:b64zu(s.b64), h:s.text}); else dbDel('n.'+k);
+      if(s && s.b64) dbPut('n.'+k, {type:'audio/mpeg', buf:b64zu(s.b64), h:s.text, rate:1}); else dbDel('n.'+k);   // rate 1: Namens-Sätze im selben Tempo wie Funkels feste Sätze (UNICORN-64)
     });
     try{ if(r.hash) localStorage.setItem(hk, r.hash); else localStorage.removeItem(hk); }catch(e){}
   }, function(){});
@@ -2932,7 +2933,7 @@ $('btn-einf').addEventListener('click', function(){ if(window.Einfuehrung) Einfu
 // Erster Bildschirm: Die Karte „Zum ersten Mal hier?“ schwebt unten, so ist sie auf Handy und Tablet ohne Scrollen zu sehen (UNICORN-54); zeige() bietet sie an
 
 /* Für den Selbsttest: reine Funktionen */
-window.__zs={proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, state:function(){ return state; }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};
+window.__zs={proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, tempo:function(k){ return tempo(clips[k]); }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, state:function(){ return state; }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};
 };
 </script>
 
