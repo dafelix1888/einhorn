@@ -54,8 +54,8 @@
     var wetter=!draussen ? '' : p.planB ? ' Regen gemeldet? Dann schaltest du mit einem Tipp auf drinnen um.' : ' Ohne Plan B: bei Regen Termin oder Ort überlegen.';
     var l=[
       // Reihenfolge (UNICORN-27): zuerst, was Lieferzeit braucht; die Einladung geht, wann man mag. Nichts ist gesperrt.
-      {id:'bestellen', tag:-14, titel:'Alles bestellen', kurz:'Eine Liste, passend für '+p.kinder+' Kinder',
-        text:'Haarreifen, Holz-Regenbogen, Glückssteine und Zaubertafeln: Die Mengen passen schon zu '+p.kinder+' Kindern.', knopf:'Zur Einkaufsliste', link:'#einkauf',
+      {id:'bestellen', tag:-14, titel:'Alles bestellen', kurz:'Bestellen oder Notlösungen von zu Hause',
+        text:'Zwei Wege: Alles bestellen ist am bequemsten, die Mengen passen schon zu '+p.kinder+' Kindern. Oder nur das Nötige kaufen und den Rest weglassen oder mit Dingen von zu Hause lösen. Dann kostet es wenig oder gar nichts.', knopf:'Zur Einkaufsliste', link:'#einkauf',
         teile:[{id:'bestellen', titel:'Alles bestellt', erkannt:allesGekauft}]},
       {id:'einladen', tag:-14, titel:'Gäste einladen', kurz:'Ein Link für alle Eltern, du siehst, wer kommt',
         text:'Ein Link für alle Gast-Eltern. Sie sehen Termin, Treffpunkt und Abholzeit und sagen dort zu oder ab. Wer kommt, siehst du hier.', knopf:'Link teilen', aktion:'gast-link',
@@ -68,18 +68,19 @@
         {id:'route', tag:-7, titel:'Räume festlegen', kurz:'Küche, Flur, Treppe, Toberaum und Sofa',
           text:'Leg fest, welche Station in welchem Raum steht. Die Liste im Spiel hilft dabei.', knopf:'Liste öffnen', link:'spiel.html?thema='+t+'#einrichten',
           teile:[{id:'probelauf', titel:'Räume festgelegt'}]},
-      {id:'basteln', tag:-7, titel:'Basteln und drucken', kurz:'Schatzkiste, Fuchsbau, Urkunden',
-        text:'Etwa eine Stunde: Schatzkiste bekleben, Fuchsbau grau anmalen, Sticker in '+p.kinder+' Stücke schneiden. Dazu die Urkunden drucken.',
+      {id:'basteln', tag:-7, titel:'Basteln und drucken', kurz:bastelKurz(p, tour),
+        text:bastelText(p, tour),
         knopf:'Druckvorlagen öffnen', link:'druck.html?thema='+t, neben:{text:'Bastelliste im Spiel', link:'spiel.html?thema='+t+'#einrichten'},
         teile:[{id:'basteln', titel:'Gebastelt'}, {id:'drucken', titel:'Gedruckt'}]},
       {id:'geraet', tag:-1, titel:'Tablet startklar machen', kurz:(mitNamen?'Funkel lernt den Namen, ':'')+'Stimmen laden, Ton'+(draussen?' und GPS':'')+' prüfen',
         text:(mitNamen?'Zuerst lernt Funkel den Namen: Er sagt „'+name+'“ an der Haustür, beim Schatz und zum Abschied. Dann ':'')+(mitNamen?'f':'F')+'ünf Minuten im WLAN: Stimmen laden, Ton'+(draussen?', GPS':'')+' und Akku prüfen.'+wetter, knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
         // „Funkel kennt …“ (UNICORN-33) steht sichtbar im Ablauf, zählt aber nicht für den Haken des Schritts (Extra, später bezahlt)
         teile:(mitNamen?[{id:'namen', titel:'Funkel kennt '+name, text:'Einmal einsprechen und anhören', extra:true}]:[]).concat([{id:'geraet', titel:'Tablet ist startklar'}])},
-      {id:'partytag', tag:0, titel:'Partytag', kurz:[draussen&&v!=='c'?'Kreidespur':'', p.vorausgeher?'Vorausgeher':'', 'Spiegel starten'].filter(Boolean).join(', '),
-        text:[draussen&&v!=='c'?'Eine Stunde vorher die Kreidespur malen.':'', p.vorausgeher?'20 Minuten vorher geht der Vorausgeher los.':'', draussen?'Dann alle an die Haustür und den Zauberspiegel starten.':'Dann alle zusammenholen und den Zauberspiegel starten.'].filter(Boolean).join(' '),
+      {id:'partytag', tag:0, titel:'Partytag', kurz:['Generalprobe am Vortag', draussen&&v!=='c'?'Kreidespur':'', p.vorausgeher?'Vorausgeher':'', 'Spiegel starten'].filter(Boolean).join(', '),
+        text:[draussen?'Am Tag oder Abend davor: Generalprobe. Du läufst die Tour einmal mit dem Tablet ab, so wie am Partytag, und stellst unterwegs die Punkte genau ein.':'Am Tag oder Abend davor: Generalprobe. Du spielst die Tour einmal durch und legst in jedem Raum alles bereit.', 'Am Partytag:', draussen&&v!=='c'?'Eine Stunde vorher die Kreidespur malen.':'', p.vorausgeher?'20 Minuten vorher geht der Vorausgeher los.':'', draussen?'Dann alle an die Haustür und den Zauberspiegel starten.':'Dann alle zusammenholen und den Zauberspiegel starten.'].filter(Boolean).join(' '),
         knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
         teile:[
+          {id:'generalprobe', titel:'Generalprobe', text:draussen?'Einmal mit dem Tablet ablaufen, Punkte vor Ort einstellen':'Einmal durchspielen, Räume prüfen', vortag:true, extra:true},
           draussen && v!=='c' ? {id:'kreide', minuten:-60, titel:'Kreidespur malen', text:'Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.'} : null,
           p.vorausgeher ? {id:'vorausgeher', minuten:-20, titel:'Vorausgeher startet', text:'Mit der Tasche vorgehen und die Stationen 2 bis 7 aufbauen.'} : null,
           {id:'start', minuten:0, titel:draussen?'Alle an der Haustür':'Alle zusammen', text:'Tattoos verteilen, dann den Zauberspiegel aufwecken.'}
@@ -89,12 +90,18 @@
       a.datum=plus(p, a.tag);
       a.teile.forEach(function(x){
         x.auto=!!x.nurAuto; x.fertig=!!x.erkannt || (!x.nurAuto && !!erledigt[x.id]);
-        if(x.minuten!=null) x.uhr=uhr(p, x.minuten);
+        if(x.minuten!=null) x.uhr=uhr(p, x.minuten); else if(x.vortag) x.uhr='Vortag';
       });
       a.fertig=!!erledigt['schritt.'+a.id] || a.teile.every(function(x){ return x.fertig || x.extra; });
       a.auto=false;
     });
     return l;
+  }
+  function bastelMin(l, nurNoetig){ return l.filter(function(x){ return !nurNoetig || x.noetig; }).reduce(function(s, x){ return s+x.min; }, 0); }
+  function bastelKurz(p, tour){ var l=tour?basteln(p, tour):[]; if(!l.length) return 'Schatzkiste, Fuchsbau, Urkunden'; return 'Etwa '+bastelMin(l)+' Minuten, nötig davon nur '+bastelMin(l, true); }
+  function bastelText(p, tour){
+    var l=tour?basteln(p, tour):[]; if(!l.length) return 'Schatzkiste bekleben, Fuchsbau grau anmalen, Sticker schneiden, Urkunden drucken.';
+    return 'Alles zusammen etwa '+bastelMin(l)+' Minuten. Nötig sind davon nur '+bastelMin(l, true)+' Minuten, der Rest ist Extra: Ohne Basteln und Drucken funktioniert die Tour genauso. Unten steht je Aufgabe, was sie bringt und was du sonst machst.';
   }
   function naechste(l){ return l.filter(function(a){ return !a.fertig; })[0]||null; }
   // Haken für einen ganzen Schritt setzen oder lösen (alle Teile, die man von Hand abhaken kann)
@@ -113,13 +120,24 @@
     for(var i=0;i<liste.length;i++){ var a=liste[i]; if(a && a.verfuegbar!==false && (a.asin||a.link)) return a; }
     return null;
   }
+  // Nötig oder Extra (UNICORN-60): dieselbe Einteilung wie „Vorbereitung“ im Elternbereich des Spiels.
+  // Ein Artikel ist nötig, wenn ein Eintrag aus vorbereitung.noetig (für diese Spielart) ihn nennt; dessen „Sonst“ ist die Notlösung.
+  function rolle(p, tour, id){
+    var vb=tour.vorbereitung||{}, v=variante(p), r={noetig:false, notfalls:'', genannt:false};
+    function passt(x){ return !x.nur || x.nur.indexOf(v)>=0; }
+    (vb.noetig||[]).forEach(function(x){ if((x.u||[]).indexOf(id)<0) return; r.genannt=true; if(passt(x)){ r.noetig=true; r.notfalls=x.notfalls||''; } });
+    (vb.extras||[]).forEach(function(x){ if((x.u||[]).indexOf(id)<0) return; r.genannt=true; if(!r.noetig && x.notfalls) r.notfalls=x.notfalls; });
+    if(r.genannt && !r.noetig && !r.notfalls && (vb.noetig||[]).some(function(x){ return (x.u||[]).indexOf(id)>=0 && !passt(x); })) r.notfalls='Brauchst du bei dieser Spielart nicht.';
+    return r;
+  }
   function einkauf(p, tour){
     return tour.utensilien.map(function(u, i){
       var m=String(u.menge), n=/je Kind \+ ?(\d+)/.test(m) ? p.kinder+(+RegExp.$1) : /je Kind/.test(m) ? p.kinder : +m||1;
       var a=artikelWahl(u)||{}, preis=a.asin ? (a.preis!==undefined ? a.preis : null) : undefined;
       var link=a.link || (a.asin ? 'https://www.amazon.de/dp/'+a.asin : undefined);
       var id=u.id||'u'+i, packungen=a.asin ? Math.max(1, Math.ceil(n/(a.packung||n))) : 0;
-      return {id:id, name:a.name||u.name, menge:n, wann:u.wann, link:link, asin:a.asin, packung:a.packung, packungen:packungen,
+      var ro=rolle(p, tour, u.id||'u'+i), wie=(p.einkaufWie||{})[u.id||'u'+i]||'';
+      return {id:id, noetig:ro.noetig, notfalls:ro.notfalls, wie:wie, name:a.name||u.name, menge:n, wann:u.wann, link:link, asin:a.asin, packung:a.packung, packungen:packungen,
         preis:preis, summe:preis!=null ? preis*packungen : null, zuHause:!!u.zuHause, hinweis:u.hinweis, fertig:!!(p.einkauf||{})[id],
         lieferbar:!!a.asin && preis!=null, gewaehlt:!(p.einkaufAus||{})[id]};
     });
@@ -127,6 +145,16 @@
   // Summe der noch offenen Artikel mit bekanntem Preis
   function imKorb(x){ return !x.fertig && x.lieferbar && x.gewaehlt!==false; }   // offen, lieferbar und ausgewählt
   function einkaufSumme(l){ return l.filter(imKorb).reduce(function(s, x){ return s+x.summe; }, 0); }
+  // Was alles kosten würde (offen, lieferbar), ganz oder nur das Nötige
+  function wegeSummen(l){ var o=l.filter(function(x){ return !x.fertig && x.lieferbar; }); function s(a){ return a.reduce(function(t, x){ return t+x.summe; }, 0); }
+    return {alles:s(o), noetig:s(o.filter(function(x){ return x.noetig; })), nAlles:o.length, nNoetig:o.filter(function(x){ return x.noetig; }).length}; }
+  // Basteln und drucken (UNICORN-60): Aufwand je Aufgabe, was nötig ist und was ohne passiert
+  function basteln(p, tour){
+    var v=variante(p);
+    return ((tour.vorbereitung||{}).basteln||[]).filter(function(x){ return !x.nur || x.nur.indexOf(v)>=0; }).map(function(x){
+      return {x:String(x.x).split('{kinder}').join(p.kinder), min:x.min||0, noetig:!!x.noetig, ohne:x.ohne||'', braucht:x.braucht||''};
+    });
+  }
   function euro(b){ return b.toFixed(2).replace('.', ',')+' €'; }
   // Amazon-Formular „In den Einkaufswagen“: alle offenen, lieferbaren Artikel in einem Schritt
   function warenkorbLink(l, tag){
@@ -232,5 +260,5 @@
   }
   reparieren();
 
-  root.Party={artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
+  root.Party={wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
 })(this);
