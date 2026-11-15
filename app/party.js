@@ -278,5 +278,26 @@
     if(l.mit&&l.mit.length) r.gruppen.push({art:'mit', titel:'Mitnehmen', items:dinge(l.mit)});
     return r;
   }
-  root.Party={vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
+  // Besorgen (UNICORN-68): jedes Ding einmal, mit Zweck, Preis und Notlösung – zum Entscheiden: bestellen oder selbst machen.
+  // Eigene Haken („besorgt“), getrennt vom Packen nach Station.
+  function besorgListe(tour, v, kinder){
+    var vb=(tour&&tour.vorbereitung)||{}, hv=v==='b'?'a':v, ut={};
+    (tour.utensilien||[]).forEach(function(u){ ut[u.id]=u; });
+    function f(t){ return String(t||'').replace(/\{kinder\}/g, kinder!=null ? kinder : '{kinder}'); }
+    function passt(x){ return !x.nur || x.nur.indexOf(v)>=0; }
+    function eintrag(x, extra){
+      var preis=0, link='';
+      (x.u||[]).forEach(function(id){ var u=ut[id]; if(u && typeof u.preis==='number'){ preis+=u.preis; link=link||u.link||''; } });
+      var name=f(x.x); return {x:name, wofuer:f(x.wofuer||''), notfalls:f(x.notfalls||''), preis:Math.round(preis*100)/100, link:link, extra:extra, key:hv+'|b|'+name};
+    }
+    var n=(vb.noetig||[]).filter(passt).map(function(x){ return eintrag(x, false); }), e=(vb.extras||[]).filter(passt).map(function(x){ return eintrag(x, true); });
+    var kaufen=n.filter(function(x){ return x.preis>0; }), ohne=n.filter(function(x){ return !(x.preis>0); });
+    return {gruppen:[
+      {art:'kaufen', titel:'Bestellen oder selbst machen', items:kaufen},
+      {art:'ohne', titel:'Ohne Einkauf', items:ohne},
+      {art:'extras', titel:'Extras, wenn Zeit ist', items:e}].filter(function(g){ return g.items.length; }),
+      summe:Math.round(kaufen.reduce(function(s, x){ return s+x.preis; }, 0)*100)/100,
+      noetig:n.length, schluessel:n.map(function(x){ return x.key; })};
+  }
+  root.Party={besorgListe:besorgListe, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
 })(this);
