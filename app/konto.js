@@ -18,7 +18,7 @@
   try{ if(root.KONTO_TEST){ SUPABASE_URL=root.KONTO_TEST.url; SUPABASE_KEY=root.KONTO_TEST.key; } }catch(e){}
 
   var SITZUNG='sj.konto', ROLLEN=['gast','vorausgeher','spiel'];
-  var zustand={}, uhr={};                              // je Thema: 'speichert' | 'gespeichert' | 'fehler'
+  var zustand={}, uhr={}, fehlerArt={};                              // je Thema: 'speichert' | 'gespeichert' | 'fehler'
   // Notweg: Klappt die Anmeldung aus technischen Gründen nicht (Mailversand gesperrt, Limit, Server weg),
   // läuft die App einen Tag lang wie ohne Server weiter: Daten stecken im Link, kein Anmelden nötig.
   var NOTWEG='sj.konto.notweg';
@@ -102,13 +102,18 @@
 
   // ---------- Party speichern ----------
   function schluessel(p){                              // Server-ID und je Rolle ein Link-Schlüssel, einmal pro Party
-    if(p.server && p.server.id && p.server.k) return false;
+    var ich=(sitzung()||{}).id;
+    // Gehört die gespeicherte Party einem anderen Konto (vorher auf diesem Gerät mit anderer E-Mail gespeichert)? Dann eigene Kopie (PBIM-30)
+    if(p.server && p.server.id && p.server.k && !(ich && p.server.owner && p.server.owner!==ich)) return false;
     p.server={id:uuid(), k:{}}; ROLLEN.forEach(function(r){ p.server.k[r]=zufall(18); }); return true;
   }
   function stand(o){ var s=JSON.stringify(o), h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return s.length+':'+h; }
   function sync(thema, erzwingen){
     if(!angemeldet() || !root.Party) return Promise.resolve(false);
     var p=Party.lesen(thema); if(!p || p.fremd) return Promise.resolve(false);   // fremde Party (aus einem Link) gehört nicht diesem Konto (PBIM-24)
+    var ich=(sitzung()||{}).id;
+    var kopie=erzwingen==='neu';
+    if(kopie){ delete p.server; erzwingen=true; }   // Server lehnte ab, weil die ID einem anderen Konto gehört
     var pl=Party.plan(thema);
     if(schluessel(p)) schreib('sj.party.'+thema, p);
     var daten={gast:Party.einladungsDaten(p, pl), vorausgeher:Party.planKern(pl, p), spiel:Party.planKern(pl, p)};
@@ -120,8 +125,13 @@
         body:{id:p.server.id, thema:thema, party:p, plan:pl, datum:/^\d{4}-\d\d-\d\d$/.test(p.datum||'')?p.datum:null}})
       .then(function(){ return anfrage('/rest/v1/links?on_conflict=token', {method:'POST', token:t, prefer:'resolution=merge-duplicates,return=minimal',
         body:ROLLEN.map(function(r){ return {token:p.server.k[r], party_id:p.server.id, rolle:r, daten:daten[r]}; })}); });
-    }).then(function(){ schreib('sj.konto.stand.'+thema, st); zustand[thema]='gespeichert'; zeichnen(thema); return true; },
-      function(e){ zustand[thema]=sitzung()?'fehler':null; zeichnen(thema); throw e; });
+    }).then(function(){
+      if(ich && p.server.owner!==ich){ p.server.owner=ich; schreib('sj.party.'+thema, p); st=stand([p, pl, daten]); }
+      schreib('sj.konto.stand.'+thema, st); zustand[thema]='gespeichert'; fehlerArt[thema]=''; zeichnen(thema); return true; },
+      function(e){
+        // Ältere Partys ohne vermerkten Besitzer: 403 = Eintrag gehört einem anderen Konto → einmal als eigene Kopie speichern (PBIM-30)
+        if(e && e.status===403 && !kopie && !(p.server && p.server.owner===ich)){ zustand[thema]=null; return sync(thema, 'neu'); }
+        zustand[thema]=sitzung()?'fehler':null; fehlerArt[thema]=e && e.status ? 'server' : 'netz'; zeichnen(thema); throw e; });
   }
   function merken(thema){                              // nach jeder Änderung: kurz warten, dann speichern
     if(!angemeldet()) return;
@@ -333,7 +343,7 @@
     if(!s || !p || !p.server) return '<div class="konto" id="konto-karte"><b>Noch nicht gespeichert</b>'+
       '<p>Die Party liegt nur auf diesem Gerät. Zum Teilen speichern wir sie geschützt: Nur wer einen Link von euch bekommt, sieht Treffpunkt oder Route. Gast-Eltern brauchen kein Konto.</p>'+
       '<button type="button" class="knopf mittel" data-konto="anmelden">Speichern und teilen</button></div>';
-    var st=z==='speichert'?'<span class="stand">Speichert …</span>':z==='fehler'?'<span class="stand schlecht">Nicht gespeichert, kein Netz?</span>':'<span class="stand gut">Gespeichert</span>';
+    var st=z==='speichert'?'<span class="stand">Speichert …</span>':z==='fehler'?'<span class="stand schlecht">'+(fehlerArt[thema]==='server'?'Nicht gespeichert, bitte neu laden':'Nicht gespeichert, kein Netz?')+'</span>':'<span class="stand gut">Gespeichert</span>';
     function zeile(r, n){ return '<div class="zeile"><span>'+n+'</span><button type="button" class="knopf klein leer" data-konto-neu="'+r+'">Neuer Link</button></div>'; }
     return '<div class="konto" id="konto-karte"><div class="zeile" style="border:0;padding-top:0"><b>Geschützt gespeichert</b>'+st+'</div>'+
       '<p>Angemeldet als '+esc(s.email)+'. Jeder Link zeigt nur, was er braucht: die Einladung Termin und Treffpunkt, Vorausgeher und Tablet die Route. 30 Tage nach der Party wird alles gelöscht.</p>'+
