@@ -76,9 +76,10 @@ jobs:
         run: |
           # Ein Merge durch diesen Workflow löst keine Push-Workflows aus. Darum hier ausdrücklich starten,
           # was ein Push auf main gestartet hätte. Neue Push-Workflows hier nachtragen.
+          # Stimmen: gleiche Pfade wie „on.push.paths“ in stimmen.yml (seit UNICORN-48 stehen die Sätze in tour.json).
           gh workflow run cloudflare.yml --repo "$REPO" --ref main
           DATEIEN=$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[].filename')
-          if echo "$DATEIEN" | grep -qE '^(original\.html$|stimmen/|\.github/workflows/stimmen\.yml$)'; then
+          if echo "$DATEIEN" | grep -qE '^(original\.html$|stimmen/|\.github/workflows/stimmen\.yml$|app/themen/einhorn/tour\.json$|app/spiel\.html$)'; then
             gh workflow run stimmen.yml --repo "$REPO" --ref main
           fi
           # GitHub Pages baut nach dem Merge von selbst neu, das braucht keinen Anstoß.
