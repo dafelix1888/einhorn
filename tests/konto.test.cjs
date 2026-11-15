@@ -2,6 +2,7 @@
 const { chromium } = require('playwright');
 const S='https://test.supabase.co', B=''+(process.env.BASIS||'http://localhost:8765')+'/app/';
 const db={parties:{}, links:{}, aufbau:{}, namen:{}}, mails=[];
+require('../app/namen-kern.js'); const NK=globalThis.NamenKern, NV=JSON.parse(require('fs').readFileSync(require('path').join(__dirname,'..','app/themen/einhorn/tour.json'),'utf8')).namenSaetze;
 let stimmeAus=true;   // erst ohne Schlüssel (UNICORN-8)
 function nutzer(req){ const a=req.headers()['authorization']||''; return a.startsWith('Bearer AT-') ? 'U-'+a.slice(10) : null; }
 async function mock(route){
@@ -14,19 +15,21 @@ async function mock(route){
   if(u.pathname==='/rest/v1/rpc/link_lesen'){ const l=db.links[body.t]; return j(200, l?{rolle:l.rolle, daten:l.daten}:null); }
   if(u.pathname==='/rest/v1/rpc/aufbau_setzen'){ const l=db.links[body.t]; if(!l||l.rolle!=='vorausgeher') return j(200,null); const st={}; for(const k in body.stationen) if(/^\d{1,2}$/.test(k)&&body.stationen[k]===true) st[k]=true; db.aufbau[l.party_id]={stationen:st, aktualisiert:new Date().toISOString()}; return j(200,{stationen:st}); }
   if(u.pathname==='/rest/v1/rpc/aufbau_lesen'){ const l=db.links[body.t]; if(!l||l.rolle==='gast') return j(200,null); const a=db.aufbau[l.party_id]||{stationen:{},aktualisiert:null}; return j(200,a); }
-  if(u.pathname==='/functions/v1/namen'){
+  if(u.pathname==='/functions/v1/namen'){   // wie die Edge Function (UNICORN-49/51): erstes Einsprechen frei, danach 3-mal
+    const mk=(sz,name,aus)=>{ const mp3=require('fs').readFileSync(require('path').join(__dirname,'..','app/themen/einhorn/hoerprobe.mp3')).toString('base64'); const r={}; for(const k in sz) r[k]={text:sz[k].zeigen,name,aussprache:aus,variante:sz[k].variante,b64:mp3}; return r; };
     if(body.aktion==='holen'){ const l=db.links[body.t]; if(!l||l.rolle!=='spiel') return j(404,{fehler:'Link geht nicht'}); const n=db.namen[l.party_id]; if(!n) return j(200,{hash:null}); if(body.hash===n.hash) return j(200,{hash:n.hash,gleich:true}); return j(200,{hash:n.hash,saetze:n.saetze}); }
     const p=db.parties[body.party_id]; if(!me||!p||p.owner!==me) return j(401,{fehler:'Nicht angemeldet oder fremde Party'});
-    const n=db.namen[body.party_id]||{erzeugungen:0};
-    if(body.aktion==='stand') return j(200,{max:3,uebrig:3-n.erzeugungen,hash:n.hash||null,texte:n.saetze?{gruss:n.saetze.gruss.text,schatz:n.saetze.schatz.text,abschied:n.saetze.abschied.text}:null,name:n.saetze?n.saetze.gruss.name:'',aussprache:''});
-    if(!/^[\p{L}][\p{L} '-]{0,29}$/u.test(body.name)) return j(400,{fehler:'Bitte nur einen Vornamen mit Buchstaben eingeben.'});
-    if(n.saetze && n.saetze.gruss.name===body.name) return j(200,{max:3,uebrig:3-n.erzeugungen,hash:n.hash,saetze:n.saetze,gleich:true});   // gleicher Text kostet nichts
-    if(n.erzeugungen>=3) return j(402,{fehler:'Alle 3 Erzeugungen sind verbraucht.',uebrig:0});
+    const n=db.namen[body.party_id]||{erzeugungen:0}, wahl=n.saetze?Object.fromEntries(Object.entries(n.saetze).map(([k,v])=>[k,v.variante])):{};
+    const st=x=>({max:3,uebrig:NK.uebrig(n.erzeugungen),erstes:n.erzeugungen===0,...x});
+    if(body.aktion==='stand') return j(200,st({hash:n.hash||null,texte:n.saetze?Object.fromEntries(Object.entries(n.saetze).map(([k,v])=>[k,v.text])):null,name:n.saetze?n.saetze.gruss.name:'',aussprache:n.saetze?n.saetze.gruss.aussprache:'',alter:n.alter||null,wahl}));
+    const f=NK.pruefeName(body.name); if(f) return j(400,{fehler:f});
+    const art=n.saetze&&['betonung','worte'].includes(body.art)?body.art:'neu';
+    const sz=NK.bilden(NV,{name:body.name,aussprache:body.aussprache,alter:body.alter,wahl:art==='worte'?NK.naechsteWahl(NV,wahl):wahl});
+    if(art==='neu' && n.saetze && n.saetze.gruss.name===body.name && n.saetze.gruss.aussprache===(body.aussprache||'') && n.alter===(body.alter||null)) return j(200,st({hash:n.hash,saetze:n.saetze,gleich:true}));   // gleicher Text kostet nichts
+    if(n.erzeugungen>0 && NK.uebrig(n.erzeugungen)<=0) return j(402,st({fehler:'Alle 3 Mal neu erzeugen sind verbraucht.'}));
     if(stimmeAus) return j(503,{fehler:'Die Stimme ist noch nicht eingerichtet.'});   // wie live ohne ELEVENLABS_API_KEY
-    const mp3=require('fs').readFileSync(require('path').join(__dirname,'..','app/themen/einhorn/hoerprobe.mp3')).toString('base64');
-    const mk=t=>({text:t,name:body.name,aussprache:body.aussprache,b64:mp3});
-    db.namen[body.party_id]={erzeugungen:n.erzeugungen+1,hash:'h'+(n.erzeugungen+1),saetze:{gruss:mk('Und heute ist ein ganz besonderer Tag: '+body.name+' hat Geburtstag!'),schatz:mk('Alles Liebe, '+body.name+'!'),abschied:mk('Tschüss, '+body.name+'!')}};
-    const z=db.namen[body.party_id]; return j(200,{max:3,uebrig:3-z.erzeugungen,hash:z.hash,saetze:z.saetze});
+    db.namen[body.party_id]={erzeugungen:n.erzeugungen+1,hash:'h'+(n.erzeugungen+1),alter:body.alter||null,saetze:mk(sz,body.name,body.aussprache||''),arten:(n.arten||[]).concat(art)};
+    const z=db.namen[body.party_id]; return j(200,{max:3,uebrig:NK.uebrig(z.erzeugungen),hash:z.hash,saetze:z.saetze});
   }
   if(!me) return j(401,{message:'permission denied'});
   if(u.pathname==='/rest/v1/parties'){
@@ -89,17 +92,24 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(await a.evaluate(()=>{ const s=document.querySelector('.schritt-ansicht'), k=document.getElementById('namen-karte'), kn=s.querySelector('.kachel'); return !!k && (!kn || (k.compareDocumentPosition(kn) & Node.DOCUMENT_POSITION_FOLLOWING)); }), 'Namens-Karte steht oben im Schritt');
   pruefe(/Funkel kennt Emma/.test(await a.locator('.teile').innerText()) && await a.locator('[data-teil="namen"]').getAttribute('aria-pressed')==='false', 'Teilschritt „Funkel kennt Emma“ sichtbar, noch offen');
   pruefe(await a.inputValue('#namen-name')==='Emma', 'Namens-Karte mit Vorname');
-  await a.click('#namen-los'); await a.waitForSelector('.namen-fehler', {timeout:5000});
-  pruefe(/noch nicht eingerichtet/.test(await a.locator('#namen-karte').innerText()) && /Noch 3 von 3/.test(await a.locator('#namen-karte').innerText()), 'Ohne Schlüssel: verständliche Meldung, nichts verbraucht');
+  pruefe(/Emma hat Geburtstag/.test(await a.locator('#namen-karte').innerText()) && /erste Einsprechen ist frei/.test(await a.locator('#namen-karte').innerText()), 'Sätze stehen sofort da (Vorschau), erstes Einsprechen frei (UNICORN-51)');
+  await a.click('[data-namen-los="neu"]'); await a.waitForSelector('#namen-fehler:not([hidden])', {timeout:5000});
+  pruefe(/noch nicht eingerichtet/.test(await a.locator('#namen-karte').innerText()) && Object.keys(db.namen).length===0, 'Ohne Schlüssel: verständliche Meldung, nichts verbraucht');
   stimmeAus=false;
-  await a.click('#namen-los'); await a.waitForSelector('[data-namen-hoeren="gruss"]', {timeout:5000});
-  pruefe(/Emma hat Geburtstag/.test(await a.locator('#namen-karte').innerText()) && /Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()), 'Sätze erzeugt, noch 2 übrig');
+  await a.click('[data-namen-los="neu"]'); await a.waitForSelector('[data-namen-hoeren="gruss"]', {timeout:5000});
+  const kt=await a.locator('#namen-karte').innerText();
+  pruefe(/Emma hat Geburtstag/.test(kt) && /Heute wirst du 5!/.test(kt) && /Noch 3 von 3/.test(kt), 'Sätze erzeugt, mit Alters-Satz, erstes zählt nicht: noch 3');
   await a.waitForFunction(()=>(document.querySelector('[data-teil="namen"]')||{}).getAttribute && document.querySelector('[data-teil="namen"]').getAttribute('aria-pressed')==='true', null, {timeout:5000}).catch(()=>{});
   pruefe(await a.locator('[data-teil="namen"]').getAttribute('aria-pressed')==='true', 'Nach dem Einsprechen ist „Funkel kennt Emma“ abgehakt');
   pruefe(!(await a.evaluate(()=>Party.aufgaben(Party.lesen('einhorn'), null, null).filter(x=>x.id==='geraet')[0].fertig)), 'Extra-Teil hakt den Schritt nicht allein ab');
-  await a.click('#namen-los'); await a.waitForFunction(()=>!document.querySelector('#namen-los') || !document.querySelector('#namen-los').disabled);
-  await a.waitForTimeout(300);
-  pruefe(/Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()) && db.namen[Object.keys(db.namen)[0]].erzeugungen===1, 'Gleicher Name noch einmal: zählt nicht');
+  pruefe(await a.locator('[data-namen-los="betonung"]').count()===1 && await a.locator('[data-namen-los="worte"]').count()===1, 'Danach: „Andere Betonung“ und „Andere Worte“');
+  await a.click('[data-namen-los="worte"]'); await a.waitForFunction(()=>/Noch 2 von 3/.test(document.getElementById('namen-karte').innerText), null, {timeout:5000}).catch(()=>{});
+  pruefe(/Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()) && !/Emma hat Geburtstag/.test(await a.locator('#namen-karte').innerText()), 'Andere Worte: neue Variante, zählt einmal');
+  await a.fill('#namen-name','Ida'); await a.waitForTimeout(100);
+  pruefe(/Ida/.test(await a.locator('#namen-texte').innerText()) && await a.locator('[data-namen-los="neu"]').count()===1 && await a.locator('[data-namen-hoeren]').count()===0, 'Name tippen: Sätze sofort mit „Ida“, Knopf „Neu einsprechen“');
+  await a.fill('#namen-name','Arsch'); await a.click('[data-namen-los="neu"]'); await a.waitForTimeout(200);
+  pruefe(/nicht sagen/.test(await a.locator('#namen-fehler').innerText()) && db.namen[Object.keys(db.namen)[0]].erzeugungen===2, 'Gesperrter Name: Meldung im Gerät, nichts verbraucht');
+  await a.fill('#namen-name','Emma'); await a.waitForTimeout(100);
   await a.locator('#namen-karte').screenshot({path:'namen-karte.png'});
   await a.click('#zum-ueberblick'); await a.waitForSelector('.namen-pille.da', {timeout:3000}).catch(()=>{});
   pruefe(/Funkel kennt Emma/.test(await a.locator('.namen-pille').innerText()) && /anhören/.test(await a.locator('.namen-pille').innerText()), 'Überblick danach: „Funkel kennt Emma · Anhören“');
@@ -139,9 +149,9 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   console.log('   Tablet zeigt:', live); pruefe(/bis Station 2 aufgebaut|alles aufgebaut/.test(live), 'Tablet sieht den Aufbau live');
   await s.screenshot({path:'konto-tablet.png'});
   await s.waitForTimeout(800);
-  const nk=await s.evaluate(()=>{ const k=__zs.clips(); return ['n.gruss','n.schatz','n.abschied'].map(x=>k.includes(x)); });
-  pruefe(nk.every(Boolean), 'Tablet hat die drei Namens-Sätze');
-  pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='end'; const a=__zs.akt(); return a.zweit && a.zweit.key==='n.schatz' && a.zweit.zweit.key==='ende.b'; }), 'Schatz: Namens-Satz in der Kette');
+  const nk=await s.evaluate(()=>{ const k=__zs.clips(); return ['n.gruss','n.schatz','n.alter','n.abschied'].map(x=>k.includes(x)); });
+  pruefe(nk.every(Boolean), 'Tablet hat die drei Namens-Sätze und den Alters-Satz');
+  pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='end'; const a=__zs.akt(); return a.zweit && a.zweit.key==='n.schatz' && a.zweit.zweit.key==='n.alter' && a.zweit.zweit.zweit.key==='ende.b'; }), 'Schatz: Namens-Satz, dann Alters-Satz in der Kette');
   pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='scene'; st.idx=0; st.step=0; const a=__zs.akt(); return a.zweit.key==='n.gruss' && a.zweit.zweit.key==='s0.b'; }), 'Begrüßung: Namens-Satz zwischen Teil 1 und 2');
   pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='heim'; st.step=1; return __zs.akt().zweit.key==='n.abschied'; }), 'Abschied: Namens-Satz am Ende');
   const g3=await geraet(); await g3.goto(B); const gastLiest=await g3.evaluate(async(t)=>{ const r=await fetch('https://test.supabase.co/rest/v1/rpc/aufbau_lesen',{method:'POST',headers:{apikey:'anon','Content-Type':'application/json'},body:JSON.stringify({t})}); return r.json(); }, links.e.split('k=')[1]);

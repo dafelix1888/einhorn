@@ -230,9 +230,9 @@
     var id=partyId(thema); if(!angemeldet() || !id) return Promise.resolve(null);
     return sync(thema)['catch'](function(){}).then(function(){ return namenAnfrage({aktion:'stand', party_id:id}, true); });
   }
-  function namenErzeugen(thema, name, aussprache, alter){
+  function namenErzeugen(thema, name, aussprache, alter, art){
     var id=partyId(thema); if(!angemeldet() || !id) return Promise.reject(new Error('Bitte zuerst speichern.'));
-    return sync(thema)['catch'](function(){}).then(function(){ return namenAnfrage({aktion:'erzeugen', party_id:id, name:name, aussprache:aussprache, alter:alter}, true); });
+    return sync(thema)['catch'](function(){}).then(function(){ return namenAnfrage({aktion:'erzeugen', party_id:id, name:name, aussprache:aussprache, alter:alter, art:art||'neu'}, true); });
   }
   // Fürs Spiel: Sätze mit dem Tablet-Schlüssel holen (eigener Link oder der Schlüssel der eigenen Party)
   function namenHolen(thema, hash){
