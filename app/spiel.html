@@ -450,6 +450,19 @@ body.m-tour .zur-tour{display:none}
 .erw-menu button svg,.erw-menu a svg{width:22px;height:22px;flex:none;color:var(--magic-deep)}
 .erw-menu b{display:block;font-family:var(--font-display);font-weight:800;font-size:1.1rem;line-height:1.2}
 .erw-menu small{display:block;color:var(--ink-soft);font-size:.85rem;line-height:1.3}
+/* Generalprobe (UNICORN-61): Tour zum Üben, Punkte vor Ort setzen */
+.probe{width:100%;max-width:680px;text-align:left;background:linear-gradient(130deg,rgba(74,222,128,.16),var(--surface));border:1.5px solid rgba(74,222,128,.55);border-radius:18px;padding:10px 14px;color:var(--ink);font-size:.95rem;line-height:1.4}
+.probe-kopf{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.probe-chip{font-family:var(--font-display);font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 10px;border-radius:999px;background:#4ADE80;color:#062B12}
+.probe-kopf .wert{font-weight:700;font-variant-numeric:tabular-nums}
+.probe-kopf .zu{margin-left:auto;background:none;border:0;color:var(--ink-soft);font:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:40px;padding:0 4px}
+.probe p{margin:6px 0 0;color:var(--ink-soft)}
+.probe ol{margin:6px 0 0;padding-left:20px;color:var(--ink-soft)}.probe ol li{margin:2px 0}
+.probe .reihe{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.probe .btn{min-height:44px}
+.probe-wie summary{cursor:pointer;font-weight:700;color:#86EFAC;margin-top:6px;min-height:32px;display:flex;align-items:center}
+.probe [data-probe-setzen]{background:#4ADE80;color:#062B12;border-color:#4ADE80}
+.probe .gut{color:#86EFAC}.probe .mies{color:#FCD34D}
 .erw-menu .recht{margin:6px 0 2px;font-size:.8rem;text-align:center;color:var(--ink-soft)}
 .erw-menu .recht a{display:inline;padding:4px 2px;min-height:0;color:inherit;text-decoration:underline;text-underline-offset:2px}
 /* Einrichten in drei Gruppen (UNICORN-54): das Wichtige zuerst, Seltenes am Ende */
@@ -563,6 +576,10 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.7 2.2c-.8.5-1.3 1-1.3 2"/><path d="M12 17v.2"/></svg>
           <span><b>Hilfe</b><small>Kurz erklärt, und was tun, wenn etwas hakt</small></span>
         </button>
+        <button type="button" id="btn-probe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><path d="M9 10l2 2 4-4"/></svg>
+          <span><b id="probe-menu-titel">Generalprobe</b><small id="probe-menu-text">Tour zum Üben ablaufen, Punkte vor Ort einstellen</small></span>
+        </button>
         <a href="./" id="erw-portal">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg>
           <span><b>Zur Party</b><small>Checkliste, Links und Einkauf. Die Tour bleibt gespeichert.</small></span>
@@ -573,6 +590,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
   </header>
 
   <div class="tour" id="view-tour">
+    <section class="probe" id="probe" hidden aria-label="Generalprobe"></section>
     <div id="bogen-wrap" class="bogen-wrap-float"></div>
     <div class="pillen"><p class="count" id="uhr" hidden></p></div>
     <div class="stage" id="stage">
@@ -838,7 +856,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
     <details class="karte" id="k-vorbereitung">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="tt"><b>Vorbereitung</b><span id="sum-vorbereitung"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Nur das Nötige, jeweils mit Notlösung.</p>
+        <p class="lead">Nur das Nötige, jeweils mit Notlösung. Dieselbe Einteilung wie beim Bestellen in der Party: Was hier „Sonst“ hat, musst du nicht kaufen.</p>
         <div class="liste" id="liste"></div>
         <div class="zwischen"><span class="chip" id="liste-note"></span><button type="button" class="btn quiet small" id="btn-liste-reset">Alle Haken entfernen</button></div>
       </div>
@@ -1032,7 +1050,7 @@ function renderListe(){
   var ne=extras.filter(function(x){ return haken[hakenVar()+'|'+x.x]; }).length;
   var h='<h3>Das braucht die Tour <small>'+g+' Dinge</small></h3>'+noetig.map(function(x){ return hakenZeile(x.x, x.notfalls); }).join('');
   if(extras.length) h+='<details class="mehr" id="vb-extras"'+(auf['vb-extras']?' open':'')+'><summary>Extras, wenn Zeit ist <small>'+extras.length+' Extras'+(ne?', '+ne+' erledigt':'')+'</small></summary>'+
-    (indoor() ? '' : Spielart.extraKarte(TOUR, state.variante==='b', 'extra-vb'))+extras.map(function(x){ return hakenZeile(x.x); }).join('')+'</details>';
+    (indoor() ? '' : Spielart.extraKarte(TOUR, state.variante==='b', 'extra-vb'))+extras.map(function(x){ return hakenZeile(x.x, x.notfalls); }).join('')+'</details>';
   // Packliste nach Station: je Zeile Nummer, Ort, Dinge als Stichworte, wer es hinbringt
   var pk=(VB.packliste||{})[state.variante]||(VB.packliste||{}).a;
   if(pk) h+='<details class="mehr" id="vb-packen"'+(auf['vb-packen']?' open':'')+'><summary>Packliste nach Station</summary>'+
@@ -1045,7 +1063,7 @@ function renderListe(){
 }
 
 /* ---------- Zustand ---------- */
-function frisch(){ return {points:STATIONS.map(function(){ return null; }), idx:0, phase:'start', step:0, radius:15, showTest:true, autoSag:true, kamera:false, variante:TPLAN.variante||'a', startZeit:null, heim:null, voice:null, pitch:1.15, recRate:1.15, erz:'kakapups', erzJe:{}, erzStand:''}; }
+function frisch(){ return {points:STATIONS.map(function(){ return null; }), idx:0, phase:'start', step:0, radius:15, showTest:true, autoSag:true, kamera:false, variante:TPLAN.variante||'a', startZeit:null, heim:null, probe:false, voice:null, pitch:1.15, recRate:1.15, erz:'kakapups', erzJe:{}, erzStand:''}; }
 var PUNKTE_CODE=TPLAN.punkteCode||null;   // Stationen 2 bis N aus dem Tourplaner
 var PUNKTE_STAND=TPLAN.stand||'';   // neuer Plan: jedes Gerät übernimmt die Punkte einmal
 function load(){
@@ -1063,6 +1081,7 @@ function load(){
       if(o && typeof o.kamera==='boolean') s.kamera=o.kamera;
       if(o && VARIANTEN[o.variante]) s.variante=o.variante;
       if(o && typeof o.startZeit==='number') s.startZeit=o.startZeit;
+      if(o && typeof o.probe==='boolean') s.probe=o.probe;
       if(o && o.heim && typeof o.heim.lat==='number') s.heim=o.heim;
       if(o && typeof o.voice==='string') s.voice=o.voice;
       if(o && [1,1.15,1.35].indexOf(o.pitch)>=0) s.pitch=o.pitch;
@@ -2420,6 +2439,7 @@ function fadenZeigen(an){
 }
 var funkelZiel=0.12;
 function live(){
+  probeZeichnen();
   var mt=hauptText(); $('btn-main').textContent=mt; $('btn-main').hidden=!mt;
   modusZeigen();
   $('jetzt-was').textContent=jetzt();
@@ -2567,7 +2587,7 @@ function zeige(v){
   $('tab-tour').setAttribute('aria-pressed', String(v==='tour')); $('tab-setup').setAttribute('aria-pressed', String(v==='setup'));
   try{ modusZeigen(); }catch(e){}
   try{ if(location.hash!=='#'+(v==='setup'?'einrichten':'tour')) history.replaceState(null,'','#'+(v==='setup'?'einrichten':'tour')); }catch(e){}
-  angebotPflegen();
+  angebotPflegen(); probeZeichnen();
   funkelStart();
 }
 var toastT=null;
@@ -2617,12 +2637,17 @@ $('choices').addEventListener('click', function(e){ var b=e.target.closest ? e.t
 $('btn-gps').addEventListener('click', function(){ wachBleiben(); gpsStart(); });
 $('points').addEventListener('click', function(e){
   var b=e.target.closest ? e.target.closest('button[data-set]') : null; if(!b || !fix) return;
-  var i=+b.getAttribute('data-set');
-  if(!fixFrisch()){ toast('Das GPS hat seit '+Math.round(fixAlter()/1000)+' s keine neue Position. Unter freiem Himmel kurz warten, dann setzen.'); return; }
-  if(fix.acc>40){ toast('Das GPS ist zu ungenau (±'+Math.round(fix.acc)+' m). Kurz stehen bleiben, bis es unter 40 m ist.'); return; }
-  state.points[i]={lat:fix.lat, lng:fix.lng, acc:fix.acc}; save(); render();
-  toast(fix.acc>25 ? 'Punkt '+(i+1)+' gesetzt, aber das GPS ist ungenau (±'+Math.round(fix.acc)+' m). Besser kurz warten und neu setzen.' : 'Punkt '+(i+1)+' gesetzt.');
+  punktHier(+b.getAttribute('data-set'));
 });
+// Punkt einer Station auf den jetzigen Standort setzen (Einrichten → GPS-Punkte und Generalprobe)
+function punktHier(i){
+  if(!fix){ toast('Noch kein GPS. Unter freiem Himmel kurz warten.'); return false; }
+  if(!fixFrisch()){ toast('Das GPS hat seit '+Math.round(fixAlter()/1000)+' s keine neue Position. Unter freiem Himmel kurz warten, dann setzen.'); return false; }
+  if(fix.acc>40){ toast('Das GPS ist zu ungenau (±'+Math.round(fix.acc)+' m). Kurz stehen bleiben, bis es unter 40 m ist.'); return false; }
+  state.points[i]={lat:fix.lat, lng:fix.lng, acc:fix.acc}; save(); render();
+  toast(fix.acc>25 ? 'Punkt '+(i+1)+' gesetzt, aber das GPS ist ungenau (±'+Math.round(fix.acc)+' m). Besser kurz warten und neu setzen.' : 'Punkt '+(i+1)+' gesetzt. Er gilt für dieses Gerät.');
+  return true;
+}
 $('radius').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-r]') : null; if(!b) return; state.radius=+b.getAttribute('data-r'); save(); render(); });
 $('show-test').addEventListener('change', function(){ state.showTest=this.checked; save(); render(); });
 // Spielart wechseln: Spiel, Party auf diesem Gerät und Hinweis, was sich ändert (UNICORN-47)
@@ -2693,6 +2718,70 @@ function hilfeAuf(){ erwMenu(false); if(window.Einfuehrung) Einfuehrung.hilfe({o
 $('btn-hilfe').addEventListener('click', hilfeAuf); $('btn-hilfe-2').addEventListener('click', hilfeAuf);
 $('tipps-an').addEventListener('change', function(){ if(window.Einfuehrung) Einfuehrung.tippsSetzen(this.checked); toast(this.checked ? 'Tipps sind an.' : 'Tipps sind aus.'); });
 document.addEventListener('einfuehrung', function(){ $('tipps-an').checked=Einfuehrung.tippsAn(); toast('Keine Tipps mehr. Unter „Einrichten“ → „Tour“ schaltest du sie wieder ein.'); });
+// ---------- Generalprobe (UNICORN-61) ----------
+// Die Tour einmal so durchspielen wie am Partytag, mit Abstand und GPS-Genauigkeit im Blick und „Punkt hier setzen“.
+// Am Ende: wie jede Station geöffnet hat (aus dem Probelauf-Protokoll), dann zurück auf Anfang. Die Punkte bleiben.
+var probeSchluessel='', probeSicher=false;
+function probeWert(){
+  if(indoor()) return '';
+  if(gps!=='an' || !fix) return gps==='keins' ? 'Kein GPS auf diesem Gerät' : 'GPS sucht …';
+  var d=abstand();
+  return (d!=null && unterwegs() ? 'noch '+Math.round(d)+' m · ' : '')+'GPS ±'+Math.round(fix.acc)+' m';
+}
+function probeErgebnis(){
+  var r=proto.length ? proto[proto.length-1] : null, l=((r && r.eintraege)||[]).filter(function(x){ return typeof x.i==='number' && x.modus; });
+  var hand=l.filter(function(x){ return x.modus!=='gps'; }).length;
+  return '<p><b>Geschafft!</b> So haben die Stationen geöffnet:</p>'+
+    (l.length ? '<ol>'+l.map(function(x){ return '<li>Station '+(x.i+1)+': '+(x.modus==='gps' ? '<span class="gut">von selbst</span>' : '<span class="mies">von Hand</span>')+(x.acc!=null?' · GPS ±'+x.acc+' m':'')+(x.dauer?' · '+mmss(x.dauer)+' Min. Weg':'')+'</li>'; }).join('')+'</ol>' : '<p>Keine Station mitgeschrieben.</p>')+
+    (indoor() ? '' : hand ? '<p>Wo „von Hand“ steht, lohnt es sich, den Punkt vor Ort neu zu setzen. Oder unter „Einrichten“ → „GPS-Punkte“ den Abstand auf 25 m stellen.</p>' : '<p>Alles hat von selbst geöffnet. So kann die Party kommen.</p>')+
+    '<div class="reihe"><button type="button" class="btn small" id="probe-fertig">Tour auf Anfang, Punkte behalten</button></div>';
+}
+function probeHtml(){
+  var ph=state.phase, i=state.idx, drin=indoor(), nr=i+1;
+  var kopf='<div class="probe-kopf"><span class="probe-chip">Generalprobe</span><span class="wert" id="probe-wert"></span><button type="button" class="zu" id="probe-ende">Beenden</button></div>';
+  if(ph==='start') return kopf+'<p>Lauf die Tour einmal so ab wie am Partytag. Nichts davon zählt, am Ende steht alles wieder am Anfang.</p><details class="probe-wie"><summary>So geht’s</summary><ol>'+
+    (drin ? '<li>In jedem Raum „Station öffnen“ tippen.</li><li>Prüfen, ob dort alles bereitliegt.</li>'
+          : '<li>Unterwegs zeigt diese Leiste, wie weit es noch ist und wie genau das GPS ist.</li><li>Öffnet eine Station zu früh oder gar nicht: an die richtige Stelle stellen und „Punkt hier setzen“ tippen.</li><li>Am Ende siehst du, wie jede Station geklappt hat.</li>')+
+    '</ol><p>Fein einstellen kannst du unter „Erwachsene“ → „Einrichten“: '+(drin?'Erzähler und Spielart.':'Abstand zum Öffnen (10, 15 oder 25 m), Erzähler und Spielart.')+'</p></details>';
+  if(ph==='end' || ph==='heim') return kopf+probeErgebnis();
+  if(drin) return kopf+'<p>Station '+nr+': '+(ph==='seek' ? 'Geht in den nächsten Raum und tippt „Station öffnen“.' : 'Liegt hier alles bereit?')+'</p>';
+  if(ph==='seek') return kopf+'<p>Unterwegs zu Station '+nr+'. '+(wartet ? 'Angekommen. Stimmt die Stelle? Sonst hier neu setzen.' : 'Steht ihr an der richtigen Stelle, aber nichts öffnet sich? Dann den Punkt hier setzen.')+'</p>'+
+    '<div class="reihe"><button type="button" class="btn small" data-probe-setzen="'+i+'">Punkt '+nr+' hier setzen</button></div>';
+  if(i===0) return kopf+'<p>Start an der Haustür. Die Haustür braucht keinen Punkt.</p>';
+  return kopf+'<p>Station '+nr+' ist offen. Hat sie an der richtigen Stelle geöffnet? Sonst stell dich dorthin und setz den Punkt neu.</p>'+
+    '<div class="reihe"><button type="button" class="btn small ghost" data-probe-setzen="'+i+'">Punkt '+nr+' hier neu setzen</button></div>';
+}
+function probeZeichnen(){
+  var el=$('probe'); if(!el) return;
+  var t=$('probe-menu-titel'); if(t){ t.textContent=state.probe?'Generalprobe beenden':'Generalprobe'; if(!probeSicher) $('probe-menu-text').textContent=state.probe?'Zurück auf Anfang, die Punkte bleiben':'Tour zum Üben ablaufen, Punkte vor Ort einstellen'; }
+  if(!state.probe || view!=='tour'){ el.hidden=true; probeSchluessel=''; return; }
+  el.hidden=false;
+  var key=[state.phase, state.idx, wartet?1:0, indoor()?1:0].join('|');
+  if(key!==probeSchluessel){ probeSchluessel=key; el.innerHTML=probeHtml(); }
+  var w=$('probe-wert'); if(w) w.textContent=probeWert();
+}
+function probeBeenden(){ state.probe=false; probeSicher=false; vonVorn(); toast('Generalprobe beendet. Die Tour steht wieder am Anfang, deine Punkte bleiben.'); }
+function probeStarten(){
+  probeSicher=false; erwMenu(false); fadenZeigen(false);
+  if(state.phase!=='start') vonVorn();
+  state.probe=true; save(); gpsStart(); zeige('tour'); render(); live();
+  toast(indoor() ? 'Generalprobe: Spiel die Tour einmal durch.' : 'Generalprobe: Lauf los. Unterwegs setzt du jeden Punkt mit einem Tipp.');
+}
+$('probe').addEventListener('click', function(e){
+  var b=e.target.closest ? e.target.closest('[data-probe-setzen]') : null;
+  if(b){ punktHier(+b.getAttribute('data-probe-setzen')); live(); return; }
+  if(e.target.closest && e.target.closest('#probe-ende, #probe-fertig')) probeBeenden();
+});
+$('btn-probe').addEventListener('click', function(){
+  if(state.probe){ erwMenu(false); probeBeenden(); return; }
+  if(state.phase!=='start' && !probeSicher){ probeSicher=true; $('probe-menu-text').textContent='Startet die Tour von vorn. Zum Bestätigen noch einmal tippen.'; return; }
+  probeStarten();
+});
+// Link mit ?probe=1 (Party → „Generalprobe am Vortag“, „Route ablaufen“)
+if(/[?&]probe=1(&|$)/.test(location.search) && !state.probe){
+  if(state.phase==='start'){ state.probe=true; save(); setTimeout(function(){ gpsStart(); live(); }, 0); }
+  else setTimeout(function(){ toast('Die Tour läuft gerade. Unter „Erwachsene“ → „Generalprobe“ startest du die Probe von vorn.'); }, 600);
+}
 /* Menü für Erwachsene: Ablauf und Einrichten liegen dahinter, damit Kinder nicht versehentlich hineintippen */
 function erwMenu(an){ $('erw-menu').hidden=!an; $('btn-erw').setAttribute('aria-expanded', String(an)); angebotPflegen(); if(an){ try{ $('btn-ablauf').focus({preventScroll:true}); }catch(e){} } }
 $('btn-erw').addEventListener('click', function(e){ e.stopPropagation(); erwMenu($('erw-menu').hidden); });

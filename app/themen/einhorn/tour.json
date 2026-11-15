@@ -396,19 +396,32 @@
    },
    {
     "x": "Bögen in Rot, Gelb, Grün, Blau",
-    "notfalls": "Aus Pappe ausschneiden und anmalen."
+    "notfalls": "Aus Pappe ausschneiden und anmalen.",
+    "u": [
+     "u2"
+    ]
    },
    {
     "x": "Fridolin (Kuscheltier) und ein grauer Karton",
-    "notfalls": "Jedes Kuscheltier, jeder Karton."
+    "notfalls": "Jedes Kuscheltier, jeder Karton.",
+    "u": [
+     "u8",
+     "u11"
+    ]
    },
    {
     "x": "Sticker, je Kind einer",
-    "notfalls": "Klebezettel."
+    "notfalls": "Klebezettel.",
+    "u": [
+     "u7"
+    ]
    },
    {
     "x": "1 Zaubertafel für Station 5",
-    "notfalls": "Zettel und Stift."
+    "notfalls": "Zettel und Stift.",
+    "u": [
+     "u4"
+    ]
    },
    {
     "x": "Schatzkiste, je Kind ein Geschenk",
@@ -420,6 +433,9 @@
     "nur": [
      "a",
      "b"
+    ],
+    "u": [
+     "u9"
     ]
    },
    {
@@ -450,6 +466,9 @@
     "nur": [
      "a",
      "b"
+    ],
+    "u": [
+     "u10"
     ]
    },
    {
@@ -459,13 +478,33 @@
   ],
   "extras": [
    {
-    "x": "{kinder} Haarreifen"
+    "x": "{kinder} Haarreifen",
+    "u": [
+     "u0"
+    ],
+    "notfalls": "Weglassen. Funkel verzaubert die Kinder trotzdem."
    },
    {
-    "x": "{kinder} Tattoos"
+    "x": "{kinder} Tattoos",
+    "u": [
+     "u1"
+    ],
+    "notfalls": "Weglassen."
    },
    {
-    "x": "{kinder} Glückssteine"
+    "x": "{kinder} Glückssteine",
+    "u": [
+     "u3"
+    ],
+    "notfalls": "Hübsche Kieselsteine sammeln, gern bunt bemalt."
+   },
+   {
+    "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
+    "u": [
+     "u5",
+     "u12"
+    ],
+    "notfalls": "Süßigkeiten oder Kleinigkeiten von zu Hause, in Butterbrottüten."
    },
    {
     "x": "Kiste bekleben, Karton grau anmalen"
@@ -815,7 +854,45 @@
      "Wasser"
     ]
    }
-  }
+  },
+  "basteln": [
+   {
+    "x": "Sticker in {kinder} Stücke schneiden",
+    "min": 5,
+    "noetig": true,
+    "ohne": "Klebezettel nehmen, je Kind einen."
+   },
+   {
+    "x": "Schatzkiste bekleben",
+    "min": 20,
+    "ohne": "Den Schuhkarton so lassen. Wichtig ist, was drin ist."
+   },
+   {
+    "x": "Fuchsbau grau anmalen",
+    "min": 15,
+    "ohne": "Irgendein Karton. Fridolin sitzt trotzdem drin."
+   },
+   {
+    "x": "Urkunden drucken",
+    "min": 5,
+    "braucht": "Drucker",
+    "ohne": "Weglassen. Nach der Party schickst du den Danke-Link, darin ist die Urkunde jedes Kindes zum Speichern."
+   },
+   {
+    "x": "Einladungen drucken",
+    "min": 5,
+    "braucht": "Drucker",
+    "ohne": "Nicht nötig: Der Einladungslink per WhatsApp reicht."
+   },
+   {
+    "x": "Echte Hinweise vorbereiten: 4 Schleifen, Laken, rote Kreide",
+    "min": 10,
+    "nur": [
+     "b"
+    ],
+    "ohne": "Extra aus: Die Kinder sehen die Hinweise nur im Spiegel."
+   }
+  ]
  },
  "gaben": [
   {

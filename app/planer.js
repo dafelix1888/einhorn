@@ -420,7 +420,7 @@
       var m=L.marker([s.lat,s.lng],{icon:markerIcon(i,s), draggable:i>0, autoPan:true, title:'Station '+(i+1)+': '+stationTitel(i), keyboard:true, zIndexOffset:i===gewaehlt?1000:0}).addTo(ebenen);
       m.bindTooltip((i+1)+' · '+s.name, {direction:'top'});
       m.on('click', function(){ waehle(i, false); if(sheetKlein()) sheetSetzen(false); });
-      m.on('dragstart', function(){ m._ziehen=true; gewaehlt=i; stationZeigen(); m.openTooltip(); $('sheet-kopf').classList.add('zieht'); });
+      m.on('dragstart', function(){ ziehTippWeg(); m._ziehen=true; gewaehlt=i; stationZeigen(); m.openTooltip(); $('sheet-kopf').classList.add('zieht'); });
       m.on('drag', liveAktualisieren);
       m.on('dragend', function(){ $('sheet-kopf').classList.remove('zieht'); nachZiehen(i); m._ziehen=false; });
       marker.push(m);
@@ -453,6 +453,15 @@
     ergebnisZeigen.schon=true;
     if(sheetKlein()) sheetSetzen(false);
     startTextZeigen(); listeZeichnen(); kartenZeichnen(true);
+    setTimeout(ziehTipp, 900);
+  }
+  // Erster Blick auf die Karte (UNICORN-58): einmal je Gerät zeigen, dass man Stationen verschieben kann
+  var ZIEH_TIPP='sj.planer.ziehTipp';
+  function ziehTippWeg(){ var e=$('zieh-tipp'); if(e) e.hidden=true; try{ localStorage.setItem(ZIEH_TIPP,'1'); }catch(x){} }
+  function ziehTipp(){
+    var e=$('zieh-tipp'); if(!e || $('ergebnis').hidden) return;
+    try{ if(localStorage.getItem(ZIEH_TIPP)) return; }catch(x){ return; }
+    e.hidden=false;
   }
   function netzNachladen(){                      // gespeicherte Tour: Wegenetz im Hintergrund holen, damit Verschieben live rechnet
     if(netz || !plan || !plan.start) return;
@@ -527,6 +536,7 @@
     });
     $('hier-setzen').addEventListener('click', function(){ vorOrtStart(gewaehlt); });
     sheetZiehenEinrichten();
+    $('zieh-tipp-ok').addEventListener('click', ziehTippWeg);
     $('planen').addEventListener('click', planenKlick);
     $('zur-route').addEventListener('click', ergebnisZeigen);
     $('zurueck-eingabe').addEventListener('click', function(e){ e.preventDefault(); if(plan && plan.stationen && plan.stationen.length){ ergebnisZeigen(); return; } Weg.zurueck(zurueckZiel()); });

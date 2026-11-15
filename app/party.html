@@ -181,6 +181,21 @@
 .vorein .schalter label{margin:0;font-weight:400;flex:1;cursor:pointer}
 .vorein .schalter label b{display:block}
 .vorein .schalter label span{color:var(--leise);font-size:.9rem}
+.wege{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}.wege-titel,.wege-fuss{grid-column:1/-1;margin:0}.wege-titel{font-size:.92rem;color:var(--leise)}.wege-titel b{display:block;color:var(--text);font-size:1.05rem}
+.weg-k{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--karte);border:2px solid var(--linie);border-radius:16px;padding:12px;color:inherit;font:inherit;cursor:pointer}
+.weg-k.an{border-color:var(--akzent);background:color-mix(in srgb,var(--akzent) 14%,var(--karte))}.weg-k .betrag{font-size:1.25rem;font-weight:800;color:var(--akzent)}.weg-k small{color:var(--leise);font-size:.82rem;line-height:1.35}
+.ek-gruppe{font-size:1.05rem;margin:18px 0 2px}.ek-gruppe small{color:var(--leise);font-weight:600}.ek-satz{margin:0 0 8px}
+.ding .sonst{color:#A7F3D0;font-size:.88rem}.ding .wie{font-size:.8rem;color:var(--leise);margin-right:6px}
+.bastel{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:8px}.bastel li{background:var(--karte);border-radius:14px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:2px 12px}
+.bastel .min{grid-row:span 2;align-self:start;min-width:52px;text-align:center;font-weight:800;font-size:.9rem;padding:4px 8px;border-radius:10px;background:rgba(167,139,250,.18);color:var(--akzent)}
+.bastel b{line-height:1.3}.bastel .tag{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-left:6px;padding:1px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:var(--leise);vertical-align:2px}.bastel .tag.n{background:rgba(74,222,128,.18);color:#86EFAC}
+.bastel span.o{color:var(--leise);font-size:.88rem;line-height:1.4}.bastel-summe{margin:0 0 10px;font-size:.95rem}
+.tipp-karte{display:grid;gap:6px;background:linear-gradient(130deg,rgba(74,222,128,.14),var(--karte));border:1px solid rgba(74,222,128,.35);border-radius:16px;padding:12px 14px;margin:10px 0}
+.tipp-karte b{color:#86EFAC}.tipp-karte span{color:var(--text);font-size:.92rem;line-height:1.45}.tipp-karte .knopf{justify-self:start;margin-top:4px}
+.probe-tablet{margin:-2px 2px 12px}
+.hinweis-loeschen{display:flex;gap:10px;align-items:flex-start;margin:4px 0 0;padding:10px 12px;border-radius:14px;background:var(--karte);color:var(--leise);font-size:.88rem;line-height:1.4}
+.hinweis-loeschen svg{flex:none;width:18px;height:18px;margin-top:1px;color:var(--akzent)}.hinweis-loeschen b{color:var(--text);font-weight:700}
+.spielart-jederzeit{margin:8px 2px 4px;color:var(--leise);font-size:.88rem;line-height:1.4;padding-left:24px;background:no-repeat left 1px/16px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A78BFA' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M21 12a9 9 0 1 1-3-6.7L21 8'/%3E%3Cpath d='M21 3v5h-5'/%3E%3C/svg%3E")}
 .vorein-spaeter{margin:4px 0 12px;color:var(--leise);font-size:.88rem;border-top:1px solid var(--linie);padding-top:10px}
 .zusammen{background:linear-gradient(130deg,#3B2A64,#1F1929);border-radius:16px;padding:16px 18px}
 .zusammen b{font-size:1.2rem}
@@ -255,10 +270,13 @@
   }
   // Spielart im Assistenten (UNICORN-47): kommt sie schon aus dem Planer, nur anzeigen; sonst zwei Karten, beim Wechsel einer Party mit Hinweis
   var spielartOffen=false;
+  // Löschhinweis (UNICORN-58): mit Datum konkret, sonst allgemein. Gelöscht wird serverseitig 30 Tage nach dem Termin (alte_partys_loeschen).
+  function loeschText(d){ var t=d && Date.parse(d+'T12:00:00'); if(!t) return '30 Tage nach der Feier'; return 'am '+new Date(t+30*864e5).toLocaleDateString('de-DE',{day:'numeric', month:'long'})+', 30 Tage nach der Feier,'; }
   function spielartWahl(e){
     var v=Party.variante(e);
-    if(e.ausPlaner && !spielartOffen) return '<div class="spielart-zeile"><span class="leise">Spielart</span><b>'+esc(Spielart.name(tour, v))+'</b><button type="button" class="textknopf" id="spielart-aendern">ändern</button></div>';
-    return '<p class="spielart-titel">Wo spielt ihr?</p>'+Spielart.karten(tour, v)+(party && !party.fremd ? Spielart.wechsel(tour, Party.variante(party), v) : '');
+    var jederzeit='<p class="spielart-jederzeit">Jederzeit änderbar, auch noch am Partytag: Regnet es, schaltest du im Spiel mit einem Tipp auf Drinnen um.</p>';
+    if(e.ausPlaner && !spielartOffen) return '<div class="spielart-zeile"><span class="leise">Spielart</span><b>'+esc(Spielart.name(tour, v))+'</b><button type="button" class="textknopf" id="spielart-aendern">ändern</button></div>'+jederzeit;
+    return '<p class="spielart-titel">Wo spielt ihr?</p>'+Spielart.karten(tour, v)+jederzeit+(party && !party.fremd ? Spielart.wechsel(tour, Party.variante(party), v) : '');
   }
   function assistent(){
     var e=entwurf, zurueck=schritt>0 ? '<button type="button" class="textknopf" id="zurueck">← Zurück</button>' :
@@ -273,7 +291,8 @@
         '<div class="zwei"><label class="feld"><span>Wird</span><input id="alter" type="number" inputmode="numeric" value="'+esc(e.kind.alter||'')+'" placeholder="5"></label>'+
         '<label class="feld"><span>Start</span><input id="start" type="time" step="900" value="'+esc(e.start||'15:00')+'"></label></div>'+
         '<label class="feld"><span>Datum</span><input id="datum" type="date" min="'+heute()+'" value="'+esc(e.datum||'')+'"></label>'+
-        '<p class="leise" style="font-size:.92rem">Die Jagd dauert etwa '+tour.dauer.minuten+' Minuten. Name und Alter stehen auf Einladung und Urkunden. Der Name bleibt auf diesem Gerät.</p>';
+        '<p class="leise" style="font-size:.92rem">Die Jagd dauert etwa '+tour.dauer.minuten+' Minuten. Name und Alter stehen auf Einladung und Urkunden. Der Name bleibt auf diesem Gerät.</p>'+
+        '<p class="hinweis-loeschen"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg><span>Schatzweg löscht eure Party <b id="loesch-datum">'+loeschText(e.datum)+'</b> automatisch, mit Links, Gästeliste und Funkels Namens-Sätzen.</span></p>';
     } else if(sid()==='wo'){
       var d=e.ort==='draussen', ex=tour.extra;
       h+='<h1>Wer ist dabei, wo spielt ihr?</h1>'+
@@ -289,8 +308,8 @@
     } else if(sid()==='erz'){
       h+='<h1>Wer liest die Aufgaben vor?</h1>'+
         '<p class="leise">Funkel erzählt die Geschichte. An jeder Station liest eine zweite Figur den Kindern die Aufgabe vor. Hör rein und such eine aus.</p>'+
-        Erzaehler.zeilen(tour, Erzaehler.wahl(tour, e))+
-        '<p class="leise klein">Später änderbar unter „So spielt ihr“. Feinheiten stellst du im Elternbereich ein: im Spiel oben rechts „Erwachsene“ → „Einrichten“. Dort kannst du auch einzelne Aufgaben einer anderen Figur geben.</p>';
+        '<p class="spielart-jederzeit">Jederzeit änderbar: in der Party unter „So spielt ihr“ und im Spiel unter „Erwachsene“ → „Einrichten“. Dort kannst du auch einzelne Aufgaben einer anderen Figur geben.</p>'+
+        Erzaehler.zeilen(tour, Erzaehler.wahl(tour, e));
     } else {
       var vName=tour.varianten[Party.variante(e)].name;
       h+='<h1>Fertig! So sieht’s aus</h1>'+
@@ -306,6 +325,7 @@
     h+='</div><div style="margin-top:22px"><button type="button" class="knopf breit" id="weiter">'+(schritt<SCHRITTE-1?'Weiter':party?'Speichern':'Plan erstellen')+'</button></div><p class="fehler" id="fehler" role="alert" style="color:var(--rot);margin-top:10px"></p>';
     $('seite').innerHTML=h;
     var f=$('seite').querySelector('input'); if(f && sid()==='wer' && !party) try{ f.focus(); }catch(x){}
+    if($('datum')) $('datum').addEventListener('input', function(){ var l=$('loesch-datum'); if(l) l.textContent=loeschText(this.value); });
   }
   function uebernehmen(){                         // Felder des aktuellen Schritts in den Entwurf
     var e=entwurf;
@@ -321,9 +341,13 @@
     var box = x.fertig ? '<span class="punkt-ok" aria-hidden="true"></span>'
       : x.lieferbar && Party.imKorb ? '<input type="checkbox" id="k-'+x.id+'" data-waehle="'+x.id+'"'+(x.gewaehlt?' checked':'')+' aria-label="'+esc(x.name)+' für den Warenkorb auswählen">'
       : '<span></span>';
-    var knopf = x.fertig ? '<span class="ding-knoepfe"><button type="button" class="textknopf" data-kauf-zurueck="'+x.id+'">Wieder offen</button></span>'
-      : '<span class="ding-knoepfe">'+(x.link?'<a class="knopf klein leer" href="'+esc(x.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'')+'<button type="button" class="textknopf" data-kauf="'+x.id+'">'+(x.zuHause?'Hab ich':'Hab ich schon')+'</button></span>';
-    return '<div class="ding'+(x.fertig?' fertig':'')+'">'+box+'<label'+(x.lieferbar&&!x.fertig?' for="k-'+x.id+'"':'')+' style="margin:0;font-weight:400"><span class="menge">'+x.menge+'×</span> '+esc(x.name)+'<br><span>'+esc(x.wann)+(x.hinweis?' · '+esc(x.hinweis):'')+'</span><br><span>'+preisText(x)+'</span></label>'+knopf+'</div>';
+    var wieText={not:'Mit Notlösung', weg:'Weggelassen'}[x.wie]||'', alsNot=x.notfalls && !/^Weglassen|^Brauchst/.test(x.notfalls);
+    var knopf = x.fertig ? '<span class="ding-knoepfe">'+(wieText?'<span class="wie">'+wieText+'</span>':'')+'<button type="button" class="textknopf" data-kauf-zurueck="'+x.id+'">Wieder offen</button></span>'
+      : '<span class="ding-knoepfe">'+(x.link?'<a class="knopf klein leer" href="'+esc(x.link)+'" target="_blank" rel="sponsored noopener">Ansehen</a>':'')+'<button type="button" class="textknopf" data-kauf="'+x.id+'">'+(x.zuHause?'Hab ich':'Hab ich schon')+'</button>'+
+        (x.zuHause ? '' : x.noetig ? (alsNot?'<button type="button" class="textknopf" data-kauf="'+x.id+'" data-wie="not">Notlösung</button>':'') : '<button type="button" class="textknopf" data-kauf="'+x.id+'" data-wie="'+(alsNot?'not':'weg')+'">'+(alsNot?'Notlösung':'Lass ich weg')+'</button>')+'</span>';
+    var weglassbar=/^Weglassen\.?\s*/.test(x.notfalls||''), rest=weglassbar ? x.notfalls.replace(/^Weglassen\.?\s*/,'') : '';
+    var sonst = x.notfalls && !x.fertig ? '<br><span class="sonst">'+(weglassbar ? 'Geht auch ohne'+(rest?': '+esc(rest):'.') : 'Sonst: '+esc(x.notfalls))+'</span>' : x.fertig && x.wie==='not' && x.notfalls ? '<br><span class="sonst">'+esc(x.notfalls)+'</span>' : '';
+    return '<div class="ding'+(x.fertig?' fertig':'')+'">'+box+'<label'+(x.lieferbar&&!x.fertig?' for="k-'+x.id+'"':'')+' style="margin:0;font-weight:400"><span class="menge">'+x.menge+'×</span> '+esc(x.name)+'<br><span>'+esc(x.wann)+(x.hinweis?' · '+esc(x.hinweis):'')+'</span><br><span>'+preisText(x)+'</span>'+sonst+'</label>'+knopf+'</div>';
   }
   function preisText(x){
     if(x.zuHause) return 'Hat man meist zu Hause';
@@ -378,6 +402,17 @@
     return h;
   }
 
+  // Zwei Wege (UNICORN-60): bequem alles bestellen oder sparen mit Notlösungen. Gleiche Einteilung wie „Vorbereitung“ im Elternbereich.
+  function wegeBox(ek){
+    if(!Party.wegeSummen) return '';
+    var s=Party.wegeSummen(ek), aus=party.einkaufAus||{}, offen=ek.filter(function(x){ return !x.fertig && x.lieferbar; });
+    if(!offen.length) return '';
+    var alles=offen.every(function(x){ return !aus[x.id]; }), nurNoetig=!alles && offen.every(function(x){ return !x.noetig === !!aus[x.id]; });
+    return '<div class="wege"><p class="wege-titel"><b>Zwei Wege</b> Du entscheidest, wie viel du ausgibst. Beides passt zur Geschichte.</p>'+
+      '<button type="button" class="weg-k'+(alles?' an':'')+'" data-wege="alles" aria-pressed="'+alles+'"><b>Alles bestellen</b><span class="betrag">ca. '+Party.euro(s.alles)+'</span><small>Am wenigsten Aufwand. Kommt meist in 1 bis 3 Tagen.</small></button>'+
+      '<button type="button" class="weg-k'+(nurNoetig?' an':'')+'" data-wege="noetig" aria-pressed="'+nurNoetig+'"><b>Nur das Nötige</b><span class="betrag">ca. '+Party.euro(s.noetig)+'</span><small>Extras weglassen. Mit Notlösungen von zu Hause kostet es gar nichts.</small></button>'+
+      '<p class="leise klein wege-fuss">Dieselbe Einteilung mit Notlösungen steht im Spiel unter „Erwachsene“ → „Einrichten“ → „Vorbereitung“.</p></div>';
+  }
   function einkaufNeu(){ party=Party.speichern(party); var y=window.scrollY; uebersicht(); window.scrollTo(0,y); }
 
   // Eure Route: immer sichtbar, mit kleiner Vorschau und direktem Weg in den Planer
@@ -575,12 +610,22 @@
     var innen='<span class="k-symbol">'+symbol(o.symbol)+'</span><span class="k-text"><b>'+esc(o.titel)+'</b><span>'+esc(o.text)+'</span></span><span class="pfeil" aria-hidden="true"></span>', kl='kachel'+(o.haupt?' haupt':'');
     return o.href ? '<a class="'+kl+'" href="'+esc(o.href)+'">'+innen+'</a>' : '<button type="button" class="'+kl+'"'+(o.id?' id="'+o.id+'"':'')+(o.oeffne?' data-oeffne="'+o.oeffne+'"':'')+'>'+innen+'</button>';
   }
+  // Basteln und drucken (UNICORN-60): je Aufgabe Minuten, nötig oder Extra, und was du sonst machst
+  function bastelListe(p){
+    var l=Party.basteln ? Party.basteln(p, tour) : []; if(!l.length) return '';
+    var alle=l.reduce(function(s, x){ return s+x.min; }, 0), noetig=l.filter(function(x){ return x.noetig; }).reduce(function(s, x){ return s+x.min; }, 0);
+    return '<p class="bastel-summe"><b>Etwa '+alle+' Minuten</b> für alles. Nötig sind nur '+noetig+' Minuten, alles andere ist Extra.</p><ul class="bastel">'+l.map(function(x){
+      return '<li><span class="min">'+x.min+' Min.</span><b>'+esc(x.x)+'<span class="tag'+(x.noetig?' n':'')+'">'+(x.noetig?'Nötig':'Extra')+'</span>'+(x.braucht?'<span class="tag">'+esc(x.braucht)+'</span>':'')+'</b><span class="o">'+(x.noetig?'Sonst: ':'Ohne: ')+esc(x.ohne)+'</span></li>';
+    }).join('')+'</ul>';
+  }
   function schrittInhalt(a, p, pl){
     var draussen=p.ort!=='drinnen', live=window.Konto && Konto.aktiv && Konto.aktiv(), h='';
     if(a.id==='bestellen'){
       var ek=Party.einkauf(p, tour), fehlt=ek.filter(function(x){ return !x.fertig; }).length;
-      return (fehlt?'<p class="leise klein">Häkchen setzen, dann führt dich die App Artikel für Artikel zu Amazon. Was schon da ist, hakst du mit „Hab ich schon“ ab.</p>':'')+einkaufKopf(ek)+
-        ek.filter(function(x){ return !x.fertig; }).map(einkaufZeile).join('')+
+      var offenN=ek.filter(function(x){ return !x.fertig && x.noetig; }), offenE=ek.filter(function(x){ return !x.fertig && !x.noetig; });
+      return (fehlt?wegeBox(ek):'')+einkaufKopf(ek)+
+        (offenN.length?'<h2 class="ek-gruppe">Braucht die Tour <small>'+offenN.length+'</small></h2><p class="leise klein ek-satz">Für jedes Teil gibt es eine Notlösung von zu Hause. Tippe „Notlösung“, dann ist es erledigt. Was schon da ist: „Hab ich schon“.</p>'+offenN.map(einkaufZeile).join(''):'')+
+        (offenE.length?'<h2 class="ek-gruppe">Extras, die es schöner machen <small>'+offenE.length+'</small></h2><p class="leise klein ek-satz">Schön, aber nicht nötig. Die Geschichte funktioniert auch ohne.</p>'+offenE.map(einkaufZeile).join(''):'')+
         (ek.some(function(x){ return x.fertig; }) ? '<details class="erledigt-liste"'+(fehlt?'':' open')+'><summary>Schon da oder bestellt ('+ek.filter(function(x){ return x.fertig; }).length+')</summary>'+ek.filter(function(x){ return x.fertig; }).map(einkaufZeile).join('')+'</details>' : '');
     }
     if(a.id==='einladen') return '<div class="feld-karte"><label for="gh">Bitte mitbringen und beachten</label><textarea id="gh" rows="2" maxlength="200" placeholder="z. B. Regenhose, warme Mütze, Wechselsocken">'+esc(Party.gaesteHinweis(p))+'</textarea>'+
@@ -591,15 +636,20 @@
       '<h2>Wer kommt?</h2><div id="gaeste">'+gaesteHtml()+'</div>'+
       '<p class="leise klein">Schon anders eingeladen? Dann hak den Schritt unten einfach ab.</p>';
     if(a.id==='route') return draussen ? routeKarte(p, pl)+
+      '<div class="tipp-karte"><b>Tipp: mit dem Tablet ablaufen</b><span>Nimm das Gerät, mit dem ihr spielt, am besten das Tablet. Jedes Gerät misst GPS etwas anders. Setzt du die Punkte mit dem Tablet, öffnen die Stationen am Partytag genau dort. Am einfachsten geht das mit der Generalprobe: Sie führt dich wie bei der Party von Station zu Station, und du setzt jeden Punkt mit einem Tipp.</span>'+
+        '<a class="knopf mittel leer" href="spiel.html?thema='+thema+'&probe=1">Generalprobe starten</a></div>'+
       kachel({id:'einf-gps', symbol:'auge', titel:'So öffnen sich die Stationen', text:'Am Ziel von selbst. Die kurze Einführung zeigt, was du tust, wenn eine Station zu früh oder gar nicht öffnet.'}) :
       kachel({href:'spiel.html?thema='+thema+'#einrichten', haupt:true, symbol:'liste', titel:'Liste öffnen', text:'Zeigt, welche Station in welchen Raum kommt und was dort hingehört.'});
-    if(a.id==='basteln') return (draussen ? Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise') : '')+kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden und Einladungen.'})+
+    if(a.id==='basteln') return bastelListe(p)+(draussen ? Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise') : '')+kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden und Einladungen.'})+
       kachel({href:'spiel.html?thema='+thema+'#einrichten', symbol:'liste', titel:'Bastelliste öffnen', text:'Was in welche Station gehört. Dort hakst du ab, was fertig ist.'});
     if(a.id==='geraet') return (window.Namen && a.teile.some(function(x){ return x.id==='namen'; }) ? kachel({oeffne:'namen', haupt:!(p.erledigt||{}).namen, symbol:'ton', titel:'Funkel kennt '+p.kind.name, text:(p.erledigt||{}).namen?'Eingesprochen. Anhören oder ändern, bevor das Tablet die Sätze holt.':'Funkel sagt den Namen an drei Stellen. Hör dir an, wann und wie.'}) : '')+
       kachel({oeffne:'spiel', symbol:'liste', titel:'So spielt ihr: '+spielKurz(p), text:'Vor dem Laden prüfen. „Startklar“ lädt die Stimme eures Erzählers mit aufs Tablet.'})+
       kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
       kachel({id:'teilen', symbol:'geraet', titel:'Link fürs Tablet', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl, Spielart und Erzähler schon drin.'});
     if(a.id==='partytag'){
+      // Generalprobe (UNICORN-61): am Tag oder Abend davor die Tour einmal so durchspielen wie am Partytag
+      h+=kachel({href:'spiel.html?thema='+thema+'&probe=1', haupt:!(p.erledigt||{}).generalprobe, symbol:'start', titel:'Generalprobe am Vortag', text:draussen?'Lauf die Tour einmal mit dem Tablet ab, genau wie am Partytag. Unterwegs zeigt der Spiegel den Abstand zur Station, und mit einem Tipp setzt du jeden Punkt dort, wo er hingehört. Am Ende siehst du, wo es gut lief.':'Spiel die Tour einmal durch, Raum für Raum. Du siehst, wie die Kinder geführt werden, und prüfst, ob überall alles liegt.'});
+      h+='<p class="leise klein probe-tablet">Am besten auf dem Tablet, mit dem ihr spielt: Öffne dort euren Tablet-Link und tippe oben rechts „Erwachsene“ → „Generalprobe“. Fein einstellen kannst du danach alles unter „Erwachsene“ → „Einrichten“: GPS-Abstand, Erzähler, Spielart.</p>';
       if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.uhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das Tablet sieht seine Haken live.':'')});
       h+=kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Tablet: letzter Check, dann weckt ihr den Zauberspiegel.'});
       if(p.planB || p.ort==='drinnen' && p.warDraussen){
@@ -758,7 +808,14 @@
     if(t.closest('#vg-link')){ bereit(function(){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+partyTitel(party), 'Link kopiert. An den Vorausgeher schicken.'); }); return; }
     if(t.closest('#gast-link')){ var gh2=$('gh'); if(gh2 && gh2.value.trim().slice(0,200)!==Party.gaesteHinweis(party)){ party.gaesteHinweis=gh2.value.trim().slice(0,200); party=Party.speichern(party); } gastLink(); return; }
     var k=t.closest('[data-kauf],[data-kauf-zurueck]');
-    if(k){ party.einkauf=party.einkauf||{}; if(k.hasAttribute('data-kauf')) party.einkauf[k.getAttribute('data-kauf')]=true; else delete party.einkauf[k.getAttribute('data-kauf-zurueck')]; einkaufNeu(); return; }
+    if(k){ party.einkauf=party.einkauf||{}; party.einkaufWie=party.einkaufWie||{};
+      if(k.hasAttribute('data-kauf')){ var kid=k.getAttribute('data-kauf'); party.einkauf[kid]=true; if(k.getAttribute('data-wie')) party.einkaufWie[kid]=k.getAttribute('data-wie'); else delete party.einkaufWie[kid]; }
+      else { delete party.einkauf[k.getAttribute('data-kauf-zurueck')]; delete party.einkaufWie[k.getAttribute('data-kauf-zurueck')]; }
+      einkaufNeu(); return; }
+    if((b=t.closest('[data-wege]'))){                  // Zwei Wege (UNICORN-60): alles oder nur das Nötige auswählen
+      var ew=Party.einkauf(party, tour); party.einkaufAus={};
+      if(b.getAttribute('data-wege')==='noetig') ew.forEach(function(x){ if(!x.fertig && x.lieferbar && !x.noetig) party.einkaufAus[x.id]=true; });
+      einkaufNeu(); return; }
     if(t.closest('#alle-waehlen')){
       var ek=Party.einkauf(party, tour), alle=ek.filter(Party.imKorb).length===ek.filter(function(x){ return !x.fertig && x.lieferbar; }).length;
       party.einkaufAus={}; if(alle) ek.forEach(function(x){ if(!x.fertig && x.lieferbar) party.einkaufAus[x.id]=true; });

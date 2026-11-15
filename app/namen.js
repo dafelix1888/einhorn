@@ -162,6 +162,7 @@
     if(!root.Konto || !Konto.aktiv() || !K || !t || !K.vorlagenOk(t.namenSaetze) || !e || !e.kind || !e.kind.name) return '';
     var b=K.bilden(t.namenSaetze, {name:e.kind.name, alter:e.kind.alter}), n=esc(K.sauber(e.kind.name));
     return '<div class="nm-vorschau"><img src="themen/einhorn/figuren/funkel.svg" alt=""><div><b>Funkel kennt '+n+'</b>'+
+      '<p class="nm-wer">Funkel ist das Einhorn im Zauberspiegel. Sein Regenbogen ist verschwunden, und die Kinder helfen ihm, ihn wiederzufinden. Er erzählt die Geschichte und führt von Station zu Station.</p>'+
       '<p>Er nennt '+n+' dreimal beim Namen, zum Beispiel an der Haustür:</p><p class="nm-zitat">„'+esc(b.gruss.zeigen).split(n).join('<mark>'+n+'</mark>')+'“</p>'+
       '<p class="leise klein">Gleich nach dem Erstellen kannst du es anhören.</p></div></div>';
   }
