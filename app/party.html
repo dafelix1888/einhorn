@@ -40,6 +40,7 @@
 .namen-pille .ton{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#8B5CF6;color:#fff}
 .namen-pille .ton svg{width:18px;height:18px}
 .namen-pille .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;line-height:1.25}.namen-pille b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.namen-pille small{color:#C4B5FD;font-size:.84rem;font-weight:700}
+.namen-zeile{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px}
 .namen-pille .weiter{flex:none;font-size:1.5rem;line-height:1;color:#C4B5FD}
 .namen-pille.da{background:transparent;border-color:var(--linie,#2F2740)}.namen-pille.da .ton{background:#3FB950}.namen-pille.da small{color:var(--leise);font-weight:400}
 /* „So spielt ihr“ (UNICORN-54): Zeile im Überblick, dahinter Spielart, Erzähler und der Ablauf der Tour */
@@ -286,7 +287,7 @@
       h+='<h1>Wer liest die Aufgaben vor?</h1>'+
         '<p class="leise">Funkel erzählt die Geschichte. An jeder Station liest eine zweite Figur den Kindern die Aufgabe vor. Hör rein und such eine aus.</p>'+
         Erzaehler.zeilen(tour, Erzaehler.wahl(tour, e))+
-        '<p class="leise klein">Später änderbar: in der Party unter „So spielt ihr“ und im Spiel unter „Erwachsene“.</p>';
+        '<p class="leise klein">Später änderbar unter „So spielt ihr“. Feinheiten stellst du im Elternbereich ein: im Spiel oben rechts „Erwachsene“ → „Einrichten“. Dort kannst du auch einzelne Aufgaben einer anderen Figur geben.</p>';
     } else {
       var vName=tour.varianten[Party.variante(e)].name;
       h+='<h1>Fertig! So sieht’s aus</h1>'+
@@ -500,12 +501,12 @@
     return '<nav class="leiste-oben" aria-label="So spielt ihr"><button type="button" class="textknopf" data-oeffne="" id="zum-ueberblick"><span aria-hidden="true">‹</span><span class="wort">Überblick</span></button></nav>'+
       '<section class="schritt-ansicht spiel-ansicht" id="so-spielt-ihr" style="--f:#A78BFA">'+
       '<header class="schritt-kopf"><span class="kreis gross">'+symbol('start')+'</span><div><div class="marke">Eure Tour</div><h1 tabindex="-1">So spielt ihr</h1></div></header>'+
-      '<p class="wozu">Das Wichtige zur Tour an einer Stelle. Alles lässt sich bis zum Start ändern, auch im Spiel unter „Erwachsene“.</p>'+
+      '<p class="wozu">Das Wichtige zur Tour an einer Stelle. Alles lässt sich bis zum Start ändern. Feinheiten wie einzelne Aufgaben, GPS-Abstand oder die Kamera stellst du im Elternbereich ein: im Spiel oben rechts „Erwachsene“ → „Einrichten“.</p>'+
       '<h2>Wo spielt ihr?</h2>'+Spielart.karten(tour, v)+
       (draussen && tour.extra ? '<div style="margin-top:10px">'+Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise')+'</div>' : '')+
       '<div id="spiel-wechsel">'+spielWechsel+'</div>'+
       (Erzaehler.gibt(tour) ? '<h2 id="erzaehler">Wer liest die Aufgaben vor?</h2><p class="leise klein" style="margin:-4px 0 10px">Funkel erzählt die Geschichte. An jeder Station liest eine zweite Figur den Kindern die Aufgabe vor.</p>'+Erzaehler.zeilen(tour, Erzaehler.wahl(tour, p)) : '')+
-      namenPille(l, p)+
+      namenBlock(l, p)+
       '<h2>So läuft die Tour</h2><ol class="lauf">'+lauf.map(function(x, i){ return '<li><span class="punkt">'+(i+1)+'</span><span><b>'+x[0]+'</b><span class="x">'+x[1]+'</span></span></li>'; }).join('')+'</ol>'+
       kachel({id:'einf-zeigen', symbol:'auge', titel:'Kurz erklärt in einer Minute', text:draussen?'Dein Menü im Spiel und was hilft, wenn eine Station zu früh oder gar nicht öffnet.':'Dein Menü im Spiel und wie du drinnen die Stationen öffnest.'})+
       '<div class="schritt-fuss"><button type="button" class="knopf breit" data-oeffne="">Fertig</button></div></section>';
@@ -519,8 +520,18 @@
     var n=esc(p.kind.name);
     return '<button type="button" class="namen-pille'+(x.fertig?' da':'')+'" data-namen-auf>'+
       '<span class="ton" aria-hidden="true">'+(x.fertig?HAKEN:TON)+'</span>'+
-      '<span class="t">'+(x.fertig?'<b>Funkel kennt '+n+'</b><small>Sagt den Namen an drei Stellen · anhören</small>':'<b>Funkel sagt „'+n+'“</b><small>Neu: jetzt ausprobieren</small>')+'</span>'+
+      '<span class="t">'+(x.fertig?'<b>Funkel kennt '+n+'</b><small>Sagt den Namen dreimal laut · anhören</small>':'<b>Funkel sagt „'+n+'“</b><small>Sagt den Namen laut · Hörprobe</small>')+'</span>'+
       '<span class="weiter" aria-hidden="true">›</span></button>';
+  }
+  // „Funkel kennt …“ in „So spielt ihr“ (UNICORN-54): was es ist, Hörprobe mit Beispielnamen, Weg zum Einsprechen
+  function namenBlock(l, p){
+    var x=null; l.forEach(function(a){ a.teile.forEach(function(t){ if(t.id==='namen') x=t; }); });
+    if(!x || !window.Namen) return '';
+    var n=esc(p.kind.name||'das Kind');
+    return '<h2 id="namen-block">Funkel sagt '+n+'s Namen</h2>'+
+      '<p class="leise klein" style="margin:-4px 0 10px">Funkel spricht '+n+' in der Tour dreimal mit Namen an: an der Haustür, beim Schatz (mit Alter) und zum Abschied zu Hause. '+(x.fertig?'Die Sätze sind eingesprochen.':'Hör rein, wie das klingt, dann sprichst du die Sätze mit '+n+'s Namen ein.')+'</p>'+
+      '<div class="namen-zeile"><button type="button" class="knopf mittel leer" data-namen-beispiel>▶ Hörprobe mit „'+esc(Namen.BEISPIEL)+'“</button>'+
+      '<button type="button" class="knopf mittel'+(x.fertig?' leer':'')+'" data-namen-auf>'+(x.fertig?'Eigene Sätze anhören':'Mit „'+n+'“ einsprechen')+'</button></div>';
   }
   function zuNamen(){ var e=$('namen'); if(e) try{ e.scrollIntoView({block:'start'}); }catch(x){ e.scrollIntoView(); } }
   // Ein Schritt als eigene Ansicht: Leiste mit allen Schritten, wozu, Werkzeuge, Abschluss

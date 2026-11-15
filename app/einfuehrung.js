@@ -42,7 +42,7 @@
   // Nur in der Hilfe: was man tut, wenn etwas dauerhaft hakt
   var MEHR=[
     { id:'oft', nur:'draussen', nach:'ankunft', frage:'Stationen öffnen oft zu früh oder zu spät',
-      text:'„Erwachsene“ → „Einrichten“ → „GPS-Punkte“: Abstand auf 10 m stellen, wenn es zu früh kommt, auf 25 m, wenn es zu spät kommt. Ein Tablet ohne Mobilfunk hat oft kein GPS. Dann besser ein Handy als Spiegel nehmen oder die Stationen von Hand öffnen.' },
+      text:'„Erwachsene“ → „Einrichten“ → „GPS-Punkte“: Abstand auf 10 m stellen, wenn es zu früh kommt, auf 25 m, wenn es zu spät kommt. Punkte, die du vor Ort setzt, am besten mit dem Gerät setzen, das bei der Tour der Spiegel ist. Ein Tablet ohne Mobilfunk hat oft kein GPS. Dann besser ein Handy als Spiegel nehmen oder die Stationen von Hand öffnen.' },
     { id:'ton', frage:'Kein Ton',
       text:'Stummschalter aus und Lautstärke hoch. Danach „Noch einmal hören“ tippen.' },
     { id:'regen', nur:'draussen', frage:'Es regnet',

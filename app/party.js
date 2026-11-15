@@ -62,7 +62,7 @@
         link:einladungsLink(p, pl)||('party.html?thema='+t+'#einladung'), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
       draussen ?
         {id:'route', tag:-7, titel:route?'Route ablaufen':'Route planen', kurz:route?'Steht schon'+(km?', '+km:'')+'. Einmal zur Probe gehen':'Der Planer findet die Orte für die Stationen',
-          text:route?'Eure Route steht'+(km?' ('+km+')':'')+'. Geh sie einmal ab und setz jede Station dort, wo du stehst: im Planer die Station antippen und „hier setzen“. So weißt du, dass das GPS an der richtigen Stelle auslöst.':'Adresse eingeben, Richtung wählen: Der Planer sucht passende Orte für die Stationen. Danach einmal ablaufen.',
+          text:route?'Eure Route steht'+(km?' ('+km+')':'')+'. Geh sie einmal ab und setz jede Station dort, wo du stehst: im Planer die Station antippen und „hier setzen“. So weißt du, dass das GPS an der richtigen Stelle auslöst. Nimm zum Setzen der Punkte dasselbe Gerät, das bei der Tour der Spiegel ist. Jedes Gerät misst etwas anders, so öffnen die Stationen genauer.':'Adresse eingeben, Richtung wählen: Der Planer sucht passende Orte für die Stationen. Danach einmal ablaufen.',
           knopf:route?'Route ansehen':'Route planen', link:'planer.html?thema='+t,
           teile:[{id:'route', titel:'Route geplant', nurAuto:true, erkannt:route}, {id:'probelauf', titel:'Einmal abgelaufen'}]} :
         {id:'route', tag:-7, titel:'Räume festlegen', kurz:'Küche, Flur, Treppe, Toberaum und Sofa',

@@ -85,7 +85,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(/einladung\.html\?k=[\w-]{24}$/.test(links.e) && /&k=/.test(links.v) && /&k=/.test(links.s) && !/plan=|e=/.test(links.e+links.v+links.s), 'Links nur mit Schlüssel');
 
   // Funkel kennt das Kind (UNICORN-33): im Überblick sichtbar, Karte oben im Schritt „Tablet startklar machen“
-  pruefe(/Funkel sagt „Emma“/.test(await a.locator('.namen-pille').innerText()) && /ausprobieren/.test(await a.locator('.namen-pille').innerText()), 'Überblick: Hinweis „Funkel sagt „Emma“ · jetzt ausprobieren“');
+  pruefe(/Funkel sagt „Emma“/.test(await a.locator('.namen-pille').innerText()) && /Hörprobe/.test(await a.locator('.namen-pille').innerText()), 'Überblick: Hinweis „Funkel sagt „Emma“ · Hörprobe“');
   await a.click('.namen-pille');
   await a.waitForSelector('#namen-name', {timeout:5000}); await a.waitForTimeout(200);
   pruefe(/#s-geraet$/.test(a.url()) && await a.locator('#namen').evaluate(e=>{ const r=e.getBoundingClientRect(); const n=document.querySelector('.leiste-oben'), u=n?n.getBoundingClientRect().bottom:0; return r.top>=u-2 && r.top<window.innerHeight/2; }), 'Tipp führt direkt zur Namens-Karte');
