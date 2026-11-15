@@ -87,6 +87,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   // Funkel kennt das Kind (UNICORN-33): im Überblick sichtbar, Karte oben im Schritt „Tablet startklar machen“
   pruefe(/Funkel sagt „Emma“/.test(await a.locator('.namen-pille').innerText()) && /Hörprobe/.test(await a.locator('.namen-pille').innerText()), 'Überblick: Hinweis „Funkel sagt „Emma“ · Hörprobe“');
   await a.click('.namen-pille');
+  await a.evaluate(()=>{ HTMLMediaElement.prototype.play=function(){ return Promise.resolve(); }; });   // Ton im Test nicht abspielen: verhält sich lokal und in der CI gleich
   await a.waitForSelector('#namen-name', {timeout:5000}); await a.waitForTimeout(200);
   pruefe(/#namen$/.test(a.url()) && /Funkel kennt Emma/.test(await a.locator('.namen-ansicht h1').innerText()), 'Tipp öffnet die eigene Ansicht „Funkel kennt Emma“ (#namen, UNICORN-56)');
   pruefe(await a.locator('.nm-buehne .nm-funkel').count()===1 && /Emma/.test(await a.locator('#nm-untertitel').innerText()), 'Funkel erscheint, sein Satz mit Emma ist eingeblendet');
@@ -102,9 +103,11 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   const kt=await a.locator('#namen-karte').innerText();
   pruefe(/Geburtstag von Emma/.test(kt) && /5 Jahre, wie toll!/.test(kt) && /Noch 3 von 3/.test(kt), 'Sätze erzeugt, mit Alters-Satz, erstes zählt nicht: noch 3');
   pruefe(await a.locator('[data-namen-alle]').count()===1 && await a.locator('[data-namen-ganz]').count()===3, 'Danach: „Alle drei Stellen anhören“ und je Stelle „Mit Geschichte“');
-  pruefe(await a.locator('.nm-moment.spricht').count()===1 && /■ Stopp/.test(await a.locator('#nm-haupt').innerText()), 'Nach dem Einsprechen spricht Funkel gleich los');
-  await a.click('[data-namen-alle]'); await a.waitForTimeout(100);
-  pruefe(await a.locator('.nm-moment.spricht').count()===0, 'Tipp auf „Stopp“ hält an');
+  {
+    pruefe(await a.locator('.nm-moment.spricht').count()===1 && /■ Stopp/.test(await a.locator('#nm-haupt').innerText()), 'Nach dem Einsprechen spricht Funkel gleich los');
+    await a.click('[data-namen-alle]'); await a.waitForTimeout(100);
+    pruefe(await a.locator('.nm-moment.spricht').count()===0, 'Tipp auf „Stopp“ hält an');
+  }
   await a.click('[data-namen-alle]'); await a.waitForTimeout(150);
   pruefe(await a.locator('.nm-moment.spricht').count()===1 && await a.locator('.nm-p.nm-name.spricht').count()===1, 'Beim Anhören ist die Stelle im Zeitstrahl und im Text markiert');
   await a.click('[data-namen-alle]'); await a.waitForTimeout(100);
