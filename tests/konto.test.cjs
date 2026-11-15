@@ -27,7 +27,7 @@ async function mock(route){
     const sz=NK.bilden(NV,{name:body.name,aussprache:body.aussprache,alter:body.alter,wahl:art==='worte'?NK.naechsteWahl(NV,wahl):wahl});
     if(art==='neu' && n.saetze && n.saetze.gruss.name===body.name && n.saetze.gruss.aussprache===(body.aussprache||'') && n.alter===(body.alter||null)) return j(200,st({hash:n.hash,saetze:n.saetze,gleich:true}));   // gleicher Text kostet nichts
     if(n.erzeugungen>0 && NK.uebrig(n.erzeugungen)<=0) return j(402,st({fehler:'Alle 3 Mal neu erzeugen sind verbraucht.'}));
-    if(stimmeAus) return j(503,{fehler:'Die Stimme ist noch nicht eingerichtet.'});   // wie live ohne ELEVENLABS_API_KEY
+    if(stimmeAus) return j(503,{fehler:'Die Stimme ist noch nicht eingerichtet.'});   // wie live ohne Secret ELEVENLABS
     db.namen[body.party_id]={erzeugungen:n.erzeugungen+1,hash:'h'+(n.erzeugungen+1),alter:body.alter||null,saetze:mk(sz,body.name,body.aussprache||''),arten:(n.arten||[]).concat(art)};
     const z=db.namen[body.party_id]; return j(200,{max:3,uebrig:NK.uebrig(z.erzeugungen),hash:z.hash,saetze:z.saetze});
   }

@@ -7,7 +7,8 @@
 // Stimmen-Speicher über alle Partys (UNICORN-49, ADR-28): Schlüssel = Hash aus Stimme und gesprochenem Text.
 // Ist der Text schon da (auch von einer anderen Familie), kostet er nichts. Je Text höchstens 3 Aufnahmen, beste zuerst.
 // Vorlagen aus tour.json des Themas (namenSaetze, UNICORN-50). Erstes Einsprechen frei, danach 3× neu (UNICORN-51).
-// Secret: ELEVENLABS_API_KEY (Dashboard → Edge Functions → Secrets). Nur nötig, wenn ein Text noch nicht im Speicher ist.
+// Secret: ELEVENLABS_API_KEY oder ELEVENLABS (Dashboard → Edge Functions → Secrets; live heißt es ELEVENLABS, PBIM-27).
+// Nur nötig, wenn ein Text noch nicht im Speicher ist.
 // Verbrauch je Monat: stimm_verbrauch (STRAT-2), Tagesbremse über alle Partys: stimm_tag.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import './namen-kern.js';
@@ -158,7 +159,7 @@ Deno.serve(async (req) => {
   const neu = Object.entries(plan).filter(([, x]: any) => x.neu) as [string, any][];
   const ton: Record<string, ArrayBuffer> = {};
   if (neu.length) {
-    const key = Deno.env.get('ELEVENLABS_API_KEY');
+    const key = Deno.env.get('ELEVENLABS_API_KEY') || Deno.env.get('ELEVENLABS');   // beide Namen (PBIM-27)
     if (!key) return antwort(503, { fehler: 'Die Stimme ist noch nicht eingerichtet.' });
     const { data: frei } = await admin.rpc('stimm_tag_buchen', { n: neu.length, grenze: TAG_MAX });
     if (frei !== true) return antwort(429, { fehler: 'Funkel ist für heute heiser. Bitte morgen noch einmal versuchen.' });
