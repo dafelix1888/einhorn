@@ -28,15 +28,22 @@
     Object.keys(b).forEach(function(k){ t[k]=b[k].zeigen; });
     return t;
   }
+  // Hörprobe mit Beispielnamen (UNICORN-54): fest erzeugt (stimmen/beispiel.mjs), kostet beim Anhören nichts
+  function beispielKnopf(){ return '<button type="button" class="knopf klein leer namen-beispiel" data-namen-beispiel>▶ Hörprobe mit „'+BEISPIEL+'“</button>'; }
+  var BEISPIEL='Emma';
+  function beispiel(th){
+    try{ if(spieler) spieler.pause(); spieler=new Audio('themen/'+encodeURIComponent(th||thema||'einhorn')+'/namen-beispiel.mp3');
+      var pr=spieler.play(); if(pr && pr['catch']) pr['catch'](function(){}); }catch(e){}
+  }
   function stellen(){ return vorlagen ? vorlagen.stellen.map(function(s){ return [s.id, s.titel||s.id]; }) : [['gruss','An der Haustür'],['schatz','Beim Schatz'],['abschied','Zu Hause']]; }
   function satzHtml(){
     var t=saetze(), mitTon=gespeichert() && !geaendert(), nach=(vorlagen && vorlagen.alter && vorlagen.alter.nach)||'schatz';
-    if(!t) return '<p>Funkel sagt '+(vorname()?esc(vorname()):'den Namen')+' an drei Stellen: bei der Begrüßung, beim Schatz und zum Abschied. Vorher anhören, dann aufs Tablet.</p>';
+    if(!t) return '<p>Funkel sagt '+(vorname()?esc(vorname()):'den Namen')+' an drei Stellen laut: bei der Begrüßung, beim Schatz und zum Abschied. Vorher anhören, dann aufs Tablet.</p>'+beispielKnopf();
     return '<div class="namen-saetze'+(mitTon?'':' vorschau')+'">'+stellen().map(function(s){
       var text=(t[s[0]]||'')+(s[0]===nach && t.alter ? ' '+t.alter : '');
       return '<div class="zeile"><span><b>'+esc(s[1])+'</b><br><span class="leise">„'+esc(text)+'“</span></span>'+
         (mitTon && audio[s[0]]?'<button type="button" class="knopf klein leer" data-namen-hoeren="'+s[0]+'" aria-label="'+esc(s[1])+' anhören">▶ Anhören</button>':'')+'</div>';
-    }).join('')+'</div>'+(mitTon?'':'<p class="leise namen-vorschau-hinweis">So sagt Funkel es. Zum Anhören einsprechen.</p>');
+    }).join('')+'</div>'+(mitTon?'':'<p class="leise namen-vorschau-hinweis">So sagt Funkel es, in Funkels Stimme und mit diesem Namen. Zum Anhören einsprechen.</p>'+beispielKnopf());
   }
   function knopfHtml(){
     if(!stand) return '';
@@ -59,7 +66,7 @@
     var p=party(), n=vorname();
     if(!root.Konto || !Konto.aktiv() || !p) return '';
     if(!Konto.angemeldet() || !p.server)
-      return '<p>Funkel sagt '+(n?esc(n):'den Namen')+' an drei Stellen: bei der Begrüßung, beim Schatz und zum Abschied. Dafür die Party speichern.</p>'+
+      return '<p>Funkel sagt '+(n?esc(n):'den Namen')+' an drei Stellen laut: bei der Begrüßung, beim Schatz und zum Abschied. Dafür die Party speichern.</p>'+beispielKnopf()+
         '<button type="button" class="knopf mittel" data-konto="anmelden">Speichern und teilen</button>';
     if(!stand) return '<p class="leise">Lädt …</p>'+(fehler?'<p class="namen-fehler">'+esc(fehler)+'</p>':'');
     var e=eingabe();
@@ -133,6 +140,7 @@
   document.addEventListener('click', function(ev){
     var t=ev.target; if(!t.closest) return;
     var h=t.closest('[data-namen-hoeren]'); if(h){ hoeren(h.getAttribute('data-namen-hoeren')); return; }
+    if(t.closest('[data-namen-beispiel]')){ beispiel(); return; }
     var l=t.closest('[data-namen-los]'); if(l && !l.disabled) erzeugen(l.getAttribute('data-namen-los'));
   });
   document.addEventListener('input', function(ev){
@@ -148,5 +156,5 @@
     '.namen-knoepfe{display:flex;gap:10px;flex-wrap:wrap}.namen-knoepfe .knopf{flex:1;min-width:140px}.namen-info{margin-top:8px}'+
     '.namen-fehler{color:var(--rot,#F87171);margin:4px 0 10px}#namen{scroll-margin-top:84px}';
   document.head.appendChild(stil);
-  root.Namen={karte:karte};
+  root.Namen={karte:karte, beispiel:beispiel, BEISPIEL:BEISPIEL};
 })(this);

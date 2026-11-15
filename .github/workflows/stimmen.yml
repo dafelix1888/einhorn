@@ -33,16 +33,22 @@ jobs:
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
         run: node stimmen/erzeugen.mjs
+      - name: Hörprobe für „Funkel kennt …“ (nur wenn geändert)
+        if: success() || failure()
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: node stimmen/beispiel.mjs
       - name: Stimmen in Pakete für die App aufteilen
         if: success() || failure()
         run: node stimmen/aufteilen.mjs
       - name: Neue Stimmen-Datei einchecken
         if: success() || failure()
         run: |
-          if git diff --quiet -- funkel-stimme.json stimmen/pakete && [ -z "$(git status --porcelain stimmen/pakete)" ]; then echo "Keine Änderung."; exit 0; fi
+          if git diff --quiet -- funkel-stimme.json stimmen/pakete && [ -z "$(git status --porcelain stimmen/pakete app/themen/einhorn/namen-beispiel.mp3 app/themen/einhorn/namen-beispiel.json)" ]; then echo "Keine Änderung."; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git add funkel-stimme.json stimmen/pakete
+          git add app/themen/einhorn/namen-beispiel.mp3 app/themen/einhorn/namen-beispiel.json 2>/dev/null || true
           git commit -m "Stimmen neu erzeugt"
           git push
           # Pushes mit dem GitHub-Token starten keine anderen Workflows: Veröffentlichung (Cloudflare) und Pages ausdrücklich anstoßen

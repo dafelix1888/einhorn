@@ -106,14 +106,14 @@
   "a": {
    "name": "Draußen",
    "kurz": "Ihr lauft durch eure Straße, das Tablet führt per GPS.",
-   "braucht": "Kreide, ein Seil, ein Helfer, der vorausgeht",
+   "braucht": "Kreide, ein Seil und ein Helfer, der vorausgeht. Oder du baust alles eine Stunde vorher schnell selbst auf",
    "bild": "draussen",
    "draussen": true
   },
   "b": {
    "name": "Draußen + Hinweise am Weg",
    "kurz": "Draußen, und an drei Stationen hängen echte Dinge zum Suchen.",
-   "braucht": "Kreide, ein Seil, ein Helfer, 4 Schleifen, ein weißes Laken",
+   "braucht": "Kreide, ein Seil, 4 Schleifen, ein weißes Laken und ein Helfer, der vorausgeht. Oder du baust alles eine Stunde vorher schnell selbst auf",
    "bild": "draussen",
    "st": {
     "1": {
