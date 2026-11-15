@@ -323,7 +323,8 @@
     else if(ersatz(i,s)) text='<span class="leise">Einfacher Wegpunkt.</span> Passt so. Gesucht war: '+esc(t.wo||'')+'. Wer mag, zieht die Station dorthin.';
     else text='<span class="ok">'+esc(s.hinweis||'passt')+'</span> · '+esc(s.name)+' · nach '+km(s.nachMeter)+(s.hoehe!=null?' · '+s.hoehe+' m hoch':'');
     $('st-titel').textContent='Station '+(i+1)+': '+stationTitel(i);
-    $('st-text').innerHTML=text;
+    var pl=t.planer||{};                 // kurz, was dort passiert und welcher Ort passt (UNICORN-64)
+    $('st-text').innerHTML=text+(pl.was?'<span class="st-was">'+esc(pl.was)+'</span>':'')+(pl.ort?'<span class="st-ort"><b>Passt gut:</b> '+esc(pl.ort)+'</span>':'');
     $('station').className='station'+(ersatz(i,s)?' ersatz':'');
     marker.forEach(function(m,j){ var e=m.getElement(); if(e) e.classList.toggle('gewaehlt', j===i); m.setZIndexOffset(j===i?1000:0); });
     Array.prototype.forEach.call($('liste').querySelectorAll('button[data-i]'), function(b){ b.setAttribute('aria-current', String(+b.getAttribute('data-i')===i)); });
@@ -341,8 +342,11 @@
     $('zusammenfassung').textContent=(plan.rundkurs && plan.heimweg!=null ? 'Rundkurs, '+km(plan.strecke+plan.heimweg)+' insgesamt. ' : '')+st.length+' Stationen'+(fehlt?', '+fehlt+' davon an einem einfachen Wegpunkt (gestrichelt). Das passt auch so.':', alle Orte passen zur Geschichte.');
     $('liste').innerHTML=st.map(function(s,i){
       var e=ersatz(i,s);
+      var pl=(tour.stationen[i]||{}).planer||{};
       return '<li><button type="button" data-i="'+i+'" class="'+(e?'ersatz':'')+'"><i style="background:'+farbe(i)+'">'+(i===0?HAUS:i+1)+'</i><span><b>'+esc(stationTitel(i))+'</b>'+
-        '<small>'+(i===0?'Start':(e?'Einfacher Wegpunkt':esc(s.name))+' · nach '+km(s.nachMeter))+'</small></span></button></li>';
+        '<small>'+(i===0?'Start':(e?'Einfacher Wegpunkt':esc(s.name))+' · nach '+km(s.nachMeter))+'</small>'+
+        (pl.was?'<small class="li-info">'+esc(pl.was)+'</small>':'')+(pl.ort?'<small class="li-info"><b>Passt gut:</b> '+esc(pl.ort)+'</small>':'')+(pl.versteck?'<small class="li-info"><b>Versteckt:</b> '+esc(pl.versteck)+'</small>':'')+
+        '</span></button></li>';
     }).join('');
     profilZeichnen();
     kennzahlenZeigen(plan.strecke, plan.heimweg, plan.luft);
