@@ -122,6 +122,13 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(await v.evaluate(()=>{ const pl=JSON.parse(localStorage.getItem('sj.plan.einhorn')); return pl.stationen.length===2 && !JSON.parse(localStorage.getItem('sj.party.einhorn')).server; }), 'Vorausgeher hat Route, keine Schlüssel');
   pruefe(await v.evaluate(()=>JSON.parse(localStorage.getItem('sj.link.einhorn')).rolle==='vorausgeher'), 'Vorausgeher-Link gemerkt');
   pruefe(/live/.test(await v.locator('#live-hinweis').innerText()), 'Vorausgeher: Hinweis live');
+  // UNICORN-36: Der Schlüssel entscheidet über die Seite. Vorausgeher-Schlüssel an der Spiel-Adresse landet auf der Vorausgeher-Seite, Tablet-Schlüssel an der Vorausgeher-Adresse im Spiel.
+  const kV=new URL(links.v).searchParams.get('k'), kS=new URL(links.s).searchParams.get('k');
+  pruefe(/vorausgeher\.html/.test(links.v) && /spiel\.html/.test(links.s) && kV!==kS, 'Vorausgeher-Link zeigt auf die Vorausgeher-Seite, Tablet-Link aufs Spiel');
+  const v2=await geraet(); await v2.goto(B+'spiel.html?thema=einhorn&k='+kV); await v2.waitForURL(u=>/vorausgeher\.html/.test(u.toString()) && !/k=/.test(u.toString()), {timeout:8000}); await v2.waitForTimeout(800);
+  pruefe(await v2.locator('#live-hinweis').count()===1 && await v2.locator('[data-weiter]').count()>0, 'Vorausgeher-Schlüssel an der Spiel-Adresse: Aufbau-Liste statt Tour-Start');
+  const s2=await geraet(); await s2.goto(B+'vorausgeher.html?thema=einhorn&k='+kS); await s2.waitForURL(u=>/spiel\.html/.test(u.toString()) && !/k=/.test(u.toString()), {timeout:8000});
+  pruefe(await s2.evaluate(()=>JSON.parse(localStorage.getItem('sj.link.einhorn')).rolle==='spiel'), 'Tablet-Schlüssel an der Vorausgeher-Adresse: Spiel');
   await v.locator('[data-weiter]').first().click(); await v.waitForTimeout(800);
   pruefe(Object.values(db.aufbau)[0] && Object.keys(Object.values(db.aufbau)[0].stationen).length===1, 'Haken landet auf dem Server');
   // Tablet

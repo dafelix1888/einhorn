@@ -173,7 +173,12 @@
         meldung('Dieser Link geht nicht mehr', 'Er wurde ersetzt oder die Party ist vorbei. Bitte die Eltern um einen neuen Link.'); return; }
       Party.ausLinkUebernehmen(thema, r.daten, k);
       schreib('sj.link.'+thema, {k:k, rolle:r.rolle});         // für die Live-Haken des Vorausgehers
-      q.delete('k'); location.replace(location.pathname+'?'+q.toString()+location.hash);
+      q.delete('k');
+      // Der Link entscheidet über die Seite, nicht die Adresse (UNICORN-36): Vorausgeher-Schlüssel auf der Spiel-Seite
+      // (oder umgekehrt) führt zur passenden Seite. Sonst sähe der Vorausgeher nur den Tour-Start ohne Aufbau-Liste.
+      var datei=location.pathname.replace(/^.*\//,''), soll=r.rolle==='vorausgeher' ? 'vorausgeher.html' : 'spiel.html';
+      var pfad=(datei==='spiel.html' || datei==='vorausgeher.html') && datei!==soll ? location.pathname.replace(/[^/]*$/, soll) : location.pathname;
+      location.replace(pfad+'?'+q.toString()+(pfad===location.pathname ? location.hash : ''));
     }, function(){ meldung('Kein Netz', 'Zum ersten Öffnen braucht der Link Internet. Danach geht die Tour auch ohne.'); });
     return true;
   }
