@@ -107,6 +107,19 @@ button{font:inherit;color:inherit;touch-action:manipulation}
 .mirror-pic svg{width:100%;height:100%;display:block}
 .mirror-pic.tap{cursor:pointer}
 .mirror-pic{position:relative}
+/* „Wer war das?“ (UNICORN-62): Nebel über der Spur, Uhr während sie zu sehen ist */
+.mirror-pic .spur-nebel{position:absolute;inset:-10%;border-radius:50%;pointer-events:none;opacity:0;transition:opacity 1.4s ease;
+  background:radial-gradient(circle at 28% 38%,rgba(255,255,255,.97),rgba(255,255,255,0) 46%),radial-gradient(circle at 72% 52%,rgba(238,232,252,.97),rgba(238,232,252,0) 50%),
+    radial-gradient(circle at 48% 76%,rgba(255,255,255,.95),rgba(255,255,255,0) 46%),radial-gradient(circle at 52% 28%,rgba(228,220,248,.95),rgba(228,220,248,0) 50%),radial-gradient(circle,rgba(246,243,253,.9),rgba(246,243,253,.6) 60%,rgba(246,243,253,0) 72%);
+  filter:blur(5px);animation:nebelZieht 8s ease-in-out infinite alternate}
+.mirror-pic.nebel .spur-nebel{opacity:1}
+.mirror-pic.nebel svg,.mirror-pic.spur-sichtbar svg{transition:filter 1.4s ease,opacity 1.4s ease}
+.mirror-pic.nebel svg{filter:blur(16px);opacity:.08}
+.mirror-pic .spur-uhr{position:absolute;left:18%;right:18%;bottom:-6%;height:7px;border-radius:4px;background:var(--lila);transform-origin:left center;animation:spurUhr linear forwards}
+@keyframes spurUhr{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@keyframes nebelZieht{from{transform:translateX(-4%) scale(1)}to{transform:translateX(4%) scale(1.06)}}
+.spur-nochmal{flex:1 1 100%;background:none;border:0;color:var(--ink-soft);font:inherit;font-size:.95rem;text-decoration:underline;text-underline-offset:3px;padding:10px;min-height:44px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){ .mirror-pic .spur-nebel{animation:none} }
 .mirror-pic svg.deko-wolke{position:absolute;top:-11%;right:16%;width:40%;height:auto;animation:wolkeSchlaf 4.5s ease-in-out infinite;filter:drop-shadow(0 3px 5px rgba(36,26,61,.18))}
 @keyframes wolkeSchlaf{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(3px) scale(1.04)}}
 @media (prefers-reduced-motion:reduce){ .mirror-pic svg.deko-wolke{animation:none} }
@@ -1075,6 +1088,7 @@ function load(){
       if(o && o.idx>=0 && o.idx<N) s.idx=o.idx|0;
       if(o && ['start','seek','scene','end'].indexOf(o.phase)>=0) s.phase=o.phase;
       if(o && o.step>=0 && o.step<4) s.step=o.step|0;
+      if(o && ['','zeigen','nebel','wahl'].indexOf(o.spur)>=0){ s.spur=o.spur; s.spurBis=+o.spurBis||0; s.spurNach=['nebel','wahl'].indexOf(o.spurNach)>=0 ? o.spurNach : ''; }   // „Wer war das?“ (UNICORN-62)
       if(o && [10,15,25].indexOf(o.radius)>=0) s.radius=o.radius;
       if(o && typeof o.showTest==='boolean') s.showTest=o.showTest;
       if(o && typeof o.autoSag==='boolean') s.autoSag=o.autoSag;
@@ -1166,6 +1180,30 @@ function modusZeigen(){
 var trackTaps={};          // angetippte falsche Spuren in der Spuren-Szene
 var trackMsg='';
 var galN=0;                // Station 4, Draußen ohne Extra: welches Bild der Spiegel gerade zeigt (4 = alle gesehen)
+// „Wer war das?“ (UNICORN-62): Spur kurz zeigen, Nebel, aus dem Gedächtnis malen, dann vergleichen.
+// state.spur: '' bereit (Nebel), 'zeigen' (Spur sichtbar), 'nebel' (draußen: malen), 'wahl' (Spuren antippen)
+function spurMerken(){ var st=STATIONS[state.idx]; return state.phase==='scene' && !!st && st.kind==='wahl' && !!st.merken && state.step===0; }
+var spurUhr=null;
+function spurZeigen(nochmal){
+  if(!spurMerken()) return;
+  tonAn(); still(); clearTimeout(spurUhr);
+  var m=STATIONS[state.idx].merken;
+  state.spurNach = state.spur==='wahl' ? 'wahl' : (indoor() ? 'wahl' : 'nebel');
+  state.spur='zeigen'; state.spurBis=Date.now()+(nochmal ? 3 : (m.sekunden||5))*1000;
+  klang(KLANG_ZAUBER); save(); render(); spurUhrStellen();
+}
+function spurUhrStellen(){
+  clearTimeout(spurUhr);
+  if(!spurMerken() || state.spur!=='zeigen') return;
+  spurUhr=setTimeout(function(){
+    if(!spurMerken() || state.spur!=='zeigen') return;
+    state.spur=state.spurNach || (indoor() ? 'wahl' : 'nebel'); save(); render();
+  }, Math.max(0, (state.spurBis||0)-Date.now()));
+}
+function spurGemalt(){ if(!spurMerken() || state.spur!=='nebel') return; tonAn(); still(); state.spur='wahl'; save(); render(); }
+function ausgeblendet(t){                // Schritt gehört nicht zur gewählten Variante
+  return !!(t.teil || (t.nurOhne && state.variante==='a') || (t.mit && state.variante!=='a') || (t.nurDrinnen && !indoor()) || (t.nurDraussen && indoor()));
+}
 function galerieAktiv(){
   var st=STATIONS[state.idx];
   return state.variante==='a' && state.phase==='scene' && st.pic==='galerie' && state.step===0 && galN<st.optionen.length;
@@ -2035,13 +2073,13 @@ function stationOeffnen(){               // „Weiter“ im Pop: jetzt liest Fun
   tonAn(); wartet=false; popAus();
   if(!$('pop-tipp').hidden){ $('pop-tipp').hidden=true; if(window.Einfuehrung) Einfuehrung.tippMerken('ankunft'); }
   protoWarte(Math.round((jetztMs()-wartetSeit)/1000));
-  state.phase='scene'; state.step=0; trackTaps={}; galN=0; trackMsg=''; save(); render();
+  state.phase='scene'; state.step=0; state.spur=''; trackTaps={}; galN=0; trackMsg=''; save(); render();
 }
 function ankunftAbbrechen(){ if(ankunftT){ clearTimeout(ankunftT); ankunftT=null; } ankunft=false; wartet=false; popAus(); $('pop-tipp').hidden=true; }
 function weiter(){
   still();
   if(state.idx>=N-1){ state.phase='end'; state.step=0; klang(KLANG_ENDE); konfetti(160, .5, .3); setTimeout(function(){ konfetti(120, .2, .35); konfetti(120, .8, .35); }, 500); }
-  else { state.idx+=1; state.phase='seek'; state.step=0; naeheIst=0; naeheZiel=0; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0; }
+  else { state.idx+=1; state.phase='seek'; state.step=0; state.spur=''; naeheIst=0; naeheZiel=0; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0; }
   save(); render(); pruefeAnkunft();
 }
 function verzaubern(){
@@ -2073,7 +2111,7 @@ function haupt(){
   var st=STATIONS[state.idx];
   if(st.kind==='plain'){ weiter(); }
   else if(st.kind==='recolor'){ if(state.step===0) verzaubern(); else weiter(); }
-  else if(st.kind==='wahl'){ if(galerieAktiv()){ galN++; still(); klang(KLANG_ZAUBER); render(); var mp=$('mirror-pic'); mp.classList.remove('neu'); void mp.offsetWidth; mp.classList.add('neu'); return; } if(state.step>=1) weiter(); }
+  else if(st.kind==='wahl'){ if(spurMerken()){ if(!state.spur) spurZeigen(); else if(state.spur==='nebel') spurGemalt(); return; } if(galerieAktiv()){ galN++; still(); klang(KLANG_ZAUBER); render(); var mp=$('mirror-pic'); mp.classList.remove('neu'); void mp.offsetWidth; mp.classList.add('neu'); return; } if(state.step>=1) weiter(); }
   else if(st.kind==='finale'){
     if(state.step<st.steps.length-1){ state.step+=1; still(); klang(KLANG_ZAUBER); save(); render(); }
     else weiter();
@@ -2082,6 +2120,7 @@ function haupt(){
 function spurTipp(id){
   var st=STATIONS[state.idx];
   if(state.phase!=='scene' || st.kind!=='wahl' || state.step!==0) return;
+  if(spurMerken() && state.spur!=='wahl') return;
   tonAn();
   var t=st.optionen.filter(function(x){ return x.id===id; })[0]; if(!t) return;
   if(t.ja){ state.step=1; klang(KLANG_ZAUBER); save(); render(); konfetti(50, .5, .45); }
@@ -2100,11 +2139,11 @@ function heimAngekommen(){
 function gehZu(n){                      // Sprung aus dem Ablauf-Faden zu einem beliebigen Schritt
   var t=TEXTE[n]; if(!t) return;
   tonAn(); still(); ankunftAbbrechen(); trackTaps={}; galN=0; trackMsg=''; naeheIst=0; naeheZiel=0; heimMarke=Infinity;
-  state.idx=t.i; state.phase=t.phase; state.step=t.step; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0;
+  state.idx=t.i; state.phase=t.phase; state.step=t.step; state.spur=t.spur||''; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0;
   if(t.phase!=='start'){ wachBleiben(); gpsStart(); }
   save(); zeige('tour'); render(); pruefeAnkunft();
 }
-function vonVorn(){ ankunftAbbrechen(); still(); state.idx=0; state.phase='start'; state.step=0; trackTaps={}; galN=0; trackMsg=''; save(); render(); zeige('tour'); }
+function vonVorn(){ ankunftAbbrechen(); still(); state.idx=0; state.phase='start'; state.step=0; state.spur=''; trackTaps={}; galN=0; trackMsg=''; save(); render(); zeige('tour'); }
 function allesLoeschen(){
   ankunftAbbrechen(); still(); state.points=[null,null,null,null,null,null,null]; state.idx=0; state.phase='start'; state.step=0; save(); render();
   toast('Alle Punkte gelöscht. Die Tour steht wieder am Anfang.');
@@ -2124,7 +2163,13 @@ function texte(){                       // alle Schritte der Tour in Reihenfolge
       if(st.say2){ l.push({key:'s'+i+'.a', label:n+' · '+st.title+', Teil 1', kurz:st.title, text:st.say, i:i, phase:'scene', step:0, zweit:'s'+i+'.b'}); l.push({key:'s'+i+'.b', label:n+' · '+st.title+', Teil 2', kurz:st.title+', Teil 2', text:st.say2, i:i, phase:'scene', step:0, teil:true}); }
       else l.push({key:'s'+i+'.frage', label:n+' · '+st.title, kurz:st.title, text:st.say, i:i, phase:'scene', step:0, mit:!!(st.ohne&&st.ohne.say)});
       if(st.ohne&&st.ohne.say) l.push({key:'s'+i+'.frage.ohne', label:n+' · '+st.title+' (ohne Ausdrucke)', kurz:st.title, text:st.ohne.say, i:i, phase:'scene', step:0, nurOhne:true});
-      if(st.after) l.push({key:'s'+i+'.antwort', label:n+' · Lösung', kurz:'Lösung', text:st.after, i:i, phase:'scene', step:1, mit:!!(st.ohne&&st.ohne.after)});
+      if(st.merken){ var mk=st.merken, md=mk.drinnen||{};
+        if(mk.malen) l.push({key:'s'+i+'.malen', label:n+' · Spur malen', kurz:'Spur malen', text:mk.malen, i:i, phase:'scene', step:0, spur:'nebel', nurDraussen:true});
+        if(mk.vergleich) l.push({key:'s'+i+'.vergleich', label:n+' · Spur vergleichen', kurz:'Vergleichen', text:mk.vergleich, i:i, phase:'scene', step:0, spur:'wahl', nurDraussen:!!md.vergleich});
+        if(md.vergleich) l.push({key:'s'+i+'.vergleich.drinnen', label:n+' · Spur vergleichen (drinnen)', kurz:'Vergleichen', text:md.vergleich, i:i, phase:'scene', step:0, spur:'wahl', nurDrinnen:true});
+      }
+      if(st.after) l.push({key:'s'+i+'.antwort', label:n+' · Lösung', kurz:'Lösung', text:st.after, i:i, phase:'scene', step:1, mit:!!(st.ohne&&st.ohne.after), nurDraussen:!!(st.merken&&st.merken.drinnen&&st.merken.drinnen.after)});
+      if(st.merken&&st.merken.drinnen&&st.merken.drinnen.after) l.push({key:'s'+i+'.antwort.drinnen', label:n+' · Lösung (drinnen)', kurz:'Lösung', text:st.merken.drinnen.after, i:i, phase:'scene', step:1, nurDrinnen:true});
       if(st.ohne&&st.ohne.after) l.push({key:'s'+i+'.antwort.ohne', label:n+' · Lösung (ohne Ausdrucke)', kurz:'Lösung', text:st.ohne.after, i:i, phase:'scene', step:1, nurOhne:true});
     }
   });
@@ -2219,6 +2264,12 @@ function akt(){                         // der Satz, der gerade dran ist
   var i=state.idx, st=STATIONS[i], o=(state.variante!=='a' && st.ohne) ? st.ohne : null;   // ohne Ausdrucke: eigene Sätze
   if(state.phase==='seek') return o&&o.seek ? {key:'s'+i+'.weg.ohne', text:o.seek} : {key:'s'+i+'.weg', text:st.seek};
   if(st.kind==='finale') return {key:'s'+i+'.f'+state.step, text:st.steps[state.step].say};
+  if(st.merken){ var mk=st.merken, md=mk.drinnen||{};
+    if(state.step>=1) return indoor()&&md.after ? {key:'s'+i+'.antwort.drinnen', text:md.after} : {key:'s'+i+'.antwort', text:st.after};
+    if(state.spur==='nebel' && mk.malen) return {key:'s'+i+'.malen', text:mk.malen};
+    if(state.spur==='wahl') return indoor()&&md.vergleich ? {key:'s'+i+'.vergleich.drinnen', text:md.vergleich} : {key:'s'+i+'.vergleich', text:mk.vergleich};
+    return {key:'s'+i+'.frage', text:st.say};
+  }
   if(st.after && state.step>=1) return o&&o.after ? {key:'s'+i+'.antwort.ohne', text:o.after} : {key:'s'+i+'.antwort', text:st.after};
   if(o&&o.say && !st.say2) return {key:'s'+i+'.frage.ohne', text:o.say};
   if(st.say2) return {key:'s'+i+'.a', text:st.say, zweit:i===0 ? mitName('n.gruss', {key:'s0.b', text:st.say2}) : {key:'s'+i+'.b', text:st.say2}};
@@ -2234,7 +2285,7 @@ function hauptText(){                   // Beschriftung des einen Hauptknopfs, l
   if(ph==='seek') return (manuell() && !ankunft && !wartet) ? 'Station öffnen' : '';
   if(st.kind==='plain') return st.go;
   if(st.kind==='recolor') return state.step===0 ? 'Bild verzaubern' : 'Bögen gefunden, weiter';
-  if(st.kind==='wahl'){ if(galerieAktiv()) return galN<st.optionen.length-1 ? 'Nächstes Bild' : 'Alle vier gesehen'; return state.step>=1 ? st.go : ''; }
+  if(st.kind==='wahl'){ if(spurMerken()) return !state.spur ? (st.merken.zeigenGo||'Spur zeigen') : state.spur==='nebel' ? (st.merken.malenGo||'Fertig gemalt') : ''; if(galerieAktiv()) return galN<st.optionen.length-1 ? 'Nächstes Bild' : 'Alle vier gesehen'; return state.step>=1 ? st.go : ''; }
   return st.steps[state.step].go;
 }
 function jetzt(){                       // was der Erzähler in diesem Moment tun soll
@@ -2259,6 +2310,7 @@ function jetzt(){                       // was der Erzähler in diesem Moment tu
   if(st.kind==='wahl'){
     if(galerieAktiv()){ var go=st.optionen[galN], m=st.optionen.length;
       return 'Bild '+(galN+1)+' von '+m+': '+go.name+'. Die Kinder rufen, was falsch ist und welche Farbe es in echt hat. '+(galN<m-1 ? 'Dann ein paar Schritte am Zaun weiter und „Nächstes Bild“ tippen.' : 'Dann „Alle vier gesehen“ tippen.'); }
+    if(spurMerken()) return !state.spur ? st.frage : state.spur==='zeigen' ? 'Alle schauen genau hin. Gleich kommt der Nebel.' : state.spur==='nebel' ? st.frageNebel : st.frageWahl;
     return state.step===0 ? st.frage : lin+st.dann;
   }
   return st.steps[state.step].dann;
@@ -2348,7 +2400,11 @@ function render(keepPic){
 
   if(ph==='scene' && st && st.deko==='wolke' && pic) pic+=DEKO_WOLKE;   // die Wolke schläft nur im Spiegel, kein Requisit nötig (UNICORN-41)
   var mp=$('mirror-pic');
+  var nebel = spurMerken() && state.spur!=='zeigen';
+  if(spurMerken() && pic) pic+='<div class="spur-nebel" aria-hidden="true"></div>'+(state.spur==='zeigen' ? '<div class="spur-uhr" style="animation-duration:'+Math.max(.3,((state.spurBis||0)-Date.now())/1000)+'s"></div>' : '');
   if(!keepPic) mp.innerHTML=pic;
+  mp.classList.toggle('nebel', nebel);
+  mp.classList.toggle('spur-sichtbar', spurMerken() && state.spur==='zeigen');
   var uw=unterwegs();
   mp.hidden = uw;
   mp.classList.toggle('tap', tap);
@@ -2367,18 +2423,23 @@ function render(keepPic){
   linseStart();
 
   var ch=$('choices');
-  if(ph==='scene' && st.kind==='wahl' && !galerieAktiv()){
+  var spurWarten = spurMerken() && state.spur!=='wahl';
+  if(ph==='scene' && st.kind==='wahl' && !galerieAktiv() && spurWarten){
+    ch.hidden = state.spur!=='nebel';
+    ch.innerHTML = state.spur==='nebel' ? '<button type="button" class="spur-nochmal" data-spur-nochmal>Spur noch einmal zeigen</button>' : '';
+  } else if(ph==='scene' && st.kind==='wahl' && !galerieAktiv()){
     ch.hidden=false;
     ch.innerHTML=st.optionen.map(function(o){
       var geloest=state.step>=1, zeigen = !!st.namenOffen || geloest || !!trackTaps[o.id];
       var cls='choice'+(o.ja && geloest ? ' richtig' : (!o.ja && (trackTaps[o.id]||geloest) ? ' falsch' : ''));
       var bild = st.pic==='pfote' ? '<svg viewBox="0 0 200 200" aria-hidden="true">'+SPUR[o.id]+'</svg>' : PIC[o.id](o.ja && geloest ? o.richtig : o.farbe);
       return '<button type="button" class="'+cls+'" data-id="'+o.id+'" aria-label="'+esc(zeigen ? o.name : 'Spur antippen')+'">'+bild+'<span>'+(zeigen ? esc(o.name) : '?')+'</span></button>';
-    }).join('');
+    }).join('')+(spurMerken() ? '<button type="button" class="spur-nochmal" data-spur-nochmal>Spur noch einmal zeigen</button>' : '');
   } else { ch.hidden=true; ch.innerHTML=''; }
 
   renderSetup();
   live();
+  spurUhrStellen();
   funkelStart();
   if(fadenOffen) renderFaden();
   var k=akt().key, alt=letzterKey; letzterKey=k;        // neuen Schritt von selbst sprechen
@@ -2414,9 +2475,7 @@ function renderFaden(){
   }
   var station=-1;
   TEXTE.forEach(function(t,n){
-    if(t.teil) return;
-    if(t.nurOhne && state.variante==='a') return;
-    if(t.mit && state.variante!=='a') return;
+    if(ausgeblendet(t)) return;
     if(t.phase==='start'){ h+=zeile(n,'ende',t.kurz,t.text); return; }
     if(t.phase==='end' || t.phase==='heim'){ h+=zeile(n,'ende',t.kurz,t.text); return; }
     if(t.i!==station){ station=t.i; var st=STATIONS[t.i]; h+=zeile(n,'kopf',(t.i+1)+' · '+st.name,'', st.arc ? FARBE[st.arc] : null); }
@@ -2450,7 +2509,7 @@ function live(){
     $('btn-aufgabe-txt').textContent = ka ? ERZ[ka.fig].kurz+' liest vor' : 'Funkel liest vor';
   }
   infoZeigen();
-  var nx=TEXTE[pos()+1]; while(nx && (nx.teil || (nx.nurOhne && state.variante==='a') || (nx.mit && state.variante!=='a'))) nx=TEXTE[KEYPOS[nx.key]+1];
+  var nx=TEXTE[pos()+1]; while(nx && ausgeblendet(nx)) nx=TEXTE[KEYPOS[nx.key]+1];
   $('jetzt-dann').textContent = (state.phase==='heim' || !nx) ? '' : 'Danach: '+nx.label;
   $('btn-linse').hidden=!linseAn();
   sprechKnopf();
@@ -2633,7 +2692,7 @@ $('btn-mehr').addEventListener('click', function(){ mehrAn=!mehrAn; modusZeigen(
 $('btn-nochmal').addEventListener('click', function(){ if(sprichtGerade()){ still(); sprechKnopf(); return; } sagen(); });
 $('btn-speak').addEventListener('click', function(){ if(sprichtGerade()){ still(); sprechKnopf(); return; } sagen(); });
 $('btn-test').addEventListener('click', test);
-$('choices').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('.choice') : null; if(b) spurTipp(b.getAttribute('data-id')); });
+$('choices').addEventListener('click', function(e){ if(e.target.closest && e.target.closest('[data-spur-nochmal]')){ spurZeigen(true); return; } var b=e.target.closest ? e.target.closest('.choice') : null; if(b) spurTipp(b.getAttribute('data-id')); });
 $('btn-gps').addEventListener('click', function(){ wachBleiben(); gpsStart(); });
 $('points').addEventListener('click', function(e){
   var b=e.target.closest ? e.target.closest('button[data-set]') : null; if(!b || !fix) return;
