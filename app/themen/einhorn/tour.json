@@ -1987,15 +1987,15 @@
   }
  },
  "namenSaetze": {
-  "version": 1,
-  "hinweis": "Funkel kennt das Kind (UNICORN-50, ADR-28): nur {name} als Variable, neutral formuliert. Jede Textänderung erzeugt neue Aufnahmen (Credits).",
+  "version": 2,
+  "hinweis": "Funkel kennt das Kind (UNICORN-50/57, ADR-28): nur {name} als Variable, neutral formuliert, passt am Geburtstag und bei einer Feier danach („heute feiern wir“, nie „heute hast du Geburtstag“). Jede Textänderung erzeugt neue Aufnahmen (Credits).",
   "stellen": [
    {
     "id": "gruss",
     "titel": "An der Haustür",
     "varianten": [
-     "Und heute ist ein ganz besonderer Tag: {name} hat Geburtstag! {name}, heute hilfst du mir ganz besonders.",
-     "Wisst ihr, wer heute Geburtstag hat? {name}! Hallo {name}, wie schön, dass du heute mit mir auf Schatzsuche gehst.",
+     "Und heute ist ein ganz besonderer Tag: Wir feiern deinen Geburtstag, {name}! {name}, heute hilfst du mir ganz besonders.",
+     "Wisst ihr, wen wir heute feiern? {name}! Hallo {name}, wie schön, dass du heute mit mir auf Schatzsuche gehst.",
      "Heute feiern wir {name}! {name}, mit dir an meiner Seite finden wir den Schatz bestimmt."
     ]
    },
@@ -2003,9 +2003,9 @@
     "id": "schatz",
     "titel": "Beim Schatz",
     "varianten": [
-     "Alles Liebe zum Geburtstag, {name}!",
+     "Alles Liebe zu deinem Geburtstag, {name}!",
      "Herzlichen Glückwunsch zum Geburtstag, {name}!",
-     "Hurra, {name} hat Geburtstag! Alles, alles Liebe!"
+     "Hurra, heute feiern wir dich, {name}! Alles, alles Liebe zum Geburtstag!"
     ]
    },
    {
@@ -2021,7 +2021,7 @@
   "alter": {
    "nach": "schatz",
    "varianten": [
-    "Und weißt du was? Heute wirst du {alter}! Ich wünsche dir ein Jahr, so bunt wie mein Regenbogen."
+    "Und weißt du was? Jetzt bist du schon {alter} alt! Ich wünsche dir ein neues Lebensjahr, so bunt wie mein Regenbogen."
    ]
   }
  }

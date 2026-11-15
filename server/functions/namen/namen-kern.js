@@ -38,6 +38,8 @@
     var h=Math.floor(n/100), r=n%100;
     return (h===1?'ein':E[h])+'hundert'+(r ? (r===1?'eins':unter100(r)) : '');
   }
+  // „6 Jahre“ / „ein Jahr“: so passt der Satz am Geburtstag und bei einer Feier danach (UNICORN-57)
+  function jahre(a, wort){ return a===1 ? (wort==='1'?'1 Jahr':'ein Jahr') : wort+' Jahre'; }
   function alterZahl(a){ var n=Math.round(Number(a)); return n>=1 ? n : 0; }
 
   function fuellen(t, w){ return String(t).replace(/\{(name|alter)\}/g, function(_, k){ return w[k]==null?'':String(w[k]); }); }
@@ -63,7 +65,7 @@
       r[s.id]={titel:s.titel||s.id, variante:i, varianten:s.varianten.length, zeigen:fuellen(s.varianten[i], {name:name}), sprechen:fuellen(s.varianten[i], {name:sprech})};
     });
     if(v.alter && a){
-      r.alter={titel:'Alter', variante:0, varianten:1, nach:v.alter.nach||'schatz', zeigen:fuellen(v.alter.varianten[0], {alter:a}), sprechen:fuellen(v.alter.varianten[0], {alter:zahlwort(a)})};
+      r.alter={titel:'Alter', variante:0, varianten:1, nach:v.alter.nach||'schatz', zeigen:fuellen(v.alter.varianten[0], {alter:jahre(a, String(a))}), sprechen:fuellen(v.alter.varianten[0], {alter:jahre(a, zahlwort(a))})};
     }
     return r;
   }
@@ -95,6 +97,6 @@
   // Zählen gegenüber den Eltern: das erste Einsprechen ist frei, danach MAX_NEU Mal neu.
   function uebrig(erzeugungen){ return Math.max(0, MAX_NEU-Math.max(0, (erzeugungen||0)-1)); }
 
-  g.NamenKern={MAX_AUFNAHMEN:MAX_AUFNAHMEN, MAX_NEU:MAX_NEU, NAME_LAENGE:NAME_LAENGE, sauber:sauber, pruefeName:pruefeName, zahlwort:zahlwort, alterZahl:alterZahl,
+  g.NamenKern={MAX_AUFNAHMEN:MAX_AUFNAHMEN, MAX_NEU:MAX_NEU, NAME_LAENGE:NAME_LAENGE, sauber:sauber, pruefeName:pruefeName, zahlwort:zahlwort, jahre:jahre, alterZahl:alterZahl,
     fuellen:fuellen, vorlagenOk:vorlagenOk, bilden:bilden, naechsteWahl:naechsteWahl, schluessel:schluessel, aufnahmeWaehlen:aufnahmeWaehlen, uebrig:uebrig};
 })(typeof globalThis!=='undefined' ? globalThis : this);

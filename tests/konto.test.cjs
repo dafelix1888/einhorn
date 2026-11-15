@@ -94,13 +94,13 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(await a.locator('.nm-moment').count()===3 && /Hallo, ihr Einhorn-Helfer/.test(await a.locator('.nm-moment').first().innerText()) && /gemopst/.test(await a.locator('.nm-moment').first().innerText()), 'Ganzer gesprochener Text: davor, Namens-Satz, danach');
   pruefe(await a.locator('.nm-satz mark').first().innerText()==='Emma', 'Name im Satz hervorgehoben');
   pruefe(await a.inputValue('#namen-name')==='Emma', 'Namens-Karte mit Vorname');
-  pruefe(/Emma hat Geburtstag/.test(await a.locator('#namen-karte').innerText()) && /erste Einsprechen ist frei/.test(await a.locator('#namen-karte').innerText()), 'Sätze stehen sofort da (Vorschau), erstes Einsprechen frei (UNICORN-51)');
+  pruefe(/Wir feiern deinen Geburtstag, Emma/.test(await a.locator('#namen-karte').innerText()) && /erste Einsprechen ist frei/.test(await a.locator('#namen-karte').innerText()), 'Sätze stehen sofort da (Vorschau), erstes Einsprechen frei (UNICORN-51)');
   await a.click('[data-namen-los="neu"]'); await a.waitForSelector('#namen-fehler:not([hidden])', {timeout:5000});
   pruefe(/noch nicht eingerichtet/.test(await a.locator('#namen-karte').innerText()) && Object.keys(db.namen).length===0, 'Ohne Schlüssel: verständliche Meldung, nichts verbraucht');
   stimmeAus=false;
   await a.click('[data-namen-los="neu"]'); await a.waitForSelector('[data-namen-alle]', {timeout:5000});
   const kt=await a.locator('#namen-karte').innerText();
-  pruefe(/Emma hat Geburtstag/.test(kt) && /Heute wirst du 5!/.test(kt) && /Noch 3 von 3/.test(kt), 'Sätze erzeugt, mit Alters-Satz, erstes zählt nicht: noch 3');
+  pruefe(/Wir feiern deinen Geburtstag, Emma/.test(kt) && /Jetzt bist du schon 5 Jahre alt!/.test(kt) && /Noch 3 von 3/.test(kt), 'Sätze erzeugt, mit Alters-Satz, erstes zählt nicht: noch 3');
   pruefe(await a.locator('[data-namen-alle]').count()===1 && await a.locator('[data-namen-ganz]').count()===3, 'Danach: „Alle drei Stellen anhören“ und je Stelle „Mit Geschichte“');
   pruefe(await a.locator('.nm-moment.spricht').count()===1 && /■ Stopp/.test(await a.locator('#nm-haupt').innerText()), 'Nach dem Einsprechen spricht Funkel gleich los');
   await a.click('[data-namen-alle]'); await a.waitForTimeout(100);
@@ -112,7 +112,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(!(await a.evaluate(()=>Party.aufgaben(Party.lesen('einhorn'), null, null).filter(x=>x.id==='geraet')[0].fertig)), 'Extra-Teil hakt den Schritt nicht allein ab');
   pruefe(await a.locator('[data-namen-los="betonung"]').count()===1 && await a.locator('[data-namen-los="worte"]').count()===1, 'Danach: „Andere Betonung“ und „Andere Worte“');
   await a.click('[data-namen-los="worte"]'); await a.waitForFunction(()=>/Noch 2 von 3/.test(document.getElementById('namen-karte').innerText), null, {timeout:5000}).catch(()=>{});
-  pruefe(/Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()) && !/Emma hat Geburtstag/.test(await a.locator('#namen-karte').innerText()), 'Andere Worte: neue Variante, zählt einmal');
+  pruefe(/Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()) && !/Wir feiern deinen Geburtstag, Emma/.test(await a.locator('#namen-karte').innerText()), 'Andere Worte: neue Variante, zählt einmal');
   await a.fill('#namen-name','Ida'); await a.waitForTimeout(100);
   pruefe(/Ida/.test(await a.locator('#namen-texte').innerText()) && await a.locator('[data-namen-los="neu"]').count()===1 && await a.locator('[data-namen-ganz]').count()===0, 'Name tippen: Sätze sofort mit „Ida“, Knopf „Neu einsprechen“');
   await a.fill('#namen-name','Arsch'); await a.click('[data-namen-los="neu"]'); await a.waitForTimeout(200);

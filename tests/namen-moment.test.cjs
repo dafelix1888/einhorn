@@ -25,7 +25,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   await p.click('.namen-pille'); await p.waitForSelector('.nm-strahl', {timeout:5000}); await p.waitForTimeout(200);
   ok(/#namen$/.test(p.url()), 'Adresse #namen');
   ok(await p.locator('.nm-strahl .nm-p.nm-name').count()===3 && await p.locator('.nm-moment').count()===3, 'Ohne Anmeldung: Zeitstrahl und drei Stellen');
-  ok(/Heute wirst du 6!/.test(await p.locator('.nm-moment').nth(1).innerText()), 'Alters-Satz beim Schatz (6)');
+  ok(/Jetzt bist du schon 6 Jahre alt!/.test(await p.locator('.nm-moment').nth(1).innerText()), 'Alters-Satz beim Schatz (6)');
   ok(await p.locator('#nm-haupt [data-konto="anmelden"]').count()===1 && await p.locator('[data-namen-los]').count()===0, 'Knopf „Party sichern und einsprechen“ statt Einsprechen');
   ok(await p.locator('[data-namen-ganz]').count()===0, 'Ohne Ton kein „Mit Geschichte“');
   await p.click('#nm-haupt [data-namen-beispiel]'); await p.waitForTimeout(400);
