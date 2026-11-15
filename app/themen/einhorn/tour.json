@@ -442,6 +442,20 @@
     "notfalls": "„Startklar“ prüft es. Powerbank einpacken."
    },
    {
+    "x": "{kinder} Haarreifen",
+    "notfalls": "Papierhörner: Papier zur Tüte rollen, mit Haargummi befestigen.",
+    "u": [
+     "u0"
+    ]
+   },
+   {
+    "x": "{kinder} Tattoos",
+    "notfalls": "Mit Kinderschminke einen kleinen Regenbogen auf die Hand malen.",
+    "u": [
+     "u1"
+    ]
+   },
+   {
     "x": "Bögen in Rot, Gelb, Grün, Blau",
     "notfalls": "Aus Pappe ausschneiden und anmalen.",
     "u": [
@@ -464,11 +478,22 @@
     ]
    },
    {
+    "x": "{kinder} Glückssteine",
+    "notfalls": "Kieselsteine sammeln, gern bunt bemalt.",
+    "u": [
+     "u3"
+    ]
+   },
+   {
     "x": "1 Zaubertafel für Station 5",
     "notfalls": "Zettel und Stift.",
     "u": [
      "u4"
     ]
+   },
+   {
+    "x": "Buntes Band am Versteck",
+    "notfalls": "Ein bunter Schal oder ein Geschirrtuch."
    },
    {
     "x": "Schatzkiste, je Kind ein Geschenk",
@@ -525,27 +550,6 @@
   ],
   "extras": [
    {
-    "x": "{kinder} Haarreifen",
-    "u": [
-     "u0"
-    ],
-    "notfalls": "Weglassen. Funkel verzaubert die Kinder trotzdem."
-   },
-   {
-    "x": "{kinder} Tattoos",
-    "u": [
-     "u1"
-    ],
-    "notfalls": "Weglassen."
-   },
-   {
-    "x": "{kinder} Glückssteine",
-    "u": [
-     "u3"
-    ],
-    "notfalls": "Hübsche Kieselsteine sammeln, gern bunt bemalt."
-   },
-   {
     "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
     "u": [
      "u5",
@@ -555,9 +559,6 @@
    },
    {
     "x": "Kiste bekleben, Karton grau anmalen"
-   },
-   {
-    "x": "Buntes Band am Versteck"
    },
    {
     "x": "Haarreif für Fridolin"
@@ -939,7 +940,8 @@
     ],
     "ohne": "Extra aus: Die Kinder sehen die Hinweise nur im Spiegel."
    }
-  ]
+  ],
+  "regel": "Nötig ist, was Funkel anspricht oder was die Kinder im Spiel tun (UNICORN-66). Dann immer mit Notlösung. Extras kommen im Spiel nicht vor."
  },
  "gaben": [
   {

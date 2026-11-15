@@ -64,14 +64,16 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   ok(/Sonst: Aus Pappe ausschneiden/.test(await p.textContent('#einkauf')), 'Holz-Regenbogen mit derselben Notlösung wie im Elternbereich');
   await p.click('[data-wege="noetig"]'); await p.waitForTimeout(200);
   const aus=await p.evaluate(()=>JSON.parse(localStorage.getItem('sj.party.einhorn')).einkaufAus);
-  ok(aus.u0 && aus.u1 && aus.u3 && aus.u5 && !aus.u2 && !aus.u9, '„Nur das Nötige“ wählt Extras ab (Haarreifen, Tattoos, Glückssteine, Geschenke)');
+  ok(aus.u5 && !aus.u0 && !aus.u1 && !aus.u3 && !aus.u2 && !aus.u9, '„Nur das Nötige“ behält alles, was im Spiel vorkommt (Haarreifen, Tattoos, Glückssteine), und wählt Geschenke ab (UNICORN-66)');
   ok(await p.getAttribute('[data-wege="noetig"]','aria-pressed')==='true', '„Nur das Nötige“ ist markiert');
   const nb=p.locator('.ding:has-text("Seil") [data-wie="not"]'); await nb.click(); await p.waitForTimeout(200);
   const pa=await p.evaluate(()=>JSON.parse(localStorage.getItem('sj.party.einhorn')));
   ok(pa.einkauf.u9 && pa.einkaufWie.u9==='not', 'Seil: „Notlösung“ hakt ab und merkt sich den Weg');
   ok(/Mit Notlösung/.test(await p.textContent('.erledigt-liste')), 'Erledigt-Liste zeigt „Mit Notlösung“');
-  await p.locator('.ding:has-text("Kindertattoos") [data-wie="weg"]').click(); await p.waitForTimeout(200);
-  ok((await p.evaluate(()=>JSON.parse(localStorage.getItem('sj.party.einhorn')).einkaufWie.u1))==='weg', 'Tattoos: „Lass ich weg“');
+  ok(await p.locator('.ding:has-text("Kindertattoos") [data-wie="weg"]').count()===0, 'Tattoos kommen im Spiel vor: kein „Lass ich weg“, nur Notlösung (UNICORN-66)');
+  await p.click('[data-wege="alles"]'); await p.waitForTimeout(200);
+  await p.locator('.ding:has-text("Kratzbilder") [data-wie]').first().click(); await p.waitForTimeout(200);
+  ok(['weg','not'].includes(await p.evaluate(()=>JSON.parse(localStorage.getItem('sj.party.einhorn')).einkaufWie.u5)), 'Kratzbilder (Extra): weglassen oder Notlösung');
 
   // --- UNICORN-60: Basteln mit Aufwand ---
   await p.goto(B+'party.html?thema=einhorn#s-basteln'); await p.waitForSelector('.bastel');

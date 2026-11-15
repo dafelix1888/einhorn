@@ -11,7 +11,8 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   await p.goto(S+'/app/spiel.html?thema=einhorn#einrichten'); await p.waitForSelector('#liste .haken', {state:'attached'});
   await p.evaluate(()=>{ document.getElementById('k-vorbereitung').open=true; document.getElementById('k-vorbereitung').scrollIntoView(); }); await p.waitForTimeout(200);
   const n=await p.locator('#liste > .haken').count(), notfalls=await p.locator('#liste > .haken .notfalls').count();
-  ok(n>=8 && n<=12, 'Oben nur das Nötige: '+n+' Dinge statt 28');
+  // UNICORN-66: alles, was im Spiel vorkommt, ist nötig (mit Notlösung); daher bis 16
+  ok(n>=8 && n<=16, 'Oben nur das Nötige: '+n+' Dinge statt 28');
   ok(notfalls===n, 'Jedes nötige Ding hat eine Notlösung');
   ok(/Das braucht die Tour/.test(await p.locator('#liste').innerText()), 'Überschrift „Das braucht die Tour wirklich“');
   ok(await p.locator('#vb-extras').count()===1 && !(await p.locator('#vb-extras').evaluate(e=>e.open)), 'Extras zugeklappt');
