@@ -502,10 +502,6 @@
    {
     "x": "Seil für Station 3",
     "notfalls": "An den Händen fassen.",
-    "nur": [
-     "a",
-     "b"
-    ],
     "u": [
      "u9"
     ]
@@ -665,11 +661,29 @@
     }
    ]
   },
-  "packliste": {
+  "liste": {
    "a": {
     "vorher": [
-     "Kreidespur bis Station 2",
-     "Vorausgeher geht 20 Min. früher los"
+     {
+      "x": "Route einmal abgelaufen",
+      "ding": "Route einmal abgelaufen"
+     },
+     {
+      "x": "Ein Helfer als Vorausgeher, geht 20 Min. früher los",
+      "ding": "Ein Helfer als Vorausgeher"
+     },
+     {
+      "x": "Kreidespur bis Station 2",
+      "ding": "Kreidespur bis Station 2"
+     },
+     {
+      "x": "Tablet startklar",
+      "ding": "Tablet oder Handy, startklar"
+     },
+     {
+      "x": "Kiste bekleben, Karton grau anmalen",
+      "ding": "Kiste bekleben, Karton grau anmalen"
+     }
     ],
     "stationen": [
      {
@@ -677,9 +691,18 @@
       "ort": "Haustür",
       "wer": "Gruppe",
       "d": [
-       "{kinder} Haarreifen",
-       "2 kleinste Bögen",
-       "Tattoos"
+       {
+        "x": "{kinder} Haarreifen",
+        "ding": "{kinder} Haarreifen"
+       },
+       {
+        "x": "{kinder} Tattoos",
+        "ding": "{kinder} Tattoos"
+       },
+       {
+        "x": "2 kleinste Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
       ]
      },
      {
@@ -687,7 +710,10 @@
       "ort": "Ecke",
       "wer": "Vorausgeher",
       "d": [
-       "Rote Bögen"
+       {
+        "x": "Rote Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
       ]
      },
      {
@@ -695,58 +721,122 @@
       "ort": "Übergang",
       "wer": "Gruppe",
       "d": [
-       "Seil"
+       {
+        "x": "Seil",
+        "ding": "Seil für Station 3"
+       }
       ]
      },
      {
       "s": 4,
-      "ort": "Zaun",
+      "ort": "Quatschbilder",
       "wer": "Vorausgeher",
       "d": [
-       "Gelbe + orange Bögen",
-       "{kinder} Glückssteine"
+       {
+        "x": "Gelbe + orange Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "{kinder} Glückssteine",
+        "ding": "{kinder} Glückssteine"
+       }
       ]
      },
      {
       "s": 5,
-      "ort": "Kreuzung",
+      "ort": "Spuren",
       "wer": "Vorausgeher",
       "d": [
-       "1 Zaubertafel"
+       {
+        "x": "1 Zaubertafel",
+        "ding": "1 Zaubertafel für Station 5"
+       }
       ]
      },
      {
       "s": 6,
-      "ort": "Wolkenberg",
+      "ort": "Wolke",
       "wer": "Vorausgeher",
       "d": [
-       "Grüne Bögen"
+       {
+        "x": "Grüne Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Etwas Weißes als Wolke",
+        "ding": "Etwas Weißes als Wolke"
+       }
       ]
      },
      {
       "s": 7,
-      "ort": "Bank",
+      "ort": "Versteck",
       "wer": "Vorausgeher",
       "d": [
-       "Fridolin im grauen Karton",
-       "Blaue Bögen",
-       "Buntes Band",
-       "Schatzkiste",
-       "Sticker (Gruppe)"
+       {
+        "x": "Fridolin im grauen Karton",
+        "ding": "Fridolin (Kuscheltier) und ein grauer Karton"
+       },
+       {
+        "x": "Blaue Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Buntes Band",
+        "ding": "Buntes Band am Versteck"
+       },
+       {
+        "x": "Schatzkiste mit Geschenken",
+        "ding": "Schatzkiste, je Kind ein Geschenk"
+       },
+       {
+        "x": "Sticker, je Kind einer",
+        "ding": "Sticker, je Kind einer"
+       },
+       {
+        "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
+        "ding": "Geschenke für den Schatz: Kratzbilder und Tüten"
+       },
+       {
+        "x": "Haarreif für Fridolin",
+        "ding": "Haarreif für Fridolin"
+       }
       ]
      }
     ],
     "mit": [
-     "Tablet",
-     "Snack",
-     "Wasser",
-     "Decke"
+     {
+      "x": "Regenbogen-Snack",
+      "ding": "Regenbogen-Snack"
+     },
+     {
+      "x": "Wasser, Becher, Decke",
+      "ding": "Wasser, Becher, Decke"
+     }
     ]
    },
    "b": {
     "vorher": [
-     "Kreidespur bis Station 2",
-     "Vorausgeher geht 20 Min. früher los"
+     {
+      "x": "Route einmal abgelaufen",
+      "ding": "Route einmal abgelaufen"
+     },
+     {
+      "x": "Ein Helfer als Vorausgeher, geht 20 Min. früher los",
+      "ding": "Ein Helfer als Vorausgeher"
+     },
+     {
+      "x": "Kreidespur bis Station 2",
+      "ding": "Kreidespur bis Station 2"
+     },
+     {
+      "x": "Tablet startklar",
+      "ding": "Tablet oder Handy, startklar"
+     },
+     {
+      "x": "Kiste bekleben, Karton grau anmalen",
+      "ding": "Kiste bekleben, Karton grau anmalen"
+     }
     ],
     "stationen": [
      {
@@ -754,9 +844,18 @@
       "ort": "Haustür",
       "wer": "Gruppe",
       "d": [
-       "{kinder} Haarreifen",
-       "2 kleinste Bögen",
-       "Tattoos"
+       {
+        "x": "{kinder} Haarreifen",
+        "ding": "{kinder} Haarreifen"
+       },
+       {
+        "x": "{kinder} Tattoos",
+        "ding": "{kinder} Tattoos"
+       },
+       {
+        "x": "2 kleinste Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
       ]
      },
      {
@@ -764,8 +863,15 @@
       "ort": "Ecke",
       "wer": "Vorausgeher",
       "d": [
-       "Rote Bögen",
-       "Rote Kreide"
+       {
+        "x": "Rote Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Rote Kreide für den Kreidekreis",
+        "ding": "4 Schleifen und ein weißes Laken",
+        "notfalls": "Ein Kreis aus rotem Papier."
+       }
       ]
      },
      {
@@ -773,60 +879,124 @@
       "ort": "Übergang",
       "wer": "Gruppe",
       "d": [
-       "Seil"
+       {
+        "x": "Seil",
+        "ding": "Seil für Station 3"
+       }
       ]
      },
      {
       "s": 4,
-      "ort": "Zaun",
+      "ort": "Quatschbilder",
       "wer": "Vorausgeher",
       "d": [
-       "4 Schleifen",
-       "Gelbe + orange Bögen",
-       "{kinder} Glückssteine"
+       {
+        "x": "4 bunte Schleifen",
+        "ding": "4 Schleifen und ein weißes Laken",
+        "notfalls": "Papierstreifen."
+       },
+       {
+        "x": "Gelbe + orange Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "{kinder} Glückssteine",
+        "ding": "{kinder} Glückssteine"
+       }
       ]
      },
      {
       "s": 5,
-      "ort": "Kreuzung",
+      "ort": "Spuren",
       "wer": "Vorausgeher",
       "d": [
-       "1 Zaubertafel"
+       {
+        "x": "1 Zaubertafel",
+        "ding": "1 Zaubertafel für Station 5"
+       }
       ]
      },
      {
       "s": 6,
-      "ort": "Wolkenberg",
+      "ort": "Wolke",
       "wer": "Vorausgeher",
       "d": [
-       "Weißes Laken",
-       "Grüne Bögen"
+       {
+        "x": "Weißes Laken als Wolke",
+        "ding": "4 Schleifen und ein weißes Laken",
+        "notfalls": "Ein weißes Handtuch."
+       },
+       {
+        "x": "Grüne Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
       ]
      },
      {
       "s": 7,
-      "ort": "Bank",
+      "ort": "Versteck",
       "wer": "Vorausgeher",
       "d": [
-       "Fridolin im grauen Karton",
-       "Blaue Bögen",
-       "Buntes Band",
-       "Schatzkiste",
-       "Sticker (Gruppe)"
+       {
+        "x": "Fridolin im grauen Karton",
+        "ding": "Fridolin (Kuscheltier) und ein grauer Karton"
+       },
+       {
+        "x": "Blaue Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Buntes Band",
+        "ding": "Buntes Band am Versteck"
+       },
+       {
+        "x": "Schatzkiste mit Geschenken",
+        "ding": "Schatzkiste, je Kind ein Geschenk"
+       },
+       {
+        "x": "Sticker, je Kind einer",
+        "ding": "Sticker, je Kind einer"
+       },
+       {
+        "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
+        "ding": "Geschenke für den Schatz: Kratzbilder und Tüten"
+       },
+       {
+        "x": "Haarreif für Fridolin",
+        "ding": "Haarreif für Fridolin"
+       }
       ]
      }
     ],
     "mit": [
-     "Tablet",
-     "Snack",
-     "Wasser",
-     "Decke"
+     {
+      "x": "Regenbogen-Snack",
+      "ding": "Regenbogen-Snack"
+     },
+     {
+      "x": "Wasser, Becher, Decke",
+      "ding": "Wasser, Becher, Decke"
+     }
     ]
    },
    "c": {
     "vorher": [
-     "Nichts vorab aufbauen",
-     "Toberaum-Tür zu"
+     {
+      "x": "Ein Helfer als Vorausgeher",
+      "ding": "Ein Helfer als Vorausgeher"
+     },
+     {
+      "x": "Tablet startklar",
+      "ding": "Tablet oder Handy, startklar"
+     },
+     {
+      "x": "Probelauf zu Hause",
+      "ding": "Probelauf zu Hause"
+     },
+     {
+      "x": "Kiste bekleben, Karton grau anmalen",
+      "ding": "Kiste bekleben, Karton grau anmalen"
+     }
     ],
     "stationen": [
      {
@@ -834,9 +1004,18 @@
       "ort": "Start",
       "wer": "Gruppe",
       "d": [
-       "{kinder} Haarreifen",
-       "2 kleinste Bögen",
-       "Tattoos"
+       {
+        "x": "{kinder} Haarreifen",
+        "ding": "{kinder} Haarreifen"
+       },
+       {
+        "x": "{kinder} Tattoos",
+        "ding": "{kinder} Tattoos"
+       },
+       {
+        "x": "2 kleinste Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
       ]
      },
      {
@@ -844,7 +1023,10 @@
       "ort": "Küche",
       "wer": "Vorausgeher",
       "d": [
-       "Rote Bögen"
+       {
+        "x": "Rote Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
       ]
      },
      {
@@ -852,8 +1034,15 @@
       "ort": "Flur",
       "wer": "Vorausgeher",
       "d": [
-       "Blaues Handtuch",
-       "Seil (Gruppe)"
+       {
+        "x": "Blaues Handtuch als Fluss",
+        "ding": "4 Bänder, blaues Handtuch, 3 Spuren-Zettel",
+        "notfalls": "Ein blaues Kissen."
+       },
+       {
+        "x": "Seil",
+        "ding": "Seil für Station 3"
+       }
       ]
      },
      {
@@ -861,9 +1050,19 @@
       "ort": "Treppe",
       "wer": "Vorausgeher",
       "d": [
-       "4 Bänder",
-       "Gelbe + orange Bögen",
-       "{kinder} Glückssteine"
+       {
+        "x": "4 Bänder am Geländer",
+        "ding": "4 Bänder, blaues Handtuch, 3 Spuren-Zettel",
+        "notfalls": "Papierstreifen."
+       },
+       {
+        "x": "Gelbe + orange Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "{kinder} Glückssteine",
+        "ding": "{kinder} Glückssteine"
+       }
       ]
      },
      {
@@ -871,8 +1070,15 @@
       "ort": "Türen",
       "wer": "Vorausgeher",
       "d": [
-       "3 Spuren-Zettel",
-       "1 Zaubertafel"
+       {
+        "x": "3 Spuren-Zettel",
+        "ding": "4 Bänder, blaues Handtuch, 3 Spuren-Zettel",
+        "notfalls": "Spuren mit Stift auf Zettel malen."
+       },
+       {
+        "x": "1 Zaubertafel",
+        "ding": "1 Zaubertafel für Station 5"
+       }
       ]
      },
      {
@@ -880,7 +1086,14 @@
       "ort": "Kissenberg",
       "wer": "Vorausgeher",
       "d": [
-       "Grüne Bögen"
+       {
+        "x": "Grüne Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Etwas Weißes als Wolke",
+        "ding": "Etwas Weißes als Wolke"
+       }
       ]
      },
      {
@@ -888,18 +1101,46 @@
       "ort": "Sofa",
       "wer": "Vorausgeher",
       "d": [
-       "Fridolin im grauen Karton",
-       "Blaue Bögen",
-       "Buntes Band",
-       "Schatzkiste",
-       "Sticker (Gruppe)"
+       {
+        "x": "Fridolin im grauen Karton",
+        "ding": "Fridolin (Kuscheltier) und ein grauer Karton"
+       },
+       {
+        "x": "Blaue Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Buntes Band",
+        "ding": "Buntes Band am Versteck"
+       },
+       {
+        "x": "Schatzkiste mit Geschenken",
+        "ding": "Schatzkiste, je Kind ein Geschenk"
+       },
+       {
+        "x": "Sticker, je Kind einer",
+        "ding": "Sticker, je Kind einer"
+       },
+       {
+        "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
+        "ding": "Geschenke für den Schatz: Kratzbilder und Tüten"
+       },
+       {
+        "x": "Haarreif für Fridolin",
+        "ding": "Haarreif für Fridolin"
+       }
       ]
      }
     ],
     "mit": [
-     "Tablet",
-     "Snack",
-     "Wasser"
+     {
+      "x": "Regenbogen-Snack",
+      "ding": "Regenbogen-Snack"
+     },
+     {
+      "x": "Wasser und Becher",
+      "ding": "Wasser, Becher, Decke"
+     }
     ]
    }
   },
@@ -941,7 +1182,7 @@
     "ohne": "Extra aus: Die Kinder sehen die Hinweise nur im Spiegel."
    }
   ],
-  "regel": "Nötig ist, was Funkel anspricht oder was die Kinder im Spiel tun (UNICORN-66). Dann immer mit Notlösung. Extras kommen im Spiel nicht vor."
+  "regel": "Nötig ist, was Funkel anspricht oder was die Kinder im Spiel tun (UNICORN-66), immer mit Notlösung. Extras kommen im Spiel nicht vor. „liste“ ordnet beides nach Station; „ding“ zeigt auf den Eintrag in noetig/extras (Notlösung, Einkauf)."
  },
  "gaben": [
   {

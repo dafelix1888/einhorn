@@ -209,6 +209,9 @@ details.karte.achtung{border-color:#F0C6C9}
 .liste h3.weg{color:var(--ink-soft);font-size:.95rem}
 .haken .notfalls{display:block;color:var(--ink-soft);font-size:.86rem;margin-top:2px;text-decoration:none}
 .haken input:checked+span .notfalls{display:none}
+.liste .vb-gruppe{border-top:1px solid var(--line);padding:10px 0 4px}.liste .vb-gruppe:first-of-type{border-top:0}
+.liste .vb-kopf{display:flex;align-items:center;gap:10px;margin-bottom:2px}.liste .vb-kopf b{font-size:1.02rem}.liste .vb-kopf small{color:var(--ink-soft);font-size:.82rem}
+.haken.extra>span{color:var(--ink-soft)}.tag-extra{font-style:normal;font-size:.72rem;font-weight:700;letter-spacing:.02em;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--ink-soft);margin-left:4px;vertical-align:2px}
 .liste details.mehr{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
 .liste details.mehr summary{cursor:pointer;font-weight:700;padding:6px 0;list-style:none;display:flex;align-items:baseline;gap:8px}.liste details.mehr summary::-webkit-details-marker{display:none}
 .liste details.mehr summary::after{content:"›";margin-left:auto;font-size:1.2rem;transition:transform .2s}.liste details.mehr[open] summary::after{transform:rotate(90deg)}
@@ -869,7 +872,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
     <details class="karte" id="k-vorbereitung">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="tt"><b>Vorbereitung</b><span id="sum-vorbereitung"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Nur das Nötige, jeweils mit Notlösung. Dieselbe Einteilung wie beim Bestellen in der Party: Was hier „Sonst“ hat, musst du nicht kaufen.</p>
+        <p class="lead">Nach Station geordnet, zum Abhaken. Nötiges hat immer ein „Sonst“, das musst du also nicht kaufen. „Extra“ ist schön, aber nicht nötig.</p>
         <div class="liste" id="liste"></div>
         <div class="zwischen"><span class="chip" id="liste-note"></span><button type="button" class="btn quiet small" id="btn-liste-reset">Alle Haken entfernen</button></div>
       </div>
@@ -1051,25 +1054,23 @@ function renderGaben(){
 // Vorbereitung: zuerst nur, was die Tour wirklich braucht (mit Notlösung), Extras und Packliste aufklappbar
 function fuerVariante(l){ return (l||[]).filter(function(x){ return !x.nur || x.nur.indexOf(state.variante)>=0; }); }
 function hakenVar(){ return state.variante==='b' ? 'a' : state.variante; }   // Extra an oder aus: dieselben Haken
-function hakenZeile(text, notfalls){
-  var id=hakenVar()+'|'+text, an=!!haken[id];
-  return '<label class="haken"><input type="checkbox" data-haken="'+esc(id)+'"'+(an?' checked':'')+'><span>'+esc(text)+(notfalls?'<small class="notfalls">Sonst: '+esc(notfalls)+'</small>':'')+'</span></label>';
+function hakenZeile(text, notfalls, extra, id){
+  id=id||hakenVar()+'|'+text; var an=!!haken[id];
+  return '<label class="haken'+(extra?' extra':'')+'"><input type="checkbox" data-haken="'+esc(id)+'"'+(an?' checked':'')+'><span>'+esc(text)+(extra?' <em class="tag-extra">Extra</em>':'')+(notfalls?'<small class="notfalls">Sonst: '+esc(notfalls)+'</small>':'')+'</span></label>';
 }
 function pkFarbe(s){ return ['#8B5CF6','#EF4444','#F97316','#EAB308','#22C55E','#16A34A','#3B82F6'][s-1]||'#8B5CF6'; }
+// Vorbereitung nach Station (UNICORN-67): eine abhakbare Liste, Nötiges mit „Sonst“, Extras markiert
 function renderListe(){
-  var VB=TOUR.vorbereitung, noetig=fuerVariante(VB.noetig), extras=fuerVariante(VB.extras), offen=$('liste').querySelectorAll('details[open]'), auf={};
+  var L=Party.vorbereitungsListe(TOUR, state.variante), offen=$('liste').querySelectorAll('details[open]'), auf={};
   Array.prototype.forEach.call(offen, function(d){ auf[d.id]=true; });
-  var n=noetig.filter(function(x){ return haken[hakenVar()+'|'+x.x]; }).length, g=noetig.length;
-  var ne=extras.filter(function(x){ return haken[hakenVar()+'|'+x.x]; }).length;
-  var h='<h3>Das braucht die Tour <small>'+g+' Dinge</small></h3>'+noetig.map(function(x){ return hakenZeile(x.x, x.notfalls); }).join('');
-  if(extras.length) h+='<details class="mehr" id="vb-extras"'+(auf['vb-extras']?' open':'')+'><summary>Extras, wenn Zeit ist <small>'+extras.length+' Extras'+(ne?', '+ne+' erledigt':'')+'</small></summary>'+
-    (indoor() ? '' : Spielart.extraKarte(TOUR, state.variante==='b', 'extra-vb'))+extras.map(function(x){ return hakenZeile(x.x, x.notfalls); }).join('')+'</details>';
-  // Packliste nach Station: je Zeile Nummer, Ort, Dinge als Stichworte, wer es hinbringt
-  var pk=(VB.packliste||{})[state.variante]||(VB.packliste||{}).a;
-  if(pk) h+='<details class="mehr" id="vb-packen"'+(auf['vb-packen']?' open':'')+'><summary>Packliste nach Station</summary>'+
-    (pk.vorher&&pk.vorher.length?'<p class="pk-vorher"><b>Vorher:</b> '+pk.vorher.map(esc).join(' · ')+'</p>':'')+
-    '<ol class="pk">'+pk.stationen.map(function(r){ return '<li><span class="pk-nr" style="background:'+pkFarbe(r.s)+'">'+r.s+'</span><span class="pk-ort">'+esc(r.ort)+'<small>'+esc(r.wer)+'</small></span><span class="pk-dinge">'+r.d.map(function(x){ return '<i>'+esc(x)+'</i>'; }).join('')+'</span></li>'; }).join('')+'</ol>'+
-    (pk.mit&&pk.mit.length?'<p class="pk-vorher"><b>Mitnehmen:</b> '+pk.mit.map(esc).join(' · ')+'</p>':'')+'</details>';
+  var g=L.noetig, n=L.schluessel.filter(function(k){ return haken[k]; }).length;
+  var h='<h3>Das braucht die Tour <small>'+g+' nötig · '+L.extras+' Extras</small></h3>';
+  h+=L.gruppen.map(function(gr){
+    var kopf = gr.art==='station' ? '<div class="vb-kopf"><span class="pk-nr" style="background:'+pkFarbe(gr.s)+'">'+gr.s+'</span><b>'+esc(gr.ort)+'</b><small>'+esc(gr.wer)+'</small></div>'
+                                  : '<div class="vb-kopf"><b>'+esc(gr.titel)+'</b></div>';
+    return '<section class="vb-gruppe">'+kopf+gr.items.map(function(i){ return hakenZeile(i.x, i.notfalls, i.extra, i.key); }).join('')+'</section>';
+  }).join('');
+  if(!indoor()) h+='<details class="mehr" id="vb-extras"'+(auf['vb-extras']?' open':'')+'><summary>Mehr Erlebnis</summary>'+Spielart.extraKarte(TOUR, state.variante==='b', 'extra-vb')+'</details>';
   $('liste').innerHTML=h;
   $('liste-note').textContent=n+' von '+g+' nötigen erledigt'; $('liste-note').className='chip '+(n===g?'on':'');
   $('sum-vorbereitung').textContent = n+' von '+g+' nötigen Dingen erledigt';

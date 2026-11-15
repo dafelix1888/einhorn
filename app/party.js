@@ -260,5 +260,23 @@
   }
   reparieren();
 
-  root.Party={wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
+  // Vorbereitung nach Station (UNICORN-67): eine Liste je Spielart, jedes Ding zeigt auf noetig/extras (Notlösung, Einkauf).
+  // Haken-Schlüssel: Spielart (Extra „Hinweise am Weg“ teilt die Haken mit Draußen) + Text, wie bisher.
+  function vorbereitungsListe(tour, v, kinder){
+    var vb=(tour&&tour.vorbereitung)||{}, l=(vb.liste||{})[v]||(vb.liste||{}).a; if(!l) return {gruppen:[], noetig:0, extras:0, schluessel:[]};
+    var hv=v==='b'?'a':v, n={}, e={};
+    function f(t){ return String(t||'').replace(/\{kinder\}/g, kinder!=null ? kinder : '{kinder}'); }
+    (vb.noetig||[]).forEach(function(x){ n[f(x.x)]=x; n[x.x]=x; }); (vb.extras||[]).forEach(function(x){ e[f(x.x)]=x; e[x.x]=x; });
+    var r={gruppen:[], noetig:0, extras:0, schluessel:[]};
+    function dinge(d){ return (d||[]).map(function(i){
+      var ding=i.ding, extra=!n[ding] && !!e[ding], q=n[ding]||e[ding]||{}, x=f(i.x);
+      if(extra) r.extras++; else { r.noetig++; r.schluessel.push(hv+'|'+x); }
+      return {x:x, notfalls:i.notfalls||(extra?'':q.notfalls||''), extra:extra, key:hv+'|'+x};
+    }); }
+    if(l.vorher&&l.vorher.length) r.gruppen.push({art:'vorher', titel:'Vorher', items:dinge(l.vorher)});
+    (l.stationen||[]).forEach(function(g){ r.gruppen.push({art:'station', s:g.s, ort:g.ort, wer:g.wer, items:dinge(g.d)}); });
+    if(l.mit&&l.mit.length) r.gruppen.push({art:'mit', titel:'Mitnehmen', items:dinge(l.mit)});
+    return r;
+  }
+  root.Party={vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
 })(this);
