@@ -266,7 +266,7 @@
       var pl0=Party.plan(thema), mitRoute=!party && pl0 && pl0.stationen && pl0.stationen.length>1;
       h+=(mitRoute?routeGeschafft(pl0):'')+'<h1>Für wen und wann?</h1>'+
         '<label class="feld"><span>Vorname</span><input id="name" type="text" autocomplete="off" value="'+esc(e.kind.name)+'" placeholder="z. B. Emma"></label>'+
-        '<div class="zwei"><label class="feld"><span>Wird</span><input id="alter" type="number" min="2" max="12" inputmode="numeric" value="'+esc(e.kind.alter||'')+'" placeholder="5"></label>'+
+        '<div class="zwei"><label class="feld"><span>Wird</span><input id="alter" type="number" inputmode="numeric" value="'+esc(e.kind.alter||'')+'" placeholder="5"></label>'+
         '<label class="feld"><span>Start</span><input id="start" type="time" step="900" value="'+esc(e.start||'15:00')+'"></label></div>'+
         '<label class="feld"><span>Datum</span><input id="datum" type="date" min="'+heute()+'" value="'+esc(e.datum||'')+'"></label>'+
         '<p class="leise" style="font-size:.92rem">Die Jagd dauert etwa '+tour.dauer.minuten+' Minuten. Name und Alter stehen auf Einladung und Urkunden. Der Name bleibt auf diesem Gerät.</p>';
@@ -303,8 +303,8 @@
   }
   function uebernehmen(){                         // Felder des aktuellen Schritts in den Entwurf
     var e=entwurf;
-    if(sid()==='wer'){ e.kind.name=$('name').value.trim().replace(/\s+/g,' ').slice(0,30); if(e.kind.name) e.kind.name=e.kind.name.charAt(0).toUpperCase()+e.kind.name.slice(1); e.kind.alter=+$('alter').value||null; e.datum=$('datum').value; e.start=$('start').value||'15:00';
-      if(!e.kind.name) return 'Bitte den Vornamen eingeben.'; if(!e.kind.alter || e.kind.alter<2 || e.kind.alter>12) return 'Bitte ein Alter zwischen 2 und 12 eingeben.'; if(!e.datum) return 'Bitte ein Datum wählen.'; }
+    if(sid()==='wer'){ e.kind.name=$('name').value.trim().replace(/\s+/g,' ').slice(0,30); if(e.kind.name) e.kind.name=e.kind.name.charAt(0).toUpperCase()+e.kind.name.slice(1); e.kind.alter=Math.round(+$('alter').value)||null; e.datum=$('datum').value; e.start=$('start').value||'15:00';
+      if(!e.kind.name) return 'Bitte den Vornamen eingeben.'; if(!e.kind.alter) return 'Bitte das Alter eingeben.'; /* keine Altersgrenze (UNICORN-52) */ if(!e.datum) return 'Bitte ein Datum wählen.'; }
     if(sid()==='wo'){ e.vorausgeher=!!(e.vorausgeher && e.helfer>=2); }
     if(sid()==='erz'){ e.erz=Erzaehler.wahl(tour, e); Erzaehler.still(); }
     return '';
