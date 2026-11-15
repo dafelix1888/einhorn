@@ -209,6 +209,9 @@ details.karte.achtung{border-color:#F0C6C9}
 .liste h3.weg{color:var(--ink-soft);font-size:.95rem}
 .haken .notfalls{display:block;color:var(--ink-soft);font-size:.86rem;margin-top:2px;text-decoration:none}
 .haken input:checked+span .notfalls{display:none}
+.liste .vb-ansicht{margin:4px 0 8px}.liste .vb-ansicht small{font-weight:400;opacity:.75;margin-left:4px}
+.liste .vb-lead{color:var(--ink-soft);font-size:.92rem;margin:4px 0 6px}.liste .vb-fuss{font-size:.88rem;color:var(--ink-soft);margin:4px 0 6px}.liste .vb-kopf{flex-wrap:wrap}
+.haken .wofuer{display:block;font-size:.86rem;margin-top:2px;color:var(--ink)}.haken input:checked+span .wofuer{display:none}.tag-preis{font-style:normal;font-size:.76rem;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--surface);border:1px solid var(--line);margin-left:4px;vertical-align:2px;white-space:nowrap}
 .liste .vb-gruppe{border-top:1px solid var(--line);padding:10px 0 4px}.liste .vb-gruppe:first-of-type{border-top:0}
 .liste .vb-kopf{display:flex;align-items:center;gap:10px;margin-bottom:2px}.liste .vb-kopf b{font-size:1.02rem}.liste .vb-kopf small{color:var(--ink-soft);font-size:.82rem}
 .haken.extra>span{color:var(--ink-soft)}.tag-extra{font-style:normal;font-size:.72rem;font-weight:700;letter-spacing:.02em;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--ink-soft);margin-left:4px;vertical-align:2px}
@@ -872,7 +875,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
     <details class="karte" id="k-vorbereitung">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="tt"><b>Vorbereitung</b><span id="sum-vorbereitung"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Nach Station geordnet, zum Abhaken. Nötiges hat immer ein „Sonst“, das musst du also nicht kaufen. „Extra“ ist schön, aber nicht nötig.</p>
+        <p class="lead">Erst besorgen, dann packen. Nötiges hat immer eine Lösung ohne Kauf. „Extra“ ist schön, aber nicht nötig.</p>
         <div class="liste" id="liste"></div>
         <div class="zwischen"><span class="chip" id="liste-note"></span><button type="button" class="btn quiet small" id="btn-liste-reset">Alle Haken entfernen</button></div>
       </div>
@@ -1054,26 +1057,41 @@ function renderGaben(){
 // Vorbereitung: zuerst nur, was die Tour wirklich braucht (mit Notlösung), Extras und Packliste aufklappbar
 function fuerVariante(l){ return (l||[]).filter(function(x){ return !x.nur || x.nur.indexOf(state.variante)>=0; }); }
 function hakenVar(){ return state.variante==='b' ? 'a' : state.variante; }   // Extra an oder aus: dieselben Haken
-function hakenZeile(text, notfalls, extra, id){
-  id=id||hakenVar()+'|'+text; var an=!!haken[id];
-  return '<label class="haken'+(extra?' extra':'')+'"><input type="checkbox" data-haken="'+esc(id)+'"'+(an?' checked':'')+'><span>'+esc(text)+(extra?' <em class="tag-extra">Extra</em>':'')+(notfalls?'<small class="notfalls">Sonst: '+esc(notfalls)+'</small>':'')+'</span></label>';
+function hakenZeile(text, notfalls, extra, id, mehr){
+  id=id||hakenVar()+'|'+text; var an=!!haken[id], m=mehr||{};
+  return '<label class="haken'+(extra?' extra':'')+'"><input type="checkbox" data-haken="'+esc(id)+'"'+(an?' checked':'')+'><span>'+esc(text)+(extra?' <em class="tag-extra">Extra</em>':'')+(m.preis?' <em class="tag-preis">ca. '+esc(Party.euro(m.preis))+'</em>':'')+
+    (m.wofuer?'<small class="wofuer">'+esc(m.wofuer)+'</small>':'')+(notfalls?'<small class="notfalls">'+(m.sonst||'Sonst')+': '+esc(notfalls)+'</small>':'')+'</span></label>';
 }
 function pkFarbe(s){ return ['#8B5CF6','#EF4444','#F97316','#EAB308','#22C55E','#16A34A','#3B82F6'][s-1]||'#8B5CF6'; }
-// Vorbereitung nach Station (UNICORN-67): eine abhakbare Liste, Nötiges mit „Sonst“, Extras markiert
+// Vorbereitung (UNICORN-67/68): Umschalter „Besorgen“ (jedes Ding einmal: wofür, Preis, selbst machen) und „Packen“ (nach Station)
+var VB_ANSICHT_KEY=TOUR.speicher+'.vb-ansicht', vbAnsicht='besorgen';
+try{ vbAnsicht=localStorage.getItem(VB_ANSICHT_KEY)==='packen' ? 'packen' : 'besorgen'; }catch(e){}
 function renderListe(){
-  var L=Party.vorbereitungsListe(TOUR, state.variante), offen=$('liste').querySelectorAll('details[open]'), auf={};
+  var P=Party.vorbereitungsListe(TOUR, state.variante), B=Party.besorgListe(TOUR, state.variante), offen=$('liste').querySelectorAll('details[open]'), auf={};
   Array.prototype.forEach.call(offen, function(d){ auf[d.id]=true; });
-  var g=L.noetig, n=L.schluessel.filter(function(k){ return haken[k]; }).length;
-  var h='<h3>Das braucht die Tour <small>'+g+' nötig · '+L.extras+' Extras</small></h3>';
-  h+=L.gruppen.map(function(gr){
-    var kopf = gr.art==='station' ? '<div class="vb-kopf"><span class="pk-nr" style="background:'+pkFarbe(gr.s)+'">'+gr.s+'</span><b>'+esc(gr.ort)+'</b><small>'+esc(gr.wer)+'</small></div>'
-                                  : '<div class="vb-kopf"><b>'+esc(gr.titel)+'</b></div>';
-    return '<section class="vb-gruppe">'+kopf+gr.items.map(function(i){ return hakenZeile(i.x, i.notfalls, i.extra, i.key); }).join('')+'</section>';
-  }).join('');
+  function zaehl(l){ return l.filter(function(k){ return haken[k]; }).length; }
+  var nB=zaehl(B.schluessel), nP=zaehl(P.schluessel);
+  var h='<div class="seg vb-ansicht" role="group" aria-label="Ansicht"><button type="button" data-vb="besorgen" aria-pressed="'+(vbAnsicht==='besorgen')+'">Besorgen <small>'+nB+'/'+B.noetig+'</small></button><button type="button" data-vb="packen" aria-pressed="'+(vbAnsicht==='packen')+'">Packen <small>'+nP+'/'+P.noetig+'</small></button></div>';
+  if(vbAnsicht==='besorgen'){
+    h+='<p class="vb-lead">Jedes Ding einmal: wofür es ist, was es kostet und wie es ohne Kauf geht. So entscheidest du: bestellen oder selbst machen.</p>';
+    h+=B.gruppen.map(function(gr){
+      var kopf='<div class="vb-kopf"><b>'+esc(gr.titel)+'</b>'+(gr.art==='kaufen'?'<small>Alles bestellt ca. '+esc(Party.euro(B.summe))+' · alles selbst gemacht 0 €</small>':'')+'</div>';
+      var fuss=gr.art==='kaufen' ? '<p class="vb-fuss">Bestellen geht in der Party unter „Alles bestellen“: <a href="party.html?thema='+encodeURIComponent(TOUR.id)+'#s-bestellen">zur Einkaufsliste</a></p>' : '';
+      return '<section class="vb-gruppe">'+kopf+gr.items.map(function(i){ return hakenZeile(i.x, i.notfalls, i.extra, i.key, {wofuer:i.wofuer, preis:i.preis, sonst:gr.art==='kaufen'?'Selbst machen':i.extra?'Ohne Kauf':'So geht es auch'}); }).join('')+fuss+'</section>';
+    }).join('');
+  } else {
+    h+='<p class="vb-lead">Was an welche Station kommt und wer es hinbringt. Abhaken, wenn es eingepackt ist.</p>';
+    h+=P.gruppen.map(function(gr){
+      var kopf = gr.art==='station' ? '<div class="vb-kopf"><span class="pk-nr" style="background:'+pkFarbe(gr.s)+'">'+gr.s+'</span><b>'+esc(gr.ort)+'</b><small>'+esc(gr.wer)+'</small></div>'
+                                    : '<div class="vb-kopf"><b>'+esc(gr.titel)+'</b></div>';
+      return '<section class="vb-gruppe">'+kopf+gr.items.map(function(i){ return hakenZeile(i.x, i.notfalls, i.extra, i.key); }).join('')+'</section>';
+    }).join('');
+  }
   if(!indoor()) h+='<details class="mehr" id="vb-extras"'+(auf['vb-extras']?' open':'')+'><summary>Mehr Erlebnis</summary>'+Spielart.extraKarte(TOUR, state.variante==='b', 'extra-vb')+'</details>';
   $('liste').innerHTML=h;
-  $('liste-note').textContent=n+' von '+g+' nötigen erledigt'; $('liste-note').className='chip '+(n===g?'on':'');
-  $('sum-vorbereitung').textContent = n+' von '+g+' nötigen Dingen erledigt';
+  var n=vbAnsicht==='besorgen'?nB:nP, g=vbAnsicht==='besorgen'?B.noetig:P.noetig;
+  $('liste-note').textContent=n+' von '+g+' nötigen '+(vbAnsicht==='besorgen'?'besorgt':'gepackt'); $('liste-note').className='chip '+(n===g?'on':'');
+  $('sum-vorbereitung').textContent='Besorgt '+nB+' von '+B.noetig+' · gepackt '+nP+' von '+P.noetig;
 }
 
 /* ---------- Zustand ---------- */
@@ -2880,6 +2898,7 @@ $('btn-copy').addEventListener('click', function(){
   function markieren(){ ta.focus(); ta.select(); toast('Code ist markiert. Jetzt kopieren.'); }
   try{ navigator.clipboard.writeText(ta.value).then(function(){ toast('Code kopiert.'); }, markieren); }catch(e){ markieren(); }
 });
+$('liste').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('[data-vb]') : null; if(!b) return; vbAnsicht=b.getAttribute('data-vb'); try{ localStorage.setItem(VB_ANSICHT_KEY, vbAnsicht); }catch(x){} renderListe(); });
 $('liste').addEventListener('change', function(e){ var b=e.target; if(!b.hasAttribute('data-haken')) return; haken[b.getAttribute('data-haken')]=b.checked; hakenSave(); renderListe(); });
 $('btn-liste-reset').addEventListener('click', function(){ haken={}; hakenSave(); renderListe(); });
 $('btn-clips-export').addEventListener('click', clipsExport);

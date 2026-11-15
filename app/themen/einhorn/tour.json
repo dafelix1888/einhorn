@@ -439,10 +439,12 @@
   "noetig": [
    {
     "x": "Tablet oder Handy, startklar",
+    "wofuer": "Der Zauberspiegel für die ganze Tour",
     "notfalls": "„Startklar“ prüft es. Powerbank einpacken."
    },
    {
     "x": "{kinder} Haarreifen",
+    "wofuer": "Station 1: Funkel prüft, ob alle ein Horn tragen",
     "notfalls": "Papierhörner: Papier zur Tüte rollen, mit Haargummi befestigen.",
     "u": [
      "u0"
@@ -450,6 +452,7 @@
    },
    {
     "x": "{kinder} Tattoos",
+    "wofuer": "Station 1: Funkels Zeichen auf der Hand",
     "notfalls": "Mit Kinderschminke einen kleinen Regenbogen auf die Hand malen.",
     "u": [
      "u1"
@@ -457,6 +460,7 @@
    },
    {
     "x": "Bögen in Rot, Gelb, Grün, Blau",
+    "wofuer": "Jede Station gibt einen Bogen des Regenbogens zurück",
     "notfalls": "Aus Pappe ausschneiden und anmalen.",
     "u": [
      "u2"
@@ -464,6 +468,7 @@
    },
    {
     "x": "Fridolin (Kuscheltier) und ein grauer Karton",
+    "wofuer": "Station 7: Fridolin sitzt in seinem grauen Bau",
     "notfalls": "Jedes Kuscheltier, jeder Karton.",
     "u": [
      "u8",
@@ -472,6 +477,7 @@
    },
    {
     "x": "Sticker, je Kind einer",
+    "wofuer": "Station 7: Die Kinder machen den Bau bunt",
     "notfalls": "Klebezettel.",
     "u": [
      "u7"
@@ -479,6 +485,7 @@
    },
    {
     "x": "{kinder} Glückssteine",
+    "wofuer": "Station 4: je Kind ein Glücksstein",
     "notfalls": "Kieselsteine sammeln, gern bunt bemalt.",
     "u": [
      "u3"
@@ -486,6 +493,7 @@
    },
    {
     "x": "1 Zaubertafel für Station 5",
+    "wofuer": "Station 5: für das Rätsel „Wer war das?“",
     "notfalls": "Zettel und Stift.",
     "u": [
      "u4"
@@ -493,14 +501,17 @@
    },
    {
     "x": "Buntes Band am Versteck",
+    "wofuer": "Station 7: zeigt das Versteck",
     "notfalls": "Ein bunter Schal oder ein Geschirrtuch."
    },
    {
     "x": "Schatzkiste, je Kind ein Geschenk",
+    "wofuer": "Station 7: der Schatz für alle",
     "notfalls": "Eine Tasche mit Süßigkeiten."
    },
    {
     "x": "Seil für Station 3",
+    "wofuer": "Station 3: Alle halten sich auf der Regenbogenbrücke fest",
     "notfalls": "An den Händen fassen.",
     "u": [
      "u9"
@@ -508,6 +519,7 @@
    },
    {
     "x": "4 Schleifen und ein weißes Laken",
+    "wofuer": "Extra „Hinweise am Weg“: Station 2, 4 und 6",
     "notfalls": "Papierstreifen, weißes Handtuch.",
     "nur": [
      "b"
@@ -515,6 +527,7 @@
    },
    {
     "x": "4 Bänder, blaues Handtuch, 3 Spuren-Zettel",
+    "wofuer": "Drinnen: Fluss im Flur, Bänder an der Treppe, Spuren an den Türen",
     "notfalls": "Papierstreifen, blaues Kissen.",
     "nur": [
      "c"
@@ -522,6 +535,7 @@
    },
    {
     "x": "Route einmal abgelaufen",
+    "wofuer": "Damit das GPS an jeder Station richtig auslöst",
     "notfalls": "Am Tag „Wir sind da“ tippen.",
     "nur": [
      "a",
@@ -530,6 +544,7 @@
    },
    {
     "x": "Kreidespur bis Station 2",
+    "wofuer": "Der Weg von der Haustür bis Station 2",
     "notfalls": "Einfach mit dem Spiegel losgehen.",
     "nur": [
      "a",
@@ -541,12 +556,14 @@
    },
    {
     "x": "Ein Helfer als Vorausgeher",
+    "wofuer": "Baut Station 2 bis 7 auf, bevor die Kinder kommen",
     "notfalls": "Morgens selbst auslegen."
    }
   ],
   "extras": [
    {
     "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
+    "wofuer": "Für die Schatzkiste",
     "u": [
      "u5",
      "u12"
@@ -554,26 +571,32 @@
     "notfalls": "Süßigkeiten oder Kleinigkeiten von zu Hause, in Butterbrottüten."
    },
    {
-    "x": "Kiste bekleben, Karton grau anmalen"
+    "x": "Kiste bekleben, Karton grau anmalen",
+    "wofuer": "Sieht schöner aus, ändert am Spiel nichts"
    },
    {
-    "x": "Haarreif für Fridolin"
+    "x": "Haarreif für Fridolin",
+    "wofuer": "Fridolin wird auch ein kleines Einhorn"
    },
    {
     "x": "Etwas Weißes als Wolke",
+    "wofuer": "Station 6: eine Wolke zum Anfassen",
     "nur": [
      "a",
      "c"
     ]
    },
    {
-    "x": "Regenbogen-Snack"
+    "x": "Regenbogen-Snack",
+    "wofuer": "Pause unterwegs"
    },
    {
-    "x": "Wasser, Becher, Decke"
+    "x": "Wasser, Becher, Decke",
+    "wofuer": "Pause unterwegs"
    },
    {
     "x": "Probelauf zu Hause",
+    "wofuer": "Damit drinnen alles klappt",
     "nur": [
      "c"
     ]
