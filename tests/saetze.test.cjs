@@ -26,4 +26,13 @@ const namen = JSON.stringify(tour.namenSaetze);
 ok(!/wunderbares Abenteuer/.test(namen), 'Abschied wiederholt nicht „Abenteuer“ direkt nach „Bis zum nächsten Abenteuer!“');
 const spiel = fs.readFileSync(path.join(wurzel, 'app/spiel.html'), 'utf8');
 ok(/dbPut\('n\.'\+k, \{[^}]*rate:1\}/.test(spiel), 'Namens-Sätze laufen im Tempo 1 wie Funkels feste Sätze');
+// Vorbereitung (UNICORN-66): Was Funkel anspricht, ist nötig und hat eine Notlösung
+const vb = tour.vorbereitung;
+ok(vb.noetig.every((x) => x.notfalls), 'Jedes nötige Ding hat eine Notlösung');
+const gesprochen = JSON.stringify([tour.stationen.map((s) => [s.say, s.say2, s.seek, s.after, s.task, (s.steps || []).map((x) => x.say), s.ohne]), tour.texte, tour.erzaehler]);
+const pruef = [['Haarreifen', /Hörner|Haarreif/], ['Tattoos', /mein Zeichen/], ['Glückssteine', /Glücksstein/], ['Buntes Band', /das bunte Band/]];
+for (const [ding, muster] of pruef) {
+  const gesagt = muster.test(gesprochen), noetig = vb.noetig.some((x) => x.x.includes(ding)), extra = vb.extras.some((x) => x.x.includes(ding));
+  ok(!gesagt || (noetig && !extra), ding + (gesagt ? ' kommt im Spiel vor, steht deshalb unter „nötig“' : ' kommt im Spiel nicht vor'));
+}
 console.log(fehler ? fehler + ' FEHLER' : 'ALLES OK'); process.exit(fehler ? 1 : 0);
