@@ -157,8 +157,9 @@
     },
     "4": {
      "wo": "Flur mit drei Türen",
-     "frage": "Vor drei Türen liegt je eine Spurenkarte. Ein Kind tippt im Spiegel auf die Spur, die zu den kleinen Pfoten passt.",
-     "dann": "Hinter der Fuchs-Tür liegt die Zaubertafel. Reihum malt jedes Kind ein Stück der Pfote, danach kommt die Tafel weg. Dann „Der Fuchsspur folgen“ tippen."
+     "frage": "Alle stehen vor den drei Türen mit den Spurenkarten. Schauen alle in den Spiegel, „Spur zeigen“ tippen. Die Spur ist 5 Sekunden zu sehen.",
+     "dann": "Hinter der Fuchs-Tür liegt die Zaubertafel. Reihum malt jedes Kind ein Stück der Pfote, danach kommt die Tafel weg. Dann „Der Fuchsspur folgen“ tippen.",
+     "frageWahl": "Die Kinder vergleichen die Spurenkarten vor den Türen mit der Spur, die sie sich gemerkt haben. Ein Kind tippt im Spiegel auf die passende."
     },
     "5": {
      "wo": "Kissenberg im Toberaum",
@@ -188,8 +189,8 @@
    "arc": "lila",
    "pic": "horn",
    "title": "Funkels Botschaft",
-   "say": "Hallo, ihr Einhorn-Helfer! Ihr tragt ja schon mein Zeichen. Ich bin Funkel und wohne im Wald hinter euren Häusern. Jeden Morgen male ich mit meinem Regenbogen die Farben in die Welt.",
-   "say2": "Aber heute Nacht hat ihn jemand gemopst! Jetzt sind alle Farben durcheinander. Nur die zwei kleinsten Bögen habe ich noch. Setzt eure Hörner auf und folgt meinen Hufspuren!",
+   "say": "Hallo, ihr Einhorn-Helfer! Ihr tragt ja schon mein Zeichen. Ich bin Funkel und wohne im Wald hinter euren Häusern. Jeden Morgen male ich mit meinem Regenbogen die Farben in die Welt. Und das hier ist mein Zauberspiegel! Durch ihn kann ich euch sehen und mit euch sprechen. Er zeigt euch den Weg, und an jeder Station hat er ein Rätsel für euch.",
+   "say2": "Aber heute Nacht hat jemand meinen Regenbogen gemopst! Jetzt sind alle Farben durcheinander. Nur die zwei kleinsten Bögen habe ich noch. Setzt eure Hörner auf und folgt meinen Hufspuren!",
    "task": "Einhorn-Prüfung machen: wiehern, mit dem Huf scharren, mit dem Horn wackeln. Wer besteht, bekommt seinen Haarreif mit Horn. Danach „Prüfung bestanden, los!“ tippen.",
    "go": "Prüfung bestanden, los!",
    "ort": {
@@ -297,18 +298,31 @@
    "pic": "pfote",
    "seek": "Der Dieb ist weitergerannt. Lauft hinterher, gleich wartet ein neues Rätsel auf euch!",
    "title": "Wer war das?",
-   "say": "Schaut in meinen Spiegel! Drei Spuren. Wem gehören die kleinen Pfoten?",
-   "frage": "Der Spiegel zeigt drei Spuren. Die Kinder schauen sie genau an, dann tippt ein Kind auf die Spur, die zu den kleinen Pfoten passt.",
+   "say": "Psst! Der Dieb hat hier eine Spur hinterlassen. Ich zeige sie euch in meinem Spiegel, aber nur ganz kurz. Dann kommt der Nebel! Schaut genau hin und merkt sie euch gut.",
+   "frage": "Alle Kinder vor den Spiegel holen. Schauen alle hin, „Spur zeigen“ tippen. Die Spur ist 5 Sekunden zu sehen, dann kommt der Nebel.",
+   "frageNebel": "Die Kinder suchen die Zaubertafel (liegt hier an der Kreuzung) und malen die Spur aus dem Gedächtnis, reihum jeder ein Stück. Dann „Fertig gemalt“ tippen. Vergessen? „Spur noch einmal zeigen“.",
+   "frageWahl": "Die Kinder halten die Zaubertafel neben den Spiegel. Ein Kind tippt auf die Spur, die sie gemalt haben.",
+   "merken": {
+    "sekunden": 5,
+    "zeigenGo": "Spur zeigen",
+    "malen": "Der Nebel ist da! Schnell, der Dieb hat hier eine Zaubertafel verloren. Sucht sie und malt die Spur darauf, so wie ihr sie euch gemerkt habt. Jeder malt ein Stück!",
+    "malenGo": "Fertig gemalt",
+    "vergleich": "Zeigt mir eure Zaubertafel! Haltet sie neben meinen Spiegel. Welche Spur habt ihr gemalt?",
+    "drinnen": {
+     "vergleich": "Der Nebel ist da! Vor den Türen liegen drei Spuren. Welche habt ihr euch gemerkt? Tippt sie in meinem Spiegel an.",
+     "after": "Ein Fuchs! Was will denn ein Fuchs mit meinem Regenbogen? Hinter der Fuchs-Tür wartet etwas auf euch. Malt die Spur darauf, dann vergesst ihr sie nicht!"
+    }
+   },
    "optionen": [
     {
      "id": "hase",
      "name": "Hase",
-     "nein": "Hoppel, hoppel! Das war der Hase. Hat ein Hase so kleine Pfoten?"
+     "nein": "Hoppel, hoppel! Das ist die Hasenspur. War eure Spur so lang?"
     },
     {
      "id": "ente",
      "name": "Ente",
-     "nein": "Quak, quak! Das war die Ente. Macht ein Fuchs Quak?"
+     "nein": "Quak, quak! Das ist die Entenspur mit Schwimmhäuten. War eure Spur so spitz?"
     },
     {
      "id": "fuchs",
@@ -316,9 +330,9 @@
      "ja": true
     }
    ],
-   "after": "Ein Fuchs! Was will denn ein Fuchs mit meinem Regenbogen? Der Fuchs hat hier eine Zaubertafel verloren. Schaut euch gut um! Malt die Pfote gemeinsam darauf ab, dann erkennt ihr die Spur überall wieder!",
+   "after": "Ein Fuchs! Was will denn ein Fuchs mit meinem Regenbogen? Steckt die Zaubertafel ein und lauft der Fuchsspur hinterher!",
    "go": "Der Fuchsspur folgen",
-   "dann": "Die Kinder schauen sich um und finden die Zaubertafel. Reihum malt jedes Kind ein Stück der Pfote, danach kommt die Tafel in die Tasche. Dann „Der Fuchsspur folgen“ tippen.",
+   "dann": "Die Zaubertafel kommt in die Tasche. Dann „Der Fuchsspur folgen“ tippen.",
    "ort": {
     "typ": "kreuzung",
     "anteil": 0.64
@@ -1123,11 +1137,11 @@
    },
    "4": {
     "0": {
-     "a": "Ups! Das war ein Forschungspups. Spurenkunde! Schaut euch die drei Spuren im Spiegel ganz genau an. Welche passt zu den kleinen Pfoten? Ein Kind tippt auf die richtige Spur. Also nochmal: Die richtige Spur antippen!",
-     "c": "Ups! Das war ein Forschungspups. Spurenkunde! Vor den drei Türen liegen Spurenkarten. Welche passt zu den kleinen Pfoten? Ein Kind tippt im Spiegel auf die richtige Spur. Also nochmal: Die richtige Spur antippen!"
+     "a": "Ups! Das war ein Forschungspups. Spurenkunde! Merkt euch die Spur im Spiegel ganz genau, gleich kommt der Nebel. Dann sucht die Zaubertafel und malt die Spur darauf. Also nochmal: Spur merken, malen, antippen!",
+     "c": "Ups! Das war ein Forschungspups. Spurenkunde! Merkt euch die Spur im Spiegel ganz genau, gleich kommt der Nebel. Dann sucht die passende Karte vor den Türen. Also nochmal: Spur merken, Karte finden, antippen!"
     },
     "1": {
-     "a": "Verzeihung! Der Fuchs hat hier eine Zaubertafel verloren. Schaut euch gut um! Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen. Schön ordentlich, wie ein echter Forscher! Also nochmal: Zaubertafel finden, Pfote gemeinsam abmalen!",
+     "a": "Verzeihung! Ein Fuchs war das, ganz wie auf eurer Zaubertafel. Schön gemalt, wie echte Forscher! Also nochmal: Tafel einstecken, Fuchsspur folgen!",
      "c": "Verzeihung! Hinter der Fuchs-Tür liegt eine Zaubertafel. Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen. Schön ordentlich, wie ein echter Forscher! Also nochmal: Hinter die Fuchs-Tür, Pfote gemeinsam abmalen!"
     }
    },
@@ -1158,8 +1172,8 @@
    "moehre": "Falsch! Eine Möhre ist in echt orange. Nicht gelb!",
    "elefant": "Falsch! Elefanten sind in echt grau. Törööö!",
    "kuh": "Falsch! Kühe sind in echt schwarz und weiß. Muh!",
-   "hase": "Hoppel, hoppel! Das war der Hase. Hat ein Hase so kleine Pfoten?",
-   "ente": "Quak, quak! Das war die Ente. Macht ein Fuchs Quak?"
+   "hase": "Hoppel, hoppel! Das ist die Hasenspur. War eure Spur so lang?",
+   "ente": "Quak, quak! Das ist die Entenspur. War eure Spur so spitz?"
   },
   "figuren": {
    "kakapups": {
@@ -1247,11 +1261,11 @@
    },
    "4": {
     "0": {
-     "a": "Schaut euch die drei Spuren im Spiegel ganz genau an. Welche passt zu den kleinen Pfoten? Ein Kind tippt auf die richtige Spur.",
-     "c": "Vor den drei Türen liegen Spurenkarten. Welche passt zu den kleinen Pfoten? Ein Kind tippt im Spiegel auf die richtige Spur."
+     "a": "Merkt euch die Spur im Spiegel ganz genau! Dann kommt der Nebel. Sucht die Zaubertafel, malt die Spur darauf und tippt auf die Spur, die ihr gemalt habt.",
+     "c": "Merkt euch die Spur im Spiegel ganz genau! Dann kommt der Nebel. Sucht die passende Spurenkarte vor den Türen und tippt die Spur im Spiegel an."
     },
     "1": {
-     "a": "Der Fuchs hat hier eine Zaubertafel verloren. Schaut euch gut um! Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen.",
+     "a": "Ein Fuchs war das! Steckt die Zaubertafel ein und lauft der Fuchsspur hinterher.",
      "c": "Hinter der Fuchs-Tür liegt eine Zaubertafel. Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen."
     }
    },
@@ -1305,10 +1319,11 @@
     "c": "Bögen aus der Schüssel holen, jeder einen Glücksstein!"
    },
    "4.0": {
-    "a": "Die richtige Spur antippen!"
+    "a": "Spur merken, malen, antippen!",
+    "c": "Spur merken, Karte finden, antippen!"
    },
    "4.1": {
-    "a": "Zaubertafel finden, Pfote gemeinsam abmalen!",
+    "a": "Tafel einstecken, Fuchsspur folgen!",
     "c": "Hinter die Fuchs-Tür, Pfote gemeinsam abmalen!"
    },
    "5.0": {
@@ -1354,7 +1369,7 @@
     "3.0": "Hihi, die Bilder sind ja ganz verdreht. Wie meine Fühler!",
     "3.1": "Ich trag den Glücksstein! Uff, zu schwer. Hihi!",
     "4.0": "Ameisen haben sechs Beine. Aber das hier sind keine Ameisenspuren!",
-    "4.1": "Ich male meine Fühler ab. Hihi! Ihr malt die Pfote.",
+    "4.1": "Hihi! Ein Fuchs! Den hätte ich nie erkannt.",
     "5.0": "Hihi, psst! Ich kann gaaanz leise kichern.",
     "5.1": "Ich bin schon da! Ich bin nämlich ganz klein. Hihi!",
     "6.0": "Hihi, so viele Farben! Mir wird ganz schwindelig.",
@@ -1384,7 +1399,7 @@
     "3.0": "Yo, der Spiegel ist voll verrückt geworden. Kein Stress.",
     "3.1": "Respekt, Leute! Jetzt kommt die Belohnung.",
     "4.0": "Detektiv-Modus an, Sonnenbrille auf!",
-    "4.1": "Krass gemacht! Jetzt wird gemalt.",
+    "4.1": "Krass gemacht! Fall gelöst.",
     "5.0": "Psst, ganz cool bleiben, Leute.",
     "5.1": "Ninja-Modus, Leute. Ganz lässig schleichen.",
     "6.0": "Yo, das Finale! Jetzt wird es richtig cool.",
@@ -1411,8 +1426,8 @@
    "moehre": "Eine Möhre ist in echt orange. Nicht gelb!",
    "elefant": "Elefanten sind in echt grau. Törööö!",
    "kuh": "Kühe sind in echt schwarz und weiß. Muh!",
-   "hase": "Das war der Hase. Hat ein Hase so kleine Pfoten?",
-   "ente": "Das war die Ente. Macht ein Fuchs Quak?"
+   "hase": "Das ist die Hasenspur. War eure Spur so lang?",
+   "ente": "Das ist die Entenspur. War eure Spur so spitz?"
   }
  },
  "info": {
