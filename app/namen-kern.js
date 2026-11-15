@@ -38,6 +38,8 @@
     var h=Math.floor(n/100), r=n%100;
     return (h===1?'ein':E[h])+'hundert'+(r ? (r===1?'eins':unter100(r)) : '');
   }
+  // Alter 1: „ein Jahr“ statt „eins Jahre“ (UNICORN-57); andere Alter bleiben Wort für Wort gleich (keine neuen Aufnahmen)
+  function einJahr(t, a, wort){ return a===1 ? String(t).replace(/\{alter\} Jahre\b/g, wort) : t; }
   function alterZahl(a){ var n=Math.round(Number(a)); return n>=1 ? n : 0; }
 
   function fuellen(t, w){ return String(t).replace(/\{(name|alter)\}/g, function(_, k){ return w[k]==null?'':String(w[k]); }); }
@@ -63,7 +65,7 @@
       r[s.id]={titel:s.titel||s.id, variante:i, varianten:s.varianten.length, zeigen:fuellen(s.varianten[i], {name:name}), sprechen:fuellen(s.varianten[i], {name:sprech})};
     });
     if(v.alter && a){
-      r.alter={titel:'Alter', variante:0, varianten:1, nach:v.alter.nach||'schatz', zeigen:fuellen(v.alter.varianten[0], {alter:a}), sprechen:fuellen(v.alter.varianten[0], {alter:zahlwort(a)})};
+      r.alter={titel:'Alter', variante:0, varianten:1, nach:v.alter.nach||'schatz', zeigen:fuellen(einJahr(v.alter.varianten[0], a, '1 Jahr'), {alter:a}), sprechen:fuellen(einJahr(v.alter.varianten[0], a, 'ein Jahr'), {alter:zahlwort(a)})};
     }
     return r;
   }

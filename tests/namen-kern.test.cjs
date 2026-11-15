@@ -26,6 +26,9 @@ const STIMME={voice_id:'v', modell:'m', einstellungen:{a:1}, vorweg:'<p> '};
   const b6=K.bilden(V,{name:'Leo',alter:6}), b40=K.bilden(V,{name:'Leo',alter:40});
   ok(/6 Jahre/.test(b6.alter.zeigen) && /sechs Jahre/.test(b6.alter.sprechen), 'Alters-Satz: Ziffer angezeigt, Wort gesprochen');
   ok(/vierzig/.test(b40.alter.sprechen), 'Alter 40 geht');
+  const b1=K.bilden(V,{name:'Leo',alter:1});
+  ok(/ein Jahr\b/.test(b1.alter.sprechen) && /1 Jahr\b/.test(b1.alter.zeigen) && !/eins Jahre|1 Jahre/.test(b1.alter.sprechen+b1.alter.zeigen), 'Alter 1: „ein Jahr“ (UNICORN-57)');
+  ok([...V.stellen.flatMap(s=>s.varianten), ...V.alter.varianten].every(t=>!/hat Geburtstag|hast du Geburtstag|wirst du/.test(t)), 'Passt auch bei einer Feier nach dem Geburtstag');
   ok(!K.bilden(V,{name:'Leo'}).alter, 'Ohne Alter kein Alters-Satz');
   ok(b6.gruss.sprechen===b40.gruss.sprechen && b6.schatz.sprechen===b40.schatz.sprechen, 'Namens-Sätze hängen nicht am Alter');
 
