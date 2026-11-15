@@ -195,6 +195,10 @@
    "go": "Prüfung bestanden, los!",
    "ort": {
     "typ": "start"
+   },
+   "planer": {
+    "was": "Funkel stellt sich vor: Sein Regenbogen ist gemopst. Danach Einhorn-Prüfung mit Wiehern, Scharren und Hörnern.",
+    "ort": "Vor eurer Haustür, mit Platz für alle Kinder."
    }
   },
   {
@@ -218,7 +222,12 @@
     "typ": "weg",
     "anteil": 0.18
    },
-   "ansage": "Die Hufspuren führen {zu}."
+   "ansage": "Die Hufspuren führen {zu}.",
+   "planer": {
+    "was": "Im Spiegel ist die Erdbeere blau. Die Kinder rufen „Rot!“ und suchen die roten Bögen.",
+    "ort": "Am Ende einer Kreidespur, ein ruhiger Fleck mit einem Versteck in Bodennähe.",
+    "versteck": "Rote Bögen"
+   }
   },
   {
    "name": "Straßenübergang",
@@ -236,7 +245,11 @@
     "typ": "strassenquerung",
     "anteil": 0.32
    },
-   "ansage": "Die Regenbogenbrücke wartet {an}."
+   "ansage": "Die Regenbogenbrücke wartet {an}.",
+   "planer": {
+    "was": "Alle fassen das Seil und gehen gemeinsam über die Regenbogenbrücke, also über die Straße.",
+    "ort": "Eine sichere Stelle zum Überqueren, am besten Zebrastreifen oder Ampel."
+   }
   },
   {
    "name": "Am Zaun",
@@ -288,7 +301,12 @@
     "typ": "zaun",
     "anteil": 0.48
    },
-   "ansage": "Die Bilder warten {an}."
+   "ansage": "Die Bilder warten {an}.",
+   "planer": {
+    "was": "Der Spiegel zeigt Dinge in falschen Farben, die Kinder rufen die richtige. Danach finden sie Bögen und Glückssteine.",
+    "ort": "Am Anfang eines Zauns oder einer Hecke, wo man etwas verstecken kann.",
+    "versteck": "Gelber und oranger Bogen, Glückssteine"
+   }
   },
   {
    "name": "Wegkreuzung",
@@ -337,7 +355,12 @@
     "typ": "kreuzung",
     "anteil": 0.64
    },
-   "ansage": "Das nächste Rätsel wartet {an}."
+   "ansage": "Das nächste Rätsel wartet {an}.",
+   "planer": {
+    "was": "Der Spiegel zeigt kurz eine Spur, die Kinder malen sie auf die Zaubertafel und finden heraus: ein Fuchs!",
+    "ort": "Eine Wegkreuzung, an der die Gruppe in Ruhe stehen bleiben kann.",
+    "versteck": "Zaubertafel"
+   }
   },
   {
    "name": "Wolkenberg",
@@ -361,7 +384,12 @@
     "typ": "huegel_unten",
     "anteil": 0.8
    },
-   "ansage": "Die Regenwolke schläft {an}."
+   "ansage": "Die Regenwolke schläft {an}.",
+   "planer": {
+    "was": "Der Frosch ist lila statt grün. Die Wolke schläft, also schleichen alle leise los und suchen die grünen Bögen.",
+    "ort": "Unten an einem kleinen Hügel oder einer Böschung.",
+    "versteck": "Grüne Bögen"
+   }
   },
   {
    "name": "Parkbank",
@@ -399,7 +427,12 @@
     "ende": true,
     "oben": true
    },
-   "ansage": "Der letzte Ort ist {an}."
+   "ansage": "Der letzte Ort ist {an}.",
+   "planer": {
+    "was": "Blau fehlt! Die Pfoten führen zu Fridolins grauem Bau. Der Fuchs gibt die Bögen zurück, dann kommt der Schatz.",
+    "ort": "Oben auf einem Hügel bei einer Bank: Platz zum Sitzen, für den Snack und den Schatz.",
+    "versteck": "Grauer Karton (Fridolins Bau), blaue Bögen, Schatzkiste"
+   }
   }
  ],
  "vorbereitung": {

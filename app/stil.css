@@ -98,6 +98,10 @@ body.mit-karte{overflow:hidden;height:100%;overscroll-behavior:none}
 .station.ersatz{border:2px dashed var(--linie)}
 .station.ersatz .warn{color:var(--gelb);font-weight:700}
 .tipp{color:var(--leise);font-size:.85rem}
+.tipp-info{margin:6px 0 0}.tipp-info summary{display:inline-flex;align-items:center;gap:6px;min-height:40px;cursor:pointer;color:var(--leise);font-size:.88rem;font-weight:700;list-style:none}
+.tipp-info summary::-webkit-details-marker{display:none}.tipp-info summary .ico{width:18px;height:18px}.tipp-info[open] summary{color:var(--text,#fff)}.tipp-info .tipp{margin:2px 0 6px}
+.station .st-was{display:block;margin-top:6px;color:var(--text,#fff);font-size:.92rem}.station .st-ort{display:block;margin-top:2px;color:var(--leise);font-size:.88rem}.station .st-ort b{display:inline;font-weight:700}
+.liste .li-info{display:block;margin-top:3px;color:var(--leise);font-size:.82rem;line-height:1.35}.liste .li-info b{display:inline;font-weight:700}
 .haupt{display:flex;gap:10px}
 .haupt .knopf{flex:1;padding:12px 10px}
 .haupt .knopf:last-child{flex:1.4}
