@@ -28,6 +28,10 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   ok(/Heute wirst du 6!/.test(await p.locator('.nm-moment').nth(1).innerText()), 'Alters-Satz beim Schatz (6)');
   ok(await p.locator('#nm-haupt [data-konto="anmelden"]').count()===1 && await p.locator('[data-namen-los]').count()===0, 'Knopf „Party sichern und einsprechen“ statt Einsprechen');
   ok(await p.locator('[data-namen-ganz]').count()===0, 'Ohne Ton kein „Mit Geschichte“');
+  await p.click('#nm-haupt [data-namen-beispiel]'); await p.waitForTimeout(400);
+  ok(await p.locator('.nm-buehne.spricht').count()===1 && /Emma/.test(await p.locator('#nm-untertitel').innerText()), 'Hörprobe mit „Emma“: Funkel spricht, Satz eingeblendet');
+  await p.click('#nm-haupt [data-namen-beispiel]'); await p.waitForTimeout(100);
+  ok(await p.locator('.nm-buehne.spricht').count()===0, 'Zweiter Tipp hält die Hörprobe an');
   await p.fill('#namen-name','Lotta'); await p.waitForTimeout(100);
   ok(/Lotta/.test(await p.locator('#nm-untertitel').innerText()) && /Lotta!/.test(await p.locator('.nm-strahl').innerText()), 'Name tippen: Funkels Satz und Zeitstrahl sofort mit „Lotta“');
   await p.fill('#namen-name','Mia');
