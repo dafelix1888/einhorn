@@ -112,9 +112,11 @@
       '<p class="leise nm-info">Zum Einsprechen sicherst du die Party mit deiner E-Mail. Kein Passwort. Das erste Einsprechen ist frei.</p>';
     if(!stand) return '<p class="leise nm-info">Lädt …</p>';
     var aus=laeuft?' disabled':'';
-    if(!gespeichert()) return '<button type="button" class="knopf breit" data-namen-los="neu"'+aus+'>'+(laeuft?'Funkel spricht ein …':'Funkel einsprechen lassen')+'</button>'+
-      '<p class="leise nm-info">Das erste Einsprechen ist frei. Danach kannst du '+max+'-mal neu erzeugen.</p>';
-    if(geaendert()) return stand.uebrig>0 ? '<button type="button" class="knopf breit" data-namen-los="neu"'+aus+'>'+(laeuft?'Funkel spricht ein …':'Neu einsprechen')+'</button>'+
+    // Vorher sagen, was passiert (UNICORN-54, Rückmeldung Felix): Funkel spricht jetzt mit dem echten Namen, nach etwa 10 Sekunden zu hören
+    var nm=esc(K.sauber(($('namen-name')||{}).value||'')||(stand&&stand.name)||(party()&&party().kind&&party().kind.name)||'dem Namen');
+    if(!gespeichert()) return '<button type="button" class="knopf breit" data-namen-los="neu"'+aus+'>'+(laeuft?'Funkel spricht „'+nm+'“ ein … etwa 10 Sekunden':'▶ Jetzt mit „'+nm+'“ anhören')+'</button>'+
+      '<p class="leise nm-info">Funkel spricht die drei Sätze jetzt mit diesem Namen ein. Nach etwa 10 Sekunden hörst du sie hier, und sie kommen von selbst aufs Tablet. Kostenlos, danach kannst du '+max+'-mal neu erzeugen.</p>';
+    if(geaendert()) return stand.uebrig>0 ? '<button type="button" class="knopf breit" data-namen-los="neu"'+aus+'>'+(laeuft?'Funkel spricht ein … etwa 10 Sekunden':'▶ Neu einsprechen und anhören')+'</button>'+
       '<p class="leise nm-info">Zählt als 1 von '+stand.uebrig+' übrigen Mal.</p>' : '<p class="leise nm-info">Alle '+max+' Mal neu erzeugt.</p>';
     return '<button type="button" class="knopf breit" data-namen-alle'+(laeuft?' disabled':'')+'>'+(spielt()?'■ Stopp':'▶ Alle drei Stellen anhören')+'</button>';
   }
@@ -208,7 +210,7 @@
       stand.texte={}; stand.wahl={}; Object.keys(r.saetze||{}).forEach(function(k){ stand.texte[k]=r.saetze[k].text; stand.wahl[k]=r.saetze[k].variante||0; });
       stand.alter=alter()||null;
       audioAus(r.saetze); zeichnen(); if(!still) alleAnhoeren(); melden();
-    }, function(x){ laeuft=''; if(!still) fehler=x.message||'Das ging nicht.'; if(x.daten && typeof x.daten.uebrig==='number') stand.uebrig=x.daten.uebrig; teilweise(); });
+    }, function(x){ laeuft=''; if(!still) fehler=/nicht eingerichtet/.test(x.message||'') ? 'Funkels Stimme für Namen ist gerade nicht erreichbar. Die Tour läuft trotzdem, nur ohne die drei Namens-Sätze. Bitte später noch einmal versuchen.' : (x.message||'Das ging nicht.'); if(x.daten && typeof x.daten.uebrig==='number') stand.uebrig=x.daten.uebrig; teilweise(); });
   }
 
   // ---------- Funkel in 3D: ein Element für die ganze Seite, wird in jede neue Bühne gehängt ----------

@@ -1994,8 +1994,8 @@
     "id": "gruss",
     "titel": "An der Haustür",
     "varianten": [
-     "Und heute ist ein ganz besonderer Tag: {name} hat Geburtstag! {name}, heute hilfst du mir ganz besonders.",
-     "Wisst ihr, wer heute Geburtstag hat? {name}! Hallo {name}, wie schön, dass du heute mit mir auf Schatzsuche gehst.",
+     "Heute ist ein ganz besonderer Tag: Wir feiern den Geburtstag von {name}! {name}, heute hilfst du mir ganz besonders.",
+     "Wisst ihr, wessen Geburtstag wir heute feiern? Den von {name}! Hallo {name}, wie schön, dass du heute mit mir auf Schatzsuche gehst.",
      "Heute feiern wir {name}! {name}, mit dir an meiner Seite finden wir den Schatz bestimmt."
     ]
    },
@@ -2005,7 +2005,7 @@
     "varianten": [
      "Alles Liebe zum Geburtstag, {name}!",
      "Herzlichen Glückwunsch zum Geburtstag, {name}!",
-     "Hurra, {name} hat Geburtstag! Alles, alles Liebe!"
+     "Hurra, heute feiern wir dich, {name}! Alles, alles Liebe zum Geburtstag!"
     ]
    },
    {
@@ -2021,7 +2021,7 @@
   "alter": {
    "nach": "schatz",
    "varianten": [
-    "Und weißt du was? Heute wirst du {alter}! Ich wünsche dir ein Jahr, so bunt wie mein Regenbogen."
+    "Und weißt du was? {alter} Jahre, wie toll! Ich wünsche dir ein neues Lebensjahr, so bunt wie mein Regenbogen."
    ]
   }
  }

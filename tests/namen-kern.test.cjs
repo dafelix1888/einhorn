@@ -24,7 +24,7 @@ const STIMME={voice_id:'v', modell:'m', einstellungen:{a:1}, vorweg:'<p> '};
   ok(Object.entries(z).every(([n,w])=>K.zahlwort(+n)===w), 'Zahlwörter 1 bis 117');
   ok(K.zahlwort(2000)==='2000', 'Sehr große Zahl bleibt Ziffer');
   const b6=K.bilden(V,{name:'Leo',alter:6}), b40=K.bilden(V,{name:'Leo',alter:40});
-  ok(/wirst du 6!/.test(b6.alter.zeigen) && /wirst du sechs!/.test(b6.alter.sprechen), 'Alters-Satz: Ziffer angezeigt, Wort gesprochen');
+  ok(/6 Jahre/.test(b6.alter.zeigen) && /sechs Jahre/.test(b6.alter.sprechen), 'Alters-Satz: Ziffer angezeigt, Wort gesprochen');
   ok(/vierzig/.test(b40.alter.sprechen), 'Alter 40 geht');
   ok(!K.bilden(V,{name:'Leo'}).alter, 'Ohne Alter kein Alters-Satz');
   ok(b6.gruss.sprechen===b40.gruss.sprechen && b6.schatz.sprechen===b40.schatz.sprechen, 'Namens-Sätze hängen nicht am Alter');

@@ -41,6 +41,7 @@
 .namen-pille .ton svg{width:18px;height:18px}
 .namen-pille .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;line-height:1.25}.namen-pille b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.namen-pille small{color:#C4B5FD;font-size:.84rem;font-weight:700}
 .namen-zeile{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px}
+.namen-so{margin:0 0 12px}.namen-ueber{margin:0 0 6px}.namen-info .namen-beispiel{display:inline;min-height:0;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
 .namen-pille .weiter{flex:none;font-size:1.5rem;line-height:1;color:#C4B5FD}
 .namen-pille.da{background:transparent;border-color:var(--linie,#2F2740)}.namen-pille.da .ton{background:#3FB950}.namen-pille.da small{color:var(--leise);font-weight:400}
 /* „So spielt ihr“ (UNICORN-54): Zeile im Überblick, dahinter Spielart, Erzähler und der Ablauf der Tour */
@@ -180,6 +181,7 @@
 .vorein .schalter label{margin:0;font-weight:400;flex:1;cursor:pointer}
 .vorein .schalter label b{display:block}
 .vorein .schalter label span{color:var(--leise);font-size:.9rem}
+.vorein-spaeter{margin:4px 0 12px;color:var(--leise);font-size:.88rem;border-top:1px solid var(--linie);padding-top:10px}
 .zusammen{background:linear-gradient(130deg,#3B2A64,#1F1929);border-radius:16px;padding:16px 18px}
 .zusammen b{font-size:1.2rem}
 .zusammen p{margin:4px 0 0;color:var(--leise)}
@@ -282,6 +284,7 @@
           (d?'<div class="schalter"><label for="planb"><b>Plan B bei Regen</b><span>Drinnen-Variante mit vorbereiten, am Partytag mit einem Tipp umschalten.</span></label><input type="checkbox" id="planb"'+(e.planB?' checked':'')+'></div>'+
              (ex?'<div class="schalter"><label for="extra-assistent"><b>Extra: '+esc(ex.titel)+'</b><span>'+esc(ex.text)+(ex.braucht?' Dazu brauchst du: '+esc(ex.braucht)+'.':'')+'</span></label><input type="checkbox" id="extra-assistent"'+(e.ausdrucke===false?' checked':'')+'></div>':''):'')+
           '<div class="schalter"><label for="vorausgeher"><b>Ein Erwachsener geht voraus</b><span>'+(e.helfer<2?'Geht ab zwei Erwachsenen. Mit nur einem wird alles vorher aufgebaut.':'Baut die Stationen kurz vorher auf. Ohne liegt alles schon vorher bereit.')+'</span></label><input type="checkbox" id="vorausgeher"'+(e.vorausgeher?' checked':'')+(e.helfer<2?' disabled':'')+'></div>'+
+        '<p class="vorein-spaeter">Das alles kannst du später ändern: in der Party unter „So spielt ihr“ und im Spiel unter „Erwachsene“ → „Einrichten“.</p>'+
         '</details>';
     } else if(sid()==='erz'){
       h+='<h1>Wer liest die Aufgaben vor?</h1>'+
