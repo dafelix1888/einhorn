@@ -190,7 +190,7 @@
    "pic": "horn",
    "title": "Funkels Botschaft",
    "say": "Hallo, ihr Einhorn-Helfer! Ihr tragt ja schon mein Zeichen. Ich bin Funkel und wohne im Wald hinter euren Häusern. Jeden Morgen male ich mit meinem Regenbogen die Farben in die Welt. Und das hier ist mein Zauberspiegel! Durch ihn kann ich euch sehen und mit euch sprechen. Er zeigt euch den Weg, und an jeder Station hat er ein Rätsel für euch.",
-   "say2": "Aber heute Nacht hat jemand meinen Regenbogen gemopst! Jetzt sind alle Farben durcheinander. Nur die zwei kleinsten Bögen habe ich noch. Setzt eure Hörner auf und folgt meinen Hufspuren!",
+   "say2": "Und stellt euch vor: In der Nacht hat jemand meinen Regenbogen gemopst! Jetzt sind alle Farben durcheinander. Nur die zwei kleinsten Bögen habe ich noch. Setzt eure Hörner auf und folgt meinen Hufspuren!",
    "task": "Einhorn-Prüfung machen: wiehern, mit dem Huf scharren, mit dem Horn wackeln. Wer besteht, bekommt seinen Haarreif mit Horn. Danach „Prüfung bestanden, los!“ tippen.",
    "go": "Prüfung bestanden, los!",
    "ort": {
@@ -288,7 +288,7 @@
     "typ": "zaun",
     "anteil": 0.48
    },
-   "ansage": "Der Zaun beginnt {an}."
+   "ansage": "Die Bilder warten {an}."
   },
   {
    "name": "Wegkreuzung",
@@ -337,7 +337,7 @@
     "typ": "kreuzung",
     "anteil": 0.64
    },
-   "ansage": "Die Kreuzung ist {an}."
+   "ansage": "Das nächste Rätsel wartet {an}."
   },
   {
    "name": "Wolkenberg",
@@ -361,7 +361,7 @@
     "typ": "huegel_unten",
     "anteil": 0.8
    },
-   "ansage": "Der Wolkenberg ist {an}."
+   "ansage": "Die Regenwolke schläft {an}."
   },
   {
    "name": "Parkbank",
@@ -399,7 +399,7 @@
     "ende": true,
     "oben": true
    },
-   "ansage": "Die Parkbank steht {an}."
+   "ansage": "Der letzte Ort ist {an}."
   }
  ],
  "vorbereitung": {
@@ -2105,7 +2105,7 @@
     "titel": "Zu Hause",
     "varianten": [
      "Tschüss, {name}! Feier schön weiter, du Geburtstags-Einhorn.",
-     "Mach’s gut, {name}! Das war ein wunderbares Abenteuer mit dir.",
+     "Mach’s gut, {name}! Mit dir hat die Schatzsuche besonders viel Spaß gemacht.",
      "Auf Wiedersehen, {name}! Ich zaubere dir noch einen Regenbogen in deinen Geburtstag."
     ]
    }
