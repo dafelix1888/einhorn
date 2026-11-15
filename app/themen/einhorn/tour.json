@@ -1985,5 +1985,44 @@
     ]
    ]
   }
+ },
+ "namenSaetze": {
+  "version": 1,
+  "hinweis": "Funkel kennt das Kind (UNICORN-50, ADR-28): nur {name} als Variable, neutral formuliert. Jede Textänderung erzeugt neue Aufnahmen (Credits).",
+  "stellen": [
+   {
+    "id": "gruss",
+    "titel": "An der Haustür",
+    "varianten": [
+     "Und heute ist ein ganz besonderer Tag: {name} hat Geburtstag! {name}, heute hilfst du mir ganz besonders.",
+     "Wisst ihr, wer heute Geburtstag hat? {name}! Hallo {name}, wie schön, dass du heute mit mir auf Schatzsuche gehst.",
+     "Heute feiern wir {name}! {name}, mit dir an meiner Seite finden wir den Schatz bestimmt."
+    ]
+   },
+   {
+    "id": "schatz",
+    "titel": "Beim Schatz",
+    "varianten": [
+     "Alles Liebe zum Geburtstag, {name}!",
+     "Herzlichen Glückwunsch zum Geburtstag, {name}!",
+     "Hurra, {name} hat Geburtstag! Alles, alles Liebe!"
+    ]
+   },
+   {
+    "id": "abschied",
+    "titel": "Zu Hause",
+    "varianten": [
+     "Tschüss, {name}! Feier schön weiter, du Geburtstags-Einhorn.",
+     "Mach’s gut, {name}! Das war ein wunderbares Abenteuer mit dir.",
+     "Auf Wiedersehen, {name}! Ich zaubere dir noch einen Regenbogen in deinen Geburtstag."
+    ]
+   }
+  ],
+  "alter": {
+   "nach": "schatz",
+   "varianten": [
+    "Und weißt du was? Heute wirst du {alter}! Ich wünsche dir ein Jahr, so bunt wie mein Regenbogen."
+   ]
+  }
  }
 }
