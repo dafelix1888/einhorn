@@ -60,7 +60,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   const euro=async s=>+((await p.textContent('[data-wege="'+s+'"] .betrag')).replace(/[^0-9,]/g,'').replace(',','.'));
   const alles=await euro('alles'), noetig=await euro('noetig');
   ok(alles>0 && noetig>0 && noetig<alles, 'Zwei Wege mit Preis: alles ('+alles+' €) und nur das Nötige ('+noetig+' €)');
-  ok((await p.locator('.ek-gruppe').allInnerTexts()).map(t=>t.replace(/\s*\d+$/,'')).join('|')==='Braucht die Tour|Extras, die es schöner machen', 'Liste in zwei Gruppen: nötig und Extras');
+  ok((await p.locator('.ek-gruppe').allInnerTexts()).map(t=>t.replace(/\s*\d+$/,'')).join('|')==='Braucht die Tour|Extras, die es schöner machen|Von zu Hause', 'Liste in Gruppen: nötig, Extras, von zu Hause (UNICORN-92)');
   ok(/Sonst: Aus Pappe ausschneiden/.test(await p.textContent('#einkauf')), 'Holz-Regenbogen mit derselben Notlösung wie im Spiel unter „Vorbereitung“');
   await p.click('[data-wege="noetig"]'); await p.waitForTimeout(200);
   const aus=await p.evaluate(()=>JSON.parse(localStorage.getItem('sj.party.einhorn')).einkaufAus);
@@ -79,7 +79,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   await p.goto(B+'party.html?thema=einhorn#s-basteln'); await p.waitForSelector('.bastel');
   const bt=await p.textContent('#s-basteln');
   ok(/Etwa \d+ Minuten/.test(bt) && /Nötig sind nur 5 Minuten/.test(bt), 'Basteln: Gesamtaufwand und nötiger Teil');
-  ok(await p.locator('.bastel li').count()===5 && /Ohne: Den Schuhkarton so lassen/.test(bt) && /Danke-Link/.test(bt), 'Je Aufgabe Minuten und was ohne passiert');
+  ok(await p.locator('.bastel li').count()===4 && /Ohne: Den Schuhkarton so lassen/.test(bt) && /Danke-Link/.test(bt), 'Je Aufgabe Minuten und was ohne passiert');
 
   // --- UNICORN-76: Eine Generalprobe statt zwei Läufen ---
   await p.goto(B+'party.html?thema=einhorn#s-route'); await p.waitForSelector('#s-route');

@@ -22,6 +22,7 @@
 .einladung dt{font-weight:700;color:#6B35C9}
 .einladung dd{margin:0}
 .einladung .klein{font-size:10pt;color:#5A5073;margin-top:5mm}
+.einladung .qr{display:flex;gap:4mm;align-items:center;margin-top:3mm;font-size:10pt;color:#5A5073}.einladung .qr svg{width:24mm;height:24mm;flex:none}
 /* Urkunde */
 .urkunde{padding:22mm 20mm;text-align:center;height:100%;display:flex;flex-direction:column;align-items:center;border:6mm solid transparent;border-image:linear-gradient(90deg,#E23A3F,#F28C1B,#F2B90F,#3A9D4B,#2B6FE0,#9050C8) 1}
 .urkunde img{width:70mm;height:70mm;border-radius:6mm;margin-bottom:8mm}
@@ -69,6 +70,7 @@
 <div class="toast" id="toast" hidden></div>
 <script src="weg.js"></script>
 <script src="party.js"></script>
+<script src="qr.js"></script>
 <script src="konto.js"></script>
 <script>
 (function(){
@@ -89,12 +91,18 @@
   $('hinweis-gaeste').value=Party.gaesteHinweis(party);
 
 
+  // QR-Code zum Einladungslink (UNICORN-97): nur mit gesicherter Party (Link mit Schlüssel), im Browser erzeugt
+  function qrBlock(){
+    var l=Party.einladungsLink(party, plan);
+    if(!window.QR || !l || !/[?&]k=/.test(l)) return '';
+    return '<div class="qr">'+QR.svg(l)+'<span>Mit dem Handy scannen und hier zu- oder absagen.</span></div>';
+  }
   function einladung(){
     var draussen=party.ort!=='drinnen';
     var karte='<div class="einladung"><img src="'+info.cover+'" alt=""><div><h2>'+esc(name)+' wird '+esc(alter)+'!</h2><p class="unter">Komm mit auf Funkels Regenbogen-Abenteuer, einer Einhorn-Schatzsuche mit sprechendem Zauberspiegel.</p>'+
       '<dl><dt>Wann</dt><dd>'+esc(datumLang)+', '+esc(party.start)+' Uhr</dd><dt>Wo</dt><dd>'+esc($('treff').value)+'</dd><dt>Abholen</dt><dd>'+esc($('abholen').value)+' Uhr</dd>'+
       (Party.gaesteHinweis(party)?'<dt>Bitte</dt><dd>'+esc(Party.gaesteHinweis(party))+'</dd>':'')+'</dl>'+
-      '<p class="klein">'+(antwortBis?'Bitte sagt bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.':'Bitte sagt kurz Bescheid, ob ihr kommt.')+'</p></div></div>';
+      '<p class="klein">'+(antwortBis?'Bitte sagt bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.':'Bitte sagt kurz Bescheid, ob ihr kommt.')+'</p>'+qrBlock()+'</div></div>';
     return '<section class="blatt" id="einladung">'+karte+karte+'</section>';
   }
   // Namen auf den Urkunden (UNICORN-102): aus der Gästeliste vorbelegt, oder ohne Namen zum Reinschreiben
@@ -153,6 +161,7 @@
   Promise.all([fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }), fetch('themen/index.json').then(function(r){ return r.json(); })]).then(function(r){
     tour=r[0]; info=r[1].themen.filter(function(t){ return t.id===thema; })[0]; zeichnen();
     if(location.hash==='#einladung'){ an.urkunde=false; zeichnen(); }
+    if(location.hash==='#urkunden'){ an.einladung=false; zeichnen(); }   // aus „Basteln und drucken“ nur die Urkunden (UNICORN-101)
     if(window.Konto && Konto.gaeste && Konto.angemeldet && Konto.angemeldet()) Konto.gaeste(thema).then(function(){ zeichnen(); }, function(){});   // frische Zusagen für die Urkunden-Namen
   });
 })();

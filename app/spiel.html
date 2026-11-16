@@ -3,6 +3,8 @@
 <script src="fehler.js"></script><script src="weg.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Schatzweg"><title>Funkels Zauberspiegel</title><style>@font-face{font-family:"Baloo 2";src:url(schrift/baloo2.woff) format("woff");font-weight:400 800;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-regular.woff) format("woff");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-bold.woff) format("woff");font-weight:700;font-display:swap}/* Entwickler-Teile (UNICORN-118): nur mit ?entwickler=1 */
 html:not(.entwickler) .nur-entwickler{display:none!important}
 .probe-orte{display:flex;flex-wrap:wrap;gap:6px 16px;margin:8px 0}.probe-orte label{display:flex;gap:8px;align-items:center;min-height:36px}.probe-orte input{width:22px;height:22px}
+.probe-geraet{background:rgba(255,255,255,.06);border-radius:12px;padding:8px 12px;margin:6px 0 10px}.probe-geraet p{margin:4px 0}.probe-gps.gut{color:#7EE2A8}.probe-gps.mies{color:#FFB4A8}
+.foto-jetzt{background:rgba(255,255,255,.07);border-radius:14px;padding:10px 14px;margin:10px 0}.foto-jetzt p{margin:0 0 8px}
 </style><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
 <style>
 /* Layout: oben Fortschritt und der Knopf für Erwachsene, in der Mitte der runde Spiegel,
@@ -833,6 +835,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       <p class="say" id="scene-say"></p>
       <div class="choices" id="choices" hidden></div>
       <div class="jetzt" id="jetzt"><div class="jetzt-zeile"><p class="was-zeile" id="jetzt-zeile"><b class="lab">Für Erwachsene:</b> <span class="was" id="jetzt-was"></span></p><span class="lab-knoepfe"><button type="button" class="aufg-hoer" id="btn-aufgabe" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg><span id="btn-aufgabe-txt">Aufgabe vorlesen</span></button><button type="button" class="info-knopf" id="btn-info" aria-expanded="false" aria-controls="jetzt-info" aria-label="Was ist zu tun?" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.2" r="1.7" fill="currentColor"/><rect x="8.4" y="8.3" width="3.2" height="9" rx="1.6" fill="currentColor"/></svg></button></span></div><ul class="jetzt-info" id="jetzt-info" hidden></ul><span class="dann" id="jetzt-dann"></span></div>
+      <div class="foto-jetzt" id="foto-jetzt" hidden><p><b>Jetzt ein Gruppenfoto!</b> Alle mit Horn, der Regenbogen ist komplett, Fridolin ist dabei. Am besten mit dem Handy, das hat die bessere Kamera.</p><button type="button" class="btn ghost small" id="btn-foto-jetzt">Gruppenfoto mit Rahmen</button></div>
       <div class="actions">
         <button type="button" class="btn primary haupt" id="btn-main"></button>
         <button type="button" class="btn ghost" id="btn-speak">Noch einmal hören</button>
@@ -2507,6 +2510,7 @@ function render(keepPic){
   $('btn-foto').hidden = !(ph==='end' || (ph==='heim' && state.step===0) || (ph==='heim' && state.probe));   // am Ende steht das Foto in der Abschlusskarte (UNICORN-75)
   $('btn-portal').hidden = true;                         // „Zur Party“ steht am Ende in der Abschlusskarte (UNICORN-75)
   abschlussZeigen(ph==='heim' && state.step>=1 && !state.probe);
+  $('foto-jetzt').hidden=!(ph==='end' && !state.probe);   // bester Moment fürs Gruppenfoto: am Schatz (UNICORN-113)
   if(alt!==null && k!==alt && k!=='start' && ph!=='seek' && state.autoSag && beruehrt && view==='tour') sagen();   // unterwegs nie von selbst: erst sammeln, dann tippen
 }
 function chipText(){
@@ -2816,6 +2820,7 @@ $('erz-je').addEventListener('change', function(e){
 $('auto-sag').addEventListener('change', function(){ state.autoSag=this.checked; save(); render(); });
 $('btn-pop').addEventListener('click', stationOeffnen);
 $('btn-foto').addEventListener('click', fotoAuf);
+$('btn-foto-jetzt').addEventListener('click', fotoAuf);
 $('abschluss').addEventListener('click', function(e){ if(e.target.closest && e.target.closest('[data-abschluss-foto]')) fotoAuf(); if(e.target.closest && e.target.closest('#abschluss-party')) save(); }); $('btn-foto-2').addEventListener('click', fotoAuf);
 $('foto-zu').addEventListener('click', fotoZu); $('foto-knips').addEventListener('click', fotoKnips);
 $('foto-wechsel').addEventListener('click', function(){ fotoSeite = fotoSeite==='user' ? 'environment' : 'user'; $('foto-video').classList.toggle('spiegeln', fotoSeite==='user'); fotoKamera(); });
@@ -2838,6 +2843,15 @@ document.addEventListener('einfuehrung', function(){ $('tipps-an').checked=Einfu
 // Die Tour einmal so durchspielen wie am Partytag, mit Abstand und GPS-Genauigkeit im Blick und „Punkt hier setzen“.
 // Am Ende: wie jede Station geöffnet hat (aus dem Generalprobe-Protokoll), dann zurück auf Anfang. Die Punkte bleiben.
 var probeSchluessel='', probeSicher=false;
+// GPS-Test am Anfang der Generalprobe (UNICORN-98): gleiche Grenzen wie Startklar
+function probeGpsTest(){
+  if(gps==='keins') return {art:'mies', text:'Dieses Gerät hat kein GPS. Nehmt ein Handy als Spiegel.'};
+  if(gps!=='an' || !fix) return {art:'', text:'GPS-Test läuft … Bitte draußen ein paar Sekunden warten.'};
+  var a=Math.round(fix.acc);
+  if(a<=15) return {art:'gut', text:'GPS gut (±'+a+' m). Mit diesem Gerät könnt ihr spielen.'};
+  if(a<=30) return {art:'', text:'GPS geht (±'+a+' m). Unter freiem Himmel wird es meist genauer.'};
+  return {art:'mies', text:'GPS zu ungenau (±'+a+' m). Nehmt besser ein Handy oder ein Tablet mit Mobilfunk.'};
+}
 function probeWert(){
   if(indoor()) return '';
   if(gps!=='an' || !fix) return gps==='keins' ? 'Kein GPS auf diesem Gerät' : 'GPS sucht …';
@@ -2863,7 +2877,7 @@ function probeErgebnis(){
 function probeHtml(){
   var ph=state.phase, i=state.idx, drin=indoor(), nr=i+1;
   var kopf='<div class="probe-kopf"><span class="probe-chip">Generalprobe</span><span class="wert" id="probe-wert"></span><button type="button" class="zu" id="probe-ende">Beenden</button></div>';
-  if(ph==='start') return kopf+'<p>Lauf die Tour einmal so ab wie am Partytag. Nichts davon zählt, am Ende steht alles wieder am Anfang.</p><details class="probe-wie"><summary>So geht’s</summary><ol>'+
+  if(ph==='start') return kopf+(drin?'':'<div class="probe-geraet"><p><b>Zuerst das Gerät prüfen.</b> Hat euer Tablet Mobilfunk (eine SIM-Karte)? Sonst nehmt ein Handy als Spiegel. Ein Tablet ohne Mobilfunk hat oft kein GPS.</p><p class="probe-gps" id="probe-gps">GPS-Test läuft …</p></div>')+'<p>Lauf die Tour einmal so ab wie am Partytag. Nichts davon zählt, am Ende steht alles wieder am Anfang.</p><details class="probe-wie"><summary>So geht’s</summary><ol>'+
     (drin ? '<li>In jedem Raum „Station öffnen“ tippen.</li><li>Prüfen, ob dort alles bereitliegt.</li>'
           : '<li>Unterwegs zeigt diese Leiste, wie weit es noch ist und wie genau das GPS ist.</li><li>Öffnet eine Station zu früh oder gar nicht: an die richtige Stelle stellen und „Punkt hier setzen“ tippen.</li><li>Am Ende siehst du, wie jede Station geklappt hat.</li>')+
     '</ol><p>Fein einstellen kannst du unter „Erwachsene“ → „Einrichten“: '+(drin?'Erzähler und Spielart.':'Abstand zum Öffnen (10, 15 oder 25 m), Erzähler und Spielart.')+'</p></details>';
@@ -2883,6 +2897,7 @@ function probeZeichnen(){
   var key=[state.phase, state.idx, wartet?1:0, indoor()?1:0].join('|');
   if(key!==probeSchluessel){ probeSchluessel=key; el.innerHTML=probeHtml(); }
   var w=$('probe-wert'); if(w) w.textContent=probeWert();
+  var g=$('probe-gps'); if(g){ var t=probeGpsTest(); g.textContent=t.text; g.className='probe-gps '+t.art; }
 }
 // Zu Ende gespielte Generalprobe hakt den Schritt in der Party ab (UNICORN-76), nur auf dem Gerät mit der eigenen Party
 var probeAbgehakt=false;

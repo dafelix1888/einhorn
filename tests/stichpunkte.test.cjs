@@ -34,5 +34,15 @@ ok(/versteckt/.test(tour.stationen[6].vorOrt), 'Hinweis vor Ort: Schatzkiste ble
 ok(Object.values(tour.vorbereitung.variante).every(l=>l.every(b=>b.items.filter(x=>/^Schatzkiste/.test(x)).every(x=>/nicht hinlegen/.test(x)))), 'Packlisten: Schatzkiste „nicht hinlegen“');
 ok(/hinstellen/.test(text(info.ende.a)) && /zu Hause/.test(text(info.ende.a)), 'Stichpunkte am Schatz: hinstellen, öffnen, zu Hause verteilen');
 
+// Jeder Schritt hat Stichpunkte, in jeder Spielart ohne Ortsreste außer im Extra b (UNICORN-112)
+const soll=['start','ende','heim','heim.ende'];
+tour.stationen.forEach((s,i)=>{ if(i>0) soll.push('w'+i); const n=s.steps&&s.steps.length ? s.steps.length : (s.kind==='recolor'||s.kind==='wahl') ? 2 : 1; for(let k=0;k<n;k++) soll.push(i+'.'+k); });
+const fehlt=soll.filter(k=>!info[k] || !(info[k].a||[]).length);
+ok(!fehlt.length, 'Jeder Schritt hat Stichpunkte ('+soll.length+' Schritte)'+(fehlt.length?', fehlt: '+fehlt.join(', '):''));
+const leer=[]; Object.entries(info).forEach(([k,e])=>Object.entries(e).forEach(([v,z])=>(z||[]).forEach(r=>{ if(!r[0]||!r[1]) leer.push(k+' '+v); })));
+ok(!leer.length, 'Keine leeren Stichpunkte'+(leer.length?': '+leer.join(', '):''));
+const resteAlle=[]; Object.entries(info).forEach(([k,e])=>Object.entries(e).forEach(([v,z])=>{ if(v!=='b' && ORT.test(text(z))) resteAlle.push(k+' '+v); }));
+ok(!resteAlle.length, 'Auch drinnen (c) und in allen anderen Fassungen keine Ortsreste'+(resteAlle.length?': '+resteAlle.join(', '):''));
+
 if(fehler){ console.log(fehler+' FEHLER'); process.exit(1); }
 console.log('ALLES OK');

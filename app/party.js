@@ -90,7 +90,7 @@
       draussen ?
         // Eine Generalprobe statt zwei Läufen (UNICORN-76): Schritt 3 ist die Probe, am Vortag bleibt draußen nichts mehr
         {id:'route', tag:-7, titel:route?'Generalprobe':'Route planen', kurz:route?'Einmal mit dem Tablet ablaufen'+(km?', '+km:''):'Der Planer findet die Orte für die Stationen',
-          text:route?(probe.geaendert?'Die Route hat sich seit der Generalprobe geändert. Lauf sie bitte noch einmal ab. ':'')+'Lauf die Tour einmal so ab wie am Partytag, mit dem Gerät, das der Spiegel sein wird. Der Spiegel zeigt den Abstand zur Station. Öffnet eine zu früh oder gar nicht, setzt du den Punkt mit einem Tipp neu.':'Adresse eingeben, Richtung wählen: Der Planer sucht passende Orte für die Stationen. Danach machst du einmal die Generalprobe.',
+          text:route?(probe.geaendert?'Die Route hat sich seit der Generalprobe geändert. Lauf sie bitte noch einmal ab. ':'')+'Lauf die Tour einmal so ab wie am Partytag, mit dem Gerät, das der Spiegel sein wird. Ein Tablet ohne Mobilfunk hat oft kein GPS, dann besser ein Handy. Der Spiegel zeigt den Abstand zur Station. Öffnet eine zu früh oder gar nicht, setzt du den Punkt mit einem Tipp neu.':'Adresse eingeben, Richtung wählen: Der Planer sucht passende Orte für die Stationen. Danach machst du einmal die Generalprobe.',
           knopf:route?'Generalprobe starten':'Route planen', link:route?'spiel.html?thema='+t+'&probe=1':'planer.html?thema='+t,
           teile:[{id:'route', titel:'Route geplant', nurAuto:true, erkannt:route}, {id:'probelauf', titel:'Einmal abgelaufen', ungueltig:probe.geaendert, text:probe.geaendert?'Route geändert, bitte noch einmal ablaufen':''}]} :
         {id:'route', tag:-7, titel:'Räume festlegen', kurz:'Küche, Flur, Treppe, Toberaum und Sofa',
@@ -98,7 +98,7 @@
           teile:[{id:'probelauf', titel:'Räume festgelegt'}]},
       {id:'basteln', tag:-7, titel:'Basteln und drucken', kurz:bastelKurz(p, tour),
         text:bastelText(p, tour),
-        knopf:'Druckvorlagen öffnen', link:'druck.html?thema='+t, neben:{text:'Packliste im Spiel', link:'spiel.html?thema='+t+'#einrichten'},
+        knopf:'Urkunden drucken', link:'druck.html?thema='+t+'#urkunden', neben:{text:'Packliste im Spiel', link:'spiel.html?thema='+t+'#einrichten'},
         teile:[{id:'basteln', titel:'Gebastelt'}, {id:'drucken', titel:'Gedruckt'}]},
       {id:'geraet', tag:-1, titel:'Tablet startklar machen', kurz:(mitNamen?'Funkel lernt den Namen, ':'')+'Stimmen laden, Ton'+(draussen?' und GPS':'')+' prüfen',
         text:(mitNamen?'Zuerst lernt Funkel den Namen: Er sagt „'+name+'“ an der Haustür, beim Schatz und zum Abschied. Dann ':'')+(mitNamen?'f':'F')+'ünf Minuten im WLAN: Stimmen laden, Ton'+(draussen?', GPS':'')+' und Akku prüfen.'+wetter, knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
@@ -111,7 +111,7 @@
           draussen ? null : {id:'generalprobe', titel:'Generalprobe', text:'Einmal durchspielen, Räume prüfen', vortag:true, extra:true},
           pack && pack.noetig ? {id:'packen', titel:'Taschen packen', text:'Nach der Packliste unten, Station für Station. '+pack.gepackt+' von '+pack.noetig+' nötigen gepackt.', vortag:true, erkannt:pack.gepackt>=pack.noetig} : null,
           {id:'gaeste', minuten:0, titel:'Gäste kommen', text:'Ankommen, Geschenke, kurz spielen.', extra:true, info:true},
-          draussen && v!=='c' ? {id:'kreide', minuten:vs+(selbstAufbau?-90:-60), titel:'Kreidespur malen', text:'Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.'} : null,
+          draussen && v!=='c' ? {id:'kreide', minuten:vs+(selbstAufbau?-90:-60), titel:'Kreidespur malen', text:kreideText(pl)} : null,
           p.vorausgeher ? {id:'vorausgeher', minuten:vs-20, titel:'Vorausgeher startet', text:'Mit der Tasche vorgehen und die Stationen 2 bis 7 aufbauen.'} : null,
           // Ohne Vorausgeher baust du selbst auf (UNICORN-73): eigener Teilschritt mit Uhrzeit, gleiche Aufbau-Liste wie der Vorausgeher
           selbstAufbau ? {id:'aufbau', minuten:vs-75, titel:'Stationen aufbauen', text:'Mit der Tasche die Stationen 2 bis 7 aufbauen. Die Schatzkiste bleibt bei dir.', link:'vorausgeher.html?thema='+t+'&modus=selbst'} : null,
@@ -119,7 +119,13 @@
           {id:'start', minuten:vs, titel:'Tour startet: '+(draussen?'alle an der Haustür':'alle zusammen'), text:'Tattoos verteilen, dann den Zauberspiegel aufwecken.'}
         ].filter(Boolean).sort(function(a, b){ return (a.minuten==null?-1e4:a.minuten)-(b.minuten==null?-1e4:b.minuten); })}
     ];
+    // Ungefähre Dauer je Schritt (UNICORN-91), aus Route und Bastelliste gerechnet
+    var m5=function(m){ return Math.max(5, Math.round(m/5)*5); }, laufen=m5(tourDauer.tour+tourDauer.heim), bl=tour?basteln(p, tour):[];
+    var DAUER={bestellen:'ca. 10 Min.', einladen:'ca. 5 Min.', route:draussen?(route?'ca. '+laufen+' Min. zu Fuß':'ca. 15 Min.'):'ca. 15 Min.',
+      basteln:bl.length?'ca. '+m5(bastelMin(bl, true))+' bis '+m5(bastelMin(bl))+' Min.':'', geraet:'ca. 10 Min.',
+      partytag:'ca. '+String(Math.round((tourVersatz(p)+tourDauer.tour+tourDauer.heim+45+(draussen?(selbstAufbau?90:60):30))/30)/2).replace('.',',')+' Std.'};
     l.forEach(function(a){
+      a.dauer=DAUER[a.id]||'';
       a.datum=plus(p, a.tag);
       a.teile.forEach(function(x){
         x.auto=!!x.nurAuto; x.fertig=!x.ungueltig && (!!x.erkannt || (!x.nurAuto && !!erledigt[x.id]));
@@ -252,6 +258,20 @@
   function vorausgeherLink(p, pl){ var k=schluessel(p,'vorausgeher'); if(k!==undefined) return k ? basisUrl()+'vorausgeher.html?thema='+p.thema+'&k='+k : null; return basisUrl()+'vorausgeher.html?thema='+p.thema+'&plan='+code(planKern(pl,p)); }
   // Antwortfrist (UNICORN-96): 7 Tage vor der Party; ist sie vorbei, nennen Link, Ausdruck und Text keine Frist
   function antwortBis(p, jetzt){ var d=datum(p); d.setDate(d.getDate()-7); d.setHours(23,59,59,0); return d>=(jetzt||new Date()) ? d : null; }
+  // Kreidespur (UNICORN-110): Länge von der Haustür bis Station 2 und Zeit zum Malen (etwa 6 m pro Minute)
+  function kreide(pl){
+    var st=pl && pl.stationen; if(!st || st.length<2) return null;
+    var m=st[1].nachMeter;
+    if(m==null && st[0] && typeof st[0].lat==='number'){ var k=Math.cos(st[0].lat*Math.PI/180), dx=(st[1].lng-st[0].lng)*k, dy=st[1].lat-st[0].lat; m=Math.sqrt(dx*dx+dy*dy)*111320*1.3; }
+    if(m==null) return null;
+    m=Math.round(m/10)*10; var lang=m>150, malen=lang?100:m;
+    return {meter:m, minuten:Math.max(10, Math.round(malen/6/5)*5), lang:lang};
+  }
+  function kreideText(pl){
+    var k=kreide(pl); if(!k) return 'Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.';
+    return k.lang ? 'Bis Station 2 sind es ca. '+k.meter+' m. Mal nur die letzten 100 m davor, das dauert etwa '+k.minuten+' Minuten. Bis dahin führt der Spiegel.'
+                  : 'Von der Haustür bis Station 2, ca. '+k.meter+' m, etwa '+k.minuten+' Minuten: Hufe, dann kleine Pfoten.';
+  }
   // Nur ein Erwachsener bei der Gruppe, solange der Vorausgeher unterwegs ist (UNICORN-89)
   function einerBeiGruppe(p){ return !!(p && p.ort!=='drinnen' && p.vorausgeher && (p.helfer||2)<=2); }
   function vorOrt(p, st, basis){ return st && st.vorOrtEiner && einerBeiGruppe(p) && (!basis || st.vorOrt===basis.vorOrt) ? st.vorOrtEiner : (st && st.vorOrt); }
@@ -357,7 +377,16 @@
       .map(function(x){ return {x:f(x.x), wofuer:f(x.wofuer), notfalls:f(x.notfalls), key:(v==='b'?'a':v)+'|b|'+f(x.x)}; });
     return {noetig:ek.filter(function(x){ return x.noetig; }), extras:ek.filter(function(x){ return !x.noetig; }), ohne:ohne, summen:wegeSummen(ek)};
   }
+  // Von zu Hause (UNICORN-92): was niemand kauft, aber da sein muss. Haken wie „Besorgen“ im Spiel (gleiche Liste, gleiche Schlüssel).
+  function vonZuHause(p, tour){
+    var v=variante(p), hv=v==='b'?'a':v, vb=tour.vorbereitung||{}, h=packHaken(tour);
+    function f(t){ return String(t||'').split('{kinder}').join(p.kinder); }
+    function passt(x){ return x.haus && (!x.nur || x.nur.indexOf(v)>=0); }
+    return (vb.noetig||[]).filter(passt).map(function(x){ return {x:f(x.x), wofuer:f(x.wofuer), extra:false, key:hv+'|b|'+f(x.x)}; })
+      .concat((vb.extras||[]).filter(passt).map(function(x){ return {x:f(x.x), wofuer:f(x.wofuer), extra:true, key:hv+'|b|'+f(x.x)}; }))
+      .map(function(x){ x.da=!!h[x.key]; return x; });
+  }
   // „Jonas’“, „Max’“, „Emmas“ (UNICORN-117): überall dieselbe Regel
   function genitiv(n){ n=String(n||''); return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
-  root.Party={packHaken:packHaken, packSetzen:packSetzen, packStand:packStand, einerBeiGruppe:einerBeiGruppe, vorOrt:vorOrt, treffpunkt:treffpunkt, tourVersatz:tourVersatz, tourUhr:tourUhr, dauer:dauer, abholVorschlag:abholVorschlag, abholen:abholen, genitiv:genitiv, antwortBis:antwortBis, besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand, aufwand:aufwand};
+  root.Party={vonZuHause:vonZuHause, kreide:kreide, kreideText:kreideText, packHaken:packHaken, packSetzen:packSetzen, packStand:packStand, einerBeiGruppe:einerBeiGruppe, vorOrt:vorOrt, treffpunkt:treffpunkt, tourVersatz:tourVersatz, tourUhr:tourUhr, dauer:dauer, abholVorschlag:abholVorschlag, abholen:abholen, genitiv:genitiv, antwortBis:antwortBis, besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand, aufwand:aufwand};
 })(this);

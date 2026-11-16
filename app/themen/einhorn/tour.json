@@ -499,11 +499,13 @@
    },
    {
     "x": "Buntes Band am Versteck",
+    "haus": true,
     "wofuer": "Station 7: zeigt das Versteck",
     "notfalls": "Ein bunter Schal oder ein Geschirrtuch."
    },
    {
     "x": "Schatzkiste, je Kind ein Geschenk",
+    "haus": true,
     "wofuer": "Station 7: der Schatz für alle",
     "notfalls": "Eine Tasche mit Süßigkeiten."
    },
@@ -517,6 +519,7 @@
    },
    {
     "x": "4 Schleifen",
+    "haus": true,
     "wofuer": "Extra „Hinweise am Weg“: Station 4",
     "notfalls": "Papierstreifen.",
     "nur": [
@@ -525,6 +528,7 @@
    },
    {
     "x": "4 Bänder, blaues Handtuch, 3 Spuren-Zettel",
+    "haus": true,
     "wofuer": "Drinnen: Fluss im Flur, Bänder an der Treppe, Spuren an den Türen",
     "notfalls": "Papierstreifen, blaues Kissen.",
     "nur": [
@@ -560,6 +564,11 @@
   ],
   "extras": [
    {
+    "x": "Powerbank fürs Tablet",
+    "haus": true,
+    "wofuer": "Damit der Akku bis zum Schatz reicht"
+   },
+   {
     "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
     "wofuer": "Für die Schatzkiste",
     "u": [
@@ -574,10 +583,12 @@
    },
    {
     "x": "Haarreif für Fridolin",
+    "haus": true,
     "wofuer": "Fridolin wird auch ein kleines Einhorn"
    },
    {
     "x": "Etwas Weißes als Wolke",
+    "haus": true,
     "wofuer": "Station 6: eine Wolke zum Anfassen",
     "nur": [
      "a",
@@ -587,10 +598,12 @@
    },
    {
     "x": "Regenbogen-Snack",
+    "haus": true,
     "wofuer": "Pause unterwegs"
    },
    {
     "x": "Wasser, Becher, Decke",
+    "haus": true,
     "wofuer": "Pause unterwegs"
    },
    {
@@ -834,6 +847,10 @@
      {
       "x": "Wasser, Becher, Decke",
       "ding": "Wasser, Becher, Decke"
+     },
+     {
+      "x": "Powerbank fürs Tablet",
+      "ding": "Powerbank fürs Tablet"
      }
     ]
    },
@@ -997,6 +1014,10 @@
      {
       "x": "Wasser, Becher, Decke",
       "ding": "Wasser, Becher, Decke"
+     },
+     {
+      "x": "Powerbank fürs Tablet",
+      "ding": "Powerbank fürs Tablet"
      }
     ]
    },
@@ -1161,13 +1182,17 @@
      {
       "x": "Wasser und Becher",
       "ding": "Wasser, Becher, Decke"
+     },
+     {
+      "x": "Powerbank fürs Tablet",
+      "ding": "Powerbank fürs Tablet"
      }
     ]
    }
   },
   "basteln": [
    {
-    "x": "Sticker in {kinder} Stücke schneiden",
+    "x": "Stickerbogen in {kinder} Stücke schneiden, damit jedes Kind eins bekommt",
     "min": 5,
     "noetig": true,
     "ohne": "Klebezettel nehmen, je Kind einen."
@@ -1187,12 +1212,6 @@
     "min": 5,
     "braucht": "Drucker",
     "ohne": "Weglassen. Nach der Party schickst du den Danke-Link, darin ist die Urkunde jedes Kindes zum Speichern."
-   },
-   {
-    "x": "Einladungen drucken",
-    "min": 5,
-    "braucht": "Drucker",
-    "ohne": "Nicht nötig: Der Einladungslink per WhatsApp reicht."
    },
    {
     "x": "Echte Hinweise vorbereiten: 4 Schleifen, rote Kreide",
