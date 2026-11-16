@@ -371,7 +371,7 @@
         '<ul class="kd-vorteile">'+
           '<li><span class="ic">'+IC.schloss+'</span><span><b>Eure Tour ist geschützt</b><small>Route und Treffpunkt sieht nur, wer euren Link hat.</small></span></li>'+
           '<li><span class="ic">'+IC.teilen+'</span><span><b>Links für Tablet und Gäste</b><small>Die brauchen kein Konto, ein Tipp auf den Link reicht.</small></span></li>'+
-          '<li><span class="ic">'+IC.brief+'</span><span><b>Code statt Passwort</b><small>Wir schicken dir einen Code per E-Mail.</small></span></li></ul>'+
+          '<li><span class="ic">'+IC.brief+'</span><span><b>Code statt Passwort</b><small>Wir schicken dir einen Code per E-Mail. Nach der Party kommt einmal eine Erinnerung für das Danke an die Gäste.</small></span></li></ul>'+
         '<label class="kd-wer" for="kd-mail"><b>Deine</b> E-Mail-Adresse, nicht die vom Empfänger. Dorthin kommt der Code.</label>'+
         '<input type="email" id="kd-mail" autocomplete="email" inputmode="email" placeholder="deine@email.de" aria-label="Deine eigene E-Mail-Adresse" required value="'+esc(email)+'">'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+

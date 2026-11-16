@@ -433,3 +433,58 @@ revoke all on function public.meinung_melden() from public, anon, authenticated;
 drop trigger if exists meinung_melden on public.meinungen;
 create trigger meinung_melden before insert on public.meinungen
   for each row execute function public.meinung_melden();
+
+-- Erinnerung am Morgen nach der Party (UNICORN-80): eine Mail an die Eltern, die feiern, mit Link zur Karte „Nach der Party“
+-- (Danke-Link für die Gäste, Feedback zur App). Einmal je Party, nie wieder. Ohne Brevo-Schlüssel passiert nichts.
+-- Erst einspielen, wenn Felix zugestimmt hat (Datenschutzerklärung Abschnitt 2 und 3 nennen den Versand).
+alter table public.parties add column if not exists erinnert_am timestamptz;
+
+create or replace function public.erinnerung_nach_party() returns integer
+language plpgsql security definer set search_path = public as $$
+declare
+  schluessel text;
+  r record;
+  n int := 0;
+begin
+  select decrypted_secret into schluessel from vault.decrypted_secrets where name = 'brevo_api_key';
+  if coalesce(btrim(schluessel), '') = '' then return 0; end if;
+  for r in
+    select p.id, p.thema, u.email
+    from public.parties p join auth.users u on u.id = p.owner
+    where p.datum = current_date - 1 and p.erinnert_am is null and coalesce(u.email, '') <> ''
+    order by p.datum limit 100
+  loop
+    begin
+      perform net.http_post(
+        url := 'https://api.brevo.com/v3/smtp/email',
+        body := jsonb_build_object(
+          'sender', jsonb_build_object('name', 'Schatzweg', 'email', 'code@schatzweg.de'),
+          'to', jsonb_build_array(jsonb_build_object('email', r.email)),
+          'subject', 'Wie war eure Schatzsuche?',
+          'textContent', 'Hallo,' || E'\n\n'
+            || 'wir hoffen, die Schatzsuche gestern war ein Fest! Wenn ihr mögt, schickt den Gast-Eltern noch ein Danke mit Funkels Urkunde für jedes Kind. Und sagt uns in einer Minute, wie es war.' || E'\n\n'
+            || 'Zur Party: https://schatzweg.de/app/party.html?thema=' || r.thema || '#nach-der-party' || E'\n\n'
+            || 'Diese Erinnerung kommt einmal. 30 Tage nach der Party löschen wir eure Party von selbst.' || E'\n\n'
+            || 'Schatzweg',
+          'tags', jsonb_build_array('erinnerung')),
+        headers := jsonb_build_object('api-key', btrim(schluessel), 'Content-Type', 'application/json', 'accept', 'application/json'),
+        timeout_milliseconds := 10000);
+      update public.parties set erinnert_am = now() where id = r.id;
+      n := n + 1;
+    exception when others then
+      null;   -- eine fehlerhafte Mail hält die anderen nicht auf
+    end;
+  end loop;
+  return n;
+end $$;
+revoke all on function public.erinnerung_nach_party() from public, anon, authenticated;
+
+-- Täglich um 8:07 UTC (9:07 Uhr Winterzeit, 10:07 Uhr Sommerzeit in Deutschland)
+do $$
+begin
+  if exists (select 1 from pg_available_extensions where name = 'pg_cron') then
+    create extension if not exists pg_cron;
+    perform cron.unschedule(jobid) from cron.job where jobname = 'erinnerung-nach-party';
+    perform cron.schedule('erinnerung-nach-party', '7 8 * * *', 'select public.erinnerung_nach_party()');
+  end if;
+end $$;
