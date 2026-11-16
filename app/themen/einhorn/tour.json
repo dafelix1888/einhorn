@@ -1211,7 +1211,7 @@
   {
    "i": "start",
    "was": "Kindertattoo",
-   "wie": "Funkels Zeichen zum Ankommen. Zu Hause wieder abwischen.",
+   "wie": "Funkels Zeichen zum Ankommen.",
    "art": "Verkleidung"
   },
   {
@@ -2380,11 +2380,11 @@
    "a": [
     [
      "Tun",
-     "Tattoos abwischen"
+     "Gruppenfoto machen, am besten mit dem Handy"
     ],
     [
      "Danach",
-     "Schatz verteilen nach dem Essen"
+     "Urkunden verteilen, den Schatz gibt es nach dem Essen"
     ]
    ]
   }

@@ -474,6 +474,13 @@ body.m-tour .zur-tour{display:none}
 /* Generalprobe (UNICORN-61): Tour zum Üben, Punkte vor Ort setzen */
 .probe{width:100%;max-width:680px;text-align:left;background:linear-gradient(130deg,rgba(74,222,128,.16),var(--surface));border:1.5px solid rgba(74,222,128,.55);border-radius:18px;padding:10px 14px;color:var(--ink);font-size:.95rem;line-height:1.4}
 .probe-kopf{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.abschluss{width:100%;max-width:680px;margin:14px auto 0;text-align:left;background:linear-gradient(130deg,rgba(167,139,250,.18),var(--surface));border:1.5px solid var(--line);border-radius:18px;padding:12px 16px 14px;color:var(--ink);font-size:1rem;line-height:1.45}
+.abschluss h3{margin:0 0 6px;font-size:1.05rem}
+.abschluss ol{margin:0 0 12px;padding-left:1.3em}
+.abschluss li{margin:3px 0}
+.abschluss .link{background:none;border:0;padding:0;color:var(--ink);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.abschluss .haupt{display:flex;justify-content:center;width:100%;text-decoration:none}
+.abschluss .leise{color:var(--ink-soft);margin:0}
 .probe-chip{font-family:var(--font-display);font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 10px;border-radius:999px;background:#4ADE80;color:#062B12}
 .probe-kopf .wert{font-weight:700;font-variant-numeric:tabular-nums}
 .probe-kopf .zu{margin-left:auto;background:none;border:0;color:var(--ink-soft);font:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:40px;padding:0 4px}
@@ -834,6 +841,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       <button type="button" class="btn ghost" id="btn-foto" hidden>Gruppenfoto mit Rahmen</button>
       <a class="btn ghost" id="btn-portal" href="./" hidden>Zur Party</a>
     </div>
+    <section class="abschluss" id="abschluss" hidden aria-label="So geht es weiter"></section>
   </div>
 
   <div class="setup" id="view-setup" hidden>
@@ -2141,7 +2149,7 @@ function haupt(){
   if(state.phase==='start'){ startPruefen(aufwecken); return; }
   if(state.phase==='seek'){ if(wartet) stationOeffnen(); else ankommen('hand'); return; }
   if(state.phase==='end'){ heimStart(); return; }
-  if(state.phase==='heim'){ if(state.step===0) heimAngekommen(); else vonVorn(); return; }
+  if(state.phase==='heim'){ if(state.step===0) heimAngekommen(); return; }   // von vorn nur noch über „Erwachsene“ (UNICORN-75)
   if(state.phase!=='scene') return;
   var st=STATIONS[state.idx];
   if(st.kind==='plain'){ weiter(); }
@@ -2170,6 +2178,8 @@ var heimMarke=Infinity;
 function heimAngekommen(){
   if(state.phase!=='heim' || state.step>=1) return;
   tonAn(); state.step=1; klang(KLANG_ENDE); konfetti(140, .5, .35); save(); render();
+  if(!state.probe && window.Party){ var th0=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), pa=Party.lesen(th0);   // Party-Übersicht zeigt danach „Nach der Party“ (UNICORN-75)
+    if(pa && !pa.fremd){ pa.tourEnde=new Date().toISOString(); Party.speichern(pa); if(window.Konto && Konto.merken) try{ Konto.merken(th0); }catch(e){} } }
   if(!state.probe && window.Konto && Konto.mkMelden){ var th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
     Konto.mkMelden('completed', {rolle:(Konto.linkRolle&&Konto.linkRolle(th))||'eltern'}); }   // Marketer: Tour bis nach Hause gespielt (UNICORN-79)
 }
@@ -2318,7 +2328,7 @@ function hauptText(){                   // Beschriftung des einen Hauptknopfs, l
   var ph=state.phase, st=STATIONS[state.idx];
   if(ph==='start') return 'Spiegel aufwecken';
   if(ph==='end') return 'Heimweg starten';
-  if(ph==='heim') return state.step>=1 ? 'Zurück zum Anfang' : (manuell() ? 'Zu Hause angekommen' : '');
+  if(ph==='heim') return state.step>=1 ? '' : (manuell() ? 'Zu Hause angekommen' : '');   // am Ende kein Knopf, der die Tour zurücksetzt (UNICORN-75)
   if(ph==='seek') return (manuell() && !ankunft && !wartet) ? 'Station öffnen' : '';
   if(st.kind==='plain') return st.go;
   if(st.kind==='recolor') return state.step===0 ? 'Bild verzaubern' : 'Bögen gefunden, weiter';
@@ -2329,7 +2339,7 @@ function jetzt(){                       // was der Erzähler in diesem Moment tu
   var ph=state.phase, st=stv(state.idx);
   if(ph==='start') return indoor() ? 'Drinnen: Stationen öffnest du von Hand. Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : gesetzt() ? 'Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : 'Zum Ausprobieren „Spiegel aufwecken“ tippen. Für die echte Tour vorher unter „Einrichten“ die Punkte setzen.';
   if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Jetzt die Schatzkiste hinstellen. Kiste zusammen öffnen und staunen, verteilt wird zu Hause. Nach Schatz und Snack „Heimweg starten“.';   // eine Regel für die Schatzkiste (UNICORN-74)
-  if(ph==='heim') return state.step>=1 ? 'Geschafft! Tattoos abwischen, den Schatz gibt es nach dem Essen.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
+  if(ph==='heim') return state.step>=1 ? 'Geschafft! Ihr seid zu Hause.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
   if(ph==='seek'){
     if(ankunft) return 'Angekommen!';
     if(wartet) return 'Alle Kinder einsammeln. Wenn alle schauen, „Weiter“ tippen, dann liest Funkel die Aufgabe vor.';
@@ -2486,8 +2496,9 @@ function render(keepPic){
     sty.classList.remove('neu'); mp2.classList.remove('neu'); void sty.offsetWidth; sty.classList.add('neu'); if(!keepPic) mp2.classList.add('neu');
   }
   $('stage').classList.toggle('atmet', uw && !ankunft && !wartet);
-  $('btn-foto').hidden = !(ph==='end' || ph==='heim');
-  $('btn-portal').hidden = !(ph==='heim' && state.step>=1) || !hatParty();   // nach der Tour zurück zur Party (nur wo es eine gibt, nicht auf dem Tablet per Link)
+  $('btn-foto').hidden = !(ph==='end' || (ph==='heim' && state.step===0) || (ph==='heim' && state.probe));   // am Ende steht das Foto in der Abschlusskarte (UNICORN-75)
+  $('btn-portal').hidden = true;                         // „Zur Party“ steht am Ende in der Abschlusskarte (UNICORN-75)
+  abschlussZeigen(ph==='heim' && state.step>=1 && !state.probe);
   if(alt!==null && k!==alt && k!=='start' && ph!=='seek' && state.autoSag && beruehrt && view==='tour') sagen();   // unterwegs nie von selbst: erst sammeln, dann tippen
 }
 function chipText(){
@@ -2796,7 +2807,8 @@ $('erz-je').addEventListener('change', function(e){
 });
 $('auto-sag').addEventListener('change', function(){ state.autoSag=this.checked; save(); render(); });
 $('btn-pop').addEventListener('click', stationOeffnen);
-$('btn-foto').addEventListener('click', fotoAuf); $('btn-foto-2').addEventListener('click', fotoAuf);
+$('btn-foto').addEventListener('click', fotoAuf);
+$('abschluss').addEventListener('click', function(e){ if(e.target.closest && e.target.closest('[data-abschluss-foto]')) fotoAuf(); if(e.target.closest && e.target.closest('#abschluss-party')) save(); }); $('btn-foto-2').addEventListener('click', fotoAuf);
 $('foto-zu').addEventListener('click', fotoZu); $('foto-knips').addEventListener('click', fotoKnips);
 $('foto-wechsel').addEventListener('click', function(){ fotoSeite = fotoSeite==='user' ? 'environment' : 'user'; $('foto-video').classList.toggle('spiegeln', fotoSeite==='user'); fotoKamera(); });
 $('foto-nochmal').addEventListener('click', function(){ fotoAuf(); });
@@ -2918,6 +2930,18 @@ $('voice').addEventListener('change', function(){ state.voice=this.value||null; 
 $('btn-probe').addEventListener('click', function(){ tonAn(); still(); sprich('Hallo, ich bin Funkel, das Einhorn! Folgt den Hufspuren.'); });
 $('btn-restart').addEventListener('click', vonVorn);
 // „Zur Party“ nur auf Geräten mit eigener Party (UNICORN-25); Tablet per Link sieht keinen Weg in die Plattform
+// Abschlusskarte (UNICORN-75): was jetzt und was morgen dran ist. Auf dem Tablet per Link ohne eigene Party nur der Hinweis aufs Handy.
+function abschlussZeigen(an){
+  var el=$('abschluss'); if(!el) return;
+  if(!an){ el.hidden=true; return; }
+  var eigen=hatParty(), t=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
+  el.innerHTML='<h3>So geht es weiter</h3><ol>'+
+    '<li><button type="button" class="link" data-abschluss-foto>Gruppenfoto machen</button>, am besten mit dem Handy</li>'+
+    '<li>Urkunden verteilen</li><li>Schatz nach dem Essen verteilen</li><li>Morgen: Danke an die Gäste schicken</li></ol>'+
+    (eigen ? '<a class="btn primary haupt" id="abschluss-party" href="'+esc(window.Weg ? Weg.heim(t) : 'party.html?thema='+t)+'">Zur Party</a>'
+           : '<p class="leise">Auf dem Handy der Gastgeber geht es weiter.</p>');
+  el.hidden=false;
+}
 function hatParty(){ var t=new URLSearchParams(location.search).get('thema')||'einhorn'; return !!(window.Weg && Weg.party(t)); }
 // „Zur Party“ (UNICORN-71): immer für Eltern, nur auf dem Tablet- oder Vorausgeher-Link ohne eigene Party nicht
 (function(){ var t=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), K=window.Konto;

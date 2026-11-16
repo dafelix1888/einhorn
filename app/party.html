@@ -475,9 +475,9 @@
     gefeiert=-1; rueckmeldungZeigen(); feldPassen(); gaesteLaden();
   }
   // Regenbogen: außen der erste Schritt, innen der Partytag. Erledigte Bögen leuchten, der neueste zeichnet sich ein.
-  function bogen(l){
+  function bogen(l, alle){
     return '<svg viewBox="0 0 160 88" aria-hidden="true">'+l.map(function(a, i){
-      var r=78-i*8; return '<path class="b'+(a.fertig?' an':'')+(i===gefeiert?' neu':'')+'" pathLength="1" d="M'+(80-r)+' 84A'+r+' '+r+' 0 0 1 '+(80+r)+' 84" stroke="'+FARBEN[i%FARBEN.length]+'"/>';
+      var r=78-i*8; return '<path class="b'+(a.fertig||alle?' an':'')+(i===gefeiert?' neu':'')+'" pathLength="1" d="M'+(80-r)+' 84A'+r+' '+r+' 0 0 1 '+(80+r)+' 84" stroke="'+FARBEN[i%FARBEN.length]+'"/>';
     }).join('')+'</svg>';
   }
   function ueberblick(l, n, tage, p){
@@ -486,22 +486,26 @@
     var held=(tour.figuren && tour.figuren[0])||{}, wessen=esc(genitiv(held.name||'Funkel')), bild=held.bild||info.heldBild||info.cover;
     var h='<div class="oben"><span class="marke-sw">Schatzweg</span><span style="display:flex;gap:14px;font-size:.86rem;white-space:nowrap"><a class="textknopf" href="#" id="aendern">Ändern</a><a class="textknopf" href="./">Alle Abenteuer</a></span></div>';
     var dat=Party.datum(p);
-    if(dat && Date.now()>dat.getTime()+120*60000) h+='<section class="jetzt-karte" aria-label="Nach der Party" style="margin-bottom:14px"><div class="marke">Nach der Party</div><h2>Danke an die Gäste</h2>'+
+    // Zustand „Gefeiert“ (UNICORN-75): sobald die Tour auf diesem Gerät zu Ende gespielt ist, sonst zwei Stunden nach Beginn
+    var vorbei=(dat && Date.now()>dat.getTime()+120*60000) || !!p.tourEnde;
+    if(vorbei){ n=null; cd=''; }
+    var loeschAm=dat && window.Konto && Konto.angemeldet && Konto.angemeldet() ? new Date(dat.getTime()+30*864e5).toLocaleDateString('de-DE',{day:'numeric', month:'long'}) : '';
+    if(vorbei) h+='<section class="jetzt-karte" id="nach-der-party" aria-label="Nach der Party" style="margin-bottom:14px"><div class="marke">Nach der Party</div><h2>Danke an die Gäste</h2>'+
       '<p>Schickt den Gast-Eltern ein Danke mit Funkels Urkunde für jedes Kind. Das Gruppenfoto teilt ihr direkt aus dem Spiel („Gruppenfoto mit Rahmen“).</p>'+
-      '<div class="reihe"><button type="button" class="knopf mittel" id="danke-link">Danke-Link schicken</button>'+(meinungDa()?'<button type="button" class="knopf leer mittel" data-meinung-auf="nach-party">Feedback zur App</button>':'')+'</div><p class="leise" id="rueckmeldung" style="margin:10px 0 0" hidden></p></section>';
-    var satz = gefeiert>=0 ? '<b>'+FARBNAMEN[gefeiert%FARBNAMEN.length]+' leuchtet!</b> '+(rest ? 'Noch '+rest+(rest===1?' Bogen':' Bögen')+', dann ist '+wessen+' Regenbogen wieder da.' : wessen+' Regenbogen ist wieder da.')
+      '<div class="reihe"><button type="button" class="knopf mittel" id="danke-link">Danke-Link schicken</button>'+(meinungDa()?'<button type="button" class="knopf leer mittel" data-meinung-auf="nach-party">Feedback zur App</button>':'')+'</div><p class="leise" id="rueckmeldung" style="margin:10px 0 0" hidden></p>'+(loeschAm?'<p class="leise klein" style="margin:10px 0 0">Eure Party wird am '+esc(loeschAm)+' gelöscht, 30 Tage nach der Feier.</p>':'')+'</section>';
+    var satz = vorbei ? '<b>Gefeiert!</b> '+wessen+' Regenbogen ist wieder da.' : gefeiert>=0 ? '<b>'+FARBNAMEN[gefeiert%FARBNAMEN.length]+' leuchtet!</b> '+(rest ? 'Noch '+rest+(rest===1?' Bogen':' Bögen')+', dann ist '+wessen+' Regenbogen wieder da.' : wessen+' Regenbogen ist wieder da.')
       : !fertig ? '<b>'+wessen+' Regenbogen ist weg!</b> Mit jedem Schritt holst du einen Bogen zurück.'
       : rest ? '<b>'+fertig+' von '+l.length+' Bögen leuchten.</b> Noch '+rest+', dann ist '+wessen+' Regenbogen wieder da.'
       : '<b>Alle Bögen leuchten!</b> Am Partytag öffnest du nur noch „Startklar“.';
     h+='<section class="held" aria-label="'+fertig+' von '+l.length+' Schritten erledigt">'+
       (cd?'<span class="countdown">'+cd+'</span>':'')+'<h1>'+esc(partyTitel(p))+'</h1><div class="leise">'+esc(Party.datumText(Party.datum(p)))+' · '+esc(p.start)+' · '+p.kinder+' Kinder</div>'+
-      '<div class="bogen'+(gefeiert>=0?' feier':'')+'">'+bogen(l)+
+      '<div class="bogen'+(gefeiert>=0?' feier':'')+'">'+bogen(l, vorbei)+
         (info.hoerprobe ? '<button type="button" class="figur" id="held-hoeren" aria-label="'+esc(held.name||'Funkel')+' anhören"><img src="'+esc(bild)+'" alt=""></button>' : '<span class="figur"><img src="'+esc(bild)+'" alt=""></span>')+
         (gefeiert>=0?FUNKEN:'')+'</div>'+
       '<p class="sprech" aria-live="polite">'+satz+'</p>'+namenPille(l, p)+
-      (n ? '' : '<a class="knopf breit" href="bereit.html?thema='+thema+'" style="margin-top:12px">Startklar öffnen</a>')+'</section>';
+      (n || vorbei ? '' : '<a class="knopf breit" href="bereit.html?thema='+thema+'" style="margin-top:12px">Startklar öffnen</a>')+'</section>';
     var gz=window.Konto && Konto.gaesteGemerkt ? Konto.gaesteGemerkt(thema) : null, gt=gz?Konto.gaesteKurz(gz):'';
-    h+=spielZeile(p)+'<h2 class="weg-titel">Deine '+l.length+' Schritte</h2><ol class="weg">'+l.map(function(a, i){
+    h+=(vorbei?'<details class="vorbereitung-zu"><summary class="weg-titel">Vorbereitung · '+fertig+' von '+l.length+' Schritten erledigt</summary>':'')+spielZeile(p)+'<h2 class="weg-titel">Deine '+l.length+' Schritte</h2><ol class="weg">'+l.map(function(a, i){
       var z=a.fertig?'erledigt':zeit(a, tage);
       if(a.id==='einladen' && gt) z=gt;
       return '<li class="station'+(a.fertig?' fertig':'')+(a===n?' dran':'')+'" style="--f:'+FARBEN[i%FARBEN.length]+'"><button type="button" data-oeffne="'+a.id+'">'+
@@ -510,7 +514,7 @@
         '<span class="pfeil" aria-hidden="true"></span></button></li>';
     }).join('')+'</ol>'+
       '<p class="leise klein" style="margin:10px 2px 0">Die Reihenfolge ist nur ein Vorschlag. Jeder Schritt geht jederzeit.</p>'+
-      '<button type="button" class="textknopf klein" id="kalender">Alle Termine in den Kalender</button>';
+      '<button type="button" class="textknopf klein" id="kalender">Alle Termine in den Kalender</button>'+(vorbei?'</details>':'');
     var kk=window.Konto?Konto.karte(thema):'';
     return h+(kk?'<h2>Party sichern</h2>'+kk:'')+
       (meinungDa()?'<p class="leise klein" style="margin:22px 2px 0">Wie gefällt dir Schatzweg? <button type="button" class="textknopf klein" data-meinung-auf="party" style="min-height:44px;padding:0 0 0 4px">Feedback geben</button></p>':'')+
