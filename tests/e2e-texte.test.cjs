@@ -1,5 +1,5 @@
 // Aus der E2E-Prüfung vom 16.11.: Genitiv (UNICORN-117), Antwortfrist (96), Stationen zählen (83), Name-Satz (88),
-// „iPad“ (107), Hüter (103), Entwickler-Teile (118), „Party gesichert“ im Startklar (104), Horn-Texte (111), Plan B (95)
+// „iPad“ (107), Urkunde neutral (103), Entwickler-Teile (118), „Party gesichert“ im Startklar (104), Horn-Texte (111), Plan B (95)
 const { chromium } = require('playwright');
 const fs=require('fs'), path=require('path');
 const S='http://localhost:8765';
@@ -32,7 +32,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   const dr=await p.locator('body').innerText();
   ok(/Jonas’ 5\. Geburtstag/.test(dr) && !/Jonass/.test(dr), 'Druck: „Jonas’“, nie „Jonass“');
   ok(!/Bitte sagt bis/.test(dr) && /Bitte sagt kurz Bescheid/.test(dr), 'Druck: keine Frist in der Vergangenheit');
-  ok(/Hüter des Regenbogens/.test(await p.content()) && !/Hüterin/.test(await p.content()), 'Urkunde: „Hüter des Regenbogens“');
+  ok(/<b>Funkel<\/b>das Einhorn/.test(await p.content()) && !/Hüter/.test(await p.content()), 'Urkunde: neutral „Funkel, das Einhorn“');
   await p.goto(S+'/app/vorausgeher.html?thema=einhorn'); await p.waitForTimeout(800);
   ok(/Jonas’ Party/.test(await p.locator('body').innerText()), 'Vorausgeher-Kopf: „Jonas’ Party“');
 
