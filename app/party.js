@@ -53,7 +53,7 @@
   }
   function aufgaben(p, tour, pl){
     var draussen=p.ort!=='drinnen', v=variante(p), route=!!(pl && pl.stationen && pl.stationen.length), t=p.thema;
-    var erledigt=Object.assign({}, p.erledigt||{}), probe=probeStand(p, pl);
+    var erledigt=Object.assign({}, p.erledigt||{}), probe=probeStand(p, pl), selbstAufbau=draussen && !p.vorausgeher;
     if(draussen) erledigt.probelauf=probe.gelaufen;   // alter Haken „Generalprobe am Vortag“ zählt, geänderte Route nicht (UNICORN-76)
     // Namens-Sätze gibt es nur mit Server (Konto) und Vornamen
     var name=p.kind && p.kind.name ? String(p.kind.name) : '', mitNamen=!!(name && root.Konto && root.Konto.aktiv && root.Konto.aktiv());
@@ -86,12 +86,14 @@
         // „Funkel kennt …“ (UNICORN-33) steht sichtbar im Ablauf, zählt aber nicht für den Haken des Schritts (Extra, später bezahlt)
         teile:(mitNamen?[{id:'namen', titel:'Funkel kennt '+name, text:'Einmal einsprechen und anhören', extra:true}]:[]).concat([{id:'geraet', titel:'Tablet ist startklar'}])},
       {id:'partytag', tag:0, titel:'Partytag', kurz:[draussen?'':'Generalprobe am Vortag', draussen&&v!=='c'?'Kreidespur':'', p.vorausgeher?'Vorausgeher':'', 'Spiegel starten'].filter(Boolean).join(', '),
-        text:[draussen?'':'Am Tag oder Abend davor: Generalprobe. Du spielst die Tour einmal durch und legst in jedem Raum alles bereit.', 'Am Partytag:', draussen&&v!=='c'?'Eine Stunde vorher die Kreidespur malen.':'', p.vorausgeher?'20 Minuten vorher geht der Vorausgeher los.':'', draussen?'Dann alle an die Haustür und den Zauberspiegel starten.':'Dann alle zusammenholen und den Zauberspiegel starten.'].filter(Boolean).join(' '),
+        text:[draussen?'':'Am Tag oder Abend davor: Generalprobe. Du spielst die Tour einmal durch und legst in jedem Raum alles bereit.', 'Am Partytag:', draussen&&v!=='c'?(selbstAufbau?'Eineinhalb Stunden vorher die Kreidespur malen, danach die Stationen aufbauen.':'Eine Stunde vorher die Kreidespur malen.'):'', p.vorausgeher?'20 Minuten vorher geht der Vorausgeher los.':'', draussen?'Dann alle an die Haustür und den Zauberspiegel starten.':'Dann alle zusammenholen und den Zauberspiegel starten.'].filter(Boolean).join(' '),
         knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
         teile:[
           draussen ? null : {id:'generalprobe', titel:'Generalprobe', text:'Einmal durchspielen, Räume prüfen', vortag:true, extra:true},
-          draussen && v!=='c' ? {id:'kreide', minuten:-60, titel:'Kreidespur malen', text:'Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.'} : null,
+          draussen && v!=='c' ? {id:'kreide', minuten:selbstAufbau?-90:-60, titel:'Kreidespur malen', text:'Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.'} : null,
           p.vorausgeher ? {id:'vorausgeher', minuten:-20, titel:'Vorausgeher startet', text:'Mit der Tasche vorgehen und die Stationen 2 bis 7 aufbauen.'} : null,
+          // Ohne Vorausgeher baust du selbst auf (UNICORN-73): eigener Teilschritt mit Uhrzeit, gleiche Aufbau-Liste wie der Vorausgeher
+          selbstAufbau ? {id:'aufbau', minuten:-75, titel:'Stationen aufbauen', text:'Mit der Tasche die Stationen 2 bis 7 aufbauen. Die Schatzkiste bleibt bei dir.', link:'vorausgeher.html?thema='+t+'&modus=selbst'} : null,
           {id:'start', minuten:0, titel:draussen?'Alle an der Haustür':'Alle zusammen', text:'Tattoos verteilen, dann den Zauberspiegel aufwecken.'}
         ].filter(Boolean)}
     ];

@@ -97,10 +97,14 @@
     var t=Party.tageBis(party), v=Party.variante(party);
     $('intro').textContent=(t===0?'Heute':t===1?'Morgen':'Am '+Party.datumText(Party.datum(party)))+' um '+party.start+' Uhr geht’s los. Das Tablet prüft sich selbst, du bestätigst nur zwei Dinge.';
     $('ablauf-titel').textContent=t===0?'Heute':'Am Partytag';
-    var l=[];
-    if(draussen && v!=='c') l.push([-60,'Kreidespur malen','Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.','']);
-    if(party.vorausgeher) l.push([-20,'Vorausgeher startet','Mit der Tasche vorgehen und die Stationen aufbauen. Den Link mit Karte und Packliste schickst du hier.','<span id="vg-live" hidden></span><div style="margin-top:8px"><button type="button" class="knopf klein leer mittel" id="vg-link">Link schicken</button></div>']);
-    l.push([0,draussen?'Alle an der Haustür':'Alle zusammen','Tattoos verteilen, dann den Zauberspiegel aufwecken.','']);
+    // Uhrzeiten aus denselben Teilschritten wie in der Party (UNICORN-73), damit beide nie auseinanderlaufen
+    var pt=Party.aufgaben(party, tour||{}, Party.plan(thema)).filter(function(a){ return a.id==='partytag'; })[0], l=[];
+    ((pt&&pt.teile)||[]).filter(function(x){ return x.minuten!=null; }).forEach(function(x){
+      var extra='';
+      if(x.id==='vorausgeher') extra='<span id="vg-live" hidden></span><div style="margin-top:8px"><button type="button" class="knopf klein leer mittel" id="vg-link">Link schicken</button></div>';
+      if(x.id==='aufbau') extra='<div style="margin-top:8px"><a class="knopf klein leer mittel" href="'+x.link+'">Aufbau-Liste öffnen</a></div>';
+      l.push([x.minuten, x.titel, x.id==='vorausgeher' ? 'Mit der Tasche vorgehen und die Stationen aufbauen. Den Link mit Karte und Packliste schickst du hier.' : x.text, extra]);
+    });
     $('heute').innerHTML=l.map(function(x){ return '<div class="termin"><b>'+Party.uhr(party,x[0])+'</b><div><b>'+esc(x[1])+'</b><span>'+esc(x[2])+'</span>'+x[3]+'</div></div>'; }).join('')+
       (draussen && party.planB ? '<p class="leise" style="font-size:.88rem;margin:4px 0 0">Regen? Auf der Party-Seite mit einem Tipp auf drinnen umschalten.</p>' : '');
     $('ablauf').hidden=false;
