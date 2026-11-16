@@ -12,6 +12,14 @@ const PARTY={format:1,thema:'einhorn',kind:{name:'Mia',alter:5},datum:'2030-06-0
   const tour=JSON.parse(lies('themen/einhorn/tour.json'));
   ok(!/\bA3\b|Wolken-Ausdruck/.test(JSON.stringify(tour)), 'Tour-Datei: kein Wolken-Ausdruck in den Listen');
 
+  // Felix' Wahl B (UNICORN-41): Auch mit „Hinweise am Weg“ spielt der Satz „zur Wolke“, das Laken ist nur ein Tipp.
+  const txt=JSON.stringify(tour);
+  ok(!/Bettlaken/.test(txt), 'Tour-Datei: kein „Bettlaken“ mehr (auch nicht in gesprochenen Sätzen)');
+  const er=tour.erzaehler;
+  ok(!er.kaka['5']['1'].b && !er.kern['5']['1'].b && !er.also['5.1'].b && !tour.info['5.1'].b, 'Station 6 mit Extra: Erzähler und Stichpunkte nehmen die Standard-Fassung („zur Wolke“)');
+  ok(!/Laken/.test(JSON.stringify(tour.varianten.b)+JSON.stringify(tour.extra)+JSON.stringify(tour.vorbereitung.noetig)), 'Extra „Hinweise am Weg“: Laken weder Pflicht noch nötig');
+  ok((tour.vorbereitung.extras.find(x=>x.x==='Etwas Weißes als Wolke')||{}).nur.includes('b'), 'Etwas Weißes als Wolke bleibt ein Extra, auch mit Hinweisen am Weg');
+
   const b=await chromium.launch(), p=await b.newPage({viewport:{width:820,height:1180}});
   const fehlerSeite=[]; p.on('pageerror',e=>fehlerSeite.push(e.message));
   await p.goto(B+'party.html?thema=einhorn');

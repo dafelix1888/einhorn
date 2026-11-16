@@ -62,7 +62,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   const drinnen=await p.evaluate(async()=>{ const T=await (await fetch('themen/einhorn/tour.json')).json(); const L=Party.vorbereitungsListe(T,'c',8); return L.gruppen.map(g=>(g.ort||g.titel)+':'+g.items.map(i=>i.x).join('|')).join(' / '); });
   ok(/Flur:Blaues Handtuch als Fluss\|Seil/.test(drinnen) && !/Kreidespur/.test(drinnen), 'Drinnen: Handtuch-Fluss mit Seil, keine Kreidespur');
   const mitExtra=await p.evaluate(async()=>{ const T=await (await fetch('themen/einhorn/tour.json')).json(); return JSON.stringify(Party.vorbereitungsListe(T,'b',8)); });
-  ok(/4 bunte Schleifen/.test(mitExtra) && /Weißes Laken als Wolke/.test(mitExtra), 'Mit Extra „Hinweise am Weg“: Schleifen und Laken an ihrer Station');
+  ok(/4 bunte Schleifen/.test(mitExtra) && /Etwas Weißes als Wolke/.test(mitExtra) && !/Laken/.test(mitExtra), 'Mit Extra „Hinweise am Weg“: Schleifen an ihrer Station, Wolke nur als Tipp (UNICORN-41 B)');
 
   // Jedes Ding aus „nötig“ und „Extras“ steht in der Liste jeder Spielart, für die es gilt
   const fehlt=await p.evaluate(async()=>{ const vb=(await (await fetch('themen/einhorn/tour.json')).json()).vorbereitung, r=[];
