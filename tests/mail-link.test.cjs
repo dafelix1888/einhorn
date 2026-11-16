@@ -53,7 +53,7 @@ const plan={format:1,thema:'einhorn',variante:'a',kinder:8,adresse:'Teststraße 
   await g.p.goto(B+'party.html?thema=einhorn'); await g.p.waitForFunction(()=>window.Konto); await g.p.waitForTimeout(500);
   await g.p.evaluate(()=>Konto.bereit('einhorn'));
   await g.p.fill('#kd-mail','eltern@example.org'); await g.p.click('#kd-los'); await g.p.waitForSelector('#kd-code');
-  ok(/nur ein Link/.test(await g.p.locator('dialog.konto-dlg').innerText()), 'Code-Fenster erklärt, was bei einem Link in der Mail zu tun ist');
+  ok(/Code eintippen.*anderen Browser/.test(await g.p.locator('dialog.konto-dlg').innerText()), 'Code-Fenster erklärt, was bei einem Link in der Mail zu tun ist');
   const vorher=g.z.gespeichert;
   const t2=await g.neu(); await t2.goto(B+'impressum.html'+HASH); await t2.waitForTimeout(300);
   await t2.evaluate(()=>localStorage.setItem('sj.konto', JSON.stringify({access_token:'AT-link', refresh_token:'RT-link', ablauf:Date.now()+3500000, email:'eltern@example.org', id:'U-link'})));

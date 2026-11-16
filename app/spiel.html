@@ -580,7 +580,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
     <div class="erw-wrap">
       <button type="button" class="zur-tour" id="tab-tour" aria-pressed="true">Zurück zur Tour</button>
       <button type="button" class="erw-btn" id="btn-erw" aria-expanded="false" aria-controls="erw-menu" aria-label="Menü für Erwachsene">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         <span class="t">Erwachsene</span>
       </button>
       <div class="erw-menu" id="erw-menu" hidden>
@@ -2132,7 +2132,7 @@ function startPruefen(weiter){
   if(!K || !K.aktiv() || K.linkRolle(th) || K.angemeldet()){ los(); return; }
   var f=function(e){ if(e.detail && e.detail.art==='angemeldet'){ window.removeEventListener('konto', f); toast('Angemeldet. Jetzt „Spiegel aufwecken“ tippen.'); } };
   window.addEventListener('konto', f);
-  K.fenster(th, {titel:'Bevor Funkel loslegt', text:'Einmal kurz anmelden, dann geht eure Tour los.', fertig:'Jetzt „Spiegel aufwecken“ tippen. Funkel wartet schon.', weiter:los});
+  K.fenster(th, {titel:'Bevor Funkel loslegt', text:'Einmal kurz anmelden, dann geht eure Tour los. Schon angemeldet, aber in einem anderen Browser? Dann hier einfach noch einmal mit Code.', fertig:'Jetzt „Spiegel aufwecken“ tippen. Funkel wartet schon.', weiter:los});
 }
 function haupt(){
   tonAn();
@@ -2905,7 +2905,16 @@ $('btn-probe').addEventListener('click', function(){ tonAn(); still(); sprich('H
 $('btn-restart').addEventListener('click', vonVorn);
 // „Zur Party“ nur auf Geräten mit eigener Party (UNICORN-25); Tablet per Link sieht keinen Weg in die Plattform
 function hatParty(){ var t=new URLSearchParams(location.search).get('thema')||'einhorn'; return !!(window.Weg && Weg.party(t)); }
-(function(){ var t=new URLSearchParams(location.search).get('thema')||'einhorn'; ['erw-portal','btn-portal'].forEach(function(id){ if(window.Weg) $(id).href=Weg.heim(t); }); if(!hatParty()) $('erw-portal').hidden=true; })();
+// „Zur Party“ (UNICORN-71): immer für Eltern, nur auf dem Tablet- oder Vorausgeher-Link ohne eigene Party nicht
+(function(){ var t=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), K=window.Konto;
+  ['erw-portal','btn-portal'].forEach(function(id){ if(window.Weg) $(id).href=Weg.heim(t); });
+  if(hatParty()) return;
+  if(K && K.linkRolle && K.linkRolle(t)){ $('erw-portal').hidden=true; return; }
+  $('erw-portal').href='party.html?thema='+encodeURIComponent(t);
+  var an=K && K.angemeldet && K.angemeldet();
+  $('erw-portal').querySelector('b').textContent=an?'Zur Party':'Party planen';
+  $('erw-portal').querySelector('small').textContent=an?'Deine Party aus dem Konto öffnen. Die Tour bleibt gespeichert.':'Checkliste, Einkauf und Einladungen. Die Tour bleibt gespeichert.';
+})();
 ['erw-portal','btn-portal'].forEach(function(id){ $(id).addEventListener('click', function(){ save(); }); });   // Stand sichern, bevor es zur Party geht
 $('btn-copy').addEventListener('click', function(){
   var ta=$('code'); ta.value=codeAus(state.points);

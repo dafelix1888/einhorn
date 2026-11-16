@@ -389,7 +389,7 @@
     }
     function schritt2(fehler){
       dlg.innerHTML='<form method="dialog" id="kd2"><div class="kd-held" style="width:72px;height:72px"><span class="ic" style="color:#fff">'+IC.brief.replace(/20/g,'34')+'</span></div><h2>Code eingeben</h2>'+
-        '<p class="unter">Gerade an <span class="mail">'+esc(email)+'</span> geschickt.<br>Nichts da? Schau im Spam-Ordner nach.<br>Steht in der Mail nur ein Link? Tipp ihn an und komm dann hierher zurück.</p>'+
+        '<p class="unter">Gerade an <span class="mail">'+esc(email)+'</span> geschickt.<br>Nichts da? Schau im Spam-Ordner nach.<br>Bitte den Code eintippen. Der Link in der Mail öffnet oft einen anderen Browser, dann bist du nur dort angemeldet.</p>'+
         '<input class="code" id="kd-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code" aria-label="Code aus der E-Mail" required>'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+
         '<button class="los" id="kd-ok" type="submit">Anmelden</button><button class="neben" type="button" id="kd-zurueck">Andere E-Mail</button></form>';
