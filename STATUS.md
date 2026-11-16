@@ -1,6 +1,6 @@
 # Schatzweg (früher Zauberspiegel): Status und nächste Schritte
 
-Stand: 10. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
+Stand: 16. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
 
 ## Ziel und Arbeitsreihenfolge (STRAT-14)
 
@@ -9,6 +9,17 @@ Ziel: fremde Eltern planen und spielen ohne Hilfe; Gate bis 6. Dezember 2026: 20
 2. UNICORN-20 Offene Einrichtung: Liste bereinigt, 4 Handgriffe für Felix.
 3. UNICORN-8 Namens-Sätze: startklar, Verbrauch je Monat messbar (wartet auf ElevenLabs-Secret).
 4. UNICORN-12 Bezahlung: Konzept und Anbietervergleich (STRAT-8), Messung bei Marketer (MAR-61); Bau erst nach STRAT-8 und STRAT-12.
+
+**16. November, E2E-Prüfung (Eltern-Weg von der Landingpage bis nach der Tour):** Prüf-Doc mit 60 Empfehlungen und Spezifikation S1 bis S8: [E2E-Prüfung](https://claude.ai/artifact/2XnjgHHViTrnyCKwoUnRhF). Alle Punkte stehen als Tickets in UNICORN (UNICORN-72 bis 80 = Spezifikation, ganz oben im Backlog; UNICORN-81 bis 119 = übrige Empfehlungen, noch nicht begonnen). Gebaut und gemergt (PR #186 bis #192), Status Delivery, wartet auf Felix' Test:
+- **UNICORN-72 Kosten und Zeit:** Assistent, letzter Bildschirm „Das kommt auf dich zu“ (`Party.aufwand()`: Material 0 €/nötig/alles, Basteln, Generalprobe, Partytag, Tour) und Plan aus dem Datum („Bestellen wird knapp“ unter 4 Tagen, deckt UNICORN-87). Schritt heißt „Material besorgen“. Frage an Felix im Ticket (Aufteilung A/B). Landingpage: MAR-68.
+- **UNICORN-73 Ohne Vorausgeher:** Teilschritt „Stationen aufbauen“ (−75 Min.), Kreidespur −90 Min., Aufbau-Seite `vorausgeher.html?…&modus=selbst`, Startklar liest die Uhrzeiten aus dem Partytag.
+- **UNICORN-74 Schatzkiste, eine Regel:** nie vorab hinlegen, beim Kleben hinstellen, am Ziel öffnen, zu Hause verteilen.
+- **UNICORN-75 Ende der Tour:** Abschlusskarte im Spiel („Zur Party“), kein „Tour von vorn“ am Ende, Party-Überblick „Gefeiert!“ mit Karte `#nach-der-party`.
+- **UNICORN-76 Eine Generalprobe:** draußen ist Schritt 3 die Generalprobe (`Party.probeStand`, Route geändert → Haken wieder offen); „Generalprobe am Vortag“ nur noch drinnen.
+- **UNICORN-77/78:** Stichpunkte Station 5 in der richtigen Reihenfolge; Ortsreste vom Original-Geburtstag entfernt, geplanter Ort hat Vorrang.
+- **UNICORN-79 Messung:** Generalprobe meldet `probe_started` statt `activated`; Ende meldet `completed` (MAR-69).
+- **UNICORN-80 Erinnerungs-Mail nach der Party:** Entwurf PR #189, nicht in Supabase eingespielt, wartet auf Felix.
+- Test `konto.test.cjs` („Funkel spricht gleich los“) wackelte auf GitHub, wartet jetzt auf den Start der Wiedergabe.
 
 **15. November, UNICORN-58 bis 61 (Rückmeldung Felix):**
 - **UNICORN-58 Hinweise:** Planer zeigt beim ersten Blick auf die Karte einmal „Stationen verschieben“ (`sj.planer.ziehTipp`). Assistent Schritt 1: Löschhinweis mit Datum (30 Tage nach der Feier, wie `alte_partys_loeschen`). Schritt 2: „Spielart jederzeit änderbar, auch am Partytag“. Erzähler-Schritt: Hinweis „jederzeit änderbar“ über der Auswahl. „Fertig“: „Funkel kennt …“ sagt, wer Funkel ist.
