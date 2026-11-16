@@ -204,6 +204,9 @@
 .summe div:first-child{border-top:0}
 .summe span{color:var(--leise)}
 .summe b{text-align:right}
+.aufwand .aufwand-weg{margin:10px 0 0;font-size:.92em}
+.aufwand .weg{padding:6px 0 6px 12px;border-top:0}
+.aufwand .weg b{white-space:nowrap}
 .route-karte{display:flex;gap:16px;align-items:center;background:var(--karte);border-radius:16px;padding:14px;margin:14px 0 4px}
 .route-karte svg{width:150px;height:100px;flex:0 0 auto;background:#120E1A;border-radius:10px}
 .route-karte b{font-size:1.1rem}
@@ -332,11 +335,18 @@
   function aufwandKarte(e){
     if(!Party.aufwand) return '';
     var a=Party.aufwand(e, tour, Party.plan(thema)), draussen=e.ort!=='drinnen';
+    function m5(m){ return Math.max(5, Math.round(m/5)*5); }   // runde Minuten (Felix, 16. November)
+    var tour5=m5(a.tourMin), heim5=a.heimMin?m5(a.heimMin):0;
     return '<div class="karte summe aufwand" style="margin:0"><b style="display:block;margin-bottom:6px">Das kommt auf dich zu</b>'+
-      '<div><span>Material</span><b>0 € mit Dingen von zu Hause, ca. '+Party.euro(a.noetig)+' für das Nötige, ca. '+Party.euro(a.alles)+' für alles</b></div>'+
-      '<div><span>Vorbereitung</span><b>'+(draussen?'Generalprobe ca. '+a.tourMin+' Min. zu Fuß, ':'Einmal durchspielen ca. '+a.tourMin+' Min., ')+'Basteln '+a.bastelNoetig+' bis '+a.bastelAlle+' Min.</b></div>'+
-      '<div><span>Am Partytag</span><b>'+(draussen?(a.vorlaufMin>60?'Eineinhalb Stunden':'Eine Stunde')+' vorher geht es los. ':'')+'Die Tour dauert ca. '+a.tourMin+' Min.'+(a.heimMin?' plus '+a.heimMin+' Min. Heimweg':'')+'</b></div></div>';
+      '<p class="aufwand-weg">Material: drei Wege, du wählst später im Schritt „Material besorgen“.</p>'+
+      '<div class="weg"><span>Mit Dingen von zu Hause</span><b>0 €</b></div>'+
+      '<div class="weg"><span>Nur das Nötige bestellen</span><b>ca. '+Party.euro(a.noetig)+'</b></div>'+
+      '<div class="weg"><span>Alles bestellen</span><b>ca. '+Party.euro(a.alles)+'</b></div>'+
+      (a.mitgebsel?'<p class="aufwand-weg leise">Davon ca. '+Party.euro(a.mitgebsel)+' Mitgebsel, die die Kinder behalten.</p>':'')+
+      '<div><span>Vorbereitung</span><b>'+(draussen?'Generalprobe ca. '+tour5+' Min. zu Fuß, ':'Einmal durchspielen ca. '+tour5+' Min., ')+'Basteln '+a.bastelNoetig+' bis '+a.bastelAlle+' Min.</b></div>'+
+      '<div><span>Am Partytag</span><b>'+(draussen?(a.vorlaufMin>60?'Eineinhalb Stunden':'Eine Stunde')+' vorher geht es los. ':'')+'Die Tour dauert ca. '+tour5+' Min.'+(heim5?' plus '+heim5+' Min. Heimweg':'')+'</b></div></div>';
   }
+
   // „Dein Plan“ aus dem Datum statt fest „2 Wochen“ (UNICORN-87)
   function planKarte(e){
     var t=Party.tageBis(e), knapp=t!=null && t<4;
