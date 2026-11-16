@@ -21,6 +21,8 @@ Ziel: fremde Eltern planen und spielen ohne Hilfe; Gate bis 6. Dezember 2026: 20
 - **UNICORN-80 Erinnerungs-Mail nach der Party:** Entwurf PR #189, nicht in Supabase eingespielt, wartet auf Felix.
 - Test `konto.test.cjs` („Funkel spricht gleich los“) wackelte auf GitHub, wartet jetzt auf den Start der Wiedergabe.
 
+**16. November abends, UNICORN-116:** Danke-Seite belegt den Namen für die Urkunde mit dem Vornamen aus der Zusage vor (gleicher Schlüssel wie die Einladung, `sj.antwort.<k>` auf demselben Gerät, nur bei Zusage), änderbar. Test in `danke.test.cjs`. Service Worker v84.
+
 **16. November abends, UNICORN-119 (Wortliste):** `CLAUDE.md` hat jetzt eine Wortliste (Schatzsuche, Tour, Generalprobe, Tablet, „Erwachsene“, Material, Basteln, Packliste, Vorausgeher). Bildschirmtexte angeglichen (z. B. „Packliste öffnen“ statt „Bastelliste öffnen“, „Link fürs Tablet“, „Die Tour dauert“, Untertitel „Eine Einhorn-Schatzsuche mit Zauberspiegel“). Gesprochene Sätze unverändert. `tests/wortliste.test.cjs` findet alte Wörter. Landingpage und Themenseiten: Marketer (MAR-Ticket).
 
 **15. November, UNICORN-58 bis 61 (Rückmeldung Felix):**

@@ -62,10 +62,13 @@ canvas{display:block;width:100%;height:auto;border-radius:10px;background:#fff;m
 
   function zeigen(){
     var name=e.n||'', titel=info.titel||'Schatzsuche', heldBild=info.heldBild||info.cover||'';
+    // Name aus der Zusage auf diesem Gerät (gleicher Schlüssel wie die Einladung, UNICORN-116), änderbar.
+    var zusage=null; if(k){ try{ zusage=JSON.parse(localStorage.getItem('sj.antwort.'+k)||'null'); }catch(x){} }
+    var vorname=(zusage && zusage.kommt && typeof zusage.name==='string') ? zusage.name.trim().slice(0,24) : '';
     var h='<section class="held">'+(heldBild?'<img src="'+esc(heldBild)+'" alt="">':'')+
       '<h1>Danke fürs Mitfeiern!</h1><p>'+(name?esc(name)+' und Funkel sagen Danke':'Funkel sagt Danke')+'. Hier ist die Urkunde für euer Kind.</p></section>';
-    h+='<section class="karte"><h2>Funkels Urkunde</h2><p>Namen eintragen, dann als Bild speichern oder teilen.</p>'+
-      '<input class="feld" id="kind" maxlength="24" autocomplete="off" placeholder="Name eures Kindes">'+
+    h+='<section class="karte"><h2>Funkels Urkunde</h2><p>'+(vorname?'Der Name ist aus eurer Zusage, ihr könnt ihn ändern. Dann als Bild speichern oder teilen.':'Namen eintragen, dann als Bild speichern oder teilen.')+'</p>'+
+      '<input class="feld" id="kind" maxlength="24" autocomplete="off" placeholder="Name eures Kindes" value="'+esc(vorname)+'">'+
       '<canvas id="urkunde" width="1200" height="1600" aria-label="Urkunde"></canvas>'+
       '<button type="button" class="knopf mittel" id="speichern">Urkunde speichern</button></section>';
     if(k) h+='<section class="karte" id="rueck"><h2>Wie fand euer Kind die Schatzsuche?</h2><p>Ein Tipp reicht. Das sehen nur die Gastgeber.</p>'+
