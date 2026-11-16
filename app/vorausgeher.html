@@ -82,6 +82,7 @@ details.alle[open] summary svg{transform:rotate(180deg)}
   function km(m){ return m>=1000 ? (m/1000).toFixed(1).replace('.',',')+' km' : Math.round(m)+' m'; }
   if(!party){ $('seite').innerHTML='<h1>Vorausgeher</h1><p class="leise">Auf diesem Handy ist noch keine Party. Bitte die Gastgeber um den Link für den Vorausgeher.</p>'; return; }
   var v=Party.variante(party), drinnen=v==='c';
+  var selbst=/[?&]modus=selbst(&|$)/.test(location.search);   // ohne Vorausgeher: Eltern bauen selbst auf (UNICORN-73)
   party.aufgebaut=party.aufgebaut||{};
   // Haken „hingelegt“ je Sache: nur auf diesem Handy, eigener Schlüssel (ein neuer Plan-Link überschreibt ihn nicht)
   var GELEGT='sj.gelegt.'+thema, gelegt={};
@@ -118,6 +119,7 @@ details.alle[open] summary svg{transform:rotate(180deg)}
   function startText(){
     var d=Party.datum(party); if(!d) return '';
     var min=Math.round((d-Date.now())/60000);
+    if(selbst) return min<=0 ? 'Die Party <b>läuft</b>' : min<=180 ? 'Gäste kommen in <b>'+min+' Min.</b>' : Party.tageBis(party)===0 ? 'Gäste kommen um <b>'+esc(party.start)+' Uhr</b>' : 'Party am <b>'+esc(Party.datumText(d))+'</b>';
     if(min<=0) return 'Gruppe ist <b>unterwegs</b>';
     if(min<=120) return 'Gruppe startet in <b>'+min+' Min.</b>';
     if(Party.tageBis(party)===0) return 'Gruppe startet um <b>'+esc(party.start)+' Uhr</b>';
@@ -127,13 +129,14 @@ details.alle[open] summary svg{transform:rotate(180deg)}
   // Grundgerüst einmal bauen; danach nur die Teile neu, die sich ändern (die Karte bleibt stehen)
   function geruest(){
     $('seite').innerHTML=
-      '<div class="kopf"><b>Vorausgeher</b><span class="pille" id="start"></span></div>'+
+      '<div class="kopf"><b>'+(selbst?'Stationen aufbauen':'Vorausgeher')+'</b><span class="pille" id="start"></span></div>'+
       '<div class="balken" id="balken" role="img"></div>'+
-      '<p class="unter">'+esc(party.kind&&party.kind.name?party.kind.name+'s Party · ':'')+'Losgehen um '+Party.uhr(party,-20)+' Uhr. '+(drinnen?'Station 6 und 7 bei geschlossener Tür aufbauen.':'Mit der Tasche vorgehen und Station für Station aufbauen.')+'</p>'+
+      '<p class="unter">'+esc(party.kind&&party.kind.name?party.kind.name+'s Party · ':'')+(selbst?'Aufbauen ab '+Party.uhr(party,-75)+' Uhr. Mit der Tasche Station für Station aufbauen.':'Losgehen um '+Party.uhr(party,-20)+' Uhr. '+(drinnen?'Station 6 und 7 bei geschlossener Tür aufbauen.':'Mit der Tasche vorgehen und Station für Station aufbauen.'))+'</p>'+
+      (drinnen?'':'<p class="hinweis">Die Sachen liegen eine Weile allein. Such Stellen abseits vom Weg.</p>')+
       '<div id="fokus"></div>'+
       '<details class="alle" id="alle"><summary><span id="alleTitel">Alle Stationen</span>'+PFEIL+'</summary><div class="alle-innen">'+(drinnen?'':'<div id="karte"></div>')+'<div id="liste"></div></div></details>'+
       '<p class="hinweis" id="live-hinweis">'+(window.Konto && Konto.linkRolle(thema)==='vorausgeher' ? 'Das Tablet sieht deine Haken live.' : 'Die Haken sieht nur dieses Handy.')+'</p>'+
-      '<p class="hinweis"><a href="landing.html?utm_source=vorausgeher">Was ist Schatzweg?</a></p>';
+      (selbst?'<p class="hinweis"><a href="party.html?thema='+thema+'">Zurück zur Party</a></p>':'<p class="hinweis"><a href="landing.html?utm_source=vorausgeher">Was ist Schatzweg?</a></p>');
     $('alle').addEventListener('toggle', function(){ if($('alle').open && !drinnen){ if(karte===null) karteBauen(); else if(karte) karte.invalidateSize(); } });
   }
 
@@ -159,9 +162,10 @@ details.alle[open] summary svg{transform:rotate(180deg)}
     } else {
       // Danach (UNICORN-70): zur Gruppe zurück und mitlaufen, damit die Kinder alles finden
       var start=((plan&&plan.stationen)||[])[0], unterwegs=(Party.datum(party)||0)<=Date.now();
-      h+='<section class="fertig-karte"><h1>Alles aufgebaut!</h1><p>Jetzt zurück zur Gruppe und mitlaufen. Du weißt, wo alles liegt.</p></section>';
+      h+=selbst ? '<section class="fertig-karte"><h1>Alles steht!</h1><p>Zurück nach Hause, die Gäste kommen um '+esc(party.start||'')+' Uhr. Du weißt, wo alles liegt.</p></section>'
+                : '<section class="fertig-karte"><h1>Alles aufgebaut!</h1><p>Jetzt zurück zur Gruppe und mitlaufen. Du weißt, wo alles liegt.</p></section>';
       h+='<div class="hinlegen danach"><b>So geht es weiter</b><ol>'+
-        '<li><b>'+(drinnen?'Geh zur Gruppe.':'Geh der Gruppe entgegen.')+'</b> '+(drinnen?'Lass die Türen hinter dir zu.':'Lauf den Weg zurück, sie kommt dir entgegen.')+' <span class="leise">'+(unterwegs?'Die Gruppe ist schon unterwegs.':'Die Gruppe startet um '+esc(party.start||'')+' Uhr.')+'</span></li>'+
+        (selbst ? '<li><b>Lass die Tasche mit der Schatzkiste nicht aus den Augen.</b> Sie kommt mit auf die Tour.</li>' : '<li><b>'+(drinnen?'Geh zur Gruppe.':'Geh der Gruppe entgegen.')+'</b> '+(drinnen?'Lass die Türen hinter dir zu.':'Lauf den Weg zurück, sie kommt dir entgegen.')+' <span class="leise">'+(unterwegs?'Die Gruppe ist schon unterwegs.':'Die Gruppe startet um '+esc(party.start||'')+' Uhr.')+'</span></li>')+
         '<li><b>Lauf hinten mit.</b> Finden die Kinder etwas nicht, zeig unauffällig in die Richtung. Verraten nur im Notfall.</li>'+
         '<li><b>Beim Schatz:</b> Fridolin liegt bereit. Lass die Kinder selbst suchen. Die Schatzkiste stellst du hin, während die Kinder kleben.</li></ol>'+
         '<p class="such-titel">Das suchen die Kinder</p><ul class="such">'+Party.vorbereitungsListe(tour, v, party.kinder).gruppen.filter(function(g){ return g.art==='station' && g.wer==='Vorausgeher'; }).map(function(g){ var d=g.items.filter(function(i){ return !i.extra; }).map(function(i){ return i.x; }); return d.length ? '<li><span class="nr-klein">'+g.s+'</span>'+esc(d.join(', '))+'</li>' : ''; }).join('')+'</ul>'+
