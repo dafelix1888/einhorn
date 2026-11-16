@@ -11,19 +11,32 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   await p.goto(S+'/app/spiel.html?thema=einhorn#einrichten'); await p.waitForSelector('#liste .haken', {state:'attached'});
   await p.evaluate(()=>{ document.getElementById('k-vorbereitung').open=true; document.getElementById('k-vorbereitung').scrollIntoView(); }); await p.waitForTimeout(200);
 
-  // --- Ansicht „Besorgen“ (UNICORN-68): jedes Ding einmal, wofür, Preis, selbst machen ---
+  // --- Ansicht „Besorgen“ (UNICORN-69): dieselbe Einkaufsliste wie in der Party ---
   ok(await p.locator('[data-vb="besorgen"][aria-pressed="true"]').count()===1, 'Startet mit „Besorgen“');
   const bes=await p.locator('#liste').innerText();
-  ok(/Bestellen oder selbst machen/.test(bes) && /Ohne Einkauf/.test(bes) && /Extras, wenn Zeit ist/.test(bes), 'Gruppen: Bestellen oder selbst machen, Ohne Einkauf, Extras');
-  const hr=await p.locator('#liste .haken:has-text("Haarreifen")').innerText();
-  ok(/Station 1: Funkel prüft/.test(hr) && /ca\. 10,99 €/.test(hr) && /Selbst machen: Papierhörner/.test(hr), 'Haarreifen: wofür, Preis, selbst machen');
-  ok(await p.locator('#liste .haken:not(.extra) .wofuer').count()===await p.locator('#liste .haken:not(.extra)').count(), 'Jedes nötige Ding sagt, wofür es ist');
-  ok(/Alles bestellt ca\. [0-9]+,[0-9]{2} €/.test(bes) && /party\.html\?thema=einhorn#s-bestellen/.test(await p.locator('#liste').innerHTML()), 'Summe und Weg zur Einkaufsliste der Party');
-  await p.locator('#liste .haken:has-text("Haarreifen") input').check({force:true}); await p.waitForTimeout(150);
-  ok(/1 von [0-9]+ nötigen besorgt/.test(await p.locator('#liste-note').innerText()) && /Besorgt 1 von/.test(await p.locator('#sum-vorbereitung').innerText()), 'Besorgt zählt eigen');
+  ok(/Braucht die Tour/.test(bes) && /Ohne Einkauf/.test(bes) && /Extras, die es schöner machen/.test(bes), 'Gruppen wie in der Party: Braucht die Tour, Ohne Einkauf, Extras');
+  const hr=await p.locator('#liste .haken:has-text("Haarreif mit Einhorn-Horn")').innerText();
+  ok(/[0-9]+×/.test(hr) && /Station 1: Funkel prüft/.test(hr) && /Packung/.test(hr) && /Sonst: Papierhörner/.test(hr), 'Haarreif: Menge, wofür, Packungen und Preis, Notlösung');
+  await p.locator('#liste [data-ek="u0"]').check({force:true}); await p.waitForTimeout(150);
+  ok(/1 von [0-9]+ nötigen besorgt/.test(await p.locator('#liste-note').innerText()), 'Besorgt zählt');
   await p.click('[data-vb="packen"]'); await p.waitForTimeout(150);
   ok(await p.locator('#liste .haken input:checked').count()===0, '„Besorgt“ hakt nichts beim Packen ab');
-  await p.locator('#liste .haken input:checked').count();
+  await p.click('[data-vb="besorgen"]'); await p.locator('#liste [data-ek="u0"]').uncheck({force:true}); await p.click('[data-vb="packen"]'); await p.waitForTimeout(150);
+
+  // Gleiche Zahlen wie die Party: mit Party auf diesem Gerät, Haken landen in der Party
+  const d=new Date(Date.now()+10*864e5).toISOString().slice(0,10);
+  const c2=await b.newContext({viewport:{width:393,height:852}}); await c2.addInitScript(()=>{ window.KONTO_TEST={url:'',key:''}; }); await c2.route(/^https?:\/\/(?!localhost)/, r=>r.abort());
+  const q=await c2.newPage();
+  await q.goto(S+'/app/'); await q.evaluate((d)=>{ localStorage.clear(); localStorage.setItem('sj.party.einhorn', JSON.stringify({format:1,thema:'einhorn',kind:{name:'Mia',alter:5},datum:d,start:'15:00',kinder:10,helfer:2,vorausgeher:true,ort:'draussen',planB:true,ausdrucke:true,erledigt:{},einkauf:{},einkaufWie:{}})); }, d);
+  await q.goto(S+'/app/party.html?thema=einhorn#s-bestellen'); await q.waitForSelector('.wege');
+  const wege=await q.locator('.wege').innerText();
+  await q.goto(S+'/app/spiel.html?thema=einhorn#einrichten'); await q.waitForSelector('#liste .vb-summen', {state:'attached'}); await q.evaluate(()=>{ document.getElementById('k-vorbereitung').open=true; }); await q.waitForTimeout(150);
+  const sum=await q.locator('#liste .vb-summen').innerText();
+  const zahl=(t,w)=>(t.match(new RegExp(w+'[^0-9]*([0-9.]+,[0-9]{2})'))||[])[1];
+  ok(zahl(wege,'Alles bestellen') && zahl(wege,'Alles bestellen')===zahl(sum,'Alles bestellen') && zahl(wege,'Nur das Nötige')===zahl(sum,'Nur das Nötige'), 'Gleiche Summen wie in der Party ('+zahl(sum,'Alles bestellen')+' € / '+zahl(sum,'Nur das Nötige')+' €)');
+  await q.locator('#liste [data-ek="u0"]').check({force:true}); await q.waitForTimeout(150);
+  ok((await q.evaluate(()=>JSON.parse(localStorage.getItem('sj.party.einhorn')).einkauf.u0))===true, 'Haken im Spiel = „erledigt“ in der Party');
+  await c2.close();
 
   const gruppen=await p.locator('#liste .vb-gruppe').count();
   ok(gruppen===9, 'Gegliedert: Vorher, 7 Stationen, Mitnehmen ('+gruppen+' Abschnitte)');

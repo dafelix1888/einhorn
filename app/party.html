@@ -347,7 +347,7 @@
         (x.zuHause ? '' : x.noetig ? (alsNot?'<button type="button" class="textknopf" data-kauf="'+x.id+'" data-wie="not">Notlösung</button>':'') : '<button type="button" class="textknopf" data-kauf="'+x.id+'" data-wie="'+(alsNot?'not':'weg')+'">'+(alsNot?'Notlösung':'Lass ich weg')+'</button>')+'</span>';
     var weglassbar=/^Weglassen\.?\s*/.test(x.notfalls||''), rest=weglassbar ? x.notfalls.replace(/^Weglassen\.?\s*/,'') : '';
     var sonst = x.notfalls && !x.fertig ? '<br><span class="sonst">'+(weglassbar ? 'Geht auch ohne'+(rest?': '+esc(rest):'.') : 'Sonst: '+esc(x.notfalls))+'</span>' : x.fertig && x.wie==='not' && x.notfalls ? '<br><span class="sonst">'+esc(x.notfalls)+'</span>' : '';
-    return '<div class="ding'+(x.fertig?' fertig':'')+'">'+box+'<label'+(x.lieferbar&&!x.fertig?' for="k-'+x.id+'"':'')+' style="margin:0;font-weight:400"><span class="menge">'+x.menge+'×</span> '+esc(x.name)+'<br><span>'+esc(x.wann)+(x.hinweis?' · '+esc(x.hinweis):'')+'</span><br><span>'+preisText(x)+'</span>'+sonst+'</label>'+knopf+'</div>';
+    return '<div class="ding'+(x.fertig?' fertig':'')+'">'+box+'<label'+(x.lieferbar&&!x.fertig?' for="k-'+x.id+'"':'')+' style="margin:0;font-weight:400"><span class="menge">'+x.menge+'×</span> '+esc(x.name)+'<br><span>'+esc(Party.wofuerVon(tour, Party.variante(party), x.id)||x.wann)+(x.hinweis?' · '+esc(x.hinweis):'')+'</span><br><span>'+preisText(x)+'</span>'+sonst+'</label>'+knopf+'</div>';
   }
   function preisText(x){
     if(x.zuHause) return 'Hat man meist zu Hause';
