@@ -531,6 +531,8 @@
   var STERN_WORT=['', 'Gar nicht gut', 'Nicht so gut', 'Geht so', 'Gut', 'Super'];
   var mg={sterne:0, wo:'', stand:''};
   function meinungGeben(sterne, text, wo, stand){ return anfrage('/rest/v1/rpc/meinung_geben', {method:'POST', body:{p_sterne:sterne, p_text:text||'', p_wo:wo||'', p_stand:stand||''}}); }
+  // Wert-Frage nach der Party (UNICORN-115, für STRAT-8): anonym, nur Stufe und Betrag
+  function wertGeben(stufe, betrag, thema){ return anfrage('/rest/v1/rpc/wert_geben', {method:'POST', body:{p_stufe:stufe, p_betrag:betrag, p_thema:thema||'einhorn'}}); }
   function partyStand(thema){ var p=root.Party && thema ? Party.lesen(thema) : null, t=p ? Party.tageBis(p) : null; return !p ? 'ohne-party' : t!=null && t<0 ? 'gefeiert' : 'in-planung'; }
   function sterneHtml(n){
     var h=''; for(var i=1;i<=5;i++) h+='<button type="button" role="radio" aria-checked="'+(i===n)+'" class="'+(i<=n?'an':'')+'" data-stern="'+i+'" aria-label="'+i+(i===1?' Stern':' Sterne')+'">'+STERN+'</button>';
@@ -631,7 +633,7 @@
 
   root.Konto={eigeneOeffnen:eigeneOeffnen, fremdHinweis:fremdHinweis, notweg:notweg, mkMelden:mkMelden, aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
-    feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen, bereich:bereich, meinung:meinung,
+    feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen, bereich:bereich, meinung:meinung, wertGeben:wertGeben,
     antwortGeben:antwortGeben, einladungGesehen:einladungGesehen, gaeste:gaeste, gaesteGemerkt:gaesteGemerkt, gastEntfernen:gastEntfernen, gaesteKurz:gaesteKurz, gaesteZeile:gaesteZeile,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,
     linkRolle:linkRolle, linkStand:linkStand, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
