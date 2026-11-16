@@ -2,6 +2,7 @@
 <meta name="robots" content="noindex"><script>(function(){ try{ var q=new URLSearchParams(location.search).get('entwickler'); if(q==='1') localStorage.setItem('sj.entwickler','1'); if(q==='0') localStorage.removeItem('sj.entwickler'); if(localStorage.getItem('sj.entwickler')==='1') document.documentElement.classList.add('entwickler'); }catch(e){} })();</script>
 <script src="fehler.js"></script><script src="weg.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Schatzweg"><title>Funkels Zauberspiegel</title><style>@font-face{font-family:"Baloo 2";src:url(schrift/baloo2.woff) format("woff");font-weight:400 800;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-regular.woff) format("woff");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-bold.woff) format("woff");font-weight:700;font-display:swap}/* Entwickler-Teile (UNICORN-118): nur mit ?entwickler=1 */
 html:not(.entwickler) .nur-entwickler{display:none!important}
+.probe-orte{display:flex;flex-wrap:wrap;gap:6px 16px;margin:8px 0}.probe-orte label{display:flex;gap:8px;align-items:center;min-height:36px}.probe-orte input{width:22px;height:22px}
 </style><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
 <style>
 /* Layout: oben Fortschritt und der Knopf für Erwachsene, in der Mitte der runde Spiegel,
@@ -1041,6 +1042,8 @@ var N=STATIONS.length;
 
 /* ---------- Varianten ---------- */
 var VARIANTEN=TOUR.varianten;
+// „Vor Ort“ passend zur Zahl der Erwachsenen (UNICORN-89)
+function vorOrtFuer(st){ var p=null; try{ p=window.Party && Party.lesen(TOUR.id); }catch(e){} return window.Party && Party.vorOrt ? Party.vorOrt(p, st, STATIONS[state.idx]) : st.vorOrt; }
 function stv(i){                        // Station mit den Abweichungen der gewählten Variante
   var st=STATIONS[i], v=VARIANTEN[state.variante], o=v && v.st && v.st[i];
   if(!o) return st;
@@ -2285,7 +2288,7 @@ function infoZeilen(){                    // Stichpunkte zum aktuellen Schritt, 
   var z=((state.variante!=='a' && e[state.variante]) || e.a).slice();
   var ph=state.phase, st=stv(state.idx);
   if(ph==='seek'){
-    if(st.vorOrt) z.push(['Vor Ort', st.vorOrt]);
+    if(st.vorOrt) z.push(['Vor Ort', vorOrtFuer(st)]);
     z.push(['Weiter', manuell() ? 'Am Ziel „Station öffnen“ tippen' : 'Station öffnet sich am Ziel von selbst']);
   }
   if(ph==='heim' && state.step===0) z.push(['Weiter', !manuell() ? 'Der Spiegel öffnet sich an der Tür von selbst' : 'An der Tür „Zu Hause angekommen“ tippen']);
@@ -2344,11 +2347,11 @@ function jetzt(){                       // was der Erzähler in diesem Moment tu
   var ph=state.phase, st=stv(state.idx);
   if(ph==='start') return indoor() ? 'Drinnen: Stationen öffnest du von Hand. Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : gesetzt() ? 'Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : 'Zum Ausprobieren „Spiegel aufwecken“ tippen. Für die echte Tour vorher unter „Einrichten“ die Punkte setzen.';
   if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Jetzt die Schatzkiste hinstellen. Kiste zusammen öffnen und staunen, verteilt wird zu Hause. Nach Schatz und Snack „Heimweg starten“.';   // eine Regel für die Schatzkiste (UNICORN-74)
-  if(ph==='heim') return state.step>=1 ? 'Geschafft! Ihr seid zu Hause.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
+  if(ph==='heim') return state.step>=1 ? 'Geschafft! Ihr seid zu Hause. Jetzt den Schatz verteilen und jedem Kind seine Urkunde geben.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
   if(ph==='seek'){
     if(ankunft) return 'Angekommen!';
     if(wartet) return 'Alle Kinder einsammeln. Wenn alle schauen, „Weiter“ tippen, dann liest Funkel die Aufgabe vor.';
-    var vor = (gehoert[akt().key] ? '' : 'Erst alle Kinder sammeln, dann „Funkel sprechen lassen“ tippen. ') + (st.vorOrt ? st.vorOrt+' ' : '');
+    var vor = (gehoert[akt().key] ? '' : 'Erst alle Kinder sammeln, dann „Funkel sprechen lassen“ tippen. ') + (st.vorOrt ? vorOrtFuer(st)+' ' : '');
     if(indoor()) return vor+'Nächster Ort: '+st.wo+'. Dort „Station öffnen“ tippen.';
     if(!state.points[state.idx]) return vor+'Für diese Station ist kein Punkt gesetzt. Am Ziel „Station öffnen“ tippen.';
     if(gps!=='an') return vor+'Ohne GPS: zur Station laufen und dort „Station öffnen“ tippen.';
@@ -2841,11 +2844,19 @@ function probeWert(){
   var d=abstand();
   return (d!=null && unterwegs() ? 'noch '+Math.round(d)+' m · ' : '')+'GPS ±'+Math.round(fix.acc)+' m';
 }
+// Generalprobe prüft auch die Orte (UNICORN-99): je Station zwei Haken, an der Straße „sicher rüber“
+var PROBE_FRAGEN=['Versteck gefunden', 'Platz für alle'];
+function probeFragen(i){ var s=STATIONS[i]||{}; return s.probe && s.probe.length ? s.probe : PROBE_FRAGEN; }
+function probeOrtHtml(i){
+  var o=(state.probeOrte||{})[i]||{};
+  return '<div class="probe-orte">'+probeFragen(i).map(function(f, k){ return '<label><input type="checkbox" data-probe-ort="'+i+'|'+k+'"'+(o[k]?' checked':'')+'> '+esc(f)+'</label>'; }).join('')+'</div>';
+}
+function probeOrtOffen(i){ var o=(state.probeOrte||{})[i]||{}; return probeFragen(i).filter(function(f, k){ return !o[k]; }); }
 function probeErgebnis(){
   var r=proto.length ? proto[proto.length-1] : null, l=((r && r.eintraege)||[]).filter(function(x){ return typeof x.i==='number' && x.modus; });
   var hand=l.filter(function(x){ return x.modus!=='gps'; }).length;
   return '<p><b>Geschafft!</b> So haben die Stationen geöffnet:</p>'+
-    (l.length ? '<ol>'+l.map(function(x){ return '<li>Station '+(x.i+1)+': '+(x.modus==='gps' ? '<span class="gut">von selbst</span>' : '<span class="mies">von Hand</span>')+(x.acc!=null?' · GPS ±'+x.acc+' m':'')+(x.dauer?' · '+mmss(x.dauer)+' Min. Weg':'')+'</li>'; }).join('')+'</ol>' : '<p>Keine Station mitgeschrieben.</p>')+
+    (l.length ? '<ol>'+l.map(function(x){ var off=indoor()?[]:probeOrtOffen(x.i); return '<li>Station '+(x.i+1)+': '+(x.modus==='gps' ? '<span class="gut">von selbst</span>' : '<span class="mies">von Hand</span>')+(x.acc!=null?' · GPS ±'+x.acc+' m':'')+(x.dauer?' · '+mmss(x.dauer)+' Min. Weg':'')+(indoor()?'':off.length?' · <span class="mies">offen: '+esc(off.join(', '))+'</span>':' · <span class="gut">Ort passt</span>')+'</li>'; }).join('')+'</ol>' : '<p>Keine Station mitgeschrieben.</p>')+
     (indoor() ? '' : hand ? '<p>Wo „von Hand“ steht, lohnt es sich, den Punkt vor Ort neu zu setzen. Oder unter „Einrichten“ → „GPS-Punkte“ den Abstand auf 25 m stellen.</p>' : '<p>Alles hat von selbst geöffnet. So kann die Party kommen.</p>')+
     '<div class="reihe"><button type="button" class="btn small" id="probe-fertig">Tour auf Anfang, Punkte behalten</button></div>';
 }
@@ -2861,7 +2872,7 @@ function probeHtml(){
   if(ph==='seek') return kopf+'<p>Unterwegs zu Station '+nr+'. '+(wartet ? 'Angekommen. Stimmt die Stelle? Sonst hier neu setzen.' : 'Steht ihr an der richtigen Stelle, aber nichts öffnet sich? Dann den Punkt hier setzen.')+'</p>'+
     '<div class="reihe"><button type="button" class="btn small" data-probe-setzen="'+i+'">Punkt '+nr+' hier setzen</button></div>';
   if(i===0) return kopf+'<p>Start an der Haustür. Die Haustür braucht keinen Punkt.</p>';
-  return kopf+'<p>Station '+nr+' ist offen. Hat sie an der richtigen Stelle geöffnet? Sonst stell dich dorthin und setz den Punkt neu.</p>'+
+  return kopf+'<p>Station '+nr+' ist offen. Hat sie an der richtigen Stelle geöffnet? Sonst stell dich dorthin und setz den Punkt neu.</p>'+probeOrtHtml(i)+
     '<div class="reihe"><button type="button" class="btn small ghost" data-probe-setzen="'+i+'">Punkt '+nr+' hier neu setzen</button></div>';
 }
 function probeZeichnen(){
@@ -2887,12 +2898,14 @@ function probeBeenden(){ state.probe=false; probeSicher=false; vonVorn(); toast(
 function probeStarten(){
   probeSicher=false; erwMenu(false); fadenZeigen(false);
   if(state.phase!=='start') vonVorn();
-  state.probe=true; save(); gpsStart(); zeige('tour'); render(); live();
+  state.probe=true; state.probeOrte={}; save(); gpsStart(); zeige('tour'); render(); live();
   toast(indoor() ? 'Generalprobe: Spiel die Tour einmal durch.' : 'Generalprobe: Lauf los. Unterwegs setzt du jeden Punkt mit einem Tipp.');
 }
 $('probe').addEventListener('click', function(e){
   var b=e.target.closest ? e.target.closest('[data-probe-setzen]') : null;
   if(b){ punktHier(+b.getAttribute('data-probe-setzen')); live(); return; }
+  var c=e.target.closest ? e.target.closest('[data-probe-ort]') : null;
+  if(c && c.tagName==='INPUT'){ var a=c.getAttribute('data-probe-ort').split('|'); state.probeOrte=state.probeOrte||{}; state.probeOrte[a[0]]=state.probeOrte[a[0]]||{}; state.probeOrte[a[0]][a[1]]=c.checked; save(); return; }
   if(e.target.closest && e.target.closest('#probe-ende, #probe-fertig')) probeBeenden();
 });
 $('btn-probe').addEventListener('click', function(){
@@ -2902,7 +2915,7 @@ $('btn-probe').addEventListener('click', function(){
 });
 // Link mit ?probe=1 (Party → Schritt „Generalprobe“, drinnen „Generalprobe am Vortag“)
 if(/[?&]probe=1(&|$)/.test(location.search) && !state.probe){
-  if(state.phase==='start'){ state.probe=true; save(); setTimeout(function(){ gpsStart(); live(); }, 0); }
+  if(state.phase==='start'){ state.probe=true; state.probeOrte={}; save(); setTimeout(function(){ gpsStart(); live(); }, 0); }
   else setTimeout(function(){ toast('Die Tour läuft gerade. Unter „Erwachsene“ → „Generalprobe“ startest du die Probe von vorn.'); }, 600);
 }
 /* Menü für Erwachsene: Ablauf und Einrichten liegen dahinter, damit Kinder nicht versehentlich hineintippen */
@@ -3023,7 +3036,7 @@ $('btn-einf').addEventListener('click', function(){ if(window.Einfuehrung) Einfu
 // Erster Bildschirm: Die Karte „Zum ersten Mal hier?“ schwebt unten, so ist sie auf Handy und Tablet ohne Scrollen zu sehen (UNICORN-54); zeige() bietet sie an
 
 /* Für den Selbsttest: reine Funktionen */
-window.__zs={proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, tempo:function(k){ return tempo(clips[k]); }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, state:function(){ return state; }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};
+window.__zs={probeFragen:function(i){ return probeFragen(i); }, probeOrtHtml:function(i){ return probeOrtHtml(i); }, probeOrtOffen:function(i){ return probeOrtOffen(i); }, proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, tempo:function(k){ return tempo(clips[k]); }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, state:function(){ return state; }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};
 };
 </script>
 

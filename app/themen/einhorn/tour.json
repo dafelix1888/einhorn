@@ -232,6 +232,8 @@
    "arc": null,
    "pic": "hufe",
    "vorOrt": "Seil auspacken. Ein Erwachsener geht vorn, einer hinten.",
+   "probe": ["Hier kommen wir sicher rüber", "Platz für alle"],
+   "vorOrtEiner": "Seil auspacken. Wartet hier, bis der Vorausgeher bei euch ist. Dann geht ein Erwachsener vorn, einer hinten.",
    "seek": "Gleich kommt die Regenbogenbrücke. Bleibt dicht zusammen!",
    "title": "Die Regenbogenbrücke",
    "say": "Über die Regenbogenbrücke gehen Einhörner nur zusammen. Auf der anderen Seite beginnt mein Wald. Alle ans Seil! Beim Gehen rufen wir: klipp, klopp!",

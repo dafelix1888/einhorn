@@ -195,6 +195,15 @@
 
   // ---------- Vorausgeher live: Haken „Station steht“ ----------
   // Schreiben nur mit Vorausgeher-Link; lesen mit Vorausgeher- oder Tablet-Link, Eltern über ihren eigenen Tablet-Schlüssel.
+  // Hat dieses Gerät den neuesten Stand der Party? (UNICORN-105) Vergleicht den Link-Inhalt auf dem Server mit dem Gerät.
+  function linkStand(thema){
+    var l=lies('sj.link.'+thema); if(!aktiv() || !l || !l.k || l.rolle!=='spiel' || !root.Party) return Promise.resolve(null);
+    return linkLesen(l.k).then(function(r){
+      if(!r || !r.daten) return {weg:true};
+      var hier=JSON.stringify(Party.planKern(Party.plan(thema), Party.lesen(thema)||{thema:thema})), dort=JSON.stringify(Party.planKern(Object.assign({}, r.daten, {party:undefined}), r.daten.party||{thema:thema}));
+      return {aktuell:hier===dort, holen:function(){ Party.ausLinkUebernehmen(thema, r.daten, l.k); }};
+    });
+  }
   function linkRolle(thema){ var l=lies('sj.link.'+thema); return aktiv() && l && l.k ? l.rolle : null; }
   function aufbauSchluessel(thema){
     var l=lies('sj.link.'+thema); if(l && l.k) return l.k;
@@ -625,6 +634,6 @@
     feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen, bereich:bereich, meinung:meinung,
     antwortGeben:antwortGeben, einladungGesehen:einladungGesehen, gaeste:gaeste, gaesteGemerkt:gaesteGemerkt, gastEntfernen:gastEntfernen, gaesteKurz:gaesteKurz, gaesteZeile:gaesteZeile,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,
-    linkRolle:linkRolle, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
+    linkRolle:linkRolle, linkStand:linkStand, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
     codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ mailLinkGenutzt=true; return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};
 })(this);

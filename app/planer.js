@@ -149,7 +149,7 @@
     d.value=wahl.distanz; $('distanz-wert').textContent=km(wahl.distanz);
     $('kinder').textContent=wahl.kinder;
     var innen=!draussen() || (party && party.ort==='drinnen'), offen=!wahl.variante && !party;   // ohne Wahl geht es nicht weiter
-    $('draussen').hidden=innen || offen; $('drinnen').hidden=!innen || offen; $('sek-kinder').hidden=offen || !!party; $('planen').hidden=offen;
+    $('draussen').hidden=innen || offen; $('drinnen').hidden=!innen || offen; $('sek-kinder').hidden=true; $('planen').hidden=offen;
     $('planen').textContent=innen ? 'Speichern und spielen' : 'Route planen';
   }
   function zeigeEingabe(){

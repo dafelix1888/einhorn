@@ -62,6 +62,19 @@
   var K=window.Konto, mitKonto=!!(K && K.aktiv && K.aktiv() && !(K.linkRolle && K.linkRolle(thema)));
   if(mitKonto) zustand.gesichert=!!K.angemeldet();
   window.addEventListener('konto', function(e){ if(mitKonto && e.detail && e.detail.art==='angemeldet'){ zustand.gesichert=true; zeichnen(); } });
+  // Stand der Party auf dem Tablet (UNICORN-105): nur mit Tablet-Link
+  var mitStand=!!(K && K.linkStand && K.linkRolle && K.linkRolle(thema)==='spiel'), standHolen=null;
+  if(mitStand){ zustand.stand=null; details.standText='Wird geprüft …'; }
+  function standPruefen(){
+    if(!mitStand) return;
+    K.linkStand(thema).then(function(r){
+      if(!r){ mitStand=false; delete zustand.stand; }
+      else if(r.weg){ zustand.stand=false; details.standText='Der Tablet-Link gilt nicht mehr. Bitte von den Eltern einen neuen holen.'; }
+      else if(r.aktuell){ zustand.stand=true; details.standText='Aktuell. Alles, was auf dem Handy geändert wurde, ist hier.'; }
+      else { zustand.stand=false; standHolen=r.holen; details.standText='Auf dem Handy wurde etwas geändert. Jetzt holen, dann spielt das Tablet den neuesten Stand.'; }
+      zeichnen();
+    }, function(){ zustand.stand=false; details.standText='Kein Netz: Stand nicht geprüft. Im WLAN noch einmal öffnen.'; zeichnen(); });
+  }
   function aktiv(k){ return k!=='gps' || draussen; }
   function zeile(id, titel, text, knopf, mehr){
     var s=zustand[id], cls=s===true?'ok':s===false?'warn':'ring';
@@ -75,6 +88,7 @@
     h+=zeile('stimmen','Stimmen geladen', details.stimmenText||'Wird geprüft …',
       stimmenKnopf ? '<button type="button" class="knopf klein mittel" id="laden"'+(details.laedt?' disabled':'')+'>'+(details.laedt?'Lädt …':'Laden')+'</button>' : '',
       stimmenKnopf ? '<div class="balken"><i id="stimm-balken" style="width:'+(details.anteil||0)+'%"></i></div>' : '');
+    if(mitStand) h+=zeile('stand','Stand der Party', details.standText||'Wird geprüft …', zustand.stand===false && standHolen ? '<button type="button" class="knopf klein mittel" id="stand-holen">Jetzt holen</button>' : '');
     h+=zeile('offline','Ohne Netz spielbar', details.offlineText||'Wird geprüft …');
     if(draussen) h+=zeile('gps','GPS', details.gpsText||'Misst die Genauigkeit … Mit dem Gerät prüfen, das den Spiegel spielt.',
       zustand.gps!==true && !details.gpsLaeuft ? '<button type="button" class="knopf klein leer mittel" id="gps">Nochmal</button>' : '');
@@ -101,7 +115,7 @@
   function ablauf(){
     if(!party || !party.datum) return;
     var t=Party.tageBis(party), v=Party.variante(party);
-    $('intro').textContent=(t===0?'Heute':t===1?'Morgen':'Am '+Party.datumText(Party.datum(party)))+' um '+party.start+' Uhr geht’s los. Das Tablet prüft sich selbst, du bestätigst nur ein paar Dinge.';
+    $('intro').textContent=(t===0?'Heute':t===1?'Morgen':'Am '+Party.datumText(Party.datum(party)))+' kommen die Gäste um '+party.start+' Uhr, die Tour startet um '+Party.tourUhr(party,0)+' Uhr. Das Tablet prüft sich selbst, du bestätigst nur ein paar Dinge.';
     $('ablauf-titel').textContent=t===0?'Heute':'Am Partytag';
     // Uhrzeiten aus denselben Teilschritten wie in der Party (UNICORN-73), damit beide nie auseinanderlaufen
     var pt=Party.aufgaben(party, tour||{}, Party.plan(thema)).filter(function(a){ return a.id==='partytag'; })[0], l=[];
@@ -218,6 +232,7 @@
     else if(t.closest('#gps')) gps();
     else if(t.closest('#akku')){ zustand.akku=true; zeichnen(); }
     else if(t.closest('#sperre')){ zustand.sperre=true; zeichnen(); }
+    else if(t.closest('#stand-holen')){ if(standHolen) standHolen(); location.reload(); }
     else if(t.closest('#sichern')) K.fenster(thema, {titel:'Party sichern', text:'Einmal anmelden, dann startet der Spiegel am Partytag ohne Code.', fertig:'Gesichert. Am Partytag geht es ohne Code los.', weiter:function(){ zustand.gesichert=!!K.angemeldet(); zeichnen(); }});
     else if(t.closest('#vg-link')){ var name=party.kind&&party.kind.name?party.kind.name:'Party', los=function(){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+name, 'Link kopiert. An den Vorausgeher schicken.'); };
       if(window.Konto) Konto.bereit(thema, los); else los(); }
@@ -225,7 +240,7 @@
   ablauf();
   if(window.Einfuehrung) Einfuehrung.anbieten({ziel:document.querySelector('.start'), wo:'bereit', ort:draussen?'draussen':'drinnen'});   // UNICORN-39: einmal anbieten, leicht zu überspringen; das Spiel bietet sie danach noch einmal an
   fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }).then(function(t){
-    tour=t; soSpielt(); zeichnen(); stimmenPruefen(); offlinePruefen(); akkuPruefen(); if(draussen) gps();
+    tour=t; soSpielt(); zeichnen(); standPruefen(); stimmenPruefen(); offlinePruefen(); akkuPruefen(); if(draussen) gps();
   })['catch'](function(){ $('liste').innerHTML='<p style="padding:12px 0">Thema lässt sich nicht laden. Einmal mit Netz öffnen.</p>'; });
 })();
 </script>

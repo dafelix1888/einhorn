@@ -26,7 +26,9 @@
 .urkunde{padding:22mm 20mm;text-align:center;height:100%;display:flex;flex-direction:column;align-items:center;border:6mm solid transparent;border-image:linear-gradient(90deg,#E23A3F,#F28C1B,#F2B90F,#3A9D4B,#2B6FE0,#9050C8) 1}
 .urkunde img{width:70mm;height:70mm;border-radius:6mm;margin-bottom:8mm}
 .urkunde h2{font-size:46pt;margin:0;color:#6B35C9;letter-spacing:.04em}
-.urkunde .linie{border-bottom:1.5pt solid #241A3D;width:130mm;height:20mm;margin:12mm 0 3mm}
+.urkunde .linie{border-bottom:1.5pt solid #241A3D;width:130mm;height:20mm;margin:12mm 0 3mm;display:flex;align-items:flex-end;justify-content:center}
+.urkunde .linie span{font-size:30pt;font-weight:800;color:#241A3D;line-height:1.1}
+.urk-namen{margin:12px 0}.urk-namen .wahl{display:flex;gap:8px;align-items:center;margin:6px 0}.urk-namen textarea{margin-top:4px}
 .urkunde p{font-size:16pt;margin:3mm 0;max-width:150mm}
 .urkunde .unterschrift{margin-top:auto;font-size:13pt;color:#5A5073}
 .urkunde .unterschrift b{display:block;font-size:26pt;color:#241A3D;font-style:italic}
@@ -54,6 +56,13 @@
   <label for="tel">Handynummer für Zusagen (freiwillig)</label><input id="tel" type="text" inputmode="tel" autocomplete="tel" placeholder="z. B. 0170 1234567">
   <p class="leise" style="font-size:.88rem;margin-top:6px">Steht nur im Einladungslink, damit Gast-Eltern per WhatsApp zusagen können.</p>
   <div class="auswahl" id="auswahl"></div>
+  <div id="urk-namen" class="urk-namen" hidden>
+    <p class="titel-klein"><b>Namen auf den Urkunden</b></p>
+    <label class="wahl"><input type="radio" name="urk-art" value="ohne"> Ohne Namen, zum Reinschreiben</label>
+    <label class="wahl"><input type="radio" name="urk-art" value="mit"> Mit Namen</label>
+    <div id="urk-mit" hidden><label for="urk-liste">Ein Name pro Zeile</label><textarea id="urk-liste" rows="5" maxlength="600"></textarea>
+    <p class="leise" style="font-size:.88rem;margin-top:6px" id="urk-tipp"></p></div>
+  </div>
   <div class="reihe"><button class="knopf klein" id="link">Einladungslink teilen</button><button class="knopf leer klein" id="text">Einladung als Text kopieren</button></div>
 </div>
 <div class="vorschau" id="vorschau"></div>
@@ -75,7 +84,7 @@
   var datumLang=d.toLocaleDateString('de-DE',{weekday:'long', day:'numeric', month:'long'});
   var antwortBis=Party.antwortBis(party);   // null, wenn die Frist schon vorbei ist (UNICORN-96)
   $('treff').value=party.treffpunkt || (party.ort==='drinnen' || !plan || !plan.adresse || plan.adresse==='Mein Standort' ? 'bei uns zu Hause' : plan.adresse);
-  $('abholen').value=party.abholen || Party.uhr(party, 150);
+  $('abholen').value=Party.abholen(party, plan);
   $('tel').value=party.telefon || '';
   $('hinweis-gaeste').value=Party.gaesteHinweis(party);
 
@@ -88,18 +97,34 @@
       '<p class="klein">'+(antwortBis?'Bitte sagt bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.':'Bitte sagt kurz Bescheid, ob ihr kommt.')+'</p></div></div>';
     return '<section class="blatt" id="einladung">'+karte+karte+'</section>';
   }
+  // Namen auf den Urkunden (UNICORN-102): aus der Gästeliste vorbelegt, oder ohne Namen zum Reinschreiben
+  function gastNamen(){ var g=window.Konto && Konto.gaesteGemerkt ? Konto.gaesteGemerkt(thema) : null; return g && g.liste ? g.liste.filter(function(x){ return x.kommt && x.name; }).map(function(x){ return String(x.name).trim(); }) : []; }
+  function urkNamen(){
+    if(party.urkundeNamen && party.urkundeNamen.length) return party.urkundeNamen.slice();
+    var l=(name?[name]:[]).concat(gastNamen()); return l.filter(function(x, i){ return x && l.indexOf(x)===i; });
+  }
+  function urkMitNamen(){ return party.urkundeMitNamen!=null ? !!party.urkundeMitNamen : gastNamen().length>0; }
+  function urkSteuer(){
+    var mit=urkMitNamen(), g=gastNamen().length;
+    $('urk-namen').hidden=!an.urkunde;
+    document.querySelectorAll('input[name="urk-art"]').forEach(function(r){ r.checked=(r.value==='mit')===mit; });
+    $('urk-mit').hidden=!mit;
+    if(document.activeElement!==$('urk-liste')) $('urk-liste').value=urkNamen().join('\n');
+    $('urk-tipp').textContent=(g?g+' Namen aus den Zusagen übernommen. ':'Noch keine Zusagen mit Namen. ')+'Fehlt ein Name, bleibt die Zeile frei. Gedruckt werden mindestens '+party.kinder+' Urkunden.';
+  }
   function urkunden(){
-    var h='', n=party.kinder;
-    for(var i=0;i<n;i++) h+='<section class="blatt'+(i>0?' kopie':'')+'"><div class="urkunde"><img src="'+info.cover+'" alt=""><h2>URKUNDE</h2><div class="linie"></div><p>gehört ab heute zu Funkels Einhorn-Helfern und hat den Regenbogen gerettet.</p>'+
+    var mit=urkMitNamen(), namen=mit?urkNamen():[], h='', n=Math.max(party.kinder, namen.length);
+    for(var i=0;i<n;i++) h+='<section class="blatt'+(i>0?' kopie':'')+'"><div class="urkunde"><img src="'+info.cover+'" alt=""><h2>URKUNDE</h2><div class="linie">'+(namen[i]?'<span>'+esc(namen[i])+'</span>':'')+'</div><p>gehört ab heute zu Funkels Einhorn-Helfern und hat den Regenbogen gerettet.</p>'+
       '<p style="font-size:13pt;color:#5A5073">Auf '+esc(Party.genitiv(name))+' '+esc(alter)+'. Geburtstag am '+d.toLocaleDateString('de-DE',{day:'numeric', month:'long', year:'numeric'})+'</p>'+
       '<div class="unterschrift"><b>Funkel</b>das Einhorn</div></div></section>';
     return h;
   }
 
   function zeichnen(){
-    var teile=[['einladung','Einladungen (2 pro Blatt)'],['urkunde','Urkunden ('+party.kinder+' Stück)']];
+    var teile=[['einladung','Einladungen (2 pro Blatt)'],['urkunde','Urkunden ('+(urkMitNamen()?Math.max(party.kinder, urkNamen().length):party.kinder)+' Stück)']];
     $('auswahl').innerHTML=teile.map(function(t){ return '<label><input type="checkbox" data-teil="'+t[0]+'"'+(an[t[0]]?' checked':'')+'> '+t[1]+'</label>'; }).join('');
     $('vorschau').innerHTML=(an.einladung?einladung():'')+(an.urkunde?urkunden():'');
+    urkSteuer();
   }
   function textFuerChat(){
     return name+' wird '+alter+'! 🦄\n\nWir laden zu Funkels Regenbogen-Abenteuer ein, einer Einhorn-Schatzsuche mit sprechendem Zauberspiegel.\n\n'+
@@ -109,6 +134,8 @@
   document.addEventListener('change', function(e){
     var t=e.target;
     if(t.hasAttribute('data-teil')){ an[t.getAttribute('data-teil')]=t.checked; zeichnen(); }
+    if(t.name==='urk-art'){ party.urkundeMitNamen=t.value==='mit'; if(party.urkundeMitNamen && !party.urkundeNamen) party.urkundeNamen=urkNamen(); party=Party.speichern(party); zeichnen(); }
+    if(t.id==='urk-liste'){ party.urkundeNamen=t.value.split('\n').map(function(x){ return x.trim().slice(0,30); }).filter(Boolean).slice(0,30); party=Party.speichern(party); zeichnen(); }
     if(t.id==='treff' || t.id==='abholen' || t.id==='tel' || t.id==='hinweis-gaeste'){ party.gaesteHinweis=$('hinweis-gaeste').value.trim().slice(0,200); party.treffpunkt=$('treff').value; party.abholen=$('abholen').value; party.telefon=$('tel').value.replace(/[^0-9+]/g,''); Party.speichern(party); zeichnen(); }
   });
   $('drucken').addEventListener('click', function(){ window.print(); });
@@ -126,6 +153,7 @@
   Promise.all([fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }), fetch('themen/index.json').then(function(r){ return r.json(); })]).then(function(r){
     tour=r[0]; info=r[1].themen.filter(function(t){ return t.id===thema; })[0]; zeichnen();
     if(location.hash==='#einladung'){ an.urkunde=false; zeichnen(); }
+    if(window.Konto && Konto.gaeste && Konto.angemeldet && Konto.angemeldet()) Konto.gaeste(thema).then(function(){ zeichnen(); }, function(){});   // frische Zusagen für die Urkunden-Namen
   });
 })();
 </script>

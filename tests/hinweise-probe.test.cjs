@@ -88,7 +88,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   ok(!/im Planer die Station antippen/.test(rt), 'Kein zweiter Weg „im Planer hier setzen“ mehr');
   await p.goto(B+'party.html?thema=einhorn#s-partytag'); await p.waitForSelector('#s-partytag');
   const pt=await p.textContent('#s-partytag');
-  ok(!/Generalprobe/.test(pt) && !/Vortag/.test(await p.locator('.teile').innerText()), 'Partytag draußen: keine Generalprobe am Vortag mehr');
+  ok(!/Generalprobe/.test(pt) && !/Generalprobe/.test(await p.locator('.teile').innerText()), 'Partytag draußen: keine Generalprobe am Vortag mehr');
   await p.context().close();
 
   // --- UNICORN-61: Generalprobe im Spiel ---
