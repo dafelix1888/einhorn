@@ -17,7 +17,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   ok(/Alles aufgebaut/.test(t) && /zurück zur Gruppe/.test(t), 'Nach dem Aufbau: zurück zur Gruppe');
   ok(!/versteck dich/.test(t) && !/Bank/.test(t), 'Kein „Warte an der Bank und versteck dich“ mehr');
   ok(/Geh der Gruppe entgegen/.test(t) && /Lauf hinten mit/.test(t) && /Beim Schatz/.test(t), 'Drei klare Schritte');
-  ok(/Die Gruppe startet um 15:00 Uhr/.test(t), 'Zeigt, wann die Gruppe startet');
+  ok(/Die Gruppe startet um 15:20 Uhr/.test(t), 'Zeigt, wann die Gruppe startet');
   ok(await p.locator('.danach .such li').count()>=5 && /Rote Bögen|rote/i.test(await p.locator('.danach .such').innerText()), 'Liste: was die Kinder je Station suchen');
   ok(/destination=53\.55,10/.test(await p.locator('.danach a.knopf').getAttribute('href')||''), 'Weg zurück zum Start mit Karte');
   // Schatzkiste: eine Regel (UNICORN-74) – an Station 7 nicht hinlegen, sondern in der Tasche lassen
