@@ -33,7 +33,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   ok(await p.locator('[data-spielart="drinnen"][aria-pressed="true"]').count()===1, '„ändern“ zeigt die Karten, Drinnen gewählt');
   await p.click('#weiter'); await p.waitForSelector('.erz-liste');          // UNICORN-54: dazwischen „Wer liest die Aufgaben vor?“
   await p.click('#weiter'); await p.waitForSelector('.zusammen');
-  ok(/Spielart\s*Drinnen/.test(await p.locator('.summe').innerText()), 'Zusammenfassung nennt die Spielart');
+  ok(/Spielart\s*Drinnen/.test(await p.locator('.summe').first().innerText()), 'Zusammenfassung nennt die Spielart');
 
   // --- 3. Bestehende Party draußen: Wechsel zeigt, was sich ändert; Extra im Schritt „Basteln“ ---
   const d=new Date(Date.now()+12*864e5).toISOString().slice(0,10);

@@ -48,7 +48,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   await p.click('[data-erz="bruno"]');
   ok(await p.locator('[data-erz="bruno"][aria-pressed="true"]').count()===1 && await p.locator('.erz-zeile.an').count()===1, 'Bruno gewählt');
   await p.click('#weiter'); await p.waitForSelector('.zusammen');
-  ok(/Bruno, der brummige Bär/.test(await p.locator('.summe').innerText()), 'Zusammenfassung nennt den Erzähler');
+  ok(/Bruno, der brummige Bär/.test(await p.locator('.summe').first().innerText()), 'Zusammenfassung nennt den Erzähler');
   await p.click('#weiter'); await p.waitForSelector('.held');
   ok((await party()).erz==='bruno' && (await plan()).erz==='bruno' && !!(await plan()).erzStand, 'Party und Tourplan kennen den Erzähler');
   ok((await plan()).stand===PLAN.stand, 'Der Stand der Punkte bleibt unberührt (Spiel behält seine Punkte)');
