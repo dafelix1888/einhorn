@@ -2324,7 +2324,7 @@ function hauptText(){                   // Beschriftung des einen Hauptknopfs, l
 function jetzt(){                       // was der Erzähler in diesem Moment tun soll
   var ph=state.phase, st=stv(state.idx);
   if(ph==='start') return indoor() ? 'Drinnen: Stationen öffnest du von Hand. Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : gesetzt() ? 'Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : 'Zum Ausprobieren „Spiegel aufwecken“ tippen. Für die echte Tour vorher unter „Einrichten“ die Punkte setzen.';
-  if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Währenddessen kommt die Schatzkiste zur Parkbank. Darin liegen Kratzbilder, Zaubertafeln und Zeichenschablonen. Nach Schatz und Snack „Heimweg starten“.';
+  if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Jetzt die Schatzkiste hinstellen. Kiste zusammen öffnen und staunen, verteilt wird zu Hause. Nach Schatz und Snack „Heimweg starten“.';   // eine Regel für die Schatzkiste (UNICORN-74)
   if(ph==='heim') return state.step>=1 ? 'Geschafft! Tattoos abwischen, den Schatz gibt es nach dem Essen.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
   if(ph==='seek'){
     if(ankunft) return 'Angekommen!';

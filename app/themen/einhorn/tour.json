@@ -130,7 +130,7 @@
      "dann": "Leise zum Laken schleichen und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen."
     },
     "6": {
-     "vorOrt": "Sticker-Stücke bereithalten. Der Vorausgeher hat die Schatzkiste in der Tasche."
+     "vorOrt": "Sticker bereithalten. Die Schatzkiste bleibt noch versteckt."
     }
    },
    "draussen": true
@@ -168,7 +168,7 @@
     },
     "6": {
      "wo": "Toberaum, hinter dem Sofa",
-     "vorOrt": "Fridolins Karton steht hinter dem Sofa, buntes Band daran. Sticker-Stücke bereithalten."
+     "vorOrt": "Sticker bereithalten. Die Schatzkiste bleibt noch versteckt."
     }
    },
    "draussen": false
@@ -396,7 +396,7 @@
    "wo": "Oben am Berg, bei der Parkbank",
    "kind": "finale",
    "arc": "blau",
-   "vorOrt": "Sticker-Stücke bereithalten. Der Vorausgeher hat die Schatzkiste in der Tasche.",
+   "vorOrt": "Sticker bereithalten. Die Schatzkiste bleibt noch versteckt.",
    "seek": "Jetzt geht es zum letzten Ort. Dort legen wir den Regenbogen zusammen.",
    "steps": [
     {
@@ -431,7 +431,7 @@
    "planer": {
     "was": "Blau fehlt! Die Pfoten führen zu Fridolins grauem Bau. Der Fuchs gibt die Bögen zurück, dann kommt der Schatz.",
     "ort": "Oben auf einem Hügel bei einer Bank: Platz zum Sitzen, für den Snack und den Schatz.",
-    "versteck": "Grauer Karton (Fridolins Bau), blaue Bögen, Schatzkiste"
+    "versteck": "Grauer Karton (Fridolins Bau), blaue Bögen"
    }
   }
  ],
@@ -632,7 +632,7 @@
       "Die eine Zaubertafel, in der Nähe verstecken (Station 5)",
       "Grüne Bögen (Station 6). Die Wolke schläft nur im Spiegel. Wer mag, legt etwas Weißes dazu (Laken, Kissen, Watte)",
       "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
-      "Schatzkiste (Station 7)"
+      "Schatzkiste: bleibt in der Tasche, nicht hinlegen (Station 7)"
      ]
     },
     {
@@ -652,7 +652,7 @@
       "Die eine Zaubertafel, in der Nähe verstecken (Station 5)",
       "Weißes Bettlaken oder weißer Schirm als Wolke, grüne Bögen (Station 6)",
       "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
-      "Schatzkiste (Station 7)"
+      "Schatzkiste: bleibt in der Tasche, nicht hinlegen (Station 7)"
      ]
     },
     {
@@ -673,7 +673,7 @@
       "Drei Zettel mit gemalten Spuren (Hase, Ente, Fuchs), die eine Zaubertafel (Türen)",
       "Grüne Bögen (Kissenberg). Wer mag, legt ein weißes Kissen als Wolke dazu",
       "Grauer Karton mit Fridolin, blaue Bögen, buntes Band (Sofa)",
-      "Schatzkiste"
+      "Schatzkiste: bleibt bei dir, nicht hinlegen"
      ]
     },
     {
@@ -809,7 +809,7 @@
         "ding": "Buntes Band am Versteck"
        },
        {
-        "x": "Schatzkiste mit Geschenken",
+        "x": "Schatzkiste mit Geschenken, bleibt in der Tasche",
         "ding": "Schatzkiste, je Kind ein Geschenk"
        },
        {
@@ -973,7 +973,7 @@
         "ding": "Buntes Band am Versteck"
        },
        {
-        "x": "Schatzkiste mit Geschenken",
+        "x": "Schatzkiste mit Geschenken, bleibt in der Tasche",
         "ding": "Schatzkiste, je Kind ein Geschenk"
        },
        {
@@ -1137,7 +1137,7 @@
         "ding": "Buntes Band am Versteck"
        },
        {
-        "x": "Schatzkiste mit Geschenken",
+        "x": "Schatzkiste mit Geschenken, bleibt in der Tasche",
         "ding": "Schatzkiste, je Kind ein Geschenk"
        },
        {
@@ -1241,7 +1241,7 @@
   {
    "i": "ende",
    "was": "Schatzkiste",
-   "wie": "Je Kind ein Kratzbild mit Zeichenschablone und eine Zaubertafel. Verteilt wird nach dem Essen.",
+   "wie": "Was ihr hineingelegt habt. Am Ziel öffnen und anschauen, verteilt wird nach dem Essen.",
    "art": "Schatz"
   }
  ],
@@ -2352,7 +2352,11 @@
     ],
     [
      "Finden",
-     "Schatzkiste mit Kratzbildern, Zeichenschablonen und Zaubertafeln"
+     "Die Schatzkiste mit euren Geschenken"
+    ],
+    [
+     "Tun",
+     "Kiste zusammen öffnen und anschauen, verteilt wird zu Hause"
     ],
     [
      "Weiter",

@@ -26,5 +26,13 @@ const spiel=fs.readFileSync(path.join(__dirname,'..','app/spiel.html'),'utf8');
 ok(!/am Zaun weiter|zur Parkbank/.test(spiel), 'Hauptzeilen im Spiel ohne Zaun und Parkbank');
 ok(/'Letzte Station'/.test(fs.readFileSync(path.join(__dirname,'..','app/planer-kern.js'),'utf8')), 'Planer: Ersatz-Wegpunkt am Ziel heißt „Letzte Station“');
 
+// Schatzkiste: eine Regel (UNICORN-74)
+const roh=fs.readFileSync(path.join(__dirname,'..','app/themen/einhorn/tour.json'),'utf8');
+ok(!/Schatzkiste[^"]*(Parkbank|Kratzbild|Zeichenschablon)/.test(roh) && !/(Kratzbildern, Zaubertafeln|Darin liegen)/.test(roh+spiel), 'Schatzkiste: kein Ort und kein fester Inhalt in Texten');
+ok(!/Schatzkiste/.test(tour.stationen[6].planer.versteck), 'Planer: Schatzkiste ist kein Versteck an Station 7');
+ok(/versteckt/.test(tour.stationen[6].vorOrt), 'Hinweis vor Ort: Schatzkiste bleibt noch versteckt');
+ok(Object.values(tour.vorbereitung.variante).every(l=>l.every(b=>b.items.filter(x=>/^Schatzkiste/.test(x)).every(x=>/nicht hinlegen/.test(x)))), 'Packlisten: Schatzkiste „nicht hinlegen“');
+ok(/hinstellen/.test(text(info.ende.a)) && /zu Hause/.test(text(info.ende.a)), 'Stichpunkte am Schatz: hinstellen, öffnen, zu Hause verteilen');
+
 if(fehler){ console.log(fehler+' FEHLER'); process.exit(1); }
 console.log('ALLES OK');

@@ -20,6 +20,13 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   ok(/Die Gruppe startet um 15:00 Uhr/.test(t), 'Zeigt, wann die Gruppe startet');
   ok(await p.locator('.danach .such li').count()>=5 && /Rote Bögen|rote/i.test(await p.locator('.danach .such').innerText()), 'Liste: was die Kinder je Station suchen');
   ok(/destination=53\.55,10/.test(await p.locator('.danach a.knopf').getAttribute('href')||''), 'Weg zurück zum Start mit Karte');
+  // Schatzkiste: eine Regel (UNICORN-74) – an Station 7 nicht hinlegen, sondern in der Tasche lassen
+  ok(/Schatzkiste stellst du hin, während die Kinder kleben/.test(t), 'Beim Schatz: Kiste wird beim Kleben hingestellt');
+  await p.evaluate(()=>{ const x=JSON.parse(localStorage.getItem('sj.party.einhorn')); x.aufgebaut={1:true,2:true,3:true,4:true,5:true}; localStorage.setItem('sj.party.einhorn', JSON.stringify(x)); });
+  await p.reload(); await p.waitForSelector('.fokus');
+  const h7=await p.locator('.hinlegen').innerText();
+  ok(!/Schatzkiste/.test(h7.split('Nicht hinlegen')[0]) && /Nicht hinlegen:\s*Schatzkiste/.test(h7), 'Station 7: Schatzkiste nicht unter „Hier hinlegen“, sondern „Nicht hinlegen“');
+  ok(!/Ort 6 · |Parkbank|Oben am Berg/.test(await p.locator('.fokus').innerText()), 'Station 7: nur der geplante Ort, keine feste Ortszeile (UNICORN-78)');
   ok(!pf.length, 'Keine Seitenfehler'+(pf.length?': '+pf.join(' | '):''));
   await b.close(); console.log(fehler?fehler+' FEHLER':'ALLES OK'); process.exit(fehler?1:0);
 })();
