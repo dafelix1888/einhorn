@@ -211,6 +211,8 @@ details.karte.achtung{border-color:#F0C6C9}
 .haken input:checked+span .notfalls{display:none}
 .liste .vb-ansicht{margin:4px 0 8px}.liste .vb-ansicht small{font-weight:400;opacity:.75;margin-left:4px}
 .liste .vb-lead{color:var(--ink-soft);font-size:.92rem;margin:4px 0 6px}.liste .vb-fuss{font-size:.88rem;color:var(--ink-soft);margin:4px 0 6px}.liste .vb-kopf{flex-wrap:wrap}
+.liste .vb-summen{display:flex;flex-wrap:wrap;gap:4px 16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:6px 0 4px}.liste .vb-summen small{flex-basis:100%;color:var(--ink-soft);font-size:.84rem}.liste .vb-summen b{margin-right:4px}
+.haken .menge{color:var(--magic)}.haken .preiszeile{display:block;font-size:.84rem;color:var(--ink-soft);margin-top:2px}.haken input:checked+span .preiszeile{display:none}
 .haken .wofuer{display:block;font-size:.86rem;margin-top:2px;color:var(--ink)}.haken input:checked+span .wofuer{display:none}.tag-preis{font-style:normal;font-size:.76rem;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--surface);border:1px solid var(--line);margin-left:4px;vertical-align:2px;white-space:nowrap}
 .liste .vb-gruppe{border-top:1px solid var(--line);padding:10px 0 4px}.liste .vb-gruppe:first-of-type{border-top:0}
 .liste .vb-kopf{display:flex;align-items:center;gap:10px;margin-bottom:2px}.liste .vb-kopf b{font-size:1.02rem}.liste .vb-kopf small{color:var(--ink-soft);font-size:.82rem}
@@ -1066,19 +1068,31 @@ function pkFarbe(s){ return ['#8B5CF6','#EF4444','#F97316','#EAB308','#22C55E','
 // Vorbereitung (UNICORN-67/68): Umschalter „Besorgen“ (jedes Ding einmal: wofür, Preis, selbst machen) und „Packen“ (nach Station)
 var VB_ANSICHT_KEY=TOUR.speicher+'.vb-ansicht', vbAnsicht='besorgen';
 try{ vbAnsicht=localStorage.getItem(VB_ANSICHT_KEY)==='packen' ? 'packen' : 'besorgen'; }catch(e){}
+function besorgParty(){                          // Party auf diesem Gerät, sonst ein Stellvertreter mit Kinderzahl und Spielart
+  var p=null; try{ p=Party.lesen(TOUR.id); }catch(e){}
+  if(p && !p.fremd) return p;
+  var k=(TPLAN && TPLAN.kinder) || (TOUR.kinder||{}).standard || 8, h=haken;
+  var e={}; Object.keys(h).forEach(function(x){ if(/^ek\|/.test(x) && h[x]) e[x.slice(3)]=true; });
+  return {kinder:k, ort:indoor()?'drinnen':'draussen', ausdrucke:state.variante!=='b', einkauf:e, einkaufWie:{}, stellvertreter:true};
+}
 function renderListe(){
-  var P=Party.vorbereitungsListe(TOUR, state.variante), B=Party.besorgListe(TOUR, state.variante), offen=$('liste').querySelectorAll('details[open]'), auf={};
+  var P=Party.vorbereitungsListe(TOUR, state.variante), bp=besorgParty(), B=Party.besorgen(bp, TOUR), offen=$('liste').querySelectorAll('details[open]'), auf={};
   Array.prototype.forEach.call(offen, function(d){ auf[d.id]=true; });
   function zaehl(l){ return l.filter(function(k){ return haken[k]; }).length; }
-  var nB=zaehl(B.schluessel), nP=zaehl(P.schluessel);
-  var h='<div class="seg vb-ansicht" role="group" aria-label="Ansicht"><button type="button" data-vb="besorgen" aria-pressed="'+(vbAnsicht==='besorgen')+'">Besorgen <small>'+nB+'/'+B.noetig+'</small></button><button type="button" data-vb="packen" aria-pressed="'+(vbAnsicht==='packen')+'">Packen <small>'+nP+'/'+P.noetig+'</small></button></div>';
+  var gB=B.noetig.length+B.ohne.length, nB=B.noetig.filter(function(x){ return x.fertig; }).length+zaehl(B.ohne.map(function(x){ return x.key; })), nP=zaehl(P.schluessel);
+  var h='<div class="seg vb-ansicht" role="group" aria-label="Ansicht"><button type="button" data-vb="besorgen" aria-pressed="'+(vbAnsicht==='besorgen')+'">Besorgen <small>'+nB+'/'+gB+'</small></button><button type="button" data-vb="packen" aria-pressed="'+(vbAnsicht==='packen')+'">Packen <small>'+nP+'/'+P.noetig+'</small></button></div>';
   if(vbAnsicht==='besorgen'){
-    h+='<p class="vb-lead">Jedes Ding einmal: wofür es ist, was es kostet und wie es ohne Kauf geht. So entscheidest du: bestellen oder selbst machen.</p>';
-    h+=B.gruppen.map(function(gr){
-      var kopf='<div class="vb-kopf"><b>'+esc(gr.titel)+'</b>'+(gr.art==='kaufen'?'<small>Alles bestellt ca. '+esc(Party.euro(B.summe))+' · alles selbst gemacht 0 €</small>':'')+'</div>';
-      var fuss=gr.art==='kaufen' ? '<p class="vb-fuss">Bestellen geht in der Party unter „Alles bestellen“: <a href="party.html?thema='+encodeURIComponent(TOUR.id)+'#s-bestellen">zur Einkaufsliste</a></p>' : '';
-      return '<section class="vb-gruppe">'+kopf+gr.items.map(function(i){ return hakenZeile(i.x, i.notfalls, i.extra, i.key, {wofuer:i.wofuer, preis:i.preis, sonst:gr.art==='kaufen'?'Selbst machen':i.extra?'Ohne Kauf':'So geht es auch'}); }).join('')+fuss+'</section>';
-    }).join('');
+    var s=B.summen;
+    h+='<p class="vb-lead">Dieselbe Einkaufsliste wie in der Party, mit denselben Preisen. Haken heißt: ist da oder bestellt.</p>';
+    if(s.nAlles) h+='<div class="vb-summen"><span><b>Alles bestellen</b> ca. '+esc(Party.euro(s.alles))+'</span><span><b>Nur das Nötige</b> ca. '+esc(Party.euro(s.noetig))+'</span><small>Mit Notlösungen von zu Hause kostet es gar nichts. Bestellen geht in der Party: <a href="party.html?thema='+encodeURIComponent(TOUR.id)+'#s-bestellen">zur Einkaufsliste</a></small></div>';
+    function zeile(x){
+      var sonst=x.notfalls ? (/^Weglassen/.test(x.notfalls)?'':'Sonst: ')+x.notfalls : '', wie={not:'Mit Notlösung', weg:'Weggelassen'}[x.wie]||'';
+      return '<label class="haken'+(x.noetig?'':' extra')+'"><input type="checkbox" data-ek="'+esc(x.id)+'"'+(x.fertig?' checked':'')+'><span><b class="menge">'+x.menge+'×</b> '+esc(x.name)+(x.noetig?'':' <em class="tag-extra">Extra</em>')+
+        (x.wofuer?'<small class="wofuer">'+esc(x.wofuer)+'</small>':'')+'<small class="preiszeile">'+esc(wie||Party.preisText(x))+'</small>'+(sonst?'<small class="notfalls">'+esc(sonst)+'</small>':'')+'</span></label>';
+    }
+    if(B.noetig.length) h+='<section class="vb-gruppe"><div class="vb-kopf"><b>Braucht die Tour</b><small>'+B.noetig.length+'</small></div>'+B.noetig.map(zeile).join('')+'</section>';
+    if(B.ohne.length) h+='<section class="vb-gruppe"><div class="vb-kopf"><b>Ohne Einkauf</b><small>'+B.ohne.length+'</small></div>'+B.ohne.map(function(i){ return hakenZeile(i.x, i.notfalls, false, i.key, {wofuer:i.wofuer}); }).join('')+'</section>';
+    if(B.extras.length) h+='<section class="vb-gruppe"><div class="vb-kopf"><b>Extras, die es schöner machen</b><small>'+B.extras.length+'</small></div>'+B.extras.map(zeile).join('')+'</section>';
   } else {
     h+='<p class="vb-lead">Was an welche Station kommt und wer es hinbringt. Abhaken, wenn es eingepackt ist.</p>';
     h+=P.gruppen.map(function(gr){
@@ -1089,9 +1103,9 @@ function renderListe(){
   }
   if(!indoor()) h+='<details class="mehr" id="vb-extras"'+(auf['vb-extras']?' open':'')+'><summary>Mehr Erlebnis</summary>'+Spielart.extraKarte(TOUR, state.variante==='b', 'extra-vb')+'</details>';
   $('liste').innerHTML=h;
-  var n=vbAnsicht==='besorgen'?nB:nP, g=vbAnsicht==='besorgen'?B.noetig:P.noetig;
+  var n=vbAnsicht==='besorgen'?nB:nP, g=vbAnsicht==='besorgen'?gB:P.noetig;
   $('liste-note').textContent=n+' von '+g+' nötigen '+(vbAnsicht==='besorgen'?'besorgt':'gepackt'); $('liste-note').className='chip '+(n===g?'on':'');
-  $('sum-vorbereitung').textContent='Besorgt '+nB+' von '+B.noetig+' · gepackt '+nP+' von '+P.noetig;
+  $('sum-vorbereitung').textContent='Besorgt '+nB+' von '+gB+' · gepackt '+nP+' von '+P.noetig;
 }
 
 /* ---------- Zustand ---------- */
@@ -2899,7 +2913,11 @@ $('btn-copy').addEventListener('click', function(){
   try{ navigator.clipboard.writeText(ta.value).then(function(){ toast('Code kopiert.'); }, markieren); }catch(e){ markieren(); }
 });
 $('liste').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('[data-vb]') : null; if(!b) return; vbAnsicht=b.getAttribute('data-vb'); try{ localStorage.setItem(VB_ANSICHT_KEY, vbAnsicht); }catch(x){} renderListe(); });
-$('liste').addEventListener('change', function(e){ var b=e.target; if(!b.hasAttribute('data-haken')) return; haken[b.getAttribute('data-haken')]=b.checked; hakenSave(); renderListe(); });
+$('liste').addEventListener('change', function(e){ var b=e.target; if(b.hasAttribute('data-ek')){ var id=b.getAttribute('data-ek'), bp=besorgParty();
+    if(bp.stellvertreter){ haken['ek|'+id]=b.checked; hakenSave(); }
+    else { bp.einkauf=bp.einkauf||{}; bp.einkaufWie=bp.einkaufWie||{}; if(b.checked) bp.einkauf[id]=true; else { delete bp.einkauf[id]; delete bp.einkaufWie[id]; } Party.speichern(bp); }
+    renderListe(); return; }
+  if(!b.hasAttribute('data-haken')) return; haken[b.getAttribute('data-haken')]=b.checked; hakenSave(); renderListe(); });
 $('btn-liste-reset').addEventListener('click', function(){ haken={}; hakenSave(); renderListe(); });
 $('btn-clips-export').addEventListener('click', clipsExport);
 $('clips-file').addEventListener('change', function(){

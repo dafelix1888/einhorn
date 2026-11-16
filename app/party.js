@@ -278,26 +278,28 @@
     if(l.mit&&l.mit.length) r.gruppen.push({art:'mit', titel:'Mitnehmen', items:dinge(l.mit)});
     return r;
   }
-  // Besorgen (UNICORN-68): jedes Ding einmal, mit Zweck, Preis und Notlösung – zum Entscheiden: bestellen oder selbst machen.
-  // Eigene Haken („besorgt“), getrennt vom Packen nach Station.
-  function besorgListe(tour, v, kinder){
-    var vb=(tour&&tour.vorbereitung)||{}, hv=v==='b'?'a':v, ut={};
-    (tour.utensilien||[]).forEach(function(u){ ut[u.id]=u; });
-    function f(t){ return String(t||'').replace(/\{kinder\}/g, kinder!=null ? kinder : '{kinder}'); }
+  // Besorgen (UNICORN-69): dieselbe Einkaufsliste wie in der Party (Artikel, Packungen, Preise, „erledigt“),
+  // dazu je Artikel „wofür“ und die nötigen Dinge ohne Einkauf. Eine Quelle für Party und Spiel.
+  function wofuerVon(tour, v, id){
+    var vb=tour.vorbereitung||{}, w='';
     function passt(x){ return !x.nur || x.nur.indexOf(v)>=0; }
-    function eintrag(x, extra){
-      var preis=0, link='';
-      (x.u||[]).forEach(function(id){ var u=ut[id]; if(u && typeof u.preis==='number'){ preis+=u.preis; link=link||u.link||''; } });
-      var name=f(x.x); return {x:name, wofuer:f(x.wofuer||''), notfalls:f(x.notfalls||''), preis:Math.round(preis*100)/100, link:link, extra:extra, key:hv+'|b|'+name};
-    }
-    var n=(vb.noetig||[]).filter(passt).map(function(x){ return eintrag(x, false); }), e=(vb.extras||[]).filter(passt).map(function(x){ return eintrag(x, true); });
-    var kaufen=n.filter(function(x){ return x.preis>0; }), ohne=n.filter(function(x){ return !(x.preis>0); });
-    return {gruppen:[
-      {art:'kaufen', titel:'Bestellen oder selbst machen', items:kaufen},
-      {art:'ohne', titel:'Ohne Einkauf', items:ohne},
-      {art:'extras', titel:'Extras, wenn Zeit ist', items:e}].filter(function(g){ return g.items.length; }),
-      summe:Math.round(kaufen.reduce(function(s, x){ return s+x.preis; }, 0)*100)/100,
-      noetig:n.length, schluessel:n.map(function(x){ return x.key; })};
+    (vb.noetig||[]).forEach(function(x){ if(!w && passt(x) && (x.u||[]).indexOf(id)>=0) w=x.wofuer||''; });
+    (vb.extras||[]).forEach(function(x){ if(!w && (x.u||[]).indexOf(id)>=0) w=x.wofuer||''; });
+    return w;
   }
-  root.Party={besorgListe:besorgListe, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
+  function preisText(x){                         // gleiche Preiszeile in Party und Spiel
+    if(x.zuHause) return 'Hat man meist zu Hause';
+    if(!x.asin) return '';
+    if(x.preis==null || x.summe==null) return x.preis==null ? 'Gerade nicht lieferbar' : '';
+    return (x.packungen>1?x.packungen+' Packungen':'1 Packung')+(x.packung>1?' à '+x.packung+' Stück':'')+' · '+euro(x.summe);
+  }
+  function besorgen(p, tour){
+    var v=variante(p), vb=tour.vorbereitung||{}, ek=einkauf(p, tour);
+    ek.forEach(function(x){ x.wofuer=wofuerVon(tour, v, x.id); });
+    function f(t){ return String(t||'').split('{kinder}').join(p.kinder); }
+    var ohne=(vb.noetig||[]).filter(function(x){ return (!x.nur || x.nur.indexOf(v)>=0) && !(x.u||[]).length; })
+      .map(function(x){ return {x:f(x.x), wofuer:f(x.wofuer), notfalls:f(x.notfalls), key:(v==='b'?'a':v)+'|b|'+f(x.x)}; });
+    return {noetig:ek.filter(function(x){ return x.noetig; }), extras:ek.filter(function(x){ return !x.noetig; }), ohne:ohne, summen:wegeSummen(ek)};
+  }
+  root.Party={besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
 })(this);
