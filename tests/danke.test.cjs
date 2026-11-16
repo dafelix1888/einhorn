@@ -30,6 +30,15 @@ let f=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) f++; };
   await a.screenshot({path:'danke-eltern.png'});
   const g=await geraet(); await g.goto(link); await g.waitForTimeout(1200);
   ok(/Danke fürs Mitfeiern/.test(await g.locator('#seite').innerText()), 'Gast sieht Danke-Seite');
+  ok(await g.inputValue('#kind')==='', 'Ohne Zusage auf dem Gerät: Namensfeld leer');
+  // UNICORN-116: Zusage auf demselben Gerät belegt den Namen vor, änderbar
+  const kk=new URL(link).searchParams.get('k');
+  await g.evaluate(k=>localStorage.setItem('sj.antwort.'+k, JSON.stringify({id:'x', name:'Paul', kommt:true})), kk);
+  await g.reload(); await g.waitForTimeout(1200);
+  ok(await g.inputValue('#kind')==='Paul', 'Name aus der Zusage vorbelegt');
+  await g.evaluate(k=>localStorage.setItem('sj.antwort.'+k, JSON.stringify({id:'x', name:'Paul', kommt:false})), kk);
+  await g.reload(); await g.waitForTimeout(1200);
+  ok(await g.inputValue('#kind')==='', 'Nach Absage kein Name vorbelegt');
   await g.fill('#kind','Lotta'); await g.waitForTimeout(200);
   const hell=await g.evaluate(()=>{ const c=document.getElementById('urkunde').getContext('2d').getImageData(600,920,200,40).data; let n=0; for(let i=0;i<c.length;i+=4) if(c[i]<100) n++; return n; });
   ok(hell>50, 'Urkunde zeigt den Namen');

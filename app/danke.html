@@ -75,7 +75,13 @@ canvas{display:block;width:100%;height:auto;border-radius:10px;background:#fff;m
     $('seite').innerHTML=h;
     if(k){ var alt=null; try{ alt=localStorage.getItem('sj.danke.'+k); }catch(x){} if(alt) markieren(alt, true); }
     bild=new Image(); bild.onload=malen; bild.onerror=malen; if(heldBild) bild.src=heldBild; else malen();
+    var vorname=zusageName(); if(vorname){ $('kind').value=vorname; malen(); }   // UNICORN-116: Name aus der Zusage auf diesem Gerät, änderbar
     $('kind').addEventListener('input', malen);
+  }
+  function zusageName(){                  // Zusage auf der Einladung (gleicher Schlüssel): sj.antwort.<k> = {name, kommt}
+    if(!k) return ''; var a=null; try{ a=JSON.parse(localStorage.getItem('sj.antwort.'+k)||'null'); }catch(x){}
+    if(!a || !a.name || a.kommt===false) return '';
+    return String(a.name).trim().slice(0,24);
   }
 
   // Urkunde als Bild: Regenbogenrand, Funkel, Name, Satz, Datum
