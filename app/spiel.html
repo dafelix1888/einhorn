@@ -1096,8 +1096,8 @@ function renderListe(){
   var h='<div class="seg vb-ansicht" role="group" aria-label="Ansicht"><button type="button" data-vb="besorgen" aria-pressed="'+(vbAnsicht==='besorgen')+'">Besorgen <small>'+nB+'/'+gB+'</small></button><button type="button" data-vb="packen" aria-pressed="'+(vbAnsicht==='packen')+'">Packen <small>'+nP+'/'+P.noetig+'</small></button></div>';
   if(vbAnsicht==='besorgen'){
     var s=B.summen;
-    h+='<p class="vb-lead">Dieselbe Einkaufsliste wie in der Party, mit denselben Preisen. Haken heißt: ist da oder bestellt.</p>';
-    if(s.nAlles) h+='<div class="vb-summen"><span><b>Alles bestellen</b> ca. '+esc(Party.euro(s.alles))+'</span><span><b>Nur das Nötige</b> ca. '+esc(Party.euro(s.noetig))+'</span><small>Mit Notlösungen von zu Hause kostet es gar nichts. Bestellen geht in der Party: <a href="party.html?thema='+encodeURIComponent(TOUR.id)+'#s-bestellen">zur Einkaufsliste</a></small></div>';
+    h+='<p class="vb-lead">Dasselbe Material wie in der Party, mit denselben Preisen. Haken heißt: ist da oder bestellt.</p>';
+    if(s.nAlles) h+='<div class="vb-summen"><span><b>Alles bestellen</b> ca. '+esc(Party.euro(s.alles))+'</span><span><b>Nur das Nötige</b> ca. '+esc(Party.euro(s.noetig))+'</span><small>Mit Notlösungen von zu Hause kostet es gar nichts. Bestellen geht in der Party: <a href="party.html?thema='+encodeURIComponent(TOUR.id)+'#s-bestellen">zum Material</a></small></div>';
     function zeile(x){
       var sonst=x.notfalls ? (/^Weglassen/.test(x.notfalls)?'':'Sonst: ')+x.notfalls : '', wie={not:'Mit Notlösung', weg:'Weggelassen'}[x.wie]||'';
       return '<label class="haken'+(x.noetig?'':' extra')+'"><input type="checkbox" data-ek="'+esc(x.id)+'"'+(x.fertig?' checked':'')+'><span><b class="menge">'+x.menge+'×</b> '+esc(x.name)+(x.noetig?'':' <em class="tag-extra">Extra</em>')+
@@ -1971,7 +1971,7 @@ function uhrZeigen(){
   el.hidden=false;
 }
 
-/* ---------- Probelauf-Protokoll ---------- */
+/* ---------- Generalprobe-Protokoll ---------- */
 var PROTO_KEY=TOUR.speicher+'.protokoll', proto=[];
 try{ proto=JSON.parse(localStorage.getItem(PROTO_KEY)||'[]')||[]; }catch(e){ proto=[]; }
 function protoSave(){ try{ localStorage.setItem(PROTO_KEY, JSON.stringify(proto.slice(-5))); }catch(e){} }
@@ -2833,7 +2833,7 @@ $('tipps-an').addEventListener('change', function(){ if(window.Einfuehrung) Einf
 document.addEventListener('einfuehrung', function(){ $('tipps-an').checked=Einfuehrung.tippsAn(); toast('Keine Tipps mehr. Unter „Einrichten“ → „Tour“ schaltest du sie wieder ein.'); });
 // ---------- Generalprobe (UNICORN-61) ----------
 // Die Tour einmal so durchspielen wie am Partytag, mit Abstand und GPS-Genauigkeit im Blick und „Punkt hier setzen“.
-// Am Ende: wie jede Station geöffnet hat (aus dem Probelauf-Protokoll), dann zurück auf Anfang. Die Punkte bleiben.
+// Am Ende: wie jede Station geöffnet hat (aus dem Generalprobe-Protokoll), dann zurück auf Anfang. Die Punkte bleiben.
 var probeSchluessel='', probeSicher=false;
 function probeWert(){
   if(indoor()) return '';
@@ -2900,7 +2900,7 @@ $('btn-probe').addEventListener('click', function(){
   if(state.phase!=='start' && !probeSicher){ probeSicher=true; $('probe-menu-text').textContent='Startet die Tour von vorn. Zum Bestätigen noch einmal tippen.'; return; }
   probeStarten();
 });
-// Link mit ?probe=1 (Party → „Generalprobe am Vortag“, „Route ablaufen“)
+// Link mit ?probe=1 (Party → Schritt „Generalprobe“, drinnen „Generalprobe am Vortag“)
 if(/[?&]probe=1(&|$)/.test(location.search) && !state.probe){
   if(state.phase==='start'){ state.probe=true; save(); setTimeout(function(){ gpsStart(); live(); }, 0); }
   else setTimeout(function(){ toast('Die Tour läuft gerade. Unter „Erwachsene“ → „Generalprobe“ startest du die Probe von vorn.'); }, 600);

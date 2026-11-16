@@ -2,11 +2,27 @@
 
 - Zuerst `STATUS.md` lesen: Stand, Entscheidungen, nächste Schritte. Nach größeren Änderungen dort nachtragen.
 - Die generische App liegt in `app/`. Das verschlüsselte Original liegt in `/original.html` und wird nicht angefasst. `/index.html` leitet nur zur App weiter.
-- Texte für Eltern und Kinder auf Deutsch, kurz und ohne Fachwörter.
+- Texte für Eltern und Kinder auf Deutsch, kurz und ohne Fachwörter. Ein Wort je Sache, siehe Wortliste unten.
 - Keine echten Adressen, Straßennamen oder Namen aus Felix' Umfeld ins Repo (es ist öffentlich). Das Zauberwort nie ins Repo schreiben.
 - Arbeiten über Branch und Pull Request; PRs direkt in `main` mergen. GitHub mergt eigene PRs auch von selbst: Sobald der Workflow „Tests“ grün ist, mergt der Job „Von selbst mergen“ per Squash (Commit-Titel = PR-Titel) und startet die Veröffentlichung. Das greift auch dort, wo eine Sitzung nicht selbst mergen darf (geplante Läufe). Was noch nicht live gehen soll, als Entwurf (Draft) öffnen. Neue Workflows, die bei Push auf `main` laufen sollen, im Schritt „Veröffentlichung anstoßen“ in `.github/workflows/tests.yml` nachtragen (AM-2).
 - Jira-Tickets in UNICORN nachziehen: Status „Delivery“, sobald gebaut, aber noch etwas von Felix fehlt (Schlüssel, Test, ID); „Done“, sobald live und geprüft. Kommentar mit PR-Link dazu.
 - In jedem bearbeiteten Ticket (UNICORN, MAR, STRAT, PBIM, ADR, KM) einen kurzen, präzisen Kommentar hinterlassen: was getan wurde, was festgestellt wurde, was offen ist und bei wem (mit PR-Link). So wissen Strategist, Marketer und andere Sitzungen ohne Rückfrage, wo das Ticket steht.
+
+## Wortliste (UNICORN-119)
+
+Ein Wort je Sache, in allen Bildschirmtexten der App (nicht in gesprochenen Sätzen, die bleiben). Gilt auch für Marketer (MAR-Ticket). `tests/wortliste.test.cjs` findet die alten Wörter.
+
+| Sache | Wort | Nicht |
+|---|---|---|
+| Was die Kinder spielen, das Abenteuer als Ganzes | Schatzsuche | Schnitzeljagd, Jagd (Schnitzeljagd nur auf Landingpage und Themenseiten, wegen Suchmaschinen) |
+| Der Weg am Partytag mit den 7 Stationen | Tour | Jagd, Runde |
+| Einmal vorher ablaufen, mit dem Gerät der Tour | Generalprobe | Probelauf, Route ablaufen |
+| Das Gerät, auf dem die Kinder spielen | Tablet (in der Geschichte: Spiegel) | Spiel-Gerät, iPad |
+| Menü für Eltern im Spiel | „Erwachsene“ → „Einrichten“ | Elternbereich |
+| Was gekauft oder von zu Hause genommen wird | Material („Material besorgen“, im Spiel „Besorgen“) | Einkaufsliste, Bestellliste |
+| Was vorher gebastelt oder gedruckt wird | Basteln („Basteln und drucken“) | Bastelliste |
+| Was am Partytag in welche Station kommt | Packliste (im Spiel „Packen“) | Bastelliste, Liste |
+| Der Erwachsene, der die Stationen vorher aufbaut | Vorausgeher | Helfer (für ihn) |
 
 ## Zusammenarbeit
 

@@ -82,7 +82,7 @@
 
   function einladung(){
     var draussen=party.ort!=='drinnen';
-    var karte='<div class="einladung"><img src="'+info.cover+'" alt=""><div><h2>'+esc(name)+' wird '+esc(alter)+'!</h2><p class="unter">Komm mit auf Funkels Regenbogen-Abenteuer, einer Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.</p>'+
+    var karte='<div class="einladung"><img src="'+info.cover+'" alt=""><div><h2>'+esc(name)+' wird '+esc(alter)+'!</h2><p class="unter">Komm mit auf Funkels Regenbogen-Abenteuer, einer Einhorn-Schatzsuche mit sprechendem Zauberspiegel.</p>'+
       '<dl><dt>Wann</dt><dd>'+esc(datumLang)+', '+esc(party.start)+' Uhr</dd><dt>Wo</dt><dd>'+esc($('treff').value)+'</dd><dt>Abholen</dt><dd>'+esc($('abholen').value)+' Uhr</dd>'+
       (Party.gaesteHinweis(party)?'<dt>Bitte</dt><dd>'+esc(Party.gaesteHinweis(party))+'</dd>':'')+'</dl>'+
       '<p class="klein">'+(antwortBis?'Bitte sagt bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.':'Bitte sagt kurz Bescheid, ob ihr kommt.')+'</p></div></div>';
@@ -102,7 +102,7 @@
     $('vorschau').innerHTML=(an.einladung?einladung():'')+(an.urkunde?urkunden():'');
   }
   function textFuerChat(){
-    return name+' wird '+alter+'! 🦄\n\nWir laden zu Funkels Regenbogen-Abenteuer ein, einer Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.\n\n'+
+    return name+' wird '+alter+'! 🦄\n\nWir laden zu Funkels Regenbogen-Abenteuer ein, einer Einhorn-Schatzsuche mit sprechendem Zauberspiegel.\n\n'+
       'Wann: '+datumLang+', '+party.start+' Uhr\nWo: '+$('treff').value+'\nAbholen: '+$('abholen').value+' Uhr\n'+(Party.gaesteHinweis(party)?'Bitte mitbringen und beachten: '+Party.gaesteHinweis(party)+'\n':'')+
       '\nGebt bitte '+(antwortBis?'bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' ':'kurz ')+'Bescheid, ob ihr kommt.';
   }

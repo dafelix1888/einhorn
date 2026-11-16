@@ -239,7 +239,7 @@
     toast(plan.luft==='teils' ? 'Station '+(i+1)+' liegt außerhalb der Karte. Strecke dort als Luftlinie: '+km(plan.strecke) : 'Station '+(i+1)+' gespeichert · '+km(plan.strecke)+' · ca. '+PlanerKern.dauer(tour, plan.strecke).gesamt+' min');
     if(r && r.route) hoehenNeu();
   }
-  // ---------- Vor Ort setzen: Station auf den echten Standort legen (Probelauf) ----------
+  // ---------- Vor Ort setzen: Station auf den echten Standort legen (Generalprobe) ----------
   // Wartet, bis das GPS genau ist (3 Messungen ≤ 12 m, Mittelwert), höchstens 25 s; danach die beste Messung mit Rückfrage.
   var vorOrt=null;
   function vorOrtStopp(){ if(vorOrt){ try{ navigator.geolocation.clearWatch(vorOrt.w); }catch(e){} clearTimeout(vorOrt.t); vorOrt=null; } }
@@ -557,7 +557,7 @@
     if(window.Konto && Konto.aktiv()) $('teilen').hidden=true;   // geteilt wird geschützt über die Party-Seite
     $('teilen').addEventListener('click', function(){
       speichern(); var link=spielLink(plan);
-      if(navigator.share){ navigator.share({title:tour.titel, text:'Unsere Schnitzeljagd', url:link})['catch'](function(){}); return; }
+      if(navigator.share){ navigator.share({title:tour.titel, text:'Unsere Schatzsuche', url:link})['catch'](function(){}); return; }
       try{ navigator.clipboard.writeText(link).then(function(){ toast('Link kopiert. Auf dem Tablet öffnen, dann ist die Tour dort.'); }, function(){ prompt('Link kopieren:', link); }); }catch(e){ prompt('Link kopieren:', link); }
     });
   }
