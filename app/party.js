@@ -62,9 +62,9 @@
     var wetter=!draussen ? '' : p.planB ? ' Regen gemeldet? Dann schaltest du mit einem Tipp auf drinnen um.' : ' Ohne Plan B: bei Regen Termin oder Ort überlegen.';
     var l=[
       // Reihenfolge (UNICORN-27): zuerst, was Lieferzeit braucht; die Einladung geht, wann man mag. Nichts ist gesperrt.
-      {id:'bestellen', tag:-14, titel:'Alles bestellen', kurz:'Bestellen oder Notlösungen von zu Hause',
+      {id:'bestellen', tag:-14, titel:'Material besorgen', kurz:'Bestellen oder von zu Hause nehmen',   // UNICORN-72: drängt nicht zum Kauf
         text:'Zwei Wege: Alles bestellen ist am bequemsten, die Mengen passen schon zu '+p.kinder+' Kindern. Oder nur das Nötige kaufen und den Rest weglassen oder mit Dingen von zu Hause lösen. Dann kostet es wenig oder gar nichts.', knopf:'Zur Einkaufsliste', link:'#einkauf',
-        teile:[{id:'bestellen', titel:'Alles bestellt', erkannt:allesGekauft}]},
+        teile:[{id:'bestellen', titel:'Alles da oder bestellt', erkannt:allesGekauft}]},
       {id:'einladen', tag:-14, titel:'Gäste einladen', kurz:'Ein Link für alle Eltern, du siehst, wer kommt',
         text:'Ein Link für alle Gast-Eltern. Sie sehen Termin, Treffpunkt und Abholzeit und sagen dort zu oder ab. Wer kommt, siehst du hier.', knopf:'Link teilen', aktion:'gast-link',
         link:einladungsLink(p, pl)||('party.html?thema='+t+'#einladung'), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
@@ -161,6 +161,15 @@
   // Was alles kosten würde (offen, lieferbar), ganz oder nur das Nötige
   function wegeSummen(l){ var o=l.filter(function(x){ return !x.fertig && x.lieferbar; }); function s(a){ return a.reduce(function(t, x){ return t+x.summe; }, 0); }
     return {alles:s(o), noetig:s(o.filter(function(x){ return x.noetig; })), nAlles:o.length, nNoetig:o.filter(function(x){ return x.noetig; }).length}; }
+  // Was auf die Eltern zukommt (UNICORN-72): Material, Vorbereitung, Partytag. Alles aus tour.json und dem Plan gerechnet, nichts fest im Text.
+  function aufwand(p, tour, pl){
+    var ek=tour && tour.utensilien ? einkauf(p, tour) : [], kauf=ek.filter(function(x){ return x.lieferbar && x.summe!=null; });
+    function sum(a){ return a.reduce(function(t, x){ return t+x.summe; }, 0); }
+    var b=tour ? basteln(p, tour) : [], d=(tour && tour.dauer)||{}, v=d.meterProMinute||35, st=d.stationenMinuten!=null?d.stationenMinuten:35;
+    var tourMin=pl && pl.strecke ? st+Math.round(pl.strecke/v) : (d.minuten||50), heimMin=pl && pl.heimweg ? Math.round(pl.heimweg/v) : 0;
+    return {alles:sum(kauf), noetig:sum(kauf.filter(function(x){ return x.noetig; })), bastelAlle:bastelMin(b), bastelNoetig:bastelMin(b, true),
+      tourMin:tourMin, heimMin:heimMin, vorlaufMin:p.ort!=='drinnen' && !p.vorausgeher ? 90 : 60};
+  }
   // Basteln und drucken (UNICORN-60): Aufwand je Aufgabe, was nötig ist und was ohne passiert
   function basteln(p, tour){
     var v=variante(p);
@@ -314,5 +323,5 @@
       .map(function(x){ return {x:f(x.x), wofuer:f(x.wofuer), notfalls:f(x.notfalls), key:(v==='b'?'a':v)+'|b|'+f(x.x)}; });
     return {noetig:ek.filter(function(x){ return x.noetig; }), extras:ek.filter(function(x){ return !x.noetig; }), ohne:ohne, summen:wegeSummen(ek)};
   }
-  root.Party={besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand};
+  root.Party={besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand, aufwand:aufwand};
 })(this);
