@@ -244,7 +244,7 @@
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3200); }
   function heute(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
-  function genitiv(n){ return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
+  var genitiv=Party.genitiv;
   function partyTitel(p){ return p.kind && p.kind.name ? genitiv(p.kind.name)+' Einhorn-Party' : 'Eure Einhorn-Party'; }
   function tageAb(d){ var h=new Date(); h.setHours(0,0,0,0); var x=new Date(d); x.setHours(0,0,0,0); return Math.round((x-h)/864e5); }
   function kurzDatum(d){ return d.toLocaleDateString('de-DE',{day:'numeric', month:'numeric'}); }
@@ -598,7 +598,7 @@
     var x=null; l.forEach(function(a){ a.teile.forEach(function(t){ if(t.id==='namen') x=t; }); });
     if(!x || !window.Namen) return '';
     var n=esc(p.kind.name||'das Kind');
-    return '<h2 id="namen-block">Funkel sagt '+n+'s Namen</h2>'+
+    return '<h2 id="namen-block">'+(p.kind.name?'Funkel sagt '+esc(genitiv(p.kind.name))+' Namen':'Funkel sagt den Namen')+'</h2>'+
       '<p class="leise klein" style="margin:-4px 0 10px">Funkel spricht '+n+' in der Tour dreimal mit Namen an: an der Haustür, beim Schatz (mit Alter) und zum Abschied zu Hause. '+(x.fertig?'Die Sätze sind eingesprochen.':'Hör rein, wie das klingt, dann sprichst du die Sätze mit '+n+'s Namen ein.')+'</p>'+
       '<div class="namen-zeile"><button type="button" class="knopf mittel leer" data-namen-beispiel>▶ Hörprobe mit „'+esc(Namen.BEISPIEL)+'“</button>'+
       '<button type="button" class="knopf mittel'+(x.fertig?' leer':'')+'" data-oeffne="namen">'+(x.fertig?'Eigene Sätze anhören':'Mit „'+n+'“ einsprechen')+'</button></div>';

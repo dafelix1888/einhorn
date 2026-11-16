@@ -91,7 +91,7 @@
   function urkunden(){
     var h='', n=party.kinder;
     for(var i=0;i<n;i++) h+='<section class="blatt'+(i>0?' kopie':'')+'"><div class="urkunde"><img src="'+info.cover+'" alt=""><h2>URKUNDE</h2><div class="linie"></div><p>gehört ab heute zu Funkels Einhorn-Helfern und hat den Regenbogen gerettet.</p>'+
-      '<p style="font-size:13pt;color:#5A5073">Auf '+esc(/[sßxz]$/i.test(name)?name+'’':name+'s')+' '+esc(alter)+'. Geburtstag am '+d.toLocaleDateString('de-DE',{day:'numeric', month:'long', year:'numeric'})+'</p>'+
+      '<p style="font-size:13pt;color:#5A5073">Auf '+esc(Party.genitiv(name))+' '+esc(alter)+'. Geburtstag am '+d.toLocaleDateString('de-DE',{day:'numeric', month:'long', year:'numeric'})+'</p>'+
       '<div class="unterschrift"><b>Funkel</b>Einhorn und Hüterin des Regenbogens</div></div></section>';
     return h;
   }
@@ -115,7 +115,7 @@
   $('link').addEventListener('click', function(){
     if(window.Konto && !Party.einladungsLink(party, plan)){ Konto.bereit(thema); return; }   // erst geschützt speichern
     var l=Party.einladungsLink(party, plan);
-    if(navigator.share){ navigator.share({title:name+' wird '+alter+'!', text:'Einladung zu '+name+'s Einhorn-Party', url:l})['catch'](function(){}); return; }
+    if(navigator.share){ navigator.share({title:name+' wird '+alter+'!', text:'Einladung zu '+Party.genitiv(name)+' Einhorn-Party', url:l})['catch'](function(){}); return; }
     try{ navigator.clipboard.writeText(l).then(function(){ toast('Link kopiert. In die Eltern-Gruppe schicken.'); }, function(){ prompt('Link kopieren:', l); }); }catch(x){ prompt('Link kopieren:', l); }
   });
   $('text').addEventListener('click', function(){
