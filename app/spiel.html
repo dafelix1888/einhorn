@@ -1,5 +1,8 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
-<meta name="robots" content="noindex"><script src="fehler.js"></script><script src="weg.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Schatzweg"><title>Funkels Zauberspiegel</title><style>@font-face{font-family:"Baloo 2";src:url(schrift/baloo2.woff) format("woff");font-weight:400 800;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-regular.woff) format("woff");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-bold.woff) format("woff");font-weight:700;font-display:swap}</style><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
+<meta name="robots" content="noindex"><script>(function(){ try{ var q=new URLSearchParams(location.search).get('entwickler'); if(q==='1') localStorage.setItem('sj.entwickler','1'); if(q==='0') localStorage.removeItem('sj.entwickler'); if(localStorage.getItem('sj.entwickler')==='1') document.documentElement.classList.add('entwickler'); }catch(e){} })();</script>
+<script src="fehler.js"></script><script src="weg.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Schatzweg"><title>Funkels Zauberspiegel</title><style>@font-face{font-family:"Baloo 2";src:url(schrift/baloo2.woff) format("woff");font-weight:400 800;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-regular.woff) format("woff");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url(schrift/atkinson-bold.woff) format("woff");font-weight:700;font-display:swap}/* Entwickler-Teile (UNICORN-118): nur mit ?entwickler=1 */
+html:not(.entwickler) .nur-entwickler{display:none!important}
+</style><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
 <style>
 /* Layout: oben Fortschritt und der Knopf für Erwachsene, in der Mitte der runde Spiegel,
    darunter Titel, Sprechtext und ein großer Hauptknopf. Dunkler Nachthimmel wie auf der
@@ -916,12 +919,14 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
           <button type="button" data-r="15">15 m</button>
           <button type="button" data-r="25">25 m</button>
         </div>
+        <div class="nur-entwickler">
         <h3>Punkte als Code</h3>
         <p class="lead">Notlösung ohne Netz: Code kopieren und auf einem anderen Gerät einlesen.</p>
         <textarea id="code" spellcheck="false" aria-label="Punkte-Code"></textarea>
         <div class="row">
           <button type="button" class="btn ghost small" id="btn-copy">Code kopieren</button>
           <button type="button" class="btn ghost small" id="btn-import">Code einlesen</button>
+        </div>
         </div>
       </div>
     </details>
@@ -940,11 +945,11 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span><span class="tt"><b>Kamera</b><span id="sum-kamera"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
         <label class="schalter" for="kamera-an"><span class="st"><b>Kamera-Zauber</b><span>Aus: der Spiegel zeigt nur Funkel und die Bilder, und das Gerät fragt nie nach der Kamera.</span></span><input type="checkbox" id="kamera-an"><span class="knopf"></span></label>
-        <p class="lead">An: Unterwegs zeigt der Spiegel das Kamerabild, Funkel steht darin dort, wo das Ziel liegt. Nach jedem gelösten Farbrätsel wird der Spiegel zur Zauberlinse, im Zauberkreis hat das gedruckte Bild wieder seine echte Farbe. Kostet Akku und ist noch wenig erprobt.</p>
+        <p class="lead">An: Unterwegs zeigt der Spiegel das Kamerabild, Funkel steht darin dort, wo das Ziel liegt. Nach jedem gelösten Farbrätsel wird der Spiegel zur Zauberlinse, im Zauberkreis bekommt, was die falsche Farbe hat, seine echte Farbe zurück. Kostet Akku und ist noch wenig erprobt.</p>
       </div>
     </details>
 
-    <details class="karte" id="k-stimme">
+    <details class="karte nur-entwickler" id="k-stimme">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg></span><span class="tt"><b>Funkels Stimme</b><span id="sum-stimme"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
         <p class="lead">Am natürlichsten klingt eine echte Stimme. Nimm Funkels Sätze hier auf, dann spielt der Spiegel sie statt der Computerstimme ab.</p>
@@ -988,7 +993,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
     <details class="karte achtung" id="k-loeschen">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></span><span class="tt"><b>Alles löschen</b><span>Punkte löschen und Tour auf Anfang</span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Löscht alle sechs Punkte und setzt die Tour auf den Anfang. Aufnahmen und Vorbereitungsliste bleiben erhalten. Den Knopf drei Sekunden gedrückt halten.</p>
+        <p class="lead">Löscht alle Punkte der Tour und setzt sie auf den Anfang. Aufnahmen und Vorbereitungsliste bleiben erhalten. Den Knopf drei Sekunden gedrückt halten.</p>
         <div class="row">
           <button type="button" class="btn small hold" id="btn-reset"><span class="fill"></span><span>Alle Punkte löschen (3 Sekunden halten)</span></button>
         </div>
@@ -2352,7 +2357,7 @@ function jetzt(){                       // was der Erzähler in diesem Moment tu
     return vor+'Dreht euch, bis Funkels Horn nach oben zeigt, und lauft los. Funkel wird größer, je näher ihr kommt.';
   }
   if(st.kind==='plain') return st.task;
-  var lin = linseAn() ? 'Haltet den Spiegel vor das gedruckte Bild. Im Zauberkreis hat es wieder seine echte Farbe. ' : '';
+  var lin = linseAn() ? 'Haltet den Spiegel auf das, was die falsche Farbe hat. Im Zauberkreis bekommt es seine echte Farbe zurück. ' : '';
   if(st.kind==='recolor') return state.step===0 ? 'Die Kinder rufen, was nicht stimmt. Dann aufs Bild oder auf „Bild verzaubern“ tippen.' : lin+st.dann;
   if(st.kind==='wahl'){
     if(galerieAktiv()){ var go=st.optionen[galN], m=st.optionen.length;

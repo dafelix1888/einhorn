@@ -16,7 +16,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   const bes=await p.locator('#liste').innerText();
   ok(/Braucht die Tour/.test(bes) && /Ohne Einkauf/.test(bes) && /Extras, die es schöner machen/.test(bes), 'Gruppen wie in der Party: Braucht die Tour, Ohne Einkauf, Extras');
   const hr=await p.locator('#liste .haken:has-text("Haarreif mit Einhorn-Horn")').innerText();
-  ok(/[0-9]+×/.test(hr) && /Station 1: Funkel prüft/.test(hr) && /Packung/.test(hr) && /Sonst: Papierhörner/.test(hr), 'Haarreif: Menge, wofür, Packungen und Preis, Notlösung');
+  ok(/[0-9]+×/.test(hr) && /Station 1: Nach der Einhorn-Prüfung/.test(hr) && /Packung/.test(hr) && /Sonst: Papierhörner/.test(hr), 'Haarreif: Menge, wofür, Packungen und Preis, Notlösung');
   await p.locator('#liste [data-ek="u0"]').check({force:true}); await p.waitForTimeout(150);
   ok(/1 von [0-9]+ nötigen besorgt/.test(await p.locator('#liste-note').innerText()), 'Besorgt zählt');
   await p.click('[data-vb="packen"]'); await p.waitForTimeout(150);

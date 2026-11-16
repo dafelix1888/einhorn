@@ -73,7 +73,7 @@
   if(!party){ document.body.innerHTML='<main class="seite"><h1>Erst die Party anlegen</h1><p class="leise">Die Druckvorlagen brauchen Name, Datum und Kinderzahl.</p><a class="knopf" href="party.html?thema='+thema+'">Party anlegen</a></main>'; return; }
   var v=Party.variante(party), name=party.kind.name, alter=party.kind.alter, d=Party.datum(party);
   var datumLang=d.toLocaleDateString('de-DE',{weekday:'long', day:'numeric', month:'long'});
-  var antwortBis=new Date(d); antwortBis.setDate(antwortBis.getDate()-7);
+  var antwortBis=Party.antwortBis(party);   // null, wenn die Frist schon vorbei ist (UNICORN-96)
   $('treff').value=party.treffpunkt || (party.ort==='drinnen' || !plan || !plan.adresse || plan.adresse==='Mein Standort' ? 'bei uns zu Hause' : plan.adresse);
   $('abholen').value=party.abholen || Party.uhr(party, 150);
   $('tel').value=party.telefon || '';
@@ -85,14 +85,14 @@
     var karte='<div class="einladung"><img src="'+info.cover+'" alt=""><div><h2>'+esc(name)+' wird '+esc(alter)+'!</h2><p class="unter">Komm mit auf Funkels Regenbogen-Abenteuer, einer Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.</p>'+
       '<dl><dt>Wann</dt><dd>'+esc(datumLang)+', '+esc(party.start)+' Uhr</dd><dt>Wo</dt><dd>'+esc($('treff').value)+'</dd><dt>Abholen</dt><dd>'+esc($('abholen').value)+' Uhr</dd>'+
       (Party.gaesteHinweis(party)?'<dt>Bitte</dt><dd>'+esc(Party.gaesteHinweis(party))+'</dd>':'')+'</dl>'+
-      '<p class="klein">Bitte sagt bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.</p></div></div>';
+      '<p class="klein">'+(antwortBis?'Bitte sagt bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.':'Bitte sagt kurz Bescheid, ob ihr kommt.')+'</p></div></div>';
     return '<section class="blatt" id="einladung">'+karte+karte+'</section>';
   }
   function urkunden(){
     var h='', n=party.kinder;
     for(var i=0;i<n;i++) h+='<section class="blatt'+(i>0?' kopie':'')+'"><div class="urkunde"><img src="'+info.cover+'" alt=""><h2>URKUNDE</h2><div class="linie"></div><p>gehört ab heute zu Funkels Einhorn-Helfern und hat den Regenbogen gerettet.</p>'+
-      '<p style="font-size:13pt;color:#5A5073">Auf '+esc(/[sßxz]$/i.test(name)?name+'’':name+'s')+' '+esc(alter)+'. Geburtstag am '+d.toLocaleDateString('de-DE',{day:'numeric', month:'long', year:'numeric'})+'</p>'+
-      '<div class="unterschrift"><b>Funkel</b>Einhorn und Hüterin des Regenbogens</div></div></section>';
+      '<p style="font-size:13pt;color:#5A5073">Auf '+esc(Party.genitiv(name))+' '+esc(alter)+'. Geburtstag am '+d.toLocaleDateString('de-DE',{day:'numeric', month:'long', year:'numeric'})+'</p>'+
+      '<div class="unterschrift"><b>Funkel</b>Einhorn und Hüter des Regenbogens</div></div></section>';
     return h;
   }
 
@@ -104,7 +104,7 @@
   function textFuerChat(){
     return name+' wird '+alter+'! 🦄\n\nWir laden zu Funkels Regenbogen-Abenteuer ein, einer Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.\n\n'+
       'Wann: '+datumLang+', '+party.start+' Uhr\nWo: '+$('treff').value+'\nAbholen: '+$('abholen').value+' Uhr\n'+(Party.gaesteHinweis(party)?'Bitte mitbringen und beachten: '+Party.gaesteHinweis(party)+'\n':'')+
-      '\nGebt bitte bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' Bescheid, ob ihr kommt.';
+      '\nGebt bitte '+(antwortBis?'bis '+antwortBis.toLocaleDateString('de-DE',{day:'numeric', month:'long'})+' ':'kurz ')+'Bescheid, ob ihr kommt.';
   }
   document.addEventListener('change', function(e){
     var t=e.target;
@@ -115,7 +115,7 @@
   $('link').addEventListener('click', function(){
     if(window.Konto && !Party.einladungsLink(party, plan)){ Konto.bereit(thema); return; }   // erst geschützt speichern
     var l=Party.einladungsLink(party, plan);
-    if(navigator.share){ navigator.share({title:name+' wird '+alter+'!', text:'Einladung zu '+name+'s Einhorn-Party', url:l})['catch'](function(){}); return; }
+    if(navigator.share){ navigator.share({title:name+' wird '+alter+'!', text:'Einladung zu '+Party.genitiv(name)+' Einhorn-Party', url:l})['catch'](function(){}); return; }
     try{ navigator.clipboard.writeText(l).then(function(){ toast('Link kopiert. In die Eltern-Gruppe schicken.'); }, function(){ prompt('Link kopieren:', l); }); }catch(x){ prompt('Link kopieren:', l); }
   });
   $('text').addEventListener('click', function(){

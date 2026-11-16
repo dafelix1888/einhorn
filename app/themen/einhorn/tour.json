@@ -197,7 +197,7 @@
     "typ": "start"
    },
    "planer": {
-    "was": "Funkel stellt sich vor: Sein Regenbogen ist gemopst. Danach Einhorn-Prüfung mit Wiehern, Scharren und Hörnern.",
+    "was": "Funkel stellt sich vor: Sein Regenbogen ist gemopst. Danach die Einhorn-Prüfung. Nach der Prüfung bekommt jedes Kind sein Horn.",
     "ort": "Vor eurer Haustür, mit Platz für alle Kinder."
    }
   },
@@ -444,7 +444,7 @@
    },
    {
     "x": "{kinder} Haarreifen",
-    "wofuer": "Station 1: Funkel prüft, ob alle ein Horn tragen",
+    "wofuer": "Station 1: Nach der Einhorn-Prüfung bekommt jedes Kind sein Horn",
     "notfalls": "Papierhörner: Papier zur Tüte rollen, mit Haargummi befestigen.",
     "u": [
      "u0"

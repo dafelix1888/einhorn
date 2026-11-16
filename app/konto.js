@@ -481,7 +481,7 @@
         ((Party.eigeneGesichert(thema) || s) ? '<button class="los" type="button" data-konto="eigene">Meine eigene Party öffnen</button>' : '');
     }
     if(p){
-      var d=Party.datum(p), n=p.kind&&p.kind.name ? p.kind.name+(/[sßxz]$/i.test(p.kind.name)?'’':'s')+' Party' : 'Eure Party';
+      var d=Party.datum(p), n=p.kind&&p.kind.name ? Party.genitiv(p.kind.name)+' Party' : 'Eure Party';
       h+='<h3>Eure Party</h3><a class="mb-zeile" href="party.html?thema='+thema+'"><span><b>'+esc(n)+'</b><small>'+esc(Party.datumText(d))+', '+esc(p.start)+' Uhr</small></span><span class="pf"></span></a>';
       if(gesichert){
         h+='<a class="mb-zeile" href="party.html?thema='+thema+'#einladung"><span><b>Gäste</b><small id="mb-gaeste">'+esc(gaesteZeile(g))+'</small></span><span class="pf"></span></a>'+
@@ -550,7 +550,7 @@
   // Vor dem Teilen: ohne Server sofort weiter; mit Server erst anmelden und speichern.
   // ---------- Fremde Party auf diesem Gerät (PBIM-24) ----------
   // Über einen Tablet- oder Vorausgeher-Link geöffnet: ansehen und spielen ja, speichern und teilen nein.
-  function parteiName(p){ return p && p.kind && p.kind.name ? p.kind.name+(/[sßxz]$/i.test(p.kind.name)?'’':'s')+' Party' : 'Diese Party'; }
+  function parteiName(p){ return p && p.kind && p.kind.name ? Party.genitiv(p.kind.name)+' Party' : 'Diese Party'; }
   function fremdHinweis(thema){
     blatt(); aktuellesThema=thema; bereichOffen=false;
     var p=root.Party&&Party.lesen(thema), zurueck=(root.Party&&Party.eigeneGesichert(thema)) || angemeldet();

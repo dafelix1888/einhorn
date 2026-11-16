@@ -270,7 +270,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   function party(id){ return Party.lesen(id); }
   // Eine Reihenfolge wie auf der Landingpage (UNICORN-25): erst Route, dann Party. Mit Route oder Party direkt zur Party.
   function ziel(id){ return party(id)||plan(id) ? 'party.html?thema='+id : 'planer.html?thema='+id; }
-  function genitiv(n){ return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
+  function genitiv(n){ return Party.genitiv(n); }
   function partyName(pa){ var n=pa.kind && pa.kind.name ? pa.kind.name.charAt(0).toUpperCase()+pa.kind.name.slice(1) : ''; return n ? genitiv(n)+' Party' : 'Eure Party'; }
   function countdown(pa){ var t=Party.tageBis(pa); return t==null?'':t>1?'in '+t+' Tagen':t===1?'morgen':t===0?'heute':'vorbei'; }
   function ortText(t){ return t.orte.map(function(o){ return o==='draussen'?'draußen':'drinnen'; }).join(' & '); }
