@@ -324,7 +324,9 @@
     else text='<span class="ok">'+esc(s.hinweis||'passt')+'</span> · '+esc(s.name)+' · nach '+km(s.nachMeter)+(s.hoehe!=null?' · '+s.hoehe+' m hoch':'');
     $('st-titel').textContent='Station '+(i+1)+': '+stationTitel(i);
     var pl=t.planer||{};                 // kurz, was dort passiert und welcher Ort passt (UNICORN-64)
-    $('st-text').innerHTML=text+(pl.was?'<span class="st-was">'+esc(pl.was)+'</span>':'')+(pl.ort?'<span class="st-ort"><b>Passt gut:</b> '+esc(pl.ort)+'</span>':'');
+    $('st-text').innerHTML=text+(pl.was?'<span class="st-was">'+esc(pl.was)+'</span>':'')+(pl.ort?'<span class="st-ort"><b>Passt gut:</b> '+esc(pl.ort)+'</span>':'')+
+      // Versteck in der Karte der gewählten Station (UNICORN-86): ob ein Ort als Versteck taugt, ist der Grund zu verschieben
+      (pl.versteck?'<span class="st-versteck"><b>Versteckt:</b> '+esc(pl.versteck)+'. Liegt hier bis zu einer Stunde allein, such eine Stelle abseits vom Weg.</span>':'');
     $('station').className='station'+(ersatz(i,s)?' ersatz':'');
     marker.forEach(function(m,j){ var e=m.getElement(); if(e) e.classList.toggle('gewaehlt', j===i); m.setZIndexOffset(j===i?1000:0); });
     Array.prototype.forEach.call($('liste').querySelectorAll('button[data-i]'), function(b){ b.setAttribute('aria-current', String(+b.getAttribute('data-i')===i)); });

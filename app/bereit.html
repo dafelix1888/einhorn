@@ -47,7 +47,7 @@
 (function(){
   'use strict';
   var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
-  var tour=null, zustand={stimmen:null, offline:null, gps:null, akku:null, ton:null, sperre:null}, details={};
+  var tour=null, zustand={stimmen:null, offline:null, gps:null, akku:null, ton:null, sperre:null, stoeren:null}, details={};
   var HAKEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   var ACHTUNG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 6v8"/><path d="M12 18.5v.5"/></svg>';
   function $(id){ return document.getElementById(id); }
@@ -101,6 +101,9 @@
       zustand.gesichert ? '' : '<button type="button" class="knopf klein mittel" id="sichern">Jetzt sichern</button>');
     h+=zeile('sperre','Bildschirm bleibt an','Bildschirmsperre ausschalten. Apple: Einstellungen, Anzeige & Helligkeit, Automatische Sperre „Nie“. Android: Einstellungen, Display, Bildschirm-Timeout auf die längste Zeit.',
       zustand.sperre===true ? '' : '<button type="button" class="knopf klein mittel" id="sperre">Ist so</button>');
+    // „Nicht stören“ (UNICORN-106): Anrufe und Mitteilungen unterbrechen Funkel sonst mitten im Satz
+    h+=zeile('stoeren','Nicht stören ist an','Sonst unterbrechen Anrufe und Mitteilungen Funkel mitten im Satz. Apple: Kontrollzentrum öffnen, „Fokus“ → „Nicht stören“. Android: von oben wischen, „Bitte nicht stören“ antippen.',
+      zustand.stoeren===true ? '' : '<button type="button" class="knopf klein mittel" id="stoeren">Ist an</button>');
     $('liste').innerHTML=h;
     var offen=Object.keys(zustand).filter(function(k){ return aktiv(k) && zustand[k]!==true; }).length;
     $('los').className='knopf breit'+(offen?' still':'');
@@ -232,6 +235,7 @@
     else if(t.closest('#gps')) gps();
     else if(t.closest('#akku')){ zustand.akku=true; zeichnen(); }
     else if(t.closest('#sperre')){ zustand.sperre=true; zeichnen(); }
+    else if(t.closest('#stoeren')){ zustand.stoeren=true; zeichnen(); }
     else if(t.closest('#stand-holen')){ if(standHolen) standHolen(); location.reload(); }
     else if(t.closest('#sichern')) K.fenster(thema, {titel:'Party sichern', text:'Einmal anmelden, dann startet der Spiegel am Partytag ohne Code.', fertig:'Gesichert. Am Partytag geht es ohne Code los.', weiter:function(){ zustand.gesichert=!!K.angemeldet(); zeichnen(); }});
     else if(t.closest('#vg-link')){ var name=party.kind&&party.kind.name?party.kind.name:'Party', los=function(){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+name, 'Link kopiert. An den Vorausgeher schicken.'); };
