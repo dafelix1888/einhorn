@@ -91,9 +91,11 @@ const pfad=u=>{ const x=new URL(u); return x.pathname.replace(/^\/app\//,'')+x.s
     const kat=await q.$$eval('a', as=>as.filter(a=>a.offsetParent!==null && /^(\.\/|index\.html)(#|$)/.test(a.getAttribute('href')||'')).length);
     ok(kat===0, s+': kein sichtbarer Link in den Katalog');
   }
-  // 11) Spiel ohne Party: kein „Zur Party“; mit Party zeigt es auf die Party
+  // 11) Spiel ohne Party: unten „Party planen“ (UNICORN-71); mit Party zeigt es auf die Party
   p=await neu(); await p.goto(B+'spiel.html?thema=einhorn', {waitUntil:'domcontentloaded'}); await p.waitForTimeout(800);
-  ok(await p.locator('#erw-portal').evaluate(e=>e.hidden,null,{timeout:90000}), 'Spiel ohne Party: „Zur Party“ versteckt');
+  const ohne=await p.locator('#erw-portal').evaluate(e=>({hidden:e.hidden, href:e.getAttribute('href'), t:e.querySelector('b').textContent}),null,{timeout:90000});
+  ok(!ohne.hidden && /party\.html\?thema=einhorn/.test(ohne.href) && ohne.t==='Party planen', 'Spiel ohne Party: unten „Party planen“ ('+ohne.t+')');
+  ok(await p.locator('#btn-erw svg path').getAttribute('d')==='M4 7h16M4 12h16M4 17h16', 'Menü-Knopf: drei Striche statt Schloss');
   p=await neu({'sj.party.einhorn':PARTY}); await p.goto(B+'spiel.html?thema=einhorn', {waitUntil:'domcontentloaded'}); await p.waitForTimeout(800);
   ok(/party\.html\?thema=einhorn/.test(await p.getAttribute('#erw-portal','href',{timeout:90000})), 'Spiel mit Party: „Zur Party“ → Party');
 
