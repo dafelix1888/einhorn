@@ -38,7 +38,7 @@ let fehler=0; function ok(b, t){ console.log((b?'OK   ':'FEHLER ')+t); if(!b) fe
   // Springen über die Leiste, ohne Umweg über den Überblick
   await p.click('.punkte [data-oeffne="partytag"]'); await p.waitForSelector('#s-partytag');
   ok(await p.locator('#vg-link').isVisible() && /vorgeht/.test(await p.locator('#vg-link').innerText()), 'Partytag: Vorausgeher-Link mit Erklärung');
-  ok(await p.locator('#umschalten').isVisible() && await anzahl('.teile [data-teil]')===4 && /Vortag/.test(await p.locator('.teile').innerText()), 'Partytag: Plan B, Generalprobe am Vortag und drei Teilschritte');
+  ok(await p.locator('#umschalten').isVisible() && await anzahl('.teile [data-teil]')===3 && !/Vortag/.test(await p.locator('.teile').innerText()), 'Partytag draußen: Plan B und drei Teilschritte, keine Generalprobe am Vortag (UNICORN-76)');
   await p.click('.blaettern [data-oeffne="geraet"]'); await p.waitForSelector('#s-geraet');
   ok(await p.locator('#teilen').isVisible() && /anderen Gerät/.test(await p.locator('#teilen').innerText()), 'Blättern zum Tablet-Schritt, Tablet-Link erklärt');
   await p.goBack(); await p.waitForSelector('.held');

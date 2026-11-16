@@ -44,9 +44,17 @@
   // automatisch erkannt (erkannt; nurAuto = nur automatisch, z. B. Route geplant) oder von Hand abgehakt (p.erledigt[teil.id]).
   // Der Schritt ist fertig, wenn alle Teile fertig sind oder er als Ganzes abgehakt wurde (p.erledigt['schritt.'+id]).
   // Die Teil-IDs entsprechen den früheren Einzelschritten, damit vorhandene Haken erhalten bleiben.
+  // Generalprobe (UNICORN-76): gilt für die Route, mit der sie gelaufen ist. Ändert sich die Route im Planer, ist der Haken wieder offen.
+  function routeSchluessel(pl){ return pl && pl.stationen ? pl.stationen.map(function(s){ return s && typeof s.lat==='number' ? s.lat.toFixed(5)+','+s.lng.toFixed(5) : '-'; }).join(';') : ''; }
+  function probeStand(p, pl){
+    var e=p.erledigt||{}, gelaufen=!!(e.probelauf || e.generalprobe);   // alte Haken (Route ablaufen, Generalprobe am Vortag) zählen weiter
+    var geaendert=gelaufen && !!p.probeRoute && !!pl && p.probeRoute!==routeSchluessel(pl);
+    return {gelaufen:gelaufen && !geaendert, geaendert:geaendert};
+  }
   function aufgaben(p, tour, pl){
     var draussen=p.ort!=='drinnen', v=variante(p), route=!!(pl && pl.stationen && pl.stationen.length), t=p.thema;
-    var erledigt=p.erledigt||{};
+    var erledigt=Object.assign({}, p.erledigt||{}), probe=probeStand(p, pl);
+    if(draussen) erledigt.probelauf=probe.gelaufen;   // alter Haken „Generalprobe am Vortag“ zählt, geänderte Route nicht (UNICORN-76)
     // Namens-Sätze gibt es nur mit Server (Konto) und Vornamen
     var name=p.kind && p.kind.name ? String(p.kind.name) : '', mitNamen=!!(name && root.Konto && root.Konto.aktiv && root.Konto.aktiv());
     var ek=tour && tour.utensilien ? einkauf(p, tour) : [], allesGekauft=ek.length>0 && ek.every(function(x){ return x.fertig; });
@@ -61,10 +69,11 @@
         text:'Ein Link für alle Gast-Eltern. Sie sehen Termin, Treffpunkt und Abholzeit und sagen dort zu oder ab. Wer kommt, siehst du hier.', knopf:'Link teilen', aktion:'gast-link',
         link:einladungsLink(p, pl)||('party.html?thema='+t+'#einladung'), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
       draussen ?
-        {id:'route', tag:-7, titel:route?'Route ablaufen':'Route planen', kurz:route?'Steht schon'+(km?', '+km:'')+'. Einmal zur Probe gehen':'Der Planer findet die Orte für die Stationen',
-          text:route?'Eure Route steht'+(km?' ('+km+')':'')+'. Geh sie einmal ab und setz jede Station dort, wo du stehst: im Planer die Station antippen und „hier setzen“. So weißt du, dass das GPS an der richtigen Stelle auslöst. Nimm zum Setzen der Punkte dasselbe Gerät, das bei der Tour der Spiegel ist. Jedes Gerät misst etwas anders, so öffnen die Stationen genauer.':'Adresse eingeben, Richtung wählen: Der Planer sucht passende Orte für die Stationen. Danach einmal ablaufen.',
-          knopf:route?'Route ansehen':'Route planen', link:'planer.html?thema='+t,
-          teile:[{id:'route', titel:'Route geplant', nurAuto:true, erkannt:route}, {id:'probelauf', titel:'Einmal abgelaufen'}]} :
+        // Eine Generalprobe statt zwei Läufen (UNICORN-76): Schritt 3 ist die Probe, am Vortag bleibt draußen nichts mehr
+        {id:'route', tag:-7, titel:route?'Generalprobe':'Route planen', kurz:route?'Einmal mit dem Spiel-Gerät ablaufen'+(km?', '+km:''):'Der Planer findet die Orte für die Stationen',
+          text:route?(probe.geaendert?'Die Route hat sich seit der Generalprobe geändert. Lauf sie bitte noch einmal ab. ':'')+'Lauf die Tour einmal so ab wie am Partytag, mit dem Gerät, das der Spiegel sein wird. Der Spiegel zeigt den Abstand zur Station. Öffnet eine zu früh oder gar nicht, setzt du den Punkt mit einem Tipp neu.':'Adresse eingeben, Richtung wählen: Der Planer sucht passende Orte für die Stationen. Danach machst du einmal die Generalprobe.',
+          knopf:route?'Generalprobe starten':'Route planen', link:route?'spiel.html?thema='+t+'&probe=1':'planer.html?thema='+t,
+          teile:[{id:'route', titel:'Route geplant', nurAuto:true, erkannt:route}, {id:'probelauf', titel:'Einmal abgelaufen', ungueltig:probe.geaendert, text:probe.geaendert?'Route geändert, bitte noch einmal ablaufen':''}]} :
         {id:'route', tag:-7, titel:'Räume festlegen', kurz:'Küche, Flur, Treppe, Toberaum und Sofa',
           text:'Leg fest, welche Station in welchem Raum steht. Die Liste im Spiel hilft dabei.', knopf:'Liste öffnen', link:'spiel.html?thema='+t+'#einrichten',
           teile:[{id:'probelauf', titel:'Räume festgelegt'}]},
@@ -76,11 +85,11 @@
         text:(mitNamen?'Zuerst lernt Funkel den Namen: Er sagt „'+name+'“ an der Haustür, beim Schatz und zum Abschied. Dann ':'')+(mitNamen?'f':'F')+'ünf Minuten im WLAN: Stimmen laden, Ton'+(draussen?', GPS':'')+' und Akku prüfen.'+wetter, knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
         // „Funkel kennt …“ (UNICORN-33) steht sichtbar im Ablauf, zählt aber nicht für den Haken des Schritts (Extra, später bezahlt)
         teile:(mitNamen?[{id:'namen', titel:'Funkel kennt '+name, text:'Einmal einsprechen und anhören', extra:true}]:[]).concat([{id:'geraet', titel:'Tablet ist startklar'}])},
-      {id:'partytag', tag:0, titel:'Partytag', kurz:['Generalprobe am Vortag', draussen&&v!=='c'?'Kreidespur':'', p.vorausgeher?'Vorausgeher':'', 'Spiegel starten'].filter(Boolean).join(', '),
-        text:[draussen?'Am Tag oder Abend davor: Generalprobe. Du läufst die Tour einmal mit dem Tablet ab, so wie am Partytag, und stellst unterwegs die Punkte genau ein.':'Am Tag oder Abend davor: Generalprobe. Du spielst die Tour einmal durch und legst in jedem Raum alles bereit.', 'Am Partytag:', draussen&&v!=='c'?'Eine Stunde vorher die Kreidespur malen.':'', p.vorausgeher?'20 Minuten vorher geht der Vorausgeher los.':'', draussen?'Dann alle an die Haustür und den Zauberspiegel starten.':'Dann alle zusammenholen und den Zauberspiegel starten.'].filter(Boolean).join(' '),
+      {id:'partytag', tag:0, titel:'Partytag', kurz:[draussen?'':'Generalprobe am Vortag', draussen&&v!=='c'?'Kreidespur':'', p.vorausgeher?'Vorausgeher':'', 'Spiegel starten'].filter(Boolean).join(', '),
+        text:[draussen?'':'Am Tag oder Abend davor: Generalprobe. Du spielst die Tour einmal durch und legst in jedem Raum alles bereit.', 'Am Partytag:', draussen&&v!=='c'?'Eine Stunde vorher die Kreidespur malen.':'', p.vorausgeher?'20 Minuten vorher geht der Vorausgeher los.':'', draussen?'Dann alle an die Haustür und den Zauberspiegel starten.':'Dann alle zusammenholen und den Zauberspiegel starten.'].filter(Boolean).join(' '),
         knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
         teile:[
-          {id:'generalprobe', titel:'Generalprobe', text:draussen?'Einmal mit dem Tablet ablaufen, Punkte vor Ort einstellen':'Einmal durchspielen, Räume prüfen', vortag:true, extra:true},
+          draussen ? null : {id:'generalprobe', titel:'Generalprobe', text:'Einmal durchspielen, Räume prüfen', vortag:true, extra:true},
           draussen && v!=='c' ? {id:'kreide', minuten:-60, titel:'Kreidespur malen', text:'Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.'} : null,
           p.vorausgeher ? {id:'vorausgeher', minuten:-20, titel:'Vorausgeher startet', text:'Mit der Tasche vorgehen und die Stationen 2 bis 7 aufbauen.'} : null,
           {id:'start', minuten:0, titel:draussen?'Alle an der Haustür':'Alle zusammen', text:'Tattoos verteilen, dann den Zauberspiegel aufwecken.'}
@@ -89,10 +98,10 @@
     l.forEach(function(a){
       a.datum=plus(p, a.tag);
       a.teile.forEach(function(x){
-        x.auto=!!x.nurAuto; x.fertig=!!x.erkannt || (!x.nurAuto && !!erledigt[x.id]);
+        x.auto=!!x.nurAuto; x.fertig=!x.ungueltig && (!!x.erkannt || (!x.nurAuto && !!erledigt[x.id]));
         if(x.minuten!=null) x.uhr=uhr(p, x.minuten); else if(x.vortag) x.uhr='Vortag';
       });
-      a.fertig=!!erledigt['schritt.'+a.id] || a.teile.every(function(x){ return x.fertig || x.extra; });
+      a.fertig=!a.teile.some(function(x){ return x.ungueltig; }) && (!!erledigt['schritt.'+a.id] || a.teile.every(function(x){ return x.fertig || x.extra; }));
       a.auto=false;
     });
     return l;
@@ -109,6 +118,8 @@
     p.erledigt=p.erledigt||{};
     a.teile.forEach(function(x){ if(!x.nurAuto && !x.extra) p.erledigt[x.id]=!!an; });
     p.erledigt['schritt.'+a.id]=!!an;
+    if(an && p.erledigt.probelauf) p.probeRoute=routeSchluessel(plan(p.thema));
+    if(!an && a.id==='route' && p.ort!=='drinnen') p.erledigt.generalprobe=false;   // sonst hielte der alte Haken den Schritt fest   // Generalprobe gilt für diese Route (UNICORN-76)
     return p;
   }
 
@@ -301,5 +312,5 @@
       .map(function(x){ return {x:f(x.x), wofuer:f(x.wofuer), notfalls:f(x.notfalls), key:(v==='b'?'a':v)+'|b|'+f(x.x)}; });
     return {noetig:ek.filter(function(x){ return x.noetig; }), extras:ek.filter(function(x){ return !x.noetig; }), ohne:ohne, summen:wegeSummen(ek)};
   }
-  root.Party={besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis};
+  root.Party={besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand};
 })(this);

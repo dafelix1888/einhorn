@@ -636,8 +636,9 @@
       '<h2>Wer kommt?</h2><div id="gaeste">'+gaesteHtml()+'</div>'+
       '<p class="leise klein">Schon anders eingeladen? Dann hak den Schritt unten einfach ab.</p>';
     if(a.id==='route') return draussen ? routeKarte(p, pl)+
-      '<div class="tipp-karte"><b>Tipp: mit dem Tablet ablaufen</b><span>Nimm das Gerät, mit dem ihr spielt, am besten das Tablet. Jedes Gerät misst GPS etwas anders. Setzt du die Punkte mit dem Tablet, öffnen die Stationen am Partytag genau dort. Am einfachsten geht das mit der Generalprobe: Sie führt dich wie bei der Party von Station zu Station, und du setzt jeden Punkt mit einem Tipp.</span>'+
-        '<a class="knopf mittel leer" href="spiel.html?thema='+thema+'&probe=1">Generalprobe starten</a></div>'+
+      // Eine Generalprobe statt zwei Läufen (UNICORN-76): hier ist sie, nicht mehr am Vortag
+      ((pl && pl.stationen && pl.stationen.length) ? kachel({href:'spiel.html?thema='+thema+'&probe=1', haupt:!Party.probeStand(p, pl).gelaufen, symbol:'start', titel:'Generalprobe starten', text:'Lauf die Tour einmal ab wie am Partytag. Unterwegs zeigt der Spiegel den Abstand zur Station, und mit einem Tipp setzt du jeden Punkt dort, wo er hingehört. Am Ende siehst du, wo es gut lief.'})+
+        '<p class="leise klein probe-tablet">Nimm das Gerät, das bei der Party der Spiegel ist. Jedes Gerät misst GPS etwas anders. Spielt ihr auf einem Tablet, öffne dort euren Tablet-Link und tippe oben rechts „Erwachsene“ → „Generalprobe“.</p>' : '')+
       kachel({id:'einf-gps', symbol:'auge', titel:'So öffnen sich die Stationen', text:'Am Ziel von selbst. Die kurze Einführung zeigt, was du tust, wenn eine Station zu früh oder gar nicht öffnet.'}) :
       kachel({href:'spiel.html?thema='+thema+'#einrichten', haupt:true, symbol:'liste', titel:'Liste öffnen', text:'Zeigt, welche Station in welchen Raum kommt und was dort hingehört.'});
     if(a.id==='basteln') return bastelListe(p)+(draussen ? Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise') : '')+kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden und Einladungen.'})+
@@ -647,9 +648,9 @@
       kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
       kachel({id:'teilen', symbol:'geraet', titel:'Link fürs Tablet', text:'Die Kinder spielen auf einem anderen Gerät? Öffne den Link dort im WLAN, dann sind Route, Kinderzahl, Spielart und Erzähler schon drin.'});
     if(a.id==='partytag'){
-      // Generalprobe (UNICORN-61): am Tag oder Abend davor die Tour einmal so durchspielen wie am Partytag
-      h+=kachel({href:'spiel.html?thema='+thema+'&probe=1', haupt:!(p.erledigt||{}).generalprobe, symbol:'start', titel:'Generalprobe am Vortag', text:draussen?'Lauf die Tour einmal mit dem Tablet ab, genau wie am Partytag. Unterwegs zeigt der Spiegel den Abstand zur Station, und mit einem Tipp setzt du jeden Punkt dort, wo er hingehört. Am Ende siehst du, wo es gut lief.':'Spiel die Tour einmal durch, Raum für Raum. Du siehst, wie die Kinder geführt werden, und prüfst, ob überall alles liegt.'});
-      h+='<p class="leise klein probe-tablet">Am besten auf dem Tablet, mit dem ihr spielt: Öffne dort euren Tablet-Link und tippe oben rechts „Erwachsene“ → „Generalprobe“. Fein einstellen kannst du danach alles unter „Erwachsene“ → „Einrichten“: GPS-Abstand, Erzähler, Spielart.</p>';
+      // Generalprobe am Vortag nur noch drinnen (UNICORN-76); draußen ist sie Schritt „Generalprobe“
+      if(!draussen) h+=kachel({href:'spiel.html?thema='+thema+'&probe=1', haupt:!(p.erledigt||{}).generalprobe, symbol:'start', titel:'Generalprobe am Vortag', text:draussen?'Lauf die Tour einmal mit dem Tablet ab, genau wie am Partytag. Unterwegs zeigt der Spiegel den Abstand zur Station, und mit einem Tipp setzt du jeden Punkt dort, wo er hingehört. Am Ende siehst du, wo es gut lief.':'Spiel die Tour einmal durch, Raum für Raum. Du siehst, wie die Kinder geführt werden, und prüfst, ob überall alles liegt.'});
+      if(!draussen) h+='<p class="leise klein probe-tablet">Am besten auf dem Tablet, mit dem ihr spielt: Öffne dort euren Tablet-Link und tippe oben rechts „Erwachsene“ → „Generalprobe“. Fein einstellen kannst du danach alles unter „Erwachsene“ → „Einrichten“: GPS-Abstand, Erzähler, Spielart.</p>';
       if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.uhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das Tablet sieht seine Haken live.':'')});
       h+=kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Tablet: letzter Check, dann weckt ihr den Zauberspiegel.'});
       if(p.planB || p.ort==='drinnen' && p.warDraussen){
@@ -764,7 +765,9 @@
       var sid=b.getAttribute('data-in'), tid=b.getAttribute('data-teil'), war=schritt_(sid).fertig;
       party.erledigt=party.erledigt||{};
       var istExtra=schritt_(sid).teile.some(function(x){ return x.id===tid && x.extra; });
-      if(party.erledigt[tid]){ party.erledigt[tid]=false; if(!istExtra) party.erledigt['schritt.'+sid]=false; } else party.erledigt[tid]=true;
+      var teilFertig=schritt_(sid).teile.some(function(x){ return x.id===tid && x.fertig; });
+      if(teilFertig){ party.erledigt[tid]=false; if(tid==='probelauf') party.erledigt.generalprobe=false; if(!istExtra) party.erledigt['schritt.'+sid]=false; }
+      else { party.erledigt[tid]=true; if(tid==='probelauf') party.probeRoute=Party.routeSchluessel(Party.plan(thema)); }   // Generalprobe gilt für diese Route (UNICORN-76)
       party=Party.speichern(party);
       if(schritt_(sid).fertig && !war) feiern(sid); else { var ty=window.scrollY; uebersicht(); window.scrollTo(0,ty); var nt=$('seite').querySelector('[data-teil="'+tid+'"]'); if(nt) try{ nt.focus({preventScroll:true}); }catch(e){} }
       return;
