@@ -25,7 +25,7 @@
       bild:'<div class="einf-bild b1" aria-hidden="true"><span class="einf-leiste"><i></i><i></i><i></i></span><span class="einf-erw einf-ring">'+SCHLOSS+'Erwachsene</span><span class="einf-menue"><i>Ablauf</i><i>Einrichten</i><i>Hilfe</i></span></div>' },
     { id:'ablauf', titel:'Mit „Ablauf“ zu jedem Schritt springen', frage:'Falscher Schritt oder zu weit getippt',
       text:'Im Menü auf „Ablauf“ tippen und dann einen Schritt antippen. So lasst ihr eine Station aus, holt eine nach oder geht einen Schritt zurück.',
-      bild:'<div class="einf-bild b2" aria-hidden="true"><ol><li class="war"><b></b>Start an der Haustür</li><li class="war"><b></b>Station 1</li><li class="hier einf-ring"><b></b>Station 2<em>antippen</em></li><li><b></b>Station 3</li></ol></div>' },
+      bild:'<div class="einf-bild b2" aria-hidden="true"><ol><li class="war"><b></b>Station 1 · Haustür</li><li class="war"><b></b>Station 2</li><li class="hier einf-ring"><b></b>Station 3<em>antippen</em></li><li><b></b>Station 4</li></ol></div>' },
     { id:'ankunft', nur:'draussen', titel:'Stationen öffnen sich von selbst', frage:'Station meldet sich zu früh',
       text:'Am Ziel meldet der Spiegel „Angekommen!“. Die Aufgabe beginnt erst, wenn du „Weiter“ tippst. Kommt die Meldung ein paar Meter zu früh: in Ruhe bis zur Stelle laufen und erst dort tippen.',
       bild:'<div class="einf-bild b4" aria-hidden="true"><span class="einf-spiegel"><i></i></span><span class="einf-plakette"><b>Angekommen!</b><span class="einf-voll einf-ring">Weiter</span></span></div>' },

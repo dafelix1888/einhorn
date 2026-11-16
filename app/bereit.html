@@ -30,7 +30,7 @@
 <main class="seite">
   <div class="oben"><a class="textknopf" href="#" id="zurueck">← Zur Party</a><span class="leise" style="font-size:.9rem;margin-left:auto">auf dem Tablet öffnen</span><a class="heim-link" data-heim href="./" aria-label="Zur Übersicht"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></a></div>
   <h1>Startklar</h1>
-  <p class="leise" id="intro">Das Tablet prüft sich selbst, du bestätigst nur zwei Dinge.</p>
+  <p class="leise" id="intro">Das Tablet prüft sich selbst, du bestätigst nur ein paar Dinge.</p>
   <a class="so-spielt" id="so-spielt" href="#" hidden></a>
   <div class="checks" id="liste" style="margin-top:16px"></div>
   <section id="ablauf" hidden><h2 id="ablauf-titel">Heute</h2><div class="heute" id="heute"></div></section>
@@ -58,6 +58,10 @@
   var draussen=party ? party.ort!=='drinnen' : !(plan && plan.variante==='c');
   var gemeldet=false;
 
+  // „Party gesichert“ (UNICORN-104): am Vortag anmelden, damit an der Haustür niemand nach einem Code fragt
+  var K=window.Konto, mitKonto=!!(K && K.aktiv && K.aktiv() && !(K.linkRolle && K.linkRolle(thema)));
+  if(mitKonto) zustand.gesichert=!!K.angemeldet();
+  window.addEventListener('konto', function(e){ if(mitKonto && e.detail && e.detail.art==='angemeldet'){ zustand.gesichert=true; zeichnen(); } });
   function aktiv(k){ return k!=='gps' || draussen; }
   function zeile(id, titel, text, knopf, mehr){
     var s=zustand[id], cls=s===true?'ok':s===false?'warn':'ring';
@@ -79,7 +83,9 @@
     // bestätigt der Mensch
     h+=zeile('ton','Ton', details.klang?'Gut zu hören? Sonst lauter stellen und „Stumm“ ausschalten.':'Ton an (nicht stumm), Lautstärke hoch.',
       zustand.ton===true ? '' : details.klang ? '<button type="button" class="knopf klein mittel" id="gehoert">Gut zu hören</button>' : '<button type="button" class="knopf klein mittel" id="klang">Testklang</button>');
-    h+=zeile('sperre','Bildschirm bleibt an','Bildschirmsperre ausschalten. iPad: Einstellungen, Anzeige & Helligkeit, Automatische Sperre „Nie“. Android: Einstellungen, Display, Bildschirm-Timeout auf die längste Zeit.',
+    if(mitKonto) h+=zeile('gesichert','Party gesichert', zustand.gesichert ? 'Angemeldet. Am Partytag fragt der Spiegel nicht mehr nach einem Code.' : 'Einmal mit E-Mail und Code anmelden, am besten heute. Sonst fragt der Spiegel an der Haustür danach.',
+      zustand.gesichert ? '' : '<button type="button" class="knopf klein mittel" id="sichern">Jetzt sichern</button>');
+    h+=zeile('sperre','Bildschirm bleibt an','Bildschirmsperre ausschalten. Apple: Einstellungen, Anzeige & Helligkeit, Automatische Sperre „Nie“. Android: Einstellungen, Display, Bildschirm-Timeout auf die längste Zeit.',
       zustand.sperre===true ? '' : '<button type="button" class="knopf klein mittel" id="sperre">Ist so</button>');
     $('liste').innerHTML=h;
     var offen=Object.keys(zustand).filter(function(k){ return aktiv(k) && zustand[k]!==true; }).length;
@@ -95,7 +101,7 @@
   function ablauf(){
     if(!party || !party.datum) return;
     var t=Party.tageBis(party), v=Party.variante(party);
-    $('intro').textContent=(t===0?'Heute':t===1?'Morgen':'Am '+Party.datumText(Party.datum(party)))+' um '+party.start+' Uhr geht’s los. Das Tablet prüft sich selbst, du bestätigst nur zwei Dinge.';
+    $('intro').textContent=(t===0?'Heute':t===1?'Morgen':'Am '+Party.datumText(Party.datum(party)))+' um '+party.start+' Uhr geht’s los. Das Tablet prüft sich selbst, du bestätigst nur ein paar Dinge.';
     $('ablauf-titel').textContent=t===0?'Heute':'Am Partytag';
     // Uhrzeiten aus denselben Teilschritten wie in der Party (UNICORN-73), damit beide nie auseinanderlaufen
     var pt=Party.aufgaben(party, tour||{}, Party.plan(thema)).filter(function(a){ return a.id==='partytag'; })[0], l=[];
@@ -212,6 +218,7 @@
     else if(t.closest('#gps')) gps();
     else if(t.closest('#akku')){ zustand.akku=true; zeichnen(); }
     else if(t.closest('#sperre')){ zustand.sperre=true; zeichnen(); }
+    else if(t.closest('#sichern')) K.fenster(thema, {titel:'Party sichern', text:'Einmal anmelden, dann startet der Spiegel am Partytag ohne Code.', fertig:'Gesichert. Am Partytag geht es ohne Code los.', weiter:function(){ zustand.gesichert=!!K.angemeldet(); zeichnen(); }});
     else if(t.closest('#vg-link')){ var name=party.kind&&party.kind.name?party.kind.name:'Party', los=function(){ teilen(Party.vorausgeherLink(party, Party.plan(thema)), 'Vorausgeher: '+name, 'Link kopiert. An den Vorausgeher schicken.'); };
       if(window.Konto) Konto.bereit(thema, los); else los(); }
   });
