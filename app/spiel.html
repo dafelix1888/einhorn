@@ -2128,7 +2128,9 @@ function verzaubern(){
 var startGemeldet=false;
 function startPruefen(weiter){
   var K=window.Konto, th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
-  var los=function(){ weiter(); if(K && K.mkMelden && !startGemeldet){ startGemeldet=true; K.mkMelden('activated', {rolle:(K.linkRolle&&K.linkRolle(th))||'eltern'}); } };   // Marketer: Tour gestartet
+  // Marketer (UNICORN-79): echte Tour = activated (mit route), Generalprobe = probe_started. Die Probe setzt in Marketer sonst den Status „activated“ und zählt fürs Gate (STRAT-12).
+  var los=function(){ weiter(); if(K && K.mkMelden && !startGemeldet){ startGemeldet=true; var rolle=(K.linkRolle&&K.linkRolle(th))||'eltern';
+    if(state.probe) K.mkMelden('probe_started', {rolle:rolle}); else K.mkMelden('activated', {rolle:rolle, route:!!(indoor() || gesetzt())}); } };
   if(!K || !K.aktiv() || K.linkRolle(th) || K.angemeldet()){ los(); return; }
   var f=function(e){ if(e.detail && e.detail.art==='angemeldet'){ window.removeEventListener('konto', f); toast('Angemeldet. Jetzt „Spiegel aufwecken“ tippen.'); } };
   window.addEventListener('konto', f);
@@ -2168,6 +2170,8 @@ var heimMarke=Infinity;
 function heimAngekommen(){
   if(state.phase!=='heim' || state.step>=1) return;
   tonAn(); state.step=1; klang(KLANG_ENDE); konfetti(140, .5, .35); save(); render();
+  if(!state.probe && window.Konto && Konto.mkMelden){ var th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
+    Konto.mkMelden('completed', {rolle:(Konto.linkRolle&&Konto.linkRolle(th))||'eltern'}); }   // Marketer: Tour bis nach Hause gespielt (UNICORN-79)
 }
 function gehZu(n){                      // Sprung aus dem Ablauf-Faden zu einem beliebigen Schritt
   var t=TEXTE[n]; if(!t) return;
