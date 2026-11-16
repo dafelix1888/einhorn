@@ -64,10 +64,11 @@
 .kreis{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--f);color:var(--f);background:var(--bg);flex:0 0 auto}
 .kreis svg{width:22px;height:22px}
 .station.fertig .kreis{background:var(--f);color:#160C2B}
+.station .titel{min-width:0;flex:1}
 .station .titel b{display:block;line-height:1.2}
 .station .zeit{display:block;color:var(--leise);font-size:.85rem}
 .station .zeit.knapp{color:var(--gelb);font-weight:700}
-.station .zeit:has(+ .dauer){display:inline}.station .dauer{display:inline;color:var(--leise);font-size:.85rem}
+.station .zeile2{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.station .zeile2 .zeit{display:inline}.station .dauer{color:var(--leise);font-size:.85rem}
 .station.fertig .titel b{color:var(--leise)}
 .dran-marke{display:block;font-style:normal;font-weight:800;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--akzent)}
 .station.dran>button{background:linear-gradient(130deg,#3B2A64,#221A30);box-shadow:inset 0 0 0 1.5px rgba(167,139,250,.6);margin:5px -8px;width:calc(100% + 16px);padding:10px 14px 10px 8px}
@@ -99,6 +100,7 @@
 .teile .punkt{width:26px;height:26px}
 .teile .punkt svg{width:15px;height:15px}
 .packliste summary{cursor:pointer;padding:4px 0}.pack-gruppe{margin:10px 0 0}.pack-gruppe>b{display:block;font-size:.9rem;margin-bottom:4px}.pack-ding{display:flex;gap:10px;align-items:flex-start;padding:6px 0}.pack-ding input{width:22px;height:22px;flex:none;margin-top:1px}.pack-ding small{display:block;opacity:.7}.pack-ding em{font-style:normal;font-size:.75rem;opacity:.7}
+.wert-wahl{display:flex;flex-wrap:wrap;gap:8px}
 .teile .punkt.leer{background:transparent;border:2px dashed currentColor;opacity:.35}
 .teile .punkt.ok{background:var(--f);color:#160C2B}
 .teile .uhr{color:var(--f);font-weight:800;min-width:3.1em}
@@ -538,7 +540,7 @@
     var loeschAm=dat && window.Konto && Konto.angemeldet && Konto.angemeldet() ? new Date(dat.getTime()+30*864e5).toLocaleDateString('de-DE',{day:'numeric', month:'long'}) : '';
     if(vorbei) h+='<section class="jetzt-karte" id="nach-der-party" aria-label="Nach der Party" style="margin-bottom:14px"><div class="marke">Nach der Party</div><h2>Danke an die Gäste</h2>'+
       '<p>Schickt den Gast-Eltern ein Danke mit Funkels Urkunde für jedes Kind. Das Gruppenfoto teilt ihr direkt aus dem Spiel („Gruppenfoto mit Rahmen“).</p>'+
-      '<div class="reihe"><button type="button" class="knopf mittel" id="danke-link">Danke-Link schicken</button>'+(meinungDa()?'<button type="button" class="knopf leer mittel" data-meinung-auf="nach-party">Feedback zur App</button>':'')+'</div><p class="leise" id="rueckmeldung" style="margin:10px 0 0" hidden></p>'+(loeschAm?'<p class="leise klein" style="margin:10px 0 0">Eure Party wird am '+esc(loeschAm)+' gelöscht, 30 Tage nach der Feier.</p>':'')+'</section>';
+      '<div class="reihe"><button type="button" class="knopf mittel" id="danke-link">Danke-Link schicken</button>'+(meinungDa()?'<button type="button" class="knopf leer mittel" data-meinung-auf="nach-party">Feedback zur App</button>':'')+'</div>'+wertFrage(p)+'<p class="leise" id="rueckmeldung" style="margin:10px 0 0" hidden></p>'+(loeschAm?'<p class="leise klein" style="margin:10px 0 0">Eure Party wird am '+esc(loeschAm)+' gelöscht, 30 Tage nach der Feier.</p>':'')+'</section>';
     var satz = vorbei ? '<b>Gefeiert!</b> '+wessen+' Regenbogen ist wieder da.' : gefeiert>=0 ? '<b>'+FARBNAMEN[gefeiert%FARBNAMEN.length]+' leuchtet!</b> '+(rest ? 'Noch '+rest+(rest===1?' Bogen':' Bögen')+', dann ist '+wessen+' Regenbogen wieder da.' : wessen+' Regenbogen ist wieder da.')
       : !fertig ? '<b>'+wessen+' Regenbogen ist weg!</b> Mit jedem Schritt holst du einen Bogen zurück.'
       : rest ? '<b>'+fertig+' von '+l.length+' Bögen leuchten.</b> Noch '+rest+', dann ist '+wessen+' Regenbogen wieder da.'
@@ -556,7 +558,7 @@
       if(a.id==='einladen' && gt) z=gt;
       return '<li class="station'+(a.fertig?' fertig':'')+(a===n?' dran':'')+'" style="--f:'+FARBEN[i%FARBEN.length]+'"><button type="button" data-oeffne="'+a.id+'">'+
         '<span class="kreis">'+(a.fertig?HAKEN:symbol(a.id))+'</span>'+
-        '<span class="titel">'+(a===n?'<em class="dran-marke">Als Nächstes</em>':'')+'<b>'+esc(a.titel)+'</b><span class="zeit'+(z==='wird knapp'?' knapp':'')+'"'+(a.id==='einladen'?' id="gaeste-kurz"':'')+'>'+esc(z)+'</span>'+(a.dauer?'<span class="dauer"> · '+esc(a.dauer)+'</span>':'')+'</span>'+
+        '<span class="titel">'+(a===n?'<em class="dran-marke">Als Nächstes</em>':'')+'<b>'+esc(a.titel)+'</b><span class="zeile2"><span class="zeit'+(z==='wird knapp'?' knapp':'')+'"'+(a.id==='einladen'?' id="gaeste-kurz"':'')+'>'+esc(z)+'</span>'+(a.dauer?'<span class="dauer"> · '+esc(a.dauer)+'</span>':'')+'</span></span>'+
         '<span class="pfeil" aria-hidden="true"></span></button></li>';
     }).join('')+'</ol>'+
       '<p class="leise klein" style="margin:10px 2px 0">Die Reihenfolge ist nur ein Vorschlag. Jeder Schritt geht jederzeit.</p>'+
@@ -752,6 +754,15 @@
     return '<details class="karte packliste" id="packliste"'+(s.gepackt<s.noetig?' open':'')+'><summary><b>Packliste</b> <span class="leise" id="pack-zahl">'+s.gepackt+' von '+s.noetig+' nötigen gepackt</span></summary>'+
       '<p class="leise klein">Am Vortag packen. Dieselbe Liste steht im Spiel unter „Erwachsene“ → „Einrichten“.</p>'+g+'</details>';
   }
+  // Wert-Frage (UNICORN-115): vier Stufen zum Antippen, anonym. Stufen: Vorschlag Unicorn, Strategist entscheidet (STRAT-8).
+  var WERT=[{t:'Nichts, nur kostenlos', b:0}, {t:'Etwa 5 €', b:5}, {t:'Etwa 15 €', b:15}, {t:'25 € oder mehr', b:25}];
+  function wertFrage(p){
+    if(!(window.Konto && Konto.wertGeben && Konto.aktiv && Konto.aktiv())) return '';
+    var g=(p.erledigt||{}).wert;
+    if(g!=null) return '<p class="leise klein wert-danke" style="margin:12px 0 0">Danke! Eure Antwort: '+esc((WERT[g]||{}).t||'')+'.</p>';
+    return '<div class="wert-frage" id="wert-frage"><p style="margin:14px 0 8px"><b>Was wäre euch die Schatzsuche wert gewesen?</b> Ohne Namen, hilft uns beim Preis.</p><div class="wert-wahl">'+
+      WERT.map(function(w, i){ return '<button type="button" class="knopf klein leer" data-wert="'+i+'">'+esc(w.t)+'</button>'; }).join('')+'</div></div>';
+  }
   // Feedback zur App (UNICORN-30): nur mit Server
   function meinungDa(){ return !!(window.Konto && Konto.meinung && Konto.aktiv()); }
   // Gästeliste (UNICORN-29): Zu- und Absagen aus dem Einladungs-Link. Gemerkter Stand sofort, frischer Stand kommt nach.
@@ -880,6 +891,14 @@
     if(t.closest('#einf-zeigen')){ Einfuehrung.zeigen({ort:party.ort==='drinnen'?'drinnen':'draussen'}); return; }
     if(t.closest('#einf-gps')){ Einfuehrung.zeigen({ort:'draussen', ab:'ankunft'}); return; }
     if((b=t.closest('[data-oeffne]'))){ zeige(b.getAttribute('data-oeffne')); return; }
+    if((b=t.closest('[data-wert]'))){
+      var wi=+b.getAttribute('data-wert'); b.disabled=true;
+      Konto.wertGeben(wi, WERT[wi].b, thema).then(function(okay){
+        if(okay!==true) throw new Error('abgelehnt');
+        party.erledigt=party.erledigt||{}; party.erledigt.wert=wi; party=Party.speichern(party);
+        var e=$('wert-frage'); if(e) e.outerHTML='<p class="leise klein wert-danke" style="margin:12px 0 0">Danke! Eure Antwort: '+esc(WERT[wi].t)+'.</p>';
+      })['catch'](function(){ b.disabled=false; toast('Hat nicht geklappt. Bitte gleich noch einmal.'); });
+      return; }
     if((b=t.closest('[data-meinung-auf]'))){ if(meinungDa()) Konto.meinung({wo:b.getAttribute('data-meinung-auf'), thema:thema}); return; }
     if((b=t.closest('[data-gast-weg]'))){
       if(confirm('Eintrag entfernen?')){ b.disabled=true; Konto.gastEntfernen(thema, b.getAttribute('data-gast-weg')).then(function(){ gaesteZeigen(); toast('Entfernt.'); }, function(){ b.disabled=false; toast('Das hat nicht geklappt. Kein Netz?'); }); }
