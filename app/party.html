@@ -97,6 +97,8 @@
 .teile li>button{cursor:pointer}
 .teile .punkt{width:26px;height:26px}
 .teile .punkt svg{width:15px;height:15px}
+.packliste summary{cursor:pointer;padding:4px 0}.pack-gruppe{margin:10px 0 0}.pack-gruppe>b{display:block;font-size:.9rem;margin-bottom:4px}.pack-ding{display:flex;gap:10px;align-items:flex-start;padding:6px 0}.pack-ding input{width:22px;height:22px;flex:none;margin-top:1px}.pack-ding small{display:block;opacity:.7}.pack-ding em{font-style:normal;font-size:.75rem;opacity:.7}
+.teile .punkt.leer{background:transparent;border:2px dashed currentColor;opacity:.35}
 .teile .punkt.ok{background:var(--f);color:#160C2B}
 .teile .uhr{color:var(--f);font-weight:800;min-width:3.1em}
 .teile .t b{display:block;font-weight:700}
@@ -137,7 +139,7 @@
 .g-liste .t{flex:1;min-width:0}.g-liste .t b{display:block}.g-liste small{color:var(--leise);font-size:.84rem}
 .g-liste .nein .t b{color:var(--leise)}
 .g-liste .textknopf{min-height:40px;padding:0}
-/* Einkaufsliste */
+/* Material besorgen */
 .ding{display:grid;grid-template-columns:28px 1fr;gap:2px 12px;align-items:start;padding:12px 0;border-top:1px solid var(--linie)}
 .ding input{width:24px;height:24px;accent-color:var(--gruen);margin-top:2px}
 .ding .menge{font-weight:800;color:var(--akzent)}
@@ -292,15 +294,18 @@
       h+=(mitRoute?routeGeschafft(pl0):'')+'<h1>Für wen und wann?</h1>'+
         '<label class="feld"><span>Vorname</span><input id="name" type="text" autocomplete="off" value="'+esc(e.kind.name)+'" placeholder="z. B. Emma"></label>'+
         '<div class="zwei"><label class="feld"><span>Wird</span><input id="alter" type="number" inputmode="numeric" value="'+esc(e.kind.alter||'')+'" placeholder="5"></label>'+
-        '<label class="feld"><span>Start</span><input id="start" type="time" step="900" value="'+esc(e.start||'15:00')+'"></label></div>'+
-        '<label class="feld"><span>Datum</span><input id="datum" type="date" min="'+heute()+'" value="'+esc(e.datum||'')+'"></label>'+
-        '<p class="leise" style="font-size:.92rem">Die Jagd dauert etwa '+tour.dauer.minuten+' Minuten. Name und Alter stehen auf Einladung und Urkunden. Bis du die Party sicherst, bleibt alles auf diesem Gerät.</p>'+
+        '<label class="feld"><span>Datum</span><input id="datum" type="date" min="'+heute()+'" value="'+esc(e.datum||'')+'"></label></div>'+
+        // Gäste kommen und Tour startet getrennt (UNICORN-108); Dauer aus dem Plan (UNICORN-84)
+        '<div class="zwei"><label class="feld"><span>Gäste kommen</span><input id="start" type="time" step="300" value="'+esc(e.start||'15:00')+'"></label>'+
+        '<label class="feld"><span>Tour startet</span><input id="tourstart" type="time" step="300" value="'+esc(Party.tourUhr(Object.assign({}, e, {datum:e.datum||heute()}),0))+'"></label></div>'+
+        '<p class="leise" style="font-size:.92rem">'+dauerSatz(e, pl0)+' Name und Alter stehen auf Einladung und Urkunden. Name und Alter stehen auf Einladung und Urkunden. Bis du die Party sicherst, bleibt alles auf diesem Gerät.</p>'+
         '<p class="hinweis-loeschen"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg><span>Schatzweg löscht eure Party <b id="loesch-datum">'+loeschText(e.datum)+'</b> automatisch, mit Links, Gästeliste und Funkels Namens-Sätzen.</span></p>';
     } else if(sid()==='wo'){
       var d=e.ort==='draussen', ex=tour.extra;
       h+='<h1>Wer ist dabei, wo spielt ihr?</h1>'+
         '<div class="zaehlzeile"><b>Kinder</b><div class="zaehler"><button type="button" data-z="kinder" data-d="-1" aria-label="Weniger Kinder">–</button><b aria-live="polite">'+e.kinder+'</b><button type="button" data-z="kinder" data-d="1" aria-label="Mehr Kinder">+</button></div></div>'+
         '<div class="zaehlzeile"><b>Erwachsene</b><div class="zaehler"><button type="button" data-z="helfer" data-d="-1" aria-label="Weniger Erwachsene">–</button><b aria-live="polite">'+e.helfer+'</b><button type="button" data-z="helfer" data-d="1" aria-label="Mehr Erwachsene">+</button></div></div>'+
+        (Party.einerBeiGruppe(e) ? '<p class="leise klein erw-hinweis">Mit Vorausgeher ist anfangs nur ein Erwachsener bei den Kindern. An der Straße (Station 3) wartet ihr auf den Vorausgeher. Oder ihr nehmt einen dritten Erwachsenen mit.</p>' : '')+
         spielartWahl(e)+
         '<details class="vorein" id="vorein"'+(voreinOffen?' open':'')+'><summary><b>Schon voreingestellt <em>'+(voreinOffen?'Fertig':'Ändern')+'</em></b><span>'+esc(voreinText(e))+'. Alles später änderbar.</span></summary>'+
           (d?'<div class="schalter"><label for="planb"><b>Plan B bei Regen</b><span>Drinnen-Variante mit vorbereiten, am Partytag mit einem Tipp umschalten.</span></label><input type="checkbox" id="planb"'+(e.planB?' checked':'')+'></div>'+
@@ -347,6 +352,18 @@
       '<div><span>Am Partytag</span><b>'+(draussen?(a.vorlaufMin>60?'Eineinhalb Stunden':'Eine Stunde')+' vorher geht es los. ':'')+'Die Tour dauert ca. '+tour5+' Min.'+(heim5?' plus '+heim5+' Min. Heimweg':'')+'</b></div></div>';
   }
 
+  function plus20(s){ var a=String(s||'15:00').split(':'), m=+a[0]*60+ +a[1]+20; return ('0'+Math.floor(m/60)%24).slice(-2)+':'+('0'+m%60).slice(-2); }
+  // „Gäste kommen“ geändert: „Tour startet“ zieht mit, solange sie nicht von Hand gesetzt wurde
+  document.addEventListener('input', function(ev){
+    var t=ev.target; if(!t || !t.id) return;
+    if(t.id==='tourstart') t.dataset.hand='1';
+    if(t.id==='start'){ var ts=document.getElementById('tourstart'); if(ts && !ts.dataset.hand) ts.value=plus20(t.value); }
+  });
+  // Dauer der Tour aus dem Plan (UNICORN-84)
+  function dauerSatz(e, pl){
+    var d=Party.dauer(e, pl, tour), m5=function(m){ return Math.round(m/5)*5; };
+    return 'Die Tour dauert etwa '+m5(d.tour)+' Minuten'+(d.heim?', dazu '+m5(d.heim)+' Minuten Heimweg':'')+(d.ausPlan?' (aus eurer Route)':'')+'.';
+  }
   // „Dein Plan“ aus dem Datum statt fest „2 Wochen“ (UNICORN-87)
   function planKarte(e){
     var t=Party.tageBis(e), knapp=t!=null && t<4;
@@ -356,7 +373,7 @@
   }
   function uebernehmen(){                         // Felder des aktuellen Schritts in den Entwurf
     var e=entwurf;
-    if(sid()==='wer'){ e.kind.name=$('name').value.trim().replace(/\s+/g,' ').slice(0,30); if(e.kind.name) e.kind.name=e.kind.name.charAt(0).toUpperCase()+e.kind.name.slice(1); e.kind.alter=Math.round(+$('alter').value)||null; e.datum=$('datum').value; e.start=$('start').value||'15:00';
+    if(sid()==='wer'){ e.kind.name=$('name').value.trim().replace(/\s+/g,' ').slice(0,30); if(e.kind.name) e.kind.name=e.kind.name.charAt(0).toUpperCase()+e.kind.name.slice(1); e.kind.alter=Math.round(+$('alter').value)||null; e.datum=$('datum').value; e.start=$('start').value||'15:00'; var ts=$('tourstart').value; e.tourStart=ts && ts>=e.start && ts!==plus20(e.start) ? ts : undefined;
       if(!e.kind.name) return 'Bitte den Vornamen eingeben.'; if(!e.kind.alter) return 'Bitte das Alter eingeben.'; /* keine Altersgrenze (UNICORN-52) */ if(!e.datum) return 'Bitte ein Datum wählen.'; }
     if(sid()==='wo'){ e.vorausgeher=!!(e.vorausgeher && e.helfer>=2); }
     if(sid()==='erz'){ e.erz=Erzaehler.wahl(tour, e); Erzaehler.still(); }
@@ -429,7 +446,7 @@
     return h;
   }
 
-  // Zwei Wege (UNICORN-60): bequem alles bestellen oder sparen mit Notlösungen. Gleiche Einteilung wie „Vorbereitung“ im Elternbereich.
+  // Zwei Wege (UNICORN-60): bequem alles bestellen oder sparen mit Notlösungen. Gleiche Einteilung wie „Vorbereitung“ im Spiel.
   function wegeBox(ek){
     if(!Party.wegeSummen) return '';
     var s=Party.wegeSummen(ek), aus=party.einkaufAus||{}, offen=ek.filter(function(x){ return !x.fertig && x.lieferbar; });
@@ -500,6 +517,7 @@
     var wechsel=gezeigt!==offen; gezeigt=offen;
     $('seite').innerHTML='<div class="ansicht'+(wechsel?' neu':'')+'">'+(offen==='spiel' ? spielAnsicht(l, p) : offen==='namen' ? namenAnsicht(l, p) : nr<0 ? ueberblick(l, n, tage, p) : schrittAnsicht(l[nr], nr, l, p, pl, tage))+'</div>';
     gefeiert=-1; rueckmeldungZeigen(); feldPassen(); gaesteLaden();
+    vgStandZeigen(); vgBeobachten();
   }
   // Regenbogen: außen der erste Schritt, innen der Partytag. Erledigte Bögen leuchten, der neueste zeichnet sich ein.
   function bogen(l, alle){
@@ -571,7 +589,7 @@
     return '<nav class="leiste-oben" aria-label="So spielt ihr"><button type="button" class="textknopf" data-oeffne="" id="zum-ueberblick"><span aria-hidden="true">‹</span><span class="wort">Überblick</span></button></nav>'+
       '<section class="schritt-ansicht spiel-ansicht" id="so-spielt-ihr" style="--f:#A78BFA">'+
       '<header class="schritt-kopf"><span class="kreis gross">'+symbol('start')+'</span><div><div class="marke">Eure Tour</div><h1 tabindex="-1">So spielt ihr</h1></div></header>'+
-      '<p class="wozu">Das Wichtige zur Tour an einer Stelle. Alles lässt sich bis zum Start ändern. Feinheiten wie einzelne Aufgaben, GPS-Abstand oder die Kamera stellst du im Elternbereich ein: im Spiel oben rechts „Erwachsene“ → „Einrichten“.</p>'+
+      '<p class="wozu">Das Wichtige zur Tour an einer Stelle. Alles lässt sich bis zum Start ändern. Feinheiten wie einzelne Aufgaben, GPS-Abstand oder die Kamera stellst du im Spiel ein: oben rechts „Erwachsene“ → „Einrichten“.</p>'+
       '<h2>Wo spielt ihr?</h2>'+Spielart.karten(tour, v)+
       (draussen && tour.extra ? '<div style="margin-top:10px">'+Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise')+'</div>' : '')+
       '<div id="spiel-wechsel">'+spielWechsel+'</div>'+
@@ -631,12 +649,26 @@
     if(a.teile.length<2) return '';
     return '<ul class="teile">'+a.teile.map(function(x){
       var selbst=x.auto || x.erkannt;
+      if(x.info) return '<li class="info"><div><span class="punkt leer"></span>'+(x.uhr?'<span class="uhr">'+x.uhr+'</span>':'')+'<span class="t"><b>'+esc(x.titel)+'</b>'+(x.text?'<small>'+esc(x.text)+'</small>':'')+'</span></div></li>';   // nur Uhrzeit, nichts abzuhaken (UNICORN-108)
       var innen='<span class="punkt '+(x.fertig?'ok':'ring')+'">'+(x.fertig?HAKEN:'')+'</span>'+(x.uhr?'<span class="uhr">'+x.uhr+'</span>':'')+
         '<span class="t"><b>'+esc(x.titel)+'</b>'+(x.text?'<small>'+esc(x.text)+'</small>':'')+(selbst?'<small>'+(x.fertig?'Hat die App erkannt.':'Hakt die App selbst ab.')+'</small>':'')+'</span>';
       return selbst ? '<li><div>'+innen+'</div></li>' : '<li><button type="button" data-teil="'+x.id+'" data-in="'+a.id+'" aria-pressed="'+x.fertig+'">'+innen+'</button></li>';
     }).join('')+'</ul>';
   }
   // Kachel: großer Knopf mit Titel und ein, zwei Sätzen (für wen, wann, wie)
+  // Vorausgeher live: Wie viele Stationen stehen schon? Ohne Neuladen (UNICORN-38).
+  var vgStand=null, vgAus=null;
+  function vgStandZeigen(){
+    var e=$('vg-stand'); if(!e) return;
+    if(!vgStand || !vgStand.aktualisiert){ e.hidden=true; return; }
+    var n=Object.keys(vgStand.stationen||{}).length;
+    e.textContent='Live: '+n+(n===1?' Station steht':' Stationen stehen')+' (Stand '+new Date(vgStand.aktualisiert).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr)';
+    e.hidden=false;
+  }
+  function vgBeobachten(){
+    if(vgAus || !party || !party.vorausgeher || !window.Konto || !Konto.aufbauBeobachten) return;
+    vgAus=Konto.aufbauBeobachten(thema, function(r){ vgStand=r; vgStandZeigen(); });
+  }
   function kachel(o){
     var innen='<span class="k-symbol">'+symbol(o.symbol)+'</span><span class="k-text"><b>'+esc(o.titel)+'</b><span>'+esc(o.text)+'</span></span><span class="pfeil" aria-hidden="true"></span>', kl='kachel'+(o.haupt?' haupt':'');
     return o.href ? '<a class="'+kl+'" href="'+esc(o.href)+'">'+innen+'</a>' : '<button type="button" class="'+kl+'"'+(o.id?' id="'+o.id+'"':'')+(o.oeffne?' data-oeffne="'+o.oeffne+'"':'')+'>'+innen+'</button>';
@@ -659,7 +691,12 @@
         (offenE.length?'<h2 class="ek-gruppe">Extras, die es schöner machen <small>'+offenE.length+'</small></h2><p class="leise klein ek-satz">Schön, aber nicht nötig. Die Geschichte funktioniert auch ohne.</p>'+offenE.map(einkaufZeile).join(''):'')+
         (ek.some(function(x){ return x.fertig; }) ? '<details class="erledigt-liste"'+(fehlt?'':' open')+'><summary>Schon da oder bestellt ('+ek.filter(function(x){ return x.fertig; }).length+')</summary>'+ek.filter(function(x){ return x.fertig; }).map(einkaufZeile).join('')+'</details>' : '');
     }
-    if(a.id==='einladen') return '<div class="feld-karte"><label for="gh">Bitte mitbringen und beachten</label><textarea id="gh" rows="2" maxlength="200" placeholder="z. B. Regenhose, warme Mütze, Wechselsocken">'+esc(Party.gaesteHinweis(p))+'</textarea>'+
+    if(a.id==='einladen') return '<div class="feld-karte">'+
+        // Treffpunkt und Abholzeit direkt hier (UNICORN-94), Abholzeit aus der geplanten Dauer vorgeschlagen (UNICORN-84)
+        '<div class="zwei"><label class="feld"><span>Treffpunkt</span><input id="ein-treff" type="text" maxlength="80" value="'+esc(Party.treffpunkt(p, Party.plan(thema)))+'"></label>'+
+        '<label class="feld"><span>Abholen um</span><input id="ein-abholen" type="time" step="300" value="'+esc(Party.abholen(p, Party.plan(thema), tour))+'"></label></div>'+
+        '<p class="leise klein">Gäste kommen um '+esc(p.start)+' Uhr, die Tour startet um '+esc(Party.tourUhr(p,0))+' Uhr.'+(p.abholen?'':' Abholzeit aus eurer Route vorgeschlagen.')+'</p>'+
+        '<label for="gh">Bitte mitbringen und beachten</label><textarea id="gh" rows="2" maxlength="200" placeholder="z. B. Regenhose, warme Mütze, Wechselsocken">'+esc(Party.gaesteHinweis(p))+'</textarea>'+
         '<p class="leise klein">Steht auf der Einladung, im Link und auf dem Ausdruck.</p></div>'+
       kachel({id:'gast-link', haupt:true, symbol:'teilen', titel:'Einladungslink teilen', text:'Für die Eltern-Gruppe, zum Beispiel per WhatsApp. Jede Familie sagt dort zu oder ab.'})+
       kachel({id:'ansehen', symbol:'auge', titel:'Einladung ansehen', text:'So sehen die Gast-Eltern die Einladung.'})+
@@ -673,7 +710,7 @@
       kachel({id:'einf-gps', symbol:'auge', titel:'So öffnen sich die Stationen', text:'Am Ziel von selbst. Die kurze Einführung zeigt, was du tust, wenn eine Station zu früh oder gar nicht öffnet.'}) :
       kachel({href:'spiel.html?thema='+thema+'#einrichten', haupt:true, symbol:'liste', titel:'Liste öffnen', text:'Zeigt, welche Station in welchen Raum kommt und was dort hingehört.'});
     if(a.id==='basteln') return bastelListe(p)+(draussen ? Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise') : '')+kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden und Einladungen.'})+
-      kachel({href:'spiel.html?thema='+thema+'#einrichten', symbol:'liste', titel:'Bastelliste öffnen', text:'Was in welche Station gehört. Dort hakst du ab, was fertig ist.'});
+      kachel({href:'spiel.html?thema='+thema+'#einrichten', symbol:'liste', titel:'Packliste öffnen', text:'Was in welche Station gehört. Dort hakst du ab, was fertig ist.'});
     if(a.id==='geraet') return (window.Namen && a.teile.some(function(x){ return x.id==='namen'; }) ? kachel({oeffne:'namen', haupt:!(p.erledigt||{}).namen, symbol:'ton', titel:'Funkel kennt '+p.kind.name, text:(p.erledigt||{}).namen?'Eingesprochen. Anhören oder ändern, bevor das Tablet die Sätze holt.':'Funkel sagt den Namen an drei Stellen. Hör dir an, wann und wie.'}) : '')+
       kachel({oeffne:'spiel', symbol:'liste', titel:'So spielt ihr: '+spielKurz(p), text:'Vor dem Laden prüfen. „Startklar“ lädt die Stimme eures Erzählers mit aufs Tablet.'})+
       kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+
@@ -682,8 +719,9 @@
       // Generalprobe am Vortag nur noch drinnen (UNICORN-76); draußen ist sie Schritt „Generalprobe“
       if(!draussen) h+=kachel({href:'spiel.html?thema='+thema+'&probe=1', haupt:!(p.erledigt||{}).generalprobe, symbol:'start', titel:'Generalprobe am Vortag', text:draussen?'Lauf die Tour einmal mit dem Tablet ab, genau wie am Partytag. Unterwegs zeigt der Spiegel den Abstand zur Station, und mit einem Tipp setzt du jeden Punkt dort, wo er hingehört. Am Ende siehst du, wo es gut lief.':'Spiel die Tour einmal durch, Raum für Raum. Du siehst, wie die Kinder geführt werden, und prüfst, ob überall alles liegt.'});
       if(!draussen) h+='<p class="leise klein probe-tablet">Am besten auf dem Tablet, mit dem ihr spielt: Öffne dort euren Tablet-Link und tippe oben rechts „Erwachsene“ → „Generalprobe“. Fein einstellen kannst du danach alles unter „Erwachsene“ → „Einrichten“: GPS-Abstand, Erzähler, Spielart.</p>';
-      if(draussen && !p.vorausgeher) h+=kachel({href:'vorausgeher.html?thema='+thema+'&modus=selbst', haupt:true, symbol:'liste', titel:'Aufbau-Liste öffnen', text:'Ohne Vorausgeher baust du selbst auf, ab '+Party.uhr(p,-75)+' Uhr. Die Liste zeigt Station für Station, was wo hinkommt.'});   // UNICORN-73
-      if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.uhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das Tablet sieht seine Haken live.':'')});
+      if(draussen && !p.vorausgeher) h+=kachel({href:'vorausgeher.html?thema='+thema+'&modus=selbst', haupt:true, symbol:'liste', titel:'Aufbau-Liste öffnen', text:'Ohne Vorausgeher baust du selbst auf, ab '+Party.tourUhr(p,-75)+' Uhr. Die Liste zeigt Station für Station, was wo hinkommt.'});   // UNICORN-73
+      if(p.vorausgeher) h+=kachel({id:'vg-link', symbol:'teilen', titel:'Link für den Vorausgeher', text:'Für den Erwachsenen, der um '+Party.tourUhr(p,-20)+' Uhr vorgeht und die Stationen aufbaut. Vorher aufs Handy schicken: Der Link zeigt ihm Station für Station, wo was hinkommt.'+(live?' Das Tablet sieht seine Haken live.':'')})+'<p class="leise" id="vg-stand" role="status" hidden style="margin:6px 0 0;font-weight:700"></p>';
+      h+=packListe(p);
       h+=kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Tablet: letzter Check, dann weckt ihr den Zauberspiegel.'});
       if(p.planB || p.ort==='drinnen' && p.warDraussen){
         var drin=p.ort==='drinnen';
@@ -691,6 +729,19 @@
       }
     }
     return h;
+  }
+  // Packliste direkt in der Party (UNICORN-109): gleiche Haken wie im Spiel unter „Vorbereitung“ → „Packen“
+  function packListe(p){
+    if(!Party.packStand || !tour.vorbereitung) return '';
+    var s=Party.packStand(p, tour); if(!s.liste.gruppen.length) return '';
+    var g=s.liste.gruppen.map(function(gr){
+      var kopf=gr.art==='station' ? 'Station '+gr.s+(gr.ort?' · '+gr.ort:'')+(gr.wer?' · '+gr.wer:'') : gr.titel;
+      return '<div class="pack-gruppe"><b>'+esc(kopf)+'</b>'+gr.items.map(function(x){
+        return '<label class="pack-ding'+(x.extra?' extra':'')+'"><input type="checkbox" data-pack="'+esc(x.key)+'"'+(s.haken[x.key]?' checked':'')+'><span>'+esc(x.x)+(x.extra?' <em>Extra</em>':'')+(x.notfalls?'<small>Sonst: '+esc(x.notfalls)+'</small>':'')+'</span></label>';
+      }).join('')+'</div>';
+    }).join('');
+    return '<details class="karte packliste" id="packliste"'+(s.gepackt<s.noetig?' open':'')+'><summary><b>Packliste</b> <span class="leise" id="pack-zahl">'+s.gepackt+' von '+s.noetig+' nötigen gepackt</span></summary>'+
+      '<p class="leise klein">Am Vortag packen. Dieselbe Liste steht im Spiel unter „Erwachsene“ → „Einrichten“.</p>'+g+'</details>';
   }
   // Feedback zur App (UNICORN-30): nur mit Server
   function meinungDa(){ return !!(window.Konto && Konto.meinung && Konto.aktiv()); }
@@ -871,6 +922,12 @@
   window.addEventListener('pageshow', function(ev){ if(ev.persisted && party && !entwurf){ party=Party.lesen(thema)||party; if(party.fremd) fremdAnsicht(); else uebersicht(); } });
   document.addEventListener('change', function(ev){
     var t=ev.target;
+    if(!entwurf && t.hasAttribute && t.hasAttribute('data-pack')){
+      Party.packSetzen(tour, t.getAttribute('data-pack'), t.checked);
+      var ty=window.scrollY; uebersicht(); window.scrollTo(0,ty); var pk=$('seite').querySelector('[data-pack="'+t.getAttribute('data-pack')+'"]'); if(pk) try{ pk.focus({preventScroll:true}); }catch(e){} return; }
+    if(!entwurf && (t.id==='ein-treff' || t.id==='ein-abholen')){
+      if(t.id==='ein-treff') party.treffpunkt=t.value.trim().slice(0,80)||undefined; else party.abholen=t.value||undefined;
+      party=Party.speichern(party); toast(t.id==='ein-treff'?'Treffpunkt gespeichert.':'Abholzeit gespeichert.'); return; }
     if(!entwurf && t.id==='gh'){ party.gaesteHinweis=t.value.trim().slice(0,200); party=Party.speichern(party); toast('Hinweis für die Einladung gespeichert.'); return; }
     if(entwurf){
       if(t.id==='planb') entwurf.planB=t.checked;

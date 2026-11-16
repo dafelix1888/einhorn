@@ -37,6 +37,25 @@
   function datum(p){ return p && p.datum ? new Date(p.datum+'T'+(p.start||'15:00')+':00') : null; }
   function tageBis(p){ var d=datum(p); if(!d) return null; var heute=new Date(); heute.setHours(0,0,0,0); var t=new Date(d); t.setHours(0,0,0,0); return Math.round((t-heute)/TAG); }
   function uhr(p, minuten){ var d=datum(p); d=new Date(d.getTime()+minuten*60000); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
+  // Gäste kommen (p.start) und Tour startet (p.tourStart) sind zwei Zeiten (UNICORN-108). Alle Rückwärts-Zeiten hängen am Tourstart.
+  function tourVersatz(p){
+    if(p && /^\d\d:\d\d$/.test(p.tourStart||'') && /^\d\d:\d\d$/.test(p.start||'15:00')){
+      var a=(p.start||'15:00').split(':'), b=p.tourStart.split(':'), m=(+b[0]*60+ +b[1])-(+a[0]*60+ +a[1]); if(m>=0 && m<=240) return m;
+    }
+    return 20;
+  }
+  function tourUhr(p, minuten){ return uhr(p, tourVersatz(p)+(minuten||0)); }
+  // Dauer aus dem Plan (UNICORN-84): Stationen plus Gehzeit, Heimweg extra. Ohne Plan der Wert aus tour.json.
+  function dauer(p, pl, tour){
+    var d=(tour && tour.dauer)||{}, v=d.meterProMinute||35, st=d.stationenMinuten!=null?d.stationenMinuten:35;
+    var t=pl && pl.strecke ? st+Math.round(pl.strecke/v) : (d.minuten||50), h=pl && pl.heimweg ? Math.round(pl.heimweg/v) : (p && p.ort==='drinnen' ? 0 : 10);
+    return {tour:t, heim:p && p.ort==='drinnen' ? 0 : h, ausPlan:!!(pl && pl.strecke)};
+  }
+  // Abholzeit-Vorschlag: Tourstart + Tour + Heimweg + 45 Min. für Schatz, Kuchen und Urkunden, auf Viertelstunden aufgerundet
+  function abholVorschlag(p, pl, tour){
+    var d=dauer(p, pl, tour), m=tourVersatz(p)+d.tour+d.heim+45; m=Math.ceil(m/15)*15; return uhr(p, Math.max(90, m));
+  }
+  function abholen(p, pl, tour){ return p.abholen || abholVorschlag(p, pl, tour); }
   function plus(p, tage){ var d=datum(p); d.setDate(d.getDate()+tage); return d; }
   function datumText(d){ return d.toLocaleDateString('de-DE',{weekday:'short', day:'numeric', month:'long'}); }
 
@@ -53,7 +72,7 @@
   }
   function aufgaben(p, tour, pl){
     var draussen=p.ort!=='drinnen', v=variante(p), route=!!(pl && pl.stationen && pl.stationen.length), t=p.thema;
-    var erledigt=Object.assign({}, p.erledigt||{}), probe=probeStand(p, pl), selbstAufbau=draussen && !p.vorausgeher;
+    var erledigt=Object.assign({}, p.erledigt||{}), probe=probeStand(p, pl), selbstAufbau=draussen && !p.vorausgeher, vs=tourVersatz(p), tourDauer=dauer(p, pl, tour), pack=tour && tour.vorbereitung ? packStand(p, tour) : null;
     if(draussen) erledigt.probelauf=probe.gelaufen;   // alter Haken „Generalprobe am Vortag“ zählt, geänderte Route nicht (UNICORN-76)
     // Namens-Sätze gibt es nur mit Server (Konto) und Vornamen
     var name=p.kind && p.kind.name ? String(p.kind.name) : '', mitNamen=!!(name && root.Konto && root.Konto.aktiv && root.Konto.aktiv());
@@ -63,14 +82,14 @@
     var l=[
       // Reihenfolge (UNICORN-27): zuerst, was Lieferzeit braucht; die Einladung geht, wann man mag. Nichts ist gesperrt.
       {id:'bestellen', tag:-14, titel:'Material besorgen', kurz:'Bestellen oder von zu Hause nehmen',   // UNICORN-72: drängt nicht zum Kauf
-        text:'Zwei Wege: Alles bestellen ist am bequemsten, die Mengen passen schon zu '+p.kinder+' Kindern. Oder nur das Nötige kaufen und den Rest weglassen oder mit Dingen von zu Hause lösen. Dann kostet es wenig oder gar nichts.', knopf:'Zur Einkaufsliste', link:'#einkauf',
+        text:'Zwei Wege: Alles bestellen ist am bequemsten, die Mengen passen schon zu '+p.kinder+' Kindern. Oder nur das Nötige kaufen und den Rest weglassen oder mit Dingen von zu Hause lösen. Dann kostet es wenig oder gar nichts.', knopf:'Zum Material', link:'#einkauf',
         teile:[{id:'bestellen', titel:'Alles da oder bestellt', erkannt:allesGekauft}]},
       {id:'einladen', tag:-14, titel:'Gäste einladen', kurz:'Ein Link für alle Eltern, du siehst, wer kommt',
         text:'Ein Link für alle Gast-Eltern. Sie sehen Termin, Treffpunkt und Abholzeit und sagen dort zu oder ab. Wer kommt, siehst du hier.', knopf:'Link teilen', aktion:'gast-link',
         link:einladungsLink(p, pl)||('party.html?thema='+t+'#einladung'), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
       draussen ?
         // Eine Generalprobe statt zwei Läufen (UNICORN-76): Schritt 3 ist die Probe, am Vortag bleibt draußen nichts mehr
-        {id:'route', tag:-7, titel:route?'Generalprobe':'Route planen', kurz:route?'Einmal mit dem Spiel-Gerät ablaufen'+(km?', '+km:''):'Der Planer findet die Orte für die Stationen',
+        {id:'route', tag:-7, titel:route?'Generalprobe':'Route planen', kurz:route?'Einmal mit dem Tablet ablaufen'+(km?', '+km:''):'Der Planer findet die Orte für die Stationen',
           text:route?(probe.geaendert?'Die Route hat sich seit der Generalprobe geändert. Lauf sie bitte noch einmal ab. ':'')+'Lauf die Tour einmal so ab wie am Partytag, mit dem Gerät, das der Spiegel sein wird. Der Spiegel zeigt den Abstand zur Station. Öffnet eine zu früh oder gar nicht, setzt du den Punkt mit einem Tipp neu.':'Adresse eingeben, Richtung wählen: Der Planer sucht passende Orte für die Stationen. Danach machst du einmal die Generalprobe.',
           knopf:route?'Generalprobe starten':'Route planen', link:route?'spiel.html?thema='+t+'&probe=1':'planer.html?thema='+t,
           teile:[{id:'route', titel:'Route geplant', nurAuto:true, erkannt:route}, {id:'probelauf', titel:'Einmal abgelaufen', ungueltig:probe.geaendert, text:probe.geaendert?'Route geändert, bitte noch einmal ablaufen':''}]} :
@@ -79,23 +98,26 @@
           teile:[{id:'probelauf', titel:'Räume festgelegt'}]},
       {id:'basteln', tag:-7, titel:'Basteln und drucken', kurz:bastelKurz(p, tour),
         text:bastelText(p, tour),
-        knopf:'Druckvorlagen öffnen', link:'druck.html?thema='+t, neben:{text:'Bastelliste im Spiel', link:'spiel.html?thema='+t+'#einrichten'},
+        knopf:'Druckvorlagen öffnen', link:'druck.html?thema='+t, neben:{text:'Packliste im Spiel', link:'spiel.html?thema='+t+'#einrichten'},
         teile:[{id:'basteln', titel:'Gebastelt'}, {id:'drucken', titel:'Gedruckt'}]},
       {id:'geraet', tag:-1, titel:'Tablet startklar machen', kurz:(mitNamen?'Funkel lernt den Namen, ':'')+'Stimmen laden, Ton'+(draussen?' und GPS':'')+' prüfen',
         text:(mitNamen?'Zuerst lernt Funkel den Namen: Er sagt „'+name+'“ an der Haustür, beim Schatz und zum Abschied. Dann ':'')+(mitNamen?'f':'F')+'ünf Minuten im WLAN: Stimmen laden, Ton'+(draussen?', GPS':'')+' und Akku prüfen.'+wetter, knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
         // „Funkel kennt …“ (UNICORN-33) steht sichtbar im Ablauf, zählt aber nicht für den Haken des Schritts (Extra, später bezahlt)
         teile:(mitNamen?[{id:'namen', titel:'Funkel kennt '+name, text:'Einmal einsprechen und anhören', extra:true}]:[]).concat([{id:'geraet', titel:'Tablet ist startklar'}])},
       {id:'partytag', tag:0, titel:'Partytag', kurz:[draussen?'':'Generalprobe am Vortag', draussen&&v!=='c'?'Kreidespur':'', p.vorausgeher?'Vorausgeher':'', 'Spiegel starten'].filter(Boolean).join(', '),
-        text:[draussen?'':'Am Tag oder Abend davor: Generalprobe. Du spielst die Tour einmal durch und legst in jedem Raum alles bereit.', 'Am Partytag:', draussen&&v!=='c'?(selbstAufbau?'Eineinhalb Stunden vorher die Kreidespur malen, danach die Stationen aufbauen.':'Eine Stunde vorher die Kreidespur malen.'):'', p.vorausgeher?'20 Minuten vorher geht der Vorausgeher los.':'', draussen?'Dann alle an die Haustür und den Zauberspiegel starten.':'Dann alle zusammenholen und den Zauberspiegel starten.'].filter(Boolean).join(' '),
+        text:[draussen?'':'Am Tag oder Abend davor: Generalprobe. Du spielst die Tour einmal durch und legst in jedem Raum alles bereit.', 'Am Partytag:', draussen&&v!=='c'?(selbstAufbau?'Eineinhalb Stunden vor dem Tourstart die Kreidespur malen, danach die Stationen aufbauen.':'Eine Stunde vor dem Tourstart die Kreidespur malen.'):'', p.vorausgeher?'20 Minuten vor dem Tourstart geht der Vorausgeher los.':'', 'Um '+tourUhr(p,0)+' Uhr startet die Tour: '+(draussen?'alle an die Haustür und den Zauberspiegel aufwecken.':'alle zusammenholen und den Zauberspiegel aufwecken.')].filter(Boolean).join(' '),
         knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
         teile:[
           draussen ? null : {id:'generalprobe', titel:'Generalprobe', text:'Einmal durchspielen, Räume prüfen', vortag:true, extra:true},
-          draussen && v!=='c' ? {id:'kreide', minuten:selbstAufbau?-90:-60, titel:'Kreidespur malen', text:'Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.'} : null,
-          p.vorausgeher ? {id:'vorausgeher', minuten:-20, titel:'Vorausgeher startet', text:'Mit der Tasche vorgehen und die Stationen 2 bis 7 aufbauen.'} : null,
+          pack && pack.noetig ? {id:'packen', titel:'Taschen packen', text:'Nach der Packliste unten, Station für Station. '+pack.gepackt+' von '+pack.noetig+' nötigen gepackt.', vortag:true, erkannt:pack.gepackt>=pack.noetig} : null,
+          {id:'gaeste', minuten:0, titel:'Gäste kommen', text:'Ankommen, Geschenke, kurz spielen.', extra:true, info:true},
+          draussen && v!=='c' ? {id:'kreide', minuten:vs+(selbstAufbau?-90:-60), titel:'Kreidespur malen', text:'Von der Haustür bis Station 2: Hufe, dann kleine Pfoten.'} : null,
+          p.vorausgeher ? {id:'vorausgeher', minuten:vs-20, titel:'Vorausgeher startet', text:'Mit der Tasche vorgehen und die Stationen 2 bis 7 aufbauen.'} : null,
           // Ohne Vorausgeher baust du selbst auf (UNICORN-73): eigener Teilschritt mit Uhrzeit, gleiche Aufbau-Liste wie der Vorausgeher
-          selbstAufbau ? {id:'aufbau', minuten:-75, titel:'Stationen aufbauen', text:'Mit der Tasche die Stationen 2 bis 7 aufbauen. Die Schatzkiste bleibt bei dir.', link:'vorausgeher.html?thema='+t+'&modus=selbst'} : null,
-          {id:'start', minuten:0, titel:draussen?'Alle an der Haustür':'Alle zusammen', text:'Tattoos verteilen, dann den Zauberspiegel aufwecken.'}
-        ].filter(Boolean)}
+          selbstAufbau ? {id:'aufbau', minuten:vs-75, titel:'Stationen aufbauen', text:'Mit der Tasche die Stationen 2 bis 7 aufbauen. Die Schatzkiste bleibt bei dir.', link:'vorausgeher.html?thema='+t+'&modus=selbst'} : null,
+          {id:'urkunden', minuten:Math.round((vs+tourDauer.tour+tourDauer.heim)/5)*5, titel:'Schatz und Urkunden', text:'Zu Hause: Schatz verteilen, jedes Kind bekommt seine Urkunde.', extra:true, info:true},
+          {id:'start', minuten:vs, titel:'Tour startet: '+(draussen?'alle an der Haustür':'alle zusammen'), text:'Tattoos verteilen, dann den Zauberspiegel aufwecken.'}
+        ].filter(Boolean).sort(function(a, b){ return (a.minuten==null?-1e4:a.minuten)-(b.minuten==null?-1e4:b.minuten); })}
     ];
     l.forEach(function(a){
       a.datum=plus(p, a.tag);
@@ -133,7 +155,7 @@
     for(var i=0;i<liste.length;i++){ var a=liste[i]; if(a && a.verfuegbar!==false && (a.asin||a.link)) return a; }
     return null;
   }
-  // Nötig oder Extra (UNICORN-60): dieselbe Einteilung wie „Vorbereitung“ im Elternbereich des Spiels.
+  // Nötig oder Extra (UNICORN-60): dieselbe Einteilung wie „Vorbereitung“ im Spiel (Erwachsene → Einrichten).
   // Ein Artikel ist nötig, wenn ein Eintrag aus vorbereitung.noetig (für diese Spielart) ihn nennt; dessen „Sonst“ ist die Notlösung.
   function rolle(p, tour, id){
     var vb=tour.vorbereitung||{}, v=variante(p), r={noetig:false, notfalls:'', genannt:false};
@@ -221,7 +243,7 @@
   function code(o){ var b=new TextEncoder().encode(JSON.stringify(o)), s=''; for(var i=0;i<b.length;i++) s+=String.fromCharCode(b[i]); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
   function decode(c){ var b=c.replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4) b+='='; var bin=atob(b), a=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return JSON.parse(new TextDecoder().decode(a)); }
   function basisUrl(){ return location.href.replace(/[?#].*$/,'').replace(/[^/]*$/,''); }
-  function partyKern(p){ return {thema:p.thema, kind:p.kind, datum:p.datum, start:p.start, kinder:p.kinder, helfer:p.helfer, vorausgeher:p.vorausgeher, ort:p.ort, planB:p.planB, ausdrucke:p.ausdrucke, erz:p.erz, treffpunkt:p.treffpunkt, abholen:p.abholen, gaesteHinweis:p.gaesteHinweis}; }
+  function partyKern(p){ return {thema:p.thema, kind:p.kind, datum:p.datum, start:p.start, tourStart:p.tourStart, kinder:p.kinder, helfer:p.helfer, vorausgeher:p.vorausgeher, ort:p.ort, planB:p.planB, ausdrucke:p.ausdrucke, erz:p.erz, treffpunkt:p.treffpunkt, abholen:p.abholen, gaesteHinweis:p.gaesteHinweis}; }
   // Hinweis für Gast-Eltern (Mitbringen, bitte beachten); ohne eigenen Text draußen ein Vorschlag
   function gaesteHinweis(p){ if(typeof p.gaesteHinweis==='string') return p.gaesteHinweis.trim(); return p.ort==='drinnen' ? '' : p.planB ? 'Feste Schuhe und Kleidung für draußen. Bei Regen feiern wir drinnen.' : 'Feste Schuhe und Kleidung für draußen, bei Regen Regenjacke und Matschhose.'; }   // mit Plan B (UNICORN-95)
   function planKern(pl, p){ pl=pl||{}; return {format:1, thema:p.thema, stand:pl.stand, variante:pl.variante||variante(p), kinder:pl.kinder||p.kinder, erz:p.erz||pl.erz, erzStand:pl.erzStand, adresse:pl.adresse,
@@ -230,10 +252,14 @@
   function vorausgeherLink(p, pl){ var k=schluessel(p,'vorausgeher'); if(k!==undefined) return k ? basisUrl()+'vorausgeher.html?thema='+p.thema+'&k='+k : null; return basisUrl()+'vorausgeher.html?thema='+p.thema+'&plan='+code(planKern(pl,p)); }
   // Antwortfrist (UNICORN-96): 7 Tage vor der Party; ist sie vorbei, nennen Link, Ausdruck und Text keine Frist
   function antwortBis(p, jetzt){ var d=datum(p); d.setDate(d.getDate()-7); d.setHours(23,59,59,0); return d>=(jetzt||new Date()) ? d : null; }
+  // Nur ein Erwachsener bei der Gruppe, solange der Vorausgeher unterwegs ist (UNICORN-89)
+  function einerBeiGruppe(p){ return !!(p && p.ort!=='drinnen' && p.vorausgeher && (p.helfer||2)<=2); }
+  function vorOrt(p, st, basis){ return st && st.vorOrtEiner && einerBeiGruppe(p) && (!basis || st.vorOrt===basis.vorOrt) ? st.vorOrtEiner : (st && st.vorOrt); }
+  function treffpunkt(p, pl){ return p.treffpunkt || (p.ort==='drinnen' || !pl || !pl.adresse || pl.adresse==='Mein Standort' ? 'bei uns zu Hause' : pl.adresse); }
   function einladungsDaten(p, pl){
     var bis=datum(p); bis.setDate(bis.getDate()-7);
-    var treff=p.treffpunkt || (p.ort==='drinnen' || !pl || !pl.adresse || pl.adresse==='Mein Standort' ? 'bei uns zu Hause' : pl.adresse);
-    return {t:p.thema, n:p.kind&&p.kind.name, a:p.kind&&p.kind.alter, d:p.datum, s:p.start, w:treff, b:p.abholen||uhr(p,150), o:p.ort, r:bis.toISOString().slice(0,10), tel:p.telefon||'', h:gaesteHinweis(p)};
+    var treff=treffpunkt(p, pl);
+    return {t:p.thema, n:p.kind&&p.kind.name, a:p.kind&&p.kind.alter, d:p.datum, s:p.start, w:treff, b:abholen(p, pl), o:p.ort, r:bis.toISOString().slice(0,10), tel:p.telefon||'', h:gaesteHinweis(p)};
   }
   function einladungsLink(p, pl){ var k=schluessel(p,'gast'); if(k!==undefined) return k ? basisUrl()+'einladung.html?k='+k : null; return basisUrl()+'einladung.html?e='+code(einladungsDaten(p, pl)); }
   // Nach der Party: Danke-Seite für die Gast-Eltern (Urkunde, Rückmeldung), gleicher Schlüssel wie die Einladung
@@ -288,6 +314,10 @@
 
   // Vorbereitung nach Station (UNICORN-67): eine Liste je Spielart, jedes Ding zeigt auf noetig/extras (Notlösung, Einkauf).
   // Haken-Schlüssel: Spielart (Extra „Hinweise am Weg“ teilt die Haken mit Draußen) + Text, wie bisher.
+  // Packliste in der Party (UNICORN-109): dieselben Haken wie im Spiel (localStorage „<speicher>.liste“, gleiches Gerät)
+  function packHaken(tour){ try{ return JSON.parse(root.localStorage.getItem(((tour&&tour.speicher)||'sj.einhorn')+'.liste')||'{}')||{}; }catch(e){ return {}; } }
+  function packSetzen(tour, key, an){ var h=packHaken(tour); h[key]=!!an; try{ root.localStorage.setItem(((tour&&tour.speicher)||'sj.einhorn')+'.liste', JSON.stringify(h)); }catch(e){} }
+  function packStand(p, tour){ var l=vorbereitungsListe(tour, variante(p), p.kinder), h=packHaken(tour); var n=l.schluessel.filter(function(k){ return h[k]; }).length; return {liste:l, haken:h, gepackt:n, noetig:l.schluessel.length}; }
   function vorbereitungsListe(tour, v, kinder){
     var vb=(tour&&tour.vorbereitung)||{}, l=(vb.liste||{})[v]||(vb.liste||{}).a; if(!l) return {gruppen:[], noetig:0, extras:0, schluessel:[]};
     var hv=v==='b'?'a':v, n={}, e={};
@@ -304,7 +334,7 @@
     if(l.mit&&l.mit.length) r.gruppen.push({art:'mit', titel:'Mitnehmen', items:dinge(l.mit)});
     return r;
   }
-  // Besorgen (UNICORN-69): dieselbe Einkaufsliste wie in der Party (Artikel, Packungen, Preise, „erledigt“),
+  // Besorgen (UNICORN-69): dasselbe Material wie in der Party (Artikel, Packungen, Preise, „erledigt“),
   // dazu je Artikel „wofür“ und die nötigen Dinge ohne Einkauf. Eine Quelle für Party und Spiel.
   function wofuerVon(tour, v, id){
     var vb=tour.vorbereitung||{}, w='';
@@ -329,5 +359,5 @@
   }
   // „Jonas’“, „Max’“, „Emmas“ (UNICORN-117): überall dieselbe Regel
   function genitiv(n){ n=String(n||''); return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
-  root.Party={genitiv:genitiv, antwortBis:antwortBis, besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand, aufwand:aufwand};
+  root.Party={packHaken:packHaken, packSetzen:packSetzen, packStand:packStand, einerBeiGruppe:einerBeiGruppe, vorOrt:vorOrt, treffpunkt:treffpunkt, tourVersatz:tourVersatz, tourUhr:tourUhr, dauer:dauer, abholVorschlag:abholVorschlag, abholen:abholen, genitiv:genitiv, antwortBis:antwortBis, besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand, aufwand:aufwand};
 })(this);

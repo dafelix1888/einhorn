@@ -195,6 +195,15 @@
 
   // ---------- Vorausgeher live: Haken „Station steht“ ----------
   // Schreiben nur mit Vorausgeher-Link; lesen mit Vorausgeher- oder Tablet-Link, Eltern über ihren eigenen Tablet-Schlüssel.
+  // Hat dieses Gerät den neuesten Stand der Party? (UNICORN-105) Vergleicht den Link-Inhalt auf dem Server mit dem Gerät.
+  function linkStand(thema){
+    var l=lies('sj.link.'+thema); if(!aktiv() || !l || !l.k || l.rolle!=='spiel' || !root.Party) return Promise.resolve(null);
+    return linkLesen(l.k).then(function(r){
+      if(!r || !r.daten) return {weg:true};
+      var hier=JSON.stringify(Party.planKern(Party.plan(thema), Party.lesen(thema)||{thema:thema})), dort=JSON.stringify(Party.planKern(Object.assign({}, r.daten, {party:undefined}), r.daten.party||{thema:thema}));
+      return {aktuell:hier===dort, holen:function(){ Party.ausLinkUebernehmen(thema, r.daten, l.k); }};
+    });
+  }
   function linkRolle(thema){ var l=lies('sj.link.'+thema); return aktiv() && l && l.k ? l.rolle : null; }
   function aufbauSchluessel(thema){
     var l=lies('sj.link.'+thema); if(l && l.k) return l.k;
@@ -219,15 +228,27 @@
     var t=aufbauSchluessel(thema); if(!aktiv() || !t) return Promise.resolve(null);
     return anfrage('/rest/v1/rpc/aufbau_lesen', {method:'POST', body:{t:t}});
   }
-  // Alle ms Millisekunden nachsehen, solange die Seite sichtbar ist. cb bekommt {stationen, aktualisiert}.
+  // Nachsehen, solange die Seite sichtbar ist. cb bekommt {stationen, aktualisiert}.
+  // Am Partytag und solange der Vorausgeher gerade unterwegs ist alle 5 s, sonst höchstens alle 10 s (UNICORN-38).
+  // Beim Zurückkehren auf die Seite und sobald wieder Netz da ist: sofort.
+  var AUFBAU_SCHNELL=5000, AUFBAU_RUHIG=10000, AUFBAU_FRISCH=3*3600000;
+  function aufbauTakt(thema, ms, letzter){
+    var p=root.Party && Party.lesen(thema), tage=p && Party.tageBis ? Party.tageBis(p) : null;
+    var frisch=letzter && letzter.aktualisiert && Math.abs(Date.now()-new Date(letzter.aktualisiert).getTime())<AUFBAU_FRISCH;
+    return tage===0 || frisch ? AUFBAU_SCHNELL : Math.min(ms||AUFBAU_RUHIG, AUFBAU_RUHIG);
+  }
   function aufbauBeobachten(thema, cb, ms){
-    if(!aktiv() || !aufbauSchluessel(thema)) return function(){};
-    var uhr=null, aus=false;
-    function holen(){ if(aus) return; if(document.visibilityState==='hidden'){ uhr=setTimeout(holen, ms); return; }
-      aufbauLesen(thema).then(function(r){ if(r) cb(r); }, function(){}).then(function(){ if(!aus) uhr=setTimeout(holen, ms); }); }
-    document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible' && !aus){ clearTimeout(uhr); holen(); } });
+    if(!aktiv() || !aufbauSchluessel(thema)) return null;      // noch nicht gespeichert: später noch einmal versuchen
+    var uhr=null, aus=false, laeuft=false, letzter=null;
+    function weiter(){ if(!aus){ clearTimeout(uhr); uhr=setTimeout(holen, aufbauTakt(thema, ms, letzter)); } }
+    function holen(){ if(aus || laeuft) return; if(document.visibilityState==='hidden'){ weiter(); return; }
+      laeuft=true;
+      aufbauLesen(thema).then(function(r){ if(r){ letzter=r; if(!aus) cb(r); } }, function(){}).then(function(){ laeuft=false; weiter(); }); }
+    function sofort(){ if(aus || document.visibilityState==='hidden') return; clearTimeout(uhr); holen(); }
+    document.addEventListener('visibilitychange', sofort);
+    root.addEventListener('pageshow', sofort); root.addEventListener('online', sofort);
     holen();
-    return function(){ aus=true; clearTimeout(uhr); };
+    return function(){ aus=true; clearTimeout(uhr); document.removeEventListener('visibilitychange', sofort); root.removeEventListener('pageshow', sofort); root.removeEventListener('online', sofort); };
   }
 
   // ---------- Funkel kennt das Kind: Namens-Sätze (Edge Function „namen“) ----------
@@ -613,6 +634,6 @@
     feedbackGeben:feedbackGeben, feedbackLesen:feedbackLesen, bereich:bereich, meinung:meinung,
     antwortGeben:antwortGeben, einladungGesehen:einladungGesehen, gaeste:gaeste, gaesteGemerkt:gaesteGemerkt, gastEntfernen:gastEntfernen, gaesteKurz:gaesteKurz, gaesteZeile:gaesteZeile,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,
-    linkRolle:linkRolle, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
+    linkRolle:linkRolle, linkStand:linkStand, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
     codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ mailLinkGenutzt=true; return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};
 })(this);

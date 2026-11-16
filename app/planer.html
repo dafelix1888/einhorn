@@ -17,7 +17,7 @@
   <section class="feld" id="sek-variante">
     <p class="titel">Wo spielt ihr?</p>
     <div id="variante"></div>
-    <p class="hinweis" id="variante-kurz">Wähle zuerst, wo ihr spielt. Das kannst du später noch ändern, auch im Elternbereich des Spiels (oben rechts „Erwachsene“ → „Einrichten“).</p>
+    <p class="hinweis" id="variante-kurz">Wähle zuerst, wo ihr spielt. Das kannst du später noch ändern, auch im Spiel (oben rechts „Erwachsene“ → „Einrichten“).</p>
   </section>
 
   <div id="draussen" class="stapel">
@@ -56,7 +56,8 @@
     <p class="hinweis">Drinnen gibt es kein GPS. Jede Station öffnet ihr mit „Station öffnen“ im Spiegel. Die Räume stehen in der Vorbereitungsliste.</p>
   </section>
 
-  <section class="feld" id="sek-kinder">
+  <!-- Kinderzahl fragt nur noch die Party (UNICORN-85); die Route hängt nicht davon ab -->
+  <section class="feld" id="sek-kinder" hidden>
     <p class="titel">Wie viele Kinder?</p>
     <div class="zaehler"><button type="button" id="k-minus" aria-label="Weniger">–</button><b id="kinder"></b><button type="button" id="k-plus" aria-label="Mehr">+</button></div>
   </section>
@@ -102,7 +103,7 @@
         <svg class="profil" id="profil" viewBox="0 0 600 120" preserveAspectRatio="none" aria-label="Höhenprofil"></svg>
         <ol class="liste" id="liste"></ol>
         <div class="zwei-knoepfe">
-          <button type="button" class="knopf leer klein" id="teilen">Link fürs Spiel-Gerät</button>
+          <button type="button" class="knopf leer klein" id="teilen">Link fürs Tablet</button>
           <button type="button" class="knopf leer klein" id="aendern">Start ändern</button>
         </div>
         <p class="klein-text">Lila: Hinweg, grün gepunktet: Heimweg. Gestrichelte Stationen liegen an einem einfachen Wegpunkt, das passt auch so. Wer mag, zieht sie auf eine Ecke, einen Zaun oder eine Bank. Beim Loslassen rutscht die Station auf den nächsten Weg. Kartendaten © OpenStreetMap-Mitwirkende, Höhen: Open-Meteo.</p>

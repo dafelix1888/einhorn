@@ -61,7 +61,8 @@ const pfad=u=>{ const x=new URL(u); return x.pathname.replace(/^\/app\//,'')+x.s
   ok(true, 'alter #tour-Link → Spiel');
 
   // 7) Katalog: „Party planen“ ohne Party startet mit dem Planer, mit Route „Weiter zur Party“ statt „Spiel öffnen“
-  p=await neu(); await p.goto(B); await p.waitForTimeout(400);
+  p=await neu(); await p.goto(B);
+  await p.waitForFunction(()=>[...document.querySelectorAll('a')].some(a=>/Party planen/.test(a.textContent+a.getAttribute('aria-label'))), null, {timeout:8000}).catch(()=>{});   // Katalog baut sich nach dem Laden auf, feste 400 ms reichten auf GitHub nicht immer
   const hrefs=await p.$$eval('a', as=>as.filter(a=>/Party planen/.test(a.textContent+a.getAttribute('aria-label'))).map(a=>a.getAttribute('href')));
   ok(hrefs.length>0 && hrefs.every(h=>/^planer\.html/.test(h)), 'Katalog „Party planen“ → Planer ('+hrefs.length+')');
   p=await neu({'sj.plan.einhorn':PLAN}); await p.goto(B); await p.waitForTimeout(400);

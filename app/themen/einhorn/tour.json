@@ -2,7 +2,7 @@
  "format": 1,
  "id": "einhorn",
  "titel": "Funkels Regenbogen",
- "untertitel": "Eine Einhorn-Schnitzeljagd mit Zauberspiegel",
+ "untertitel": "Eine Einhorn-Schatzsuche mit Zauberspiegel",
  "kurz": "Über Nacht ist Funkels Regenbogen verschwunden, und alle Farben sind durcheinander. Die Kinder folgen Hufspuren, lösen Farbrätsel im Zauberspiegel, sammeln die Bögen ein und finden heraus, wer sie gemopst hat.",
  "alter": "3 bis 6 Jahre",
  "kinder": {
@@ -232,6 +232,8 @@
    "arc": null,
    "pic": "hufe",
    "vorOrt": "Seil auspacken. Ein Erwachsener geht vorn, einer hinten.",
+   "probe": ["Hier kommen wir sicher rüber", "Platz für alle"],
+   "vorOrtEiner": "Seil auspacken. Wartet hier, bis der Vorausgeher bei euch ist. Dann geht ein Erwachsener vorn, einer hinten.",
    "seek": "Gleich kommt die Regenbogenbrücke. Bleibt dicht zusammen!",
    "title": "Die Regenbogenbrücke",
    "say": "Über die Regenbogenbrücke gehen Einhörner nur zusammen. Auf der anderen Seite beginnt mein Wald. Alle ans Seil! Beim Gehen rufen wir: klipp, klopp!",
@@ -592,7 +594,7 @@
     "wofuer": "Pause unterwegs"
    },
    {
-    "x": "Probelauf zu Hause",
+    "x": "Generalprobe zu Hause",
     "wofuer": "Damit drinnen alles klappt",
     "nur": [
      "c"
@@ -1009,8 +1011,8 @@
       "ding": "Tablet oder Handy, startklar"
      },
      {
-      "x": "Probelauf zu Hause",
-      "ding": "Probelauf zu Hause"
+      "x": "Generalprobe zu Hause",
+      "ding": "Generalprobe zu Hause"
      },
      {
       "x": "Kiste bekleben, Karton grau anmalen",

@@ -18,11 +18,11 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   await setzen(party(false));
   let pt=await partytag();
   const auf=pt.teile.find(x=>x.id==='aufbau'), kr=pt.teile.find(x=>x.id==='kreide');
-  ok(auf && auf.uhr==='13:45' && /Schatzkiste bleibt bei dir/.test(auf.text), 'Ohne Vorausgeher: „Stationen aufbauen“ um 13:45 (75 Min. vorher)');
-  ok(kr && kr.uhr==='13:30', 'Ohne Vorausgeher: Kreidespur 90 Min. vorher');
+  ok(auf && auf.uhr==='14:05' && /Schatzkiste bleibt bei dir/.test(auf.text), 'Ohne Vorausgeher: „Stationen aufbauen“ um 14:05 (75 Min. vor dem Tourstart 15:20)');
+  ok(kr && kr.uhr==='13:50', 'Ohne Vorausgeher: Kreidespur 90 Min. vor dem Tourstart');
   ok(!pt.teile.some(x=>x.id==='vorausgeher'), 'Kein „Vorausgeher startet“');
   const ics=await p.evaluate(async()=>{ const t=await (await fetch('themen/einhorn/tour.json')).json(); return Party.ics(Party.lesen('einhorn'), t, Party.plan('einhorn')); });
-  ok(/Stationen aufbauen/.test(ics) && /DTSTART:20300615T134500/.test(ics), 'Kalender: Termin „Stationen aufbauen“ um 13:45');
+  ok(/Stationen aufbauen/.test(ics) && /DTSTART:20300615T140500/.test(ics), 'Kalender: Termin „Stationen aufbauen“ um 14:05');
 
   await p.goto(B+'party.html?thema=einhorn#s-partytag'); await p.waitForSelector('#s-partytag');
   const k=p.locator('#s-partytag a.kachel[href*="modus=selbst"]');
@@ -30,12 +30,12 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
 
   await p.goto(B+'bereit.html?thema=einhorn'); await p.waitForSelector('#heute .termin');
   const heute=await p.locator('#heute').innerText();
-  ok(/13:30[\s\S]*Kreidespur/.test(heute) && /13:45[\s\S]*Stationen aufbauen/.test(heute) && !/Vorausgeher startet/.test(heute), 'Startklar: dieselben Uhrzeiten wie die Party');
+  ok(/13:50[\s\S]*Kreidespur/.test(heute) && /14:05[\s\S]*Stationen aufbauen/.test(heute) && !/Vorausgeher startet/.test(heute), 'Startklar: dieselben Uhrzeiten wie die Party');
   ok(/modus=selbst/.test(await p.locator('#heute a[href*="modus=selbst"]').getAttribute('href')||''), 'Startklar: Link zur Aufbau-Liste');
 
   await p.goto(B+'vorausgeher.html?thema=einhorn&modus=selbst'); await p.waitForSelector('.fokus');
   const seite=await p.locator('#seite').innerText();
-  ok(/Stationen aufbauen/.test(await p.locator('.kopf').innerText()) && /Aufbauen ab 13:45/.test(seite), 'Aufbau-Seite „selbst“: Titel und Uhrzeit ohne Vorausgeher');
+  ok(/Stationen aufbauen/.test(await p.locator('.kopf').innerText()) && /Aufbauen ab 14:05/.test(seite), 'Aufbau-Seite „selbst“: Titel und Uhrzeit ohne Vorausgeher');
   ok(!/Losgehen um/.test(seite) && /abseits vom Weg/.test(seite), 'Ohne „Losgehen um“, mit Hinweis „Sachen liegen allein“');
   await p.evaluate(()=>{ const x=JSON.parse(localStorage.getItem('sj.party.einhorn')); x.aufgebaut={1:true,2:true,3:true,4:true,5:true,6:true}; localStorage.setItem('sj.party.einhorn', JSON.stringify(x)); });
   await p.reload(); await p.waitForSelector('.fertig-karte');
@@ -45,9 +45,9 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   // Mit Vorausgeher bleibt alles wie bisher
   await setzen(party(true));
   pt=await partytag();
-  ok(!pt.teile.some(x=>x.id==='aufbau') && pt.teile.find(x=>x.id==='kreide').uhr==='14:00' && pt.teile.find(x=>x.id==='vorausgeher').uhr==='14:40', 'Mit Vorausgeher: Kreidespur 14:00, Vorausgeher 14:40, kein eigener Aufbau');
+  ok(!pt.teile.some(x=>x.id==='aufbau') && pt.teile.find(x=>x.id==='kreide').uhr==='14:20' && pt.teile.find(x=>x.id==='vorausgeher').uhr==='15:00', 'Mit Vorausgeher: Kreidespur 14:20, Vorausgeher 15:00, kein eigener Aufbau');
   await p.goto(B+'vorausgeher.html?thema=einhorn'); await p.waitForSelector('.fokus');
-  ok(/Vorausgeher/.test(await p.locator('.kopf').innerText()) && /Losgehen um 14:40/.test(await p.locator('#seite').innerText()), 'Vorausgeher-Seite unverändert');
+  ok(/Vorausgeher/.test(await p.locator('.kopf').innerText()) && /Losgehen um 15:00/.test(await p.locator('#seite').innerText()), 'Vorausgeher-Seite unverändert');
 
   ok(!pf.length, 'Keine Seitenfehler'+(pf.length?': '+pf.join(' | '):''));
   await b.close(); console.log(fehler?fehler+' FEHLER':'ALLES OK'); process.exit(fehler?1:0);
