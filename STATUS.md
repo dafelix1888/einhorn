@@ -21,6 +21,8 @@ Ziel: fremde Eltern planen und spielen ohne Hilfe; Gate bis 6. Dezember 2026: 20
 - **UNICORN-80 Erinnerungs-Mail nach der Party:** Entwurf PR #189, nicht in Supabase eingespielt, wartet auf Felix.
 - Test `konto.test.cjs` („Funkel spricht gleich los“) wackelte auf GitHub, wartet jetzt auf den Start der Wiedergabe.
 
+**16. November abends, UNICORN-116:** Danke-Seite belegt den Namen für die Urkunde mit dem Vornamen aus der Zusage vor (gleicher Schlüssel wie die Einladung, `sj.antwort.<k>` auf demselben Gerät, nur bei Zusage), änderbar. Test in `danke.test.cjs`. Service Worker v82.
+
 **15. November, UNICORN-58 bis 61 (Rückmeldung Felix):**
 - **UNICORN-58 Hinweise:** Planer zeigt beim ersten Blick auf die Karte einmal „Stationen verschieben“ (`sj.planer.ziehTipp`). Assistent Schritt 1: Löschhinweis mit Datum (30 Tage nach der Feier, wie `alte_partys_loeschen`). Schritt 2: „Spielart jederzeit änderbar, auch am Partytag“. Erzähler-Schritt: Hinweis „jederzeit änderbar“ über der Auswahl. „Fertig“: „Funkel kennt …“ sagt, wer Funkel ist.
 - **UNICORN-59 Sprechende Figur:** Beim Anhören eines Erzählers fächert die Zeile auf, die Figur aus dem Spiel ploppt herein und spricht (Mund folgt der Lautstärke über Web Audio, sonst gleichmäßiger Takt). Figuren als Kopie in `app/themen/einhorn/erzaehler/figuren.html`; `tests/erzaehler-figuren.test.cjs` prüft, dass sie gleich wie in `spiel.html` bleiben (`--schreiben` erneuert die Kopie).

@@ -39,6 +39,16 @@ let f=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) f++; };
   await g.reload(); await g.waitForTimeout(1200);
   ok(await g.locator('[data-wert="3"]').getAttribute('aria-pressed')==='true', 'nur einmal abstimmen');
   ok(/landing\.html\?utm_source=danke/.test(await g.locator('.selbst a').getAttribute('href')), 'Weg zur eigenen Party');
+  // UNICORN-116: Name aus der Zusage auf demselben Gerät vorbelegen, änderbar; nach einer Absage nichts vorbelegen
+  const kl=new URL(link).searchParams.get('k');
+  const z=await geraet(); await z.goto(B+'impressum.html');
+  await z.evaluate(k=>localStorage.setItem('sj.antwort.'+k, JSON.stringify({id:'x1', name:'Jonas', kommt:true})), kl);
+  await z.goto(link); await z.waitForSelector('#kind');
+  ok(await z.inputValue('#kind')==='Jonas' && /aus eurer Zusage/.test(await z.locator('#seite').innerText()), 'Name aus der Zusage steht schon in der Urkunde');
+  await z.fill('#kind','Jonas M.'); ok(await z.inputValue('#kind')==='Jonas M.', 'Name bleibt änderbar');
+  await z.evaluate(k=>localStorage.setItem('sj.antwort.'+k, JSON.stringify({id:'x1', name:'Jonas', kommt:false})), kl);
+  await z.reload(); await z.waitForSelector('#kind');
+  ok(await z.inputValue('#kind')==='', 'Nach einer Absage bleibt das Feld leer');
   await a.reload(); await a.waitForTimeout(1500);
   ok(/1 Familie hat geantwortet: 😍 1/.test(await a.locator('#rueckmeldung').innerText()), 'Eltern sehen Rückmeldung');
   const oc=await b.newContext(); await oc.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort()); await oc.addInitScript(()=>{ window.KONTO_TEST={url:'',key:''}; }); const ohne=await oc.newPage(); await ohne.goto(B+'party.html'); const alt=await ohne.evaluate(p=>{ return Party.dankeLink(p,null); }, party);
