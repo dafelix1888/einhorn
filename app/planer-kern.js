@@ -220,7 +220,7 @@
     if(s.ziel){
       var fl=ziel.flaeche;
       var ort=(fl && fl.name) || wegName(netz,id);
-      return {name:(ziel.art==='Wegpunkt'?st.name:ziel.art)+(ort?' '+(praeposition(ort)||{an:'bei '+ort}).an:''), strasse:ort};
+      return {name:(ziel.art==='Wegpunkt'?'Letzte Station':ziel.art)+(ort?' '+(praeposition(ort)||{an:'bei '+ort}).an:''), strasse:ort};
     }
     var strasse=typ==='strassenquerung' ? wegName(netz,id,true) : wegName(netz,id);
     var basis=s.gefunden ? ({strassenquerung:'Übergang', zaun:'Zaun', kreuzung:'Kreuzung', huegel_unten:'Hügel', weg:'Ecke', spielplatz:'Spielplatz'}[typ]||st.name) : 'Wegpunkt';

@@ -126,11 +126,11 @@
      "dann": "Hinter der grünen Schleife den gelben und den orangen Bogen holen. Hat jedes Kind seinen Glücksstein, „Bögen gefunden, weiter“ tippen."
     },
     "5": {
-     "wo": "Unten am Hügel, beim Bettlaken",
+     "wo": "Beim Bettlaken",
      "dann": "Leise zum Laken schleichen und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen."
     },
     "6": {
-     "vorOrt": "Sticker-Stücke bereithalten. Der Vorausgeher hat die Schatzkiste in der Tasche."
+     "vorOrt": "Sticker bereithalten. Die Schatzkiste bleibt noch versteckt."
     }
    },
    "draussen": true
@@ -168,7 +168,7 @@
     },
     "6": {
      "wo": "Toberaum, hinter dem Sofa",
-     "vorOrt": "Fridolins Karton steht hinter dem Sofa, buntes Band daran. Sticker-Stücke bereithalten."
+     "vorOrt": "Sticker bereithalten. Die Schatzkiste bleibt noch versteckt."
     }
    },
    "draussen": false
@@ -396,7 +396,7 @@
    "wo": "Oben am Berg, bei der Parkbank",
    "kind": "finale",
    "arc": "blau",
-   "vorOrt": "Sticker-Stücke bereithalten. Der Vorausgeher hat die Schatzkiste in der Tasche.",
+   "vorOrt": "Sticker bereithalten. Die Schatzkiste bleibt noch versteckt.",
    "seek": "Jetzt geht es zum letzten Ort. Dort legen wir den Regenbogen zusammen.",
    "steps": [
     {
@@ -431,7 +431,7 @@
    "planer": {
     "was": "Blau fehlt! Die Pfoten führen zu Fridolins grauem Bau. Der Fuchs gibt die Bögen zurück, dann kommt der Schatz.",
     "ort": "Oben auf einem Hügel bei einer Bank: Platz zum Sitzen, für den Snack und den Schatz.",
-    "versteck": "Grauer Karton (Fridolins Bau), blaue Bögen, Schatzkiste"
+    "versteck": "Grauer Karton (Fridolins Bau), blaue Bögen"
    }
   }
  ],
@@ -627,12 +627,12 @@
     {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
-      "Rote Bögen (Station 2)",
-      "Gelbe und orange Bögen und die Tüte mit {kinder} Glückssteinen, irgendwo am Zaun verstecken (Station 4)",
-      "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
+      "Rote Bögen, neben etwas Rotes legen, zum Beispiel Briefkasten oder Blume. Gibt es nichts Rotes, ein rotes Tuch dazulegen (Station 2)",
+      "Gelbe und orange Bögen und die Tüte mit {kinder} Glückssteinen, an einer Stelle verstecken, die auffällt (Station 4)",
+      "Die eine Zaubertafel, in der Nähe verstecken (Station 5)",
       "Grüne Bögen (Station 6). Die Wolke schläft nur im Spiegel. Wer mag, legt etwas Weißes dazu (Laken, Kissen, Watte)",
       "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
-      "Schatzkiste (Station 7)"
+      "Schatzkiste: bleibt in der Tasche, nicht hinlegen (Station 7)"
      ]
     },
     {
@@ -649,10 +649,10 @@
      "items": [
       "Rote Bögen, rote Kreide für den Kreidekreis (Station 2)",
       "Vier Schleifen aus Krepp- oder Geschenkband (Blau, Pink, Grün, Rot-Weiß), gelbe und orange Bögen, Tüte mit {kinder} Glückssteinen (Station 4)",
-      "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
+      "Die eine Zaubertafel, in der Nähe verstecken (Station 5)",
       "Weißes Bettlaken oder weißer Schirm als Wolke, grüne Bögen (Station 6)",
       "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
-      "Schatzkiste (Station 7)"
+      "Schatzkiste: bleibt in der Tasche, nicht hinlegen (Station 7)"
      ]
     },
     {
@@ -673,7 +673,7 @@
       "Drei Zettel mit gemalten Spuren (Hase, Ente, Fuchs), die eine Zaubertafel (Türen)",
       "Grüne Bögen (Kissenberg). Wer mag, legt ein weißes Kissen als Wolke dazu",
       "Grauer Karton mit Fridolin, blaue Bögen, buntes Band (Sofa)",
-      "Schatzkiste"
+      "Schatzkiste: bleibt bei dir, nicht hinlegen"
      ]
     },
     {
@@ -809,7 +809,7 @@
         "ding": "Buntes Band am Versteck"
        },
        {
-        "x": "Schatzkiste mit Geschenken",
+        "x": "Schatzkiste mit Geschenken, bleibt in der Tasche",
         "ding": "Schatzkiste, je Kind ein Geschenk"
        },
        {
@@ -973,7 +973,7 @@
         "ding": "Buntes Band am Versteck"
        },
        {
-        "x": "Schatzkiste mit Geschenken",
+        "x": "Schatzkiste mit Geschenken, bleibt in der Tasche",
         "ding": "Schatzkiste, je Kind ein Geschenk"
        },
        {
@@ -1137,7 +1137,7 @@
         "ding": "Buntes Band am Versteck"
        },
        {
-        "x": "Schatzkiste mit Geschenken",
+        "x": "Schatzkiste mit Geschenken, bleibt in der Tasche",
         "ding": "Schatzkiste, je Kind ein Geschenk"
        },
        {
@@ -1229,7 +1229,7 @@
   {
    "i": 4,
    "was": "Eine Zaubertafel für alle",
-   "wie": "Reihum malen sie die Fuchspfote ab. Danach einsammeln, am Ende kommt sie einem Kind in die Tüte.",
+   "wie": "Reihum malen sie die Spur aus dem Gedächtnis darauf. Danach einsammeln, am Ende kommt sie einem Kind in die Tüte.",
    "art": "Nur ausleihen"
   },
   {
@@ -1241,7 +1241,7 @@
   {
    "i": "ende",
    "was": "Schatzkiste",
-   "wie": "Je Kind ein Kratzbild mit Zeichenschablone und eine Zaubertafel. Verteilt wird nach dem Essen.",
+   "wie": "Was ihr hineingelegt habt. Am Ziel öffnen und anschauen, verteilt wird nach dem Essen.",
    "art": "Schatz"
   }
  ],
@@ -1916,7 +1916,7 @@
    "a": [
     [
      "Tun",
-     "Hinter der Brücke zum Zaun gehen"
+     "Hinter der Brücke weiter zur nächsten Station"
     ],
     [
      "Dort",
@@ -1952,7 +1952,7 @@
     ],
     [
      "Tun",
-     "Bei jedem ein paar Schritte am Zaun weiter"
+     "Bei jedem ein paar Schritte weitergehen"
     ],
     [
      "Rufen",
@@ -2064,11 +2064,11 @@
    "a": [
     [
      "Tun",
-     "Bis zur Kreuzung gehen (Erdweg, keine Spuren am Boden)"
+     "Zur nächsten Station gehen. Am Boden gibt es hier keine Spuren"
     ],
     [
      "Ziel",
-     "Mitten auf die Kreuzung"
+     "Ein Platz, an dem alle in Ruhe stehen bleiben"
     ]
    ],
    "c": [
@@ -2086,49 +2086,57 @@
    "a": [
     [
      "Tun",
-     "Die drei Spuren im Spiegel genau anschauen"
+     "„Spur zeigen“ tippen, alle merken sich die Spur"
+    ],
+    [
+     "Dann",
+     "Nebel, die Spur ist weg"
     ],
     [
      "Finden",
-     "Die Spur, die zu den kleinen Pfoten passt"
+     "Die Zaubertafel, hier in der Nähe versteckt"
+    ],
+    [
+     "Tun",
+     "Reihum malt jedes Kind ein Stück der Spur aus dem Gedächtnis"
+    ],
+    [
+     "Weiter",
+     "„Fertig gemalt“, dann tippt ein Kind die gemalte Spur an"
     ],
     [
      "Lösung",
      "Der Fuchs"
-    ],
-    [
-     "Weiter",
-     "Ein Kind tippt im Spiegel die Fuchsspur an"
     ]
    ],
    "c": [
     [
      "Tun",
-     "Die Spurenkarten vor den drei Türen anschauen"
+     "„Spur zeigen“ tippen, alle merken sich die Spur"
+    ],
+    [
+     "Dann",
+     "Nebel, die Spur ist weg"
     ],
     [
      "Finden",
-     "Die Spur, die zu den kleinen Pfoten passt"
+     "Die passende Spurenkarte vor den drei Türen"
+    ],
+    [
+     "Weiter",
+     "Ein Kind tippt die Spur im Spiegel an"
     ],
     [
      "Lösung",
      "Der Fuchs"
-    ],
-    [
-     "Weiter",
-     "Ein Kind tippt im Spiegel die Fuchsspur an"
     ]
    ]
   },
   "4.1": {
    "a": [
     [
-     "Finden",
-     "Eine Zaubertafel, irgendwo hier versteckt"
-    ],
-    [
      "Tun",
-     "Reihum malt jedes Kind ein Stück der Fuchspfote"
+     "Tafel neben den Spiegel halten und vergleichen"
     ],
     [
      "Danach",
@@ -2162,11 +2170,11 @@
    "a": [
     [
      "Tun",
-     "Zum Berg gehen (Erdweg, keine Spuren am Boden)"
+     "Leise zur nächsten Station gehen"
     ],
     [
      "Leise",
-     "Auf dem Berg schläft eine Regenwolke"
+     "Dort schläft eine Regenwolke"
     ]
    ],
    "c": [
@@ -2248,7 +2256,7 @@
    "a": [
     [
      "Tun",
-     "Den Berg hinauf zur Parkbank bei den Bäumen"
+     "Zum letzten Ort gehen"
     ],
     [
      "Dort",
@@ -2344,7 +2352,11 @@
     ],
     [
      "Finden",
-     "Schatzkiste mit Kratzbildern, Zeichenschablonen und Zaubertafeln"
+     "Die Schatzkiste mit euren Geschenken"
+    ],
+    [
+     "Tun",
+     "Kiste zusammen öffnen und anschauen, verteilt wird zu Hause"
     ],
     [
      "Weiter",

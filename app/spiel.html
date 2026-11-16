@@ -1050,8 +1050,8 @@ function renderGaben(){
   GABEN.forEach(function(g){
     var nr, ort;
     if(g.i==='start'){ nr='–'; ort='Ankommen an der Haustür'; }
-    else if(g.i==='ende'){ nr='★'; ort='Am Ende: '+stv(N-1).wo; }
-    else { nr=String(g.i+1); ort='Station '+(g.i+1)+' · '+(g.i===0?STATIONS[0].name:indoor()?stv(g.i).wo:STATIONS[g.i].name+', '+stv(g.i).wo); }
+    else if(g.i==='ende'){ nr='★'; ort='Am Ende: '+(stv(N-1).wo||STATIONS[N-1].name); }
+    else { nr=String(g.i+1); ort='Station '+(g.i+1)+' · '+(g.i===0?STATIONS[0].name:indoor()?stv(g.i).wo:STATIONS[g.i].name+(stv(g.i).wo?', '+stv(g.i).wo:'')); }
     h+='<li><span class="nr">'+nr+'</span><div class="txt"><div class="nm">'+esc(g.was)+' <span class="art'+(g.art==='Schatz'?' schatz':'')+'">'+esc(g.art)+'</span></div><div class="wo">'+esc(ort)+'</div><div class="st">'+esc(g.wie)+'</div></div></li>';
   });
   $('gaben').innerHTML=h;
@@ -2328,7 +2328,7 @@ function hauptText(){                   // Beschriftung des einen Hauptknopfs, l
 function jetzt(){                       // was der Erzähler in diesem Moment tun soll
   var ph=state.phase, st=stv(state.idx);
   if(ph==='start') return indoor() ? 'Drinnen: Stationen öffnest du von Hand. Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : gesetzt() ? 'Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : 'Zum Ausprobieren „Spiegel aufwecken“ tippen. Für die echte Tour vorher unter „Einrichten“ die Punkte setzen.';
-  if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Währenddessen kommt die Schatzkiste zur Parkbank. Darin liegen Kratzbilder, Zaubertafeln und Zeichenschablonen. Nach Schatz und Snack „Heimweg starten“.';
+  if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Jetzt die Schatzkiste hinstellen. Kiste zusammen öffnen und staunen, verteilt wird zu Hause. Nach Schatz und Snack „Heimweg starten“.';   // eine Regel für die Schatzkiste (UNICORN-74)
   if(ph==='heim') return state.step>=1 ? 'Geschafft! Tattoos abwischen, den Schatz gibt es nach dem Essen.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
   if(ph==='seek'){
     if(ankunft) return 'Angekommen!';
@@ -2346,7 +2346,7 @@ function jetzt(){                       // was der Erzähler in diesem Moment tu
   if(st.kind==='recolor') return state.step===0 ? 'Die Kinder rufen, was nicht stimmt. Dann aufs Bild oder auf „Bild verzaubern“ tippen.' : lin+st.dann;
   if(st.kind==='wahl'){
     if(galerieAktiv()){ var go=st.optionen[galN], m=st.optionen.length;
-      return 'Bild '+(galN+1)+' von '+m+': '+go.name+'. Die Kinder rufen, was falsch ist und welche Farbe es in echt hat. '+(galN<m-1 ? 'Dann ein paar Schritte am Zaun weiter und „Nächstes Bild“ tippen.' : 'Dann „Alle vier gesehen“ tippen.'); }
+      return 'Bild '+(galN+1)+' von '+m+': '+go.name+'. Die Kinder rufen, was falsch ist und welche Farbe es in echt hat. '+(galN<m-1 ? 'Dann ein paar Schritte weitergehen und „Nächstes Bild“ tippen.' : 'Dann „Alle vier gesehen“ tippen.'); }
     if(spurMerken()) return !state.spur ? st.frage : state.spur==='zeigen' ? 'Alle schauen genau hin. Gleich kommt der Nebel.' : state.spur==='nebel' ? st.frageNebel : st.frageWahl;
     return state.step===0 ? st.frage : lin+st.dann;
   }
