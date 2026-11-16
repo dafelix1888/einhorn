@@ -23,18 +23,19 @@ const zahl=t=>{ const m=String(t).match(/(\d+),(\d\d)\s*€/); return m ? +(m[1]
   ok(a.mitgebsel>60 && a.mitgebsel<a.alles, 'Mitgebsel (je Kind) als Teil von allem ('+a.mitgebsel.toFixed(2)+' €)');
 
   let t=await zumEnde(entwurf(inTagen(20), true));
-  ok(/Das kommt auf dich zu/.test(t) && /0 € mit Dingen von zu Hause/.test(t), 'Assistent: „Das kommt auf dich zu“ mit 0 € von zu Hause');
-  ok(/davon ca\. [\d,]+ € Mitgebsel, die die Kinder behalten/.test(t), 'Assistent: Mitgebsel als Info (Entscheidung B)');
+  ok(/Das kommt auf dich zu/.test(t) && /drei Wege/.test(t) && /Mit Dingen von zu Hause\s*0 €/.test(t), 'Assistent: „Das kommt auf dich zu“ mit 0 € von zu Hause');
+  ok(/Davon ca\. [\d,]+ € Mitgebsel, die die Kinder behalten/.test(t), 'Assistent: Mitgebsel als Info (Entscheidung B)');
   ok(/Generalprobe ca\. 75 Min/.test(t) && /Tour dauert ca\. 75 Min\. plus 10 Min\. Heimweg/.test(t) && /Eine Stunde vorher/.test(t), 'Assistent: Generalprobe, Dauer und Heimweg aus dem Plan');
   ok(/Dein Plan: 6 Schritte in 3 Wochen/.test(await p.locator('#seite').innerText()), 'Plan-Zeitraum aus dem Datum (20 Tage → 3 Wochen)');
 
   t=await zumEnde(entwurf(inTagen(2), false));
   ok(/Eineinhalb Stunden vorher/.test(t), 'Ohne Vorausgeher: eineinhalb Stunden vorher');
+  ok((t.match(/ca\. \d+ Min\./g)||[]).every(function(x){ return +x.match(/\d+/)[0]%5===0; }) && (t.match(/plus \d+ Min/g)||[]).every(function(x){ return +x.match(/\d+/)[0]%5===0; }), 'Minuten auf 5 gerundet');
   ok(/in 2 Tagen/.test(await p.locator('#seite').innerText()) && /Bestellen wird knapp/.test(await p.locator('#seite').innerText()), 'Kurz vor der Party: „Bestellen wird knapp“');
 
   // Gleiche Beträge im Assistenten und im Schritt „Material besorgen“
   t=await zumEnde(entwurf(inTagen(20), true));
-  const m=t.match(/ca\. ([\d.,]+ €) für das Nötige, ca\. ([\d.,]+ €) für alles/);
+  const m=t.match(/Nur das Nötige bestellen\s*ca\. ([\d.,]+ €)\s*Alles bestellen\s*ca\. ([\d.,]+ €)/);
   await p.evaluate(e=>{ localStorage.setItem('sj.party.einhorn', JSON.stringify(e)); sessionStorage.clear(); }, entwurf(inTagen(20), true));
   await p.goto('about:blank'); await p.goto(B+'party.html?thema=einhorn#s-bestellen'); await p.waitForSelector('.wege');
   const w=await p.locator('.wege').innerText();
