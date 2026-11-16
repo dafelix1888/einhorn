@@ -895,7 +895,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="tt"><b>GPS-Punkte</b><span id="sum-punkte"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
         <p class="lead"><a href="#" id="planer-link">Tour im Planer öffnen</a>: dort Adresse, Richtung und Strecke wählen, die Stationen kommen dann von selbst hierher.</p>
-        <p class="lead">Feinschliff vor Ort: Beim Probelauf an jeder Station stehen bleiben, warten bis das GPS genau ist, und den Punkt setzen. Die Haustür braucht keinen Punkt. Am besten mit diesem Gerät: Es ist später der Spiegel, so passen die Punkte am genauesten.</p>
+        <p class="lead">Feinschliff vor Ort: Bei der Generalprobe an jeder Station stehen bleiben, warten bis das GPS genau ist, und den Punkt setzen. Die Haustür braucht keinen Punkt. Am besten mit diesem Gerät: Es ist später der Spiegel, so passen die Punkte am genauesten.</p>
         <div class="row">
           <button type="button" class="btn ghost small" id="btn-gps">GPS starten</button>
           <p class="chip" id="gps-chip-2"></p>
@@ -920,9 +920,9 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
 
     <h2 class="gruppe">Mehr<small>Selten nötig.</small></h2>
     <details class="karte" id="k-protokoll">
-      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="tt"><b>Probelauf-Protokoll</b><span id="sum-protokoll"></span></span><span class="pf"></span></summary>
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="tt"><b>Protokoll der Generalprobe</b><span id="sum-protokoll"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Bei jedem Durchlauf merkt sich der Spiegel je Station, wie lang der Weg dauerte, wie lange ihr am Pop gesammelt habt, wie genau das GPS war und ob die Station per GPS oder von Hand aufging. So siehst du nach dem Probelauf, wo es hakt.</p>
+        <p class="lead">Bei jedem Durchlauf merkt sich der Spiegel je Station, wie lang der Weg dauerte, wie lange ihr an der Station wart, wie genau das GPS war und ob die Station per GPS oder von Hand aufging. So siehst du nach der Generalprobe, wo es hakt.</p>
         <div id="protokoll"></div>
         <div class="row"><button type="button" class="btn quiet small" id="btn-proto-reset">Protokoll löschen</button></div>
       </div>
@@ -1968,7 +1968,7 @@ function protoWarte(sek){ var l=proto.length && proto[proto.length-1].eintraege;
 function mmss(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+':'+(s%60<10?'0':'')+(s%60); }
 function renderProtokoll(){
   var box=$('protokoll'), sum=$('sum-protokoll');
-  if(!proto.length){ box.innerHTML='<p class="lead">Noch kein Durchlauf. Das Protokoll füllt sich beim Probelauf von selbst.</p>'; sum.textContent='Noch kein Durchlauf'; return; }
+  if(!proto.length){ box.innerHTML='<p class="lead">Noch kein Durchlauf. Das Protokoll füllt sich bei der Generalprobe von selbst.</p>'; sum.textContent='Noch kein Durchlauf'; return; }
   var h='';
   proto.slice().reverse().slice(0,3).forEach(function(r,ri){
     var d=new Date(r.start), ges=r.eintraege.reduce(function(a,e){ return a+e.dauer+(e.warte||0); },0);
@@ -2839,7 +2839,7 @@ function probeHtml(){
     (drin ? '<li>In jedem Raum „Station öffnen“ tippen.</li><li>Prüfen, ob dort alles bereitliegt.</li>'
           : '<li>Unterwegs zeigt diese Leiste, wie weit es noch ist und wie genau das GPS ist.</li><li>Öffnet eine Station zu früh oder gar nicht: an die richtige Stelle stellen und „Punkt hier setzen“ tippen.</li><li>Am Ende siehst du, wie jede Station geklappt hat.</li>')+
     '</ol><p>Fein einstellen kannst du unter „Erwachsene“ → „Einrichten“: '+(drin?'Erzähler und Spielart.':'Abstand zum Öffnen (10, 15 oder 25 m), Erzähler und Spielart.')+'</p></details>';
-  if(ph==='end' || ph==='heim') return kopf+probeErgebnis();
+  if(ph==='end' || ph==='heim'){ probeAbhaken(); return kopf+probeErgebnis(); }
   if(drin) return kopf+'<p>Station '+nr+': '+(ph==='seek' ? 'Geht in den nächsten Raum und tippt „Station öffnen“.' : 'Liegt hier alles bereit?')+'</p>';
   if(ph==='seek') return kopf+'<p>Unterwegs zu Station '+nr+'. '+(wartet ? 'Angekommen. Stimmt die Stelle? Sonst hier neu setzen.' : 'Steht ihr an der richtigen Stelle, aber nichts öffnet sich? Dann den Punkt hier setzen.')+'</p>'+
     '<div class="reihe"><button type="button" class="btn small" data-probe-setzen="'+i+'">Punkt '+nr+' hier setzen</button></div>';
@@ -2855,6 +2855,16 @@ function probeZeichnen(){
   var key=[state.phase, state.idx, wartet?1:0, indoor()?1:0].join('|');
   if(key!==probeSchluessel){ probeSchluessel=key; el.innerHTML=probeHtml(); }
   var w=$('probe-wert'); if(w) w.textContent=probeWert();
+}
+// Zu Ende gespielte Generalprobe hakt den Schritt in der Party ab (UNICORN-76), nur auf dem Gerät mit der eigenen Party
+var probeAbgehakt=false;
+function probeAbhaken(){
+  if(probeAbgehakt || !window.Party) return; probeAbgehakt=true;
+  var th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), p=Party.lesen(th);
+  if(!p || p.fremd) return;
+  p.erledigt=p.erledigt||{};
+  if(indoor()) p.erledigt.generalprobe=true; else { p.erledigt.probelauf=true; p.probeRoute=Party.routeSchluessel(Party.plan(th)); }
+  Party.speichern(p); if(window.Konto && Konto.merken) try{ Konto.merken(th); }catch(e){}
 }
 function probeBeenden(){ state.probe=false; probeSicher=false; vonVorn(); toast('Generalprobe beendet. Die Tour steht wieder am Anfang, deine Punkte bleiben.'); }
 function probeStarten(){

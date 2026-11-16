@@ -81,12 +81,14 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   ok(/Etwa \d+ Minuten/.test(bt) && /Nötig sind nur 5 Minuten/.test(bt), 'Basteln: Gesamtaufwand und nötiger Teil');
   ok(await p.locator('.bastel li').count()===5 && /Ohne: Den Schuhkarton so lassen/.test(bt) && /Danke-Link/.test(bt), 'Je Aufgabe Minuten und was ohne passiert');
 
-  // --- UNICORN-61: Route ablaufen und Partytag führen zur Generalprobe ---
-  await p.goto(B+'party.html?thema=einhorn#s-route'); await p.waitForSelector('.tipp-karte');
-  ok(/mit dem Tablet ablaufen/.test(await p.textContent('.tipp-karte')) && /probe=1/.test(await p.getAttribute('.tipp-karte a','href')), 'Route ablaufen: Tipp „mit dem Tablet“ mit Weg zur Generalprobe');
+  // --- UNICORN-76: Eine Generalprobe statt zwei Läufen ---
+  await p.goto(B+'party.html?thema=einhorn#s-route'); await p.waitForSelector('#s-route');
+  const rt=await p.textContent('#s-route');
+  ok(/Generalprobe/.test(await p.textContent('#s-route h1, #s-route h2').catch(()=>rt)) && /probe=1/.test(await p.getAttribute('#s-route a.kachel[href*="probe=1"]','href')||''), 'Schritt 3 heißt Generalprobe, Knopf startet sie');
+  ok(!/im Planer die Station antippen/.test(rt), 'Kein zweiter Weg „im Planer hier setzen“ mehr');
   await p.goto(B+'party.html?thema=einhorn#s-partytag'); await p.waitForSelector('#s-partytag');
   const pt=await p.textContent('#s-partytag');
-  ok(/Generalprobe am Vortag/.test(pt) && /Abend davor/.test(pt) && /Vortag/.test(await p.locator('.teile').innerText()), 'Partytag: Generalprobe am Tag oder Abend davor');
+  ok(!/Generalprobe/.test(pt) && !/Vortag/.test(await p.locator('.teile').innerText()), 'Partytag draußen: keine Generalprobe am Vortag mehr');
   await p.context().close();
 
   // --- UNICORN-61: Generalprobe im Spiel ---
