@@ -1229,7 +1229,7 @@
   {
    "i": 4,
    "was": "Eine Zaubertafel für alle",
-   "wie": "Reihum malen sie die Fuchspfote ab. Danach einsammeln, am Ende kommt sie einem Kind in die Tüte.",
+   "wie": "Reihum malen sie die Spur aus dem Gedächtnis darauf. Danach einsammeln, am Ende kommt sie einem Kind in die Tüte.",
    "art": "Nur ausleihen"
   },
   {
@@ -2086,49 +2086,57 @@
    "a": [
     [
      "Tun",
-     "Die drei Spuren im Spiegel genau anschauen"
+     "„Spur zeigen“ tippen, alle merken sich die Spur"
+    ],
+    [
+     "Dann",
+     "Nebel, die Spur ist weg"
     ],
     [
      "Finden",
-     "Die Spur, die zu den kleinen Pfoten passt"
+     "Die Zaubertafel, hier in der Nähe versteckt"
+    ],
+    [
+     "Tun",
+     "Reihum malt jedes Kind ein Stück der Spur aus dem Gedächtnis"
+    ],
+    [
+     "Weiter",
+     "„Fertig gemalt“, dann tippt ein Kind die gemalte Spur an"
     ],
     [
      "Lösung",
      "Der Fuchs"
-    ],
-    [
-     "Weiter",
-     "Ein Kind tippt im Spiegel die Fuchsspur an"
     ]
    ],
    "c": [
     [
      "Tun",
-     "Die Spurenkarten vor den drei Türen anschauen"
+     "„Spur zeigen“ tippen, alle merken sich die Spur"
+    ],
+    [
+     "Dann",
+     "Nebel, die Spur ist weg"
     ],
     [
      "Finden",
-     "Die Spur, die zu den kleinen Pfoten passt"
+     "Die passende Spurenkarte vor den drei Türen"
+    ],
+    [
+     "Weiter",
+     "Ein Kind tippt die Spur im Spiegel an"
     ],
     [
      "Lösung",
      "Der Fuchs"
-    ],
-    [
-     "Weiter",
-     "Ein Kind tippt im Spiegel die Fuchsspur an"
     ]
    ]
   },
   "4.1": {
    "a": [
     [
-     "Finden",
-     "Eine Zaubertafel, irgendwo hier versteckt"
-    ],
-    [
      "Tun",
-     "Reihum malt jedes Kind ein Stück der Fuchspfote"
+     "Tafel neben den Spiegel halten und vergleichen"
     ],
     [
      "Danach",
