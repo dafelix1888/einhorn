@@ -175,6 +175,7 @@ button{font:inherit;color:inherit;touch-action:manipulation}
 /* Einrichten */
 .setup{display:flex;flex-direction:column;gap:14px}
 .setup .lead{max-width:38rem}
+.nur-entwickler[hidden]{display:none!important}
 details.karte{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:0 2px 10px rgba(36,26,61,.06)}
 details.karte>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:16px 18px}
 details.karte>summary::-webkit-details-marker{display:none}
@@ -916,12 +917,14 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
           <button type="button" data-r="15">15 m</button>
           <button type="button" data-r="25">25 m</button>
         </div>
-        <h3>Punkte als Code</h3>
-        <p class="lead">Notlösung ohne Netz: Code kopieren und auf einem anderen Gerät einlesen.</p>
-        <textarea id="code" spellcheck="false" aria-label="Punkte-Code"></textarea>
-        <div class="row">
-          <button type="button" class="btn ghost small" id="btn-copy">Code kopieren</button>
-          <button type="button" class="btn ghost small" id="btn-import">Code einlesen</button>
+        <div class="nur-entwickler" id="punkte-code" hidden>
+          <h3>Punkte als Code</h3>
+          <p class="lead">Notlösung ohne Netz: Code kopieren und auf einem anderen Gerät einlesen.</p>
+          <textarea id="code" spellcheck="false" aria-label="Punkte-Code"></textarea>
+          <div class="row">
+            <button type="button" class="btn ghost small" id="btn-copy">Code kopieren</button>
+            <button type="button" class="btn ghost small" id="btn-import">Code einlesen</button>
+          </div>
         </div>
       </div>
     </details>
@@ -940,11 +943,11 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span><span class="tt"><b>Kamera</b><span id="sum-kamera"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
         <label class="schalter" for="kamera-an"><span class="st"><b>Kamera-Zauber</b><span>Aus: der Spiegel zeigt nur Funkel und die Bilder, und das Gerät fragt nie nach der Kamera.</span></span><input type="checkbox" id="kamera-an"><span class="knopf"></span></label>
-        <p class="lead">An: Unterwegs zeigt der Spiegel das Kamerabild, Funkel steht darin dort, wo das Ziel liegt. Nach jedem gelösten Farbrätsel wird der Spiegel zur Zauberlinse, im Zauberkreis hat das gedruckte Bild wieder seine echte Farbe. Kostet Akku und ist noch wenig erprobt.</p>
+        <p class="lead">An: Unterwegs zeigt der Spiegel das Kamerabild, Funkel steht darin dort, wo das Ziel liegt. Nach einem gelösten Farbrätsel wird der Spiegel zur Zauberlinse: Hält man ihn vor etwas Blaues oder Lilafarbenes, bekommt es im Zauberkreis die richtige Farbe. Kostet Akku und ist noch wenig erprobt.</p>
       </div>
     </details>
 
-    <details class="karte" id="k-stimme">
+    <details class="karte nur-entwickler" id="k-stimme" hidden>
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg></span><span class="tt"><b>Funkels Stimme</b><span id="sum-stimme"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
         <p class="lead">Am natürlichsten klingt eine echte Stimme. Nimm Funkels Sätze hier auf, dann spielt der Spiegel sie statt der Computerstimme ab.</p>
@@ -988,7 +991,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
     <details class="karte achtung" id="k-loeschen">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></span><span class="tt"><b>Alles löschen</b><span>Punkte löschen und Tour auf Anfang</span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Löscht alle sechs Punkte und setzt die Tour auf den Anfang. Aufnahmen und Vorbereitungsliste bleiben erhalten. Den Knopf drei Sekunden gedrückt halten.</p>
+        <p class="lead">Löscht alle GPS-Punkte und setzt die Tour auf den Anfang. Die Haken in der Vorbereitung bleiben. Den Knopf drei Sekunden gedrückt halten.</p>
         <div class="row">
           <button type="button" class="btn small hold" id="btn-reset"><span class="fill"></span><span>Alle Punkte löschen (3 Sekunden halten)</span></button>
         </div>
@@ -1832,6 +1835,7 @@ function liveVorbereiten(){               // erzeugt fehlende Ortsansagen einmal
 var kamStrom=null, kamStartet=false, kamGesperrt=false, linseRaf=null, lctx=null, linseBilder=0;
 var LINSE={blau:{a:190,b:262,m:222}, gruen:{a:70,b:170,m:125}, lila:{a:255,b:325,m:280}};   // Farbton-Bereiche der falschen Farben
 var ZIELTON={rot:356, gelb:48, gruen:128}, HELLER={rot:1.1, gelb:1.5, gruen:1};
+var LINSE_WORT={blau:'etwas Blaues', gruen:'etwas Grünes', lila:'etwas Lilafarbenes'}, ZIEL_WORT={rot:'rot', gelb:'gelb', gruen:'grün'};   // Hinweis für Erwachsene (UNICORN-118)
 function kannKamera(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia); }
 function kameraSoll(){ return state.kamera && !kamGesperrt && view==='tour' && state.phase!=='start' && state.phase!=='end' && document.visibilityState!=='hidden'; }
 function kameraAn(){
@@ -2352,7 +2356,7 @@ function jetzt(){                       // was der Erzähler in diesem Moment tu
     return vor+'Dreht euch, bis Funkels Horn nach oben zeigt, und lauft los. Funkel wird größer, je näher ihr kommt.';
   }
   if(st.kind==='plain') return st.task;
-  var lin = linseAn() ? 'Haltet den Spiegel vor das gedruckte Bild. Im Zauberkreis hat es wieder seine echte Farbe. ' : '';
+  var lin = linseAn() ? 'Haltet den Spiegel vor '+(LINSE_WORT[st.linse.von]||'etwas in der falschen Farbe')+'. Im Zauberkreis wird es '+(ZIEL_WORT[st.linse.zu]||'wieder richtig')+'. ' : '';
   if(st.kind==='recolor') return state.step===0 ? 'Die Kinder rufen, was nicht stimmt. Dann aufs Bild oder auf „Bild verzaubern“ tippen.' : lin+st.dann;
   if(st.kind==='wahl'){
     if(galerieAktiv()){ var go=st.optionen[galN], m=st.optionen.length;
@@ -2991,6 +2995,16 @@ $('btn-import').addEventListener('click', function(){
 window.addEventListener('hashchange', function(){ zeige(location.hash==='#einrichten'?'setup':'tour'); });
 
 /* ---------- Start ---------- */
+// Entwickler-Schalter (UNICORN-118): „Funkels Stimme“ und „Punkte als Code“ nur mit ?entwickler=1 (merkt sich das Gerät, ?entwickler=0 schaltet ab)
+(function(){
+  var an=false;
+  try{
+    var q=new URLSearchParams(location.search).get('entwickler');
+    if(q==='1') localStorage.setItem('sj.entwickler','1'); else if(q==='0') localStorage.removeItem('sj.entwickler');
+    an=localStorage.getItem('sj.entwickler')==='1';
+  }catch(e){}
+  Array.prototype.forEach.call(document.querySelectorAll('.nur-entwickler'), function(el){ el.hidden=!an; });
+})();
 $('kompass').innerHTML=PIC.einhorn();
 fuelleStimmen(); renderClips(); renderListe(); renderProtokoll();
 if(kannSprechen){ try{ speechSynthesis.addEventListener('voiceschanged', fuelleStimmen); }catch(e){ try{ speechSynthesis.onvoiceschanged=fuelleStimmen; }catch(e2){} } }
