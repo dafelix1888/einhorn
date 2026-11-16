@@ -67,6 +67,19 @@ async function mock(route){
   await n.goto(B+'spiel.html?thema=einhorn&k=SPIELTOKENSPIELTOKEN1234'); await n.waitForURL(u=>!/k=/.test(String(u))); await n.waitForTimeout(1000);
   await n.evaluate(()=>document.getElementById('btn-main').click()); await n.waitForTimeout(500);
   ok(gesendet.some(e=>e.name==='activated' && e.properties && e.properties.rolle==='spiel' && !e.email), 'Spiel meldet activated direkt, ohne persönliche Daten');
+  ok(gesendet.some(e=>e.name==='activated' && typeof e.properties.route==='boolean'), 'activated trägt route (UNICORN-79)');
+  // Tour bis nach Hause: genau ein completed (UNICORN-79)
+  await n.evaluate(()=>{ const st=__zs.state(); st.phase='heim'; st.step=0; }); await n.evaluate(()=>document.getElementById('btn-main').click()); await n.waitForTimeout(400);
+  await n.evaluate(()=>document.getElementById('btn-main').click()); await n.waitForTimeout(300);
+  ok(gesendet.filter(e=>e.name==='completed').length===1, 'Zu Hause angekommen: genau ein completed');
+  // Generalprobe: probe_started statt activated, kein completed (UNICORN-79)
+  gesendet.length=0;
+  const gp=await c4.newPage(); gp.on('pageerror',e=>errs.push(e.message));
+  await gp.goto(B+'spiel.html?thema=einhorn&probe=1'); await gp.waitForTimeout(800);
+  await gp.evaluate(()=>document.getElementById('btn-main').click()); await gp.waitForTimeout(500);
+  ok(gesendet.some(e=>e.name==='probe_started') && !gesendet.some(e=>e.name==='activated'), 'Generalprobe meldet probe_started, nicht activated');
+  await gp.evaluate(()=>{ const st=__zs.state(); st.phase='heim'; st.step=0; }); await gp.evaluate(()=>document.getElementById('btn-main').click()); await gp.waitForTimeout(400);
+  ok(!gesendet.some(e=>e.name==='completed'), 'Generalprobe meldet kein completed');
 
   // 5. Übergabe vom Planer: Routen-Karte
   await a.evaluate(()=>localStorage.removeItem('sj.party.einhorn')); await a.goto(B+'party.html?thema=einhorn'); await a.waitForTimeout(600);

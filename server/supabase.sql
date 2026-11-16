@@ -191,6 +191,47 @@ $$;
 revoke all on function public.stimm_verbrauch_zaehlen(int) from public, anon, authenticated;
 grant execute on function public.stimm_verbrauch_zaehlen(int) to service_role;
 
+-- Stimmen-Speicher über alle Partys (UNICORN-49, ADR-28): gleicher gesprochener Text = gleiche Aufnahme, für alle Kunden.
+-- Ohne Party, ohne Konto, ohne Zeitpunkt. Dateien im privaten Storage-Bucket „stimmen“ (<schluessel>/<aufnahme>.mp3).
+-- Ablesen: select text, aufnahme, wert, nutzungen from stimm_cache order by nutzungen desc;
+create table if not exists public.stimm_cache (
+  schluessel  text not null check (schluessel ~ '^[0-9a-f]{40}$'),
+  aufnahme    int  not null check (aufnahme between 1 and 3),
+  text        text not null check (length(text) <= 300),
+  datei       text not null,
+  wert        int  not null default 0,
+  nutzungen   int  not null default 0,
+  primary key (schluessel, aufnahme)
+);
+alter table public.stimm_cache enable row level security;
+revoke all on public.stimm_cache from anon, authenticated;
+create or replace function public.stimm_cache_werten(s text, a int, d int, n int)
+returns void language sql security definer set search_path = public as $$
+  update public.stimm_cache set wert = wert + d, nutzungen = nutzungen + greatest(n, 0) where schluessel = s and aufnahme = a;
+$$;
+revoke all on function public.stimm_cache_werten(text, int, int, int) from public, anon, authenticated;
+grant execute on function public.stimm_cache_werten(text, int, int, int) to service_role;
+insert into storage.buckets (id, name, public) values ('stimmen', 'stimmen', false) on conflict (id) do nothing;
+
+-- Tagesbremse für neue Aufnahmen über alle Partys (UNICORN-49): erst zählen, dann erzeugen; über der Grenze → false
+create table if not exists public.stimm_tag (
+  tag     date primary key,
+  saetze  int not null default 0
+);
+alter table public.stimm_tag enable row level security;
+revoke all on public.stimm_tag from anon, authenticated;
+create or replace function public.stimm_tag_buchen(n int, grenze int)
+returns boolean language plpgsql security definer set search_path = public as $$
+declare t date := (now() at time zone 'Europe/Berlin')::date; ist int;
+begin
+  insert into public.stimm_tag(tag, saetze) values (t, 0) on conflict (tag) do nothing;
+  update public.stimm_tag set saetze = saetze + n where tag = t and saetze + n <= grenze returning saetze into ist;
+  delete from public.stimm_tag where tag < t - 60;
+  return ist is not null;
+end $$;
+revoke all on function public.stimm_tag_buchen(int, int) from public, anon, authenticated;
+grant execute on function public.stimm_tag_buchen(int, int) to service_role;
+
 -- Fehlermeldungen aus der App (anonym, technisch). Schreiben über fehler_melden, lesen nur der Server/Dashboard.
 -- Gleiche Meldung wird gezählt statt neu angelegt (kennung = md5 aus Seite, Meldung, Datei, Zeile). Löschen nach 90 Tagen.
 create table if not exists public.fehler (

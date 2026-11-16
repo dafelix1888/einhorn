@@ -104,13 +104,17 @@
  ],
  "varianten": {
   "a": {
-   "name": "Outdoor, voll",
-   "kurz": "Draußen mit allen Ausdrucken",
+   "name": "Draußen",
+   "kurz": "Ihr lauft durch eure Straße, das Tablet führt per GPS.",
+   "braucht": "Kreide, ein Seil und ein Helfer, der vorausgeht. Ohne Helfer baust du vor der Party selbst auf, die App zeigt dir, was wohin kommt",
+   "bild": "draussen",
    "draussen": true
   },
   "b": {
-   "name": "Outdoor ohne Ausdrucke",
-   "kurz": "Draußen, Bilder nur im Spiegel",
+   "name": "Draußen + Hinweise am Weg",
+   "kurz": "Draußen, und an drei Stationen hängen echte Dinge zum Suchen.",
+   "braucht": "Kreide, ein Seil, 4 Schleifen, ein weißes Laken und ein Helfer, der vorausgeht. Ohne Helfer baust du vor der Party selbst auf, die App zeigt dir, was wohin kommt",
+   "bild": "draussen",
    "st": {
     "1": {
      "wo": "Am Ende der Kreidespur, roter Kreidekreis",
@@ -122,18 +126,20 @@
      "dann": "Hinter der grünen Schleife den gelben und den orangen Bogen holen. Hat jedes Kind seinen Glücksstein, „Bögen gefunden, weiter“ tippen."
     },
     "5": {
-     "wo": "Unten am Hügel, beim Bettlaken",
+     "wo": "Beim Bettlaken",
      "dann": "Leise zum Laken schleichen und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen."
     },
     "6": {
-     "vorOrt": "Sticker-Stücke bereithalten. Der Vorausgeher hat die Schatzkiste in der Tasche."
+     "vorOrt": "Sticker bereithalten. Die Schatzkiste bleibt noch versteckt."
     }
    },
    "draussen": true
   },
   "c": {
-   "name": "Indoor",
-   "kurz": "Im Haus, Vorausgeher legt nach",
+   "name": "Drinnen",
+   "kurz": "In Wohnung oder Haus, jeder Raum ist eine Station.",
+   "braucht": "4 Bänder, ein blaues Handtuch, Kissen für einen Kissenberg",
+   "bild": "drinnen",
    "st": {
     "1": {
      "wo": "Küche",
@@ -151,21 +157,29 @@
     },
     "4": {
      "wo": "Flur mit drei Türen",
-     "frage": "Vor drei Türen liegt je eine Spurenkarte. Ein Kind tippt im Spiegel auf die Spur, die zu den kleinen Pfoten passt.",
-     "dann": "Hinter der Fuchs-Tür liegt die Zaubertafel. Reihum malt jedes Kind ein Stück der Pfote, danach kommt die Tafel weg. Dann „Der Fuchsspur folgen“ tippen."
+     "frage": "Alle stehen vor den drei Türen mit den Spurenkarten. Schauen alle in den Spiegel, „Spur zeigen“ tippen. Die Spur ist 5 Sekunden zu sehen.",
+     "dann": "Hinter der Fuchs-Tür liegt die Zaubertafel. Reihum malt jedes Kind ein Stück der Pfote, danach kommt die Tafel weg. Dann „Der Fuchsspur folgen“ tippen.",
+     "frageWahl": "Die Kinder vergleichen die Spurenkarten vor den Türen mit der Spur, die sie sich gemerkt haben. Ein Kind tippt im Spiegel auf die passende."
     },
     "5": {
      "wo": "Kissenberg im Toberaum",
-     "vorOrt": "Vorausgeher: Kissenberg mit Wolke und grünen Bögen aufbauen, Toberaum-Tür kurz zu.",
+     "vorOrt": "Vorausgeher: Kissenberg mit grünen Bögen aufbauen, Toberaum-Tür kurz zu.",
      "dann": "Leise über den Kissenberg klettern und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen."
     },
     "6": {
      "wo": "Toberaum, hinter dem Sofa",
-     "vorOrt": "Fridolins Karton steht hinter dem Sofa, buntes Band daran. Sticker-Stücke bereithalten."
+     "vorOrt": "Sticker bereithalten. Die Schatzkiste bleibt noch versteckt."
     }
    },
    "draussen": false
   }
+ },
+ "extra": {
+  "titel": "Echte Hinweise am Weg",
+  "text": "Statt nur Bilder im Spiegel finden die Kinder an drei Stationen echte Dinge: 4 bunte Schleifen an einem Zaun oder Geländer, einen roten Kreidekreis und ein weißes Laken als Wolke.",
+  "braucht": "4 Schleifen, 1 weißes Laken, rote Kreide",
+  "bild": "hinweise",
+  "variante": "b"
  },
  "stationen": [
   {
@@ -175,12 +189,16 @@
    "arc": "lila",
    "pic": "horn",
    "title": "Funkels Botschaft",
-   "say": "Hallo, ihr Einhorn-Helfer! Ihr tragt ja schon mein Zeichen. Ich bin Funkel und wohne im Wald hinter euren Häusern. Jeden Morgen male ich mit meinem Regenbogen die Farben in die Welt.",
-   "say2": "Aber heute Nacht hat ihn jemand gemopst! Jetzt sind alle Farben durcheinander. Nur die zwei kleinsten Bögen habe ich noch. Setzt eure Hörner auf und folgt meinen Hufspuren!",
+   "say": "Hallo, ihr Einhorn-Helfer! Ihr tragt ja schon mein Zeichen. Ich bin Funkel und wohne im Wald hinter euren Häusern. Jeden Morgen male ich mit meinem Regenbogen die Farben in die Welt. Und das hier ist mein Zauberspiegel! Durch ihn kann ich euch sehen und mit euch sprechen. Er zeigt euch den Weg, und an jeder Station hat er ein Rätsel für euch.",
+   "say2": "Und stellt euch vor: In der Nacht hat jemand meinen Regenbogen gemopst! Jetzt sind alle Farben durcheinander. Nur die zwei kleinsten Bögen habe ich noch. Setzt eure Hörner auf und folgt meinen Hufspuren!",
    "task": "Einhorn-Prüfung machen: wiehern, mit dem Huf scharren, mit dem Horn wackeln. Wer besteht, bekommt seinen Haarreif mit Horn. Danach „Prüfung bestanden, los!“ tippen.",
    "go": "Prüfung bestanden, los!",
    "ort": {
     "typ": "start"
+   },
+   "planer": {
+    "was": "Funkel stellt sich vor: Sein Regenbogen ist gemopst. Danach Einhorn-Prüfung mit Wiehern, Scharren und Hörnern.",
+    "ort": "Vor eurer Haustür, mit Platz für alle Kinder."
    }
   },
   {
@@ -204,7 +222,12 @@
     "typ": "weg",
     "anteil": 0.18
    },
-   "ansage": "Die Hufspuren führen {zu}."
+   "ansage": "Die Hufspuren führen {zu}.",
+   "planer": {
+    "was": "Im Spiegel ist die Erdbeere blau. Die Kinder rufen „Rot!“ und suchen die roten Bögen.",
+    "ort": "Am Ende einer Kreidespur, ein ruhiger Fleck mit einem Versteck in Bodennähe.",
+    "versteck": "Rote Bögen"
+   }
   },
   {
    "name": "Straßenübergang",
@@ -213,7 +236,7 @@
    "arc": null,
    "pic": "hufe",
    "vorOrt": "Seil auspacken. Ein Erwachsener geht vorn, einer hinten.",
-   "seek": "Weiter bis zur Straße. Dort wartet die Regenbogenbrücke.",
+   "seek": "Gleich kommt die Regenbogenbrücke. Bleibt dicht zusammen!",
    "title": "Die Regenbogenbrücke",
    "say": "Über die Regenbogenbrücke gehen Einhörner nur zusammen. Auf der anderen Seite beginnt mein Wald. Alle ans Seil! Beim Gehen rufen wir: klipp, klopp!",
    "task": "Tablet einstecken, alle Hände ans Seil. Drüben angekommen „Alle sind drüben“ tippen.",
@@ -222,7 +245,11 @@
     "typ": "strassenquerung",
     "anteil": 0.32
    },
-   "ansage": "Die Regenbogenbrücke wartet {an}."
+   "ansage": "Die Regenbogenbrücke wartet {an}.",
+   "planer": {
+    "was": "Alle fassen das Seil und gehen gemeinsam über die Regenbogenbrücke, also über die Straße.",
+    "ort": "Eine sichere Stelle zum Überqueren, am besten Zebrastreifen oder Ampel."
+   }
   },
   {
    "name": "Am Zaun",
@@ -231,14 +258,14 @@
    "arc": "gelb",
    "pic": "galerie",
    "namenOffen": true,
-   "seek": "Hinter der Brücke beginnt der Zaun. Dort zeigt euch mein Spiegel Bilder mit falschen Farben!",
+   "seek": "Hinter der Brücke zeigt euch mein Spiegel Bilder mit falschen Farben!",
    "ohne": {
     "seek": "Hinter der Brücke hat der Dieb vier bunte Bänder verloren. Lauft von Band zu Band und schaut dort in meinen Spiegel!",
     "say": "Schaut in meinen Spiegel! Vier Bilder mit falschen Farben. Bei einem davon liegen mein gelber und mein oranger Bogen. Es ist das Ding, das in echt gelb ist. Findet es heraus!",
     "after": "Richtig, die Sonne ist gelb! Sucht beim grünen Band. Dort liegen mein gelber und mein oranger Bogen, und für jeden ein Glücksstein. Der macht mutig für den Wald."
    },
    "title": "Die Quatschbilder",
-   "say": "Schaut nur, was ohne meinen Regenbogen passiert ist! Mein Spiegel zeigt euch vier Bilder mit falschen Farben, eins nach dem anderen. Lauft dabei am Zaun entlang. Eins davon ist in echt gelb. Findet es heraus!",
+   "say": "Schaut nur, was ohne meinen Regenbogen passiert ist! Mein Spiegel zeigt euch vier Bilder mit falschen Farben, eins nach dem anderen. Lauft dabei langsam weiter. Eins davon ist in echt gelb. Findet es heraus!",
    "frage": "Alle vier Bilder gesehen. Jetzt tippt ein Kind auf das Ding, das in echt gelb ist.",
    "optionen": [
     {
@@ -274,7 +301,12 @@
     "typ": "zaun",
     "anteil": 0.48
    },
-   "ansage": "Der Zaun beginnt {an}."
+   "ansage": "Die Bilder warten {an}.",
+   "planer": {
+    "was": "Der Spiegel zeigt Dinge in falschen Farben, die Kinder rufen die richtige. Danach finden sie Bögen und Glückssteine.",
+    "ort": "Am Anfang eines Zauns oder einer Hecke, wo man etwas verstecken kann.",
+    "versteck": "Gelber und oranger Bogen, Glückssteine"
+   }
   },
   {
    "name": "Wegkreuzung",
@@ -282,20 +314,33 @@
    "kind": "wahl",
    "arc": null,
    "pic": "pfote",
-   "seek": "Der Dieb ist weitergerannt. Geht bis zur Kreuzung. Dort wartet ein neues Rätsel auf euch!",
+   "seek": "Der Dieb ist weitergerannt. Lauft hinterher, gleich wartet ein neues Rätsel auf euch!",
    "title": "Wer war das?",
-   "say": "Schaut in meinen Spiegel! Drei Spuren. Wem gehören die kleinen Pfoten?",
-   "frage": "Der Spiegel zeigt drei Spuren. Die Kinder schauen sie genau an, dann tippt ein Kind auf die Spur, die zu den kleinen Pfoten passt.",
+   "say": "Psst! Der Dieb hat hier eine Spur hinterlassen. Ich zeige sie euch in meinem Spiegel, aber nur ganz kurz. Dann kommt der Nebel! Schaut genau hin und merkt sie euch gut.",
+   "frage": "Alle Kinder vor den Spiegel holen. Schauen alle hin, „Spur zeigen“ tippen. Die Spur ist 5 Sekunden zu sehen, dann kommt der Nebel.",
+   "frageNebel": "Die Kinder suchen die Zaubertafel (liegt hier an der Kreuzung) und malen die Spur aus dem Gedächtnis, reihum jeder ein Stück. Dann „Fertig gemalt“ tippen. Vergessen? „Spur noch einmal zeigen“.",
+   "frageWahl": "Die Kinder halten die Zaubertafel neben den Spiegel. Ein Kind tippt auf die Spur, die sie gemalt haben.",
+   "merken": {
+    "sekunden": 5,
+    "zeigenGo": "Spur zeigen",
+    "malen": "Der Nebel ist da! Schnell, der Dieb hat hier eine Zaubertafel verloren. Sucht sie und malt die Spur darauf, so wie ihr sie euch gemerkt habt. Jeder malt ein Stück!",
+    "malenGo": "Fertig gemalt",
+    "vergleich": "Zeigt mir eure Zaubertafel! Haltet sie neben meinen Spiegel. Welche Spur habt ihr gemalt?",
+    "drinnen": {
+     "vergleich": "Der Nebel ist da! Vor den Türen liegen drei Spuren. Welche habt ihr euch gemerkt? Tippt sie in meinem Spiegel an.",
+     "after": "Ein Fuchs! Was will denn ein Fuchs mit meinem Regenbogen? Hinter der Fuchs-Tür wartet etwas auf euch. Malt die Spur darauf, dann vergesst ihr sie nicht!"
+    }
+   },
    "optionen": [
     {
      "id": "hase",
      "name": "Hase",
-     "nein": "Hoppel, hoppel! Das war der Hase. Hat ein Hase so kleine Pfoten?"
+     "nein": "Hoppel, hoppel! Das ist die Hasenspur. War eure Spur so lang?"
     },
     {
      "id": "ente",
      "name": "Ente",
-     "nein": "Quak, quak! Das war die Ente. Macht ein Fuchs Quak?"
+     "nein": "Quak, quak! Das ist die Entenspur mit Schwimmhäuten. War eure Spur so spitz?"
     },
     {
      "id": "fuchs",
@@ -303,14 +348,19 @@
      "ja": true
     }
    ],
-   "after": "Ein Fuchs! Was will denn ein Fuchs mit meinem Regenbogen? Der Fuchs hat hier eine Zaubertafel verloren. Schaut euch gut um! Malt die Pfote gemeinsam darauf ab, dann erkennt ihr die Spur überall wieder!",
+   "after": "Ein Fuchs! Was will denn ein Fuchs mit meinem Regenbogen? Steckt die Zaubertafel ein und lauft der Fuchsspur hinterher!",
    "go": "Der Fuchsspur folgen",
-   "dann": "Die Kinder schauen sich um und finden die Zaubertafel. Reihum malt jedes Kind ein Stück der Pfote, danach kommt die Tafel in die Tasche. Dann „Der Fuchsspur folgen“ tippen.",
+   "dann": "Die Zaubertafel kommt in die Tasche. Dann „Der Fuchsspur folgen“ tippen.",
    "ort": {
     "typ": "kreuzung",
     "anteil": 0.64
    },
-   "ansage": "Die Kreuzung ist {an}."
+   "ansage": "Das nächste Rätsel wartet {an}.",
+   "planer": {
+    "was": "Der Spiegel zeigt kurz eine Spur, die Kinder malen sie auf die Zaubertafel und finden heraus: ein Fuchs!",
+    "ort": "Eine Wegkreuzung, an der die Gruppe in Ruhe stehen bleiben kann.",
+    "versteck": "Zaubertafel"
+   }
   },
   {
    "name": "Wolkenberg",
@@ -324,24 +374,30 @@
     "von": "lila",
     "zu": "gruen"
    },
-   "seek": "Der Fuchs ist zum Berg gelaufen. Kommt mit! Psst, auf dem Berg schläft eine Regenwolke.",
+   "seek": "Der Fuchs ist weitergelaufen. Kommt mit! Psst, gleich schläft hier eine Regenwolke.",
    "title": "Der lila Frosch",
    "say": "Psst, die Wolke schläft. Schaut leise in den Spiegel. Was stimmt hier nicht?",
    "after": "Richtig, Frösche sind grün! Schleicht zur Wolke und sucht etwas Grünes. Aber weckt sie nicht!",
-   "dann": "Leise zur Wolke schleichen und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen.",
+   "dann": "Die Wolke schläft nur im Spiegel. Leise losschleichen und die grünen Bögen suchen. Danach „Bögen gefunden, weiter“ tippen.",
+   "deko": "wolke",
    "ort": {
     "typ": "huegel_unten",
     "anteil": 0.8
    },
-   "ansage": "Der Wolkenberg ist {an}."
+   "ansage": "Die Regenwolke schläft {an}.",
+   "planer": {
+    "was": "Der Frosch ist lila statt grün. Die Wolke schläft, also schleichen alle leise los und suchen die grünen Bögen.",
+    "ort": "Unten an einem kleinen Hügel oder einer Böschung.",
+    "versteck": "Grüne Bögen"
+   }
   },
   {
    "name": "Parkbank",
    "wo": "Oben am Berg, bei der Parkbank",
    "kind": "finale",
    "arc": "blau",
-   "vorOrt": "Sticker-Stücke bereithalten. Der Vorausgeher hat die Schatzkiste in der Tasche.",
-   "seek": "Jetzt den Berg hinauf, zur Parkbank bei den Bäumen. Dort legen wir den Regenbogen.",
+   "vorOrt": "Sticker bereithalten. Die Schatzkiste bleibt noch versteckt.",
+   "seek": "Jetzt geht es zum letzten Ort. Dort legen wir den Regenbogen zusammen.",
    "steps": [
     {
      "title": "Eine Farbe fehlt",
@@ -371,32 +427,182 @@
     "ende": true,
     "oben": true
    },
-   "ansage": "Die Parkbank steht {an}."
+   "ansage": "Der letzte Ort ist {an}.",
+   "planer": {
+    "was": "Blau fehlt! Die Pfoten führen zu Fridolins grauem Bau. Der Fuchs gibt die Bögen zurück, dann kommt der Schatz.",
+    "ort": "Oben auf einem Hügel bei einer Bank: Platz zum Sitzen, für den Snack und den Schatz.",
+    "versteck": "Grauer Karton (Fridolins Bau), blaue Bögen"
+   }
   }
  ],
  "vorbereitung": {
+  "noetig": [
+   {
+    "x": "Tablet oder Handy, startklar",
+    "wofuer": "Der Zauberspiegel für die ganze Tour",
+    "notfalls": "„Startklar“ prüft es. Powerbank einpacken."
+   },
+   {
+    "x": "{kinder} Haarreifen",
+    "wofuer": "Station 1: Funkel prüft, ob alle ein Horn tragen",
+    "notfalls": "Papierhörner: Papier zur Tüte rollen, mit Haargummi befestigen.",
+    "u": [
+     "u0"
+    ]
+   },
+   {
+    "x": "{kinder} Tattoos",
+    "wofuer": "Station 1: Funkels Zeichen auf der Hand",
+    "notfalls": "Mit Kinderschminke einen kleinen Regenbogen auf die Hand malen.",
+    "u": [
+     "u1"
+    ]
+   },
+   {
+    "x": "Bögen in Rot, Gelb, Grün, Blau",
+    "wofuer": "Jede Station gibt einen Bogen des Regenbogens zurück",
+    "notfalls": "Aus Pappe ausschneiden und anmalen.",
+    "u": [
+     "u2"
+    ]
+   },
+   {
+    "x": "Fridolin (Kuscheltier) und ein grauer Karton",
+    "wofuer": "Station 7: Fridolin sitzt in seinem grauen Bau",
+    "notfalls": "Jedes Kuscheltier, jeder Karton.",
+    "u": [
+     "u8",
+     "u11"
+    ]
+   },
+   {
+    "x": "Sticker, je Kind einer",
+    "wofuer": "Station 7: Die Kinder machen den Bau bunt",
+    "notfalls": "Klebezettel.",
+    "u": [
+     "u7"
+    ]
+   },
+   {
+    "x": "{kinder} Glückssteine",
+    "wofuer": "Station 4: je Kind ein Glücksstein",
+    "notfalls": "Kieselsteine sammeln, gern bunt bemalt.",
+    "u": [
+     "u3"
+    ]
+   },
+   {
+    "x": "1 Zaubertafel für Station 5",
+    "wofuer": "Station 5: für das Rätsel „Wer war das?“",
+    "notfalls": "Zettel und Stift.",
+    "u": [
+     "u4"
+    ]
+   },
+   {
+    "x": "Buntes Band am Versteck",
+    "wofuer": "Station 7: zeigt das Versteck",
+    "notfalls": "Ein bunter Schal oder ein Geschirrtuch."
+   },
+   {
+    "x": "Schatzkiste, je Kind ein Geschenk",
+    "wofuer": "Station 7: der Schatz für alle",
+    "notfalls": "Eine Tasche mit Süßigkeiten."
+   },
+   {
+    "x": "Seil für Station 3",
+    "wofuer": "Station 3: Alle halten sich auf der Regenbogenbrücke fest",
+    "notfalls": "An den Händen fassen.",
+    "u": [
+     "u9"
+    ]
+   },
+   {
+    "x": "4 Schleifen und ein weißes Laken",
+    "wofuer": "Extra „Hinweise am Weg“: Station 2, 4 und 6",
+    "notfalls": "Papierstreifen, weißes Handtuch.",
+    "nur": [
+     "b"
+    ]
+   },
+   {
+    "x": "4 Bänder, blaues Handtuch, 3 Spuren-Zettel",
+    "wofuer": "Drinnen: Fluss im Flur, Bänder an der Treppe, Spuren an den Türen",
+    "notfalls": "Papierstreifen, blaues Kissen.",
+    "nur": [
+     "c"
+    ]
+   },
+   {
+    "x": "Route einmal abgelaufen",
+    "wofuer": "Damit das GPS an jeder Station richtig auslöst",
+    "notfalls": "Am Tag „Wir sind da“ tippen.",
+    "nur": [
+     "a",
+     "b"
+    ]
+   },
+   {
+    "x": "Kreidespur bis Station 2",
+    "wofuer": "Der Weg von der Haustür bis Station 2",
+    "notfalls": "Einfach mit dem Spiegel losgehen.",
+    "nur": [
+     "a",
+     "b"
+    ],
+    "u": [
+     "u10"
+    ]
+   },
+   {
+    "x": "Ein Helfer als Vorausgeher",
+    "wofuer": "Baut Station 2 bis 7 auf, bevor die Kinder kommen",
+    "notfalls": "Morgens selbst auslegen."
+   }
+  ],
+  "extras": [
+   {
+    "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
+    "wofuer": "Für die Schatzkiste",
+    "u": [
+     "u5",
+     "u12"
+    ],
+    "notfalls": "Süßigkeiten oder Kleinigkeiten von zu Hause, in Butterbrottüten."
+   },
+   {
+    "x": "Kiste bekleben, Karton grau anmalen",
+    "wofuer": "Sieht schöner aus, ändert am Spiel nichts"
+   },
+   {
+    "x": "Haarreif für Fridolin",
+    "wofuer": "Fridolin wird auch ein kleines Einhorn"
+   },
+   {
+    "x": "Etwas Weißes als Wolke",
+    "wofuer": "Station 6: eine Wolke zum Anfassen",
+    "nur": [
+     "a",
+     "c"
+    ]
+   },
+   {
+    "x": "Regenbogen-Snack",
+    "wofuer": "Pause unterwegs"
+   },
+   {
+    "x": "Wasser, Becher, Decke",
+    "wofuer": "Pause unterwegs"
+   },
+   {
+    "x": "Probelauf zu Hause",
+    "wofuer": "Damit drinnen alles klappt",
+    "nur": [
+     "c"
+    ]
+   }
+  ],
   "gemeinsam": [
-   {
-    "t": "Besorgen und basteln",
-    "items": [
-     "Schatzkiste: ein beklebter Schuhkarton",
-     "Fridolins Bau: Karton grau anmalen, dazu eine Plastiktüte als Unterlage",
-     "Buntes Band oder Tuch als Markierung für Fridolins Versteck",
-     "Sticker in {kinder} Stücke schneiden",
-     "Fridolin (Kuscheltier) mit Haarreif aus der Reserve",
-     "Schatzkiste füllen: {kinder} Kratzbilder mit Zeichenschablonen und {kinder} Zaubertafeln",
-     "Eine der Zaubertafeln für Station 5 beiseitelegen (zum gemeinsamen Abmalen), danach einsammeln und am Ende einem Kind in die Tüte legen",
-     "{kinder} Glückssteine in eine kleine Tüte, getrennt von den Geschenken"
-    ]
-   },
-   {
-    "t": "Spiegel",
-    "items": [
-     "funkel-stimme.json liegt neben der Seite, Tablet spielt alle Sätze dieser Variante",
-     "Bildschirmsperre ausschalten (iPad: Einstellungen → Anzeige & Helligkeit → Automatische Sperre „Nie“; Android: Einstellungen → Display → Bildschirm-Timeout, längste Zeit)",
-     "Am Morgen: Tablet voll geladen, Ton an und laut"
-    ]
-   },
    {
     "t": "Packen: bei der Gruppe",
     "items": [
@@ -419,27 +625,14 @@
   "variante": {
    "a": [
     {
-     "t": "Drucken",
-     "items": [
-      "A3: schlafende Wolke",
-      "Bei Regenwetter: in eine Klarsichthülle"
-     ]
-    },
-    {
-     "t": "GPS",
-     "items": [
-      "Tour im Planer erstellt und einmal abgelaufen, Punkte bei Bedarf im Planer verschoben"
-     ]
-    },
-    {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
-      "Rote Bögen (Station 2)",
-      "Gelbe und orange Bögen und die Tüte mit {kinder} Glückssteinen, irgendwo am Zaun verstecken (Station 4)",
-      "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
-      "Wolken-Ausdruck, grüne Bögen (Station 6)",
+      "Rote Bögen, neben etwas Rotes legen, zum Beispiel Briefkasten oder Blume. Gibt es nichts Rotes, ein rotes Tuch dazulegen (Station 2)",
+      "Gelbe und orange Bögen und die Tüte mit {kinder} Glückssteinen, an einer Stelle verstecken, die auffällt (Station 4)",
+      "Die eine Zaubertafel, in der Nähe verstecken (Station 5)",
+      "Grüne Bögen (Station 6). Die Wolke schläft nur im Spiegel. Wer mag, legt etwas Weißes dazu (Laken, Kissen, Watte)",
       "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
-      "Schatzkiste (Station 7)"
+      "Schatzkiste: bleibt in der Tasche, nicht hinlegen (Station 7)"
      ]
     },
     {
@@ -452,20 +645,14 @@
    ],
    "b": [
     {
-     "t": "GPS",
-     "items": [
-      "Tour im Planer erstellt und einmal abgelaufen, Punkte bei Bedarf im Planer verschoben"
-     ]
-    },
-    {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
       "Rote Bögen, rote Kreide für den Kreidekreis (Station 2)",
       "Vier Schleifen aus Krepp- oder Geschenkband (Blau, Pink, Grün, Rot-Weiß), gelbe und orange Bögen, Tüte mit {kinder} Glückssteinen (Station 4)",
-      "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
+      "Die eine Zaubertafel, in der Nähe verstecken (Station 5)",
       "Weißes Bettlaken oder weißer Schirm als Wolke, grüne Bögen (Station 6)",
       "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
-      "Schatzkiste (Station 7)"
+      "Schatzkiste: bleibt in der Tasche, nicht hinlegen (Station 7)"
      ]
     },
     {
@@ -478,21 +665,15 @@
    ],
    "c": [
     {
-     "t": "Spiegel",
-     "items": [
-      "Tour einmal zu Hause mit „Station öffnen“ durchgespielt"
-     ]
-    },
-    {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
       "Rote Bögen (Küche)",
       "Blaues Handtuch als Fluss (Flur)",
       "Vier Bänder (Blau, Pink, Grün, Rot-Weiß), Schüssel mit den gelben und orangen Bögen und {kinder} Glückssteinen (Treppe)",
       "Drei Zettel mit gemalten Spuren (Hase, Ente, Fuchs), die eine Zaubertafel (Türen)",
-      "Weißes Kissen oder Laken als Wolke, grüne Bögen (Kissenberg)",
+      "Grüne Bögen (Kissenberg). Wer mag, legt ein weißes Kissen als Wolke dazu",
       "Grauer Karton mit Fridolin, blaue Bögen, buntes Band (Sofa)",
-      "Schatzkiste"
+      "Schatzkiste: bleibt bei dir, nicht hinlegen"
      ]
     },
     {
@@ -502,13 +683,535 @@
      ]
     }
    ]
-  }
+  },
+  "liste": {
+   "a": {
+    "vorher": [
+     {
+      "x": "Route einmal abgelaufen",
+      "ding": "Route einmal abgelaufen"
+     },
+     {
+      "x": "Ein Helfer als Vorausgeher, geht 20 Min. früher los",
+      "ding": "Ein Helfer als Vorausgeher"
+     },
+     {
+      "x": "Kreidespur bis Station 2",
+      "ding": "Kreidespur bis Station 2"
+     },
+     {
+      "x": "Tablet startklar",
+      "ding": "Tablet oder Handy, startklar"
+     },
+     {
+      "x": "Kiste bekleben, Karton grau anmalen",
+      "ding": "Kiste bekleben, Karton grau anmalen"
+     }
+    ],
+    "stationen": [
+     {
+      "s": 1,
+      "ort": "Haustür",
+      "wer": "Gruppe",
+      "d": [
+       {
+        "x": "{kinder} Haarreifen",
+        "ding": "{kinder} Haarreifen"
+       },
+       {
+        "x": "{kinder} Tattoos",
+        "ding": "{kinder} Tattoos"
+       },
+       {
+        "x": "2 kleinste Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
+      ]
+     },
+     {
+      "s": 2,
+      "ort": "Ecke",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Rote Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
+      ]
+     },
+     {
+      "s": 3,
+      "ort": "Übergang",
+      "wer": "Gruppe",
+      "d": [
+       {
+        "x": "Seil",
+        "ding": "Seil für Station 3"
+       }
+      ]
+     },
+     {
+      "s": 4,
+      "ort": "Quatschbilder",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Gelbe + orange Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "{kinder} Glückssteine",
+        "ding": "{kinder} Glückssteine"
+       }
+      ]
+     },
+     {
+      "s": 5,
+      "ort": "Spuren",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "1 Zaubertafel",
+        "ding": "1 Zaubertafel für Station 5"
+       }
+      ]
+     },
+     {
+      "s": 6,
+      "ort": "Wolke",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Grüne Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Etwas Weißes als Wolke",
+        "ding": "Etwas Weißes als Wolke"
+       }
+      ]
+     },
+     {
+      "s": 7,
+      "ort": "Versteck",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Fridolin im grauen Karton",
+        "ding": "Fridolin (Kuscheltier) und ein grauer Karton"
+       },
+       {
+        "x": "Blaue Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Buntes Band",
+        "ding": "Buntes Band am Versteck"
+       },
+       {
+        "x": "Schatzkiste mit Geschenken, bleibt in der Tasche",
+        "ding": "Schatzkiste, je Kind ein Geschenk"
+       },
+       {
+        "x": "Sticker, je Kind einer",
+        "ding": "Sticker, je Kind einer"
+       },
+       {
+        "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
+        "ding": "Geschenke für den Schatz: Kratzbilder und Tüten"
+       },
+       {
+        "x": "Haarreif für Fridolin",
+        "ding": "Haarreif für Fridolin"
+       }
+      ]
+     }
+    ],
+    "mit": [
+     {
+      "x": "Regenbogen-Snack",
+      "ding": "Regenbogen-Snack"
+     },
+     {
+      "x": "Wasser, Becher, Decke",
+      "ding": "Wasser, Becher, Decke"
+     }
+    ]
+   },
+   "b": {
+    "vorher": [
+     {
+      "x": "Route einmal abgelaufen",
+      "ding": "Route einmal abgelaufen"
+     },
+     {
+      "x": "Ein Helfer als Vorausgeher, geht 20 Min. früher los",
+      "ding": "Ein Helfer als Vorausgeher"
+     },
+     {
+      "x": "Kreidespur bis Station 2",
+      "ding": "Kreidespur bis Station 2"
+     },
+     {
+      "x": "Tablet startklar",
+      "ding": "Tablet oder Handy, startklar"
+     },
+     {
+      "x": "Kiste bekleben, Karton grau anmalen",
+      "ding": "Kiste bekleben, Karton grau anmalen"
+     }
+    ],
+    "stationen": [
+     {
+      "s": 1,
+      "ort": "Haustür",
+      "wer": "Gruppe",
+      "d": [
+       {
+        "x": "{kinder} Haarreifen",
+        "ding": "{kinder} Haarreifen"
+       },
+       {
+        "x": "{kinder} Tattoos",
+        "ding": "{kinder} Tattoos"
+       },
+       {
+        "x": "2 kleinste Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
+      ]
+     },
+     {
+      "s": 2,
+      "ort": "Ecke",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Rote Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Rote Kreide für den Kreidekreis",
+        "ding": "4 Schleifen und ein weißes Laken",
+        "notfalls": "Ein Kreis aus rotem Papier."
+       }
+      ]
+     },
+     {
+      "s": 3,
+      "ort": "Übergang",
+      "wer": "Gruppe",
+      "d": [
+       {
+        "x": "Seil",
+        "ding": "Seil für Station 3"
+       }
+      ]
+     },
+     {
+      "s": 4,
+      "ort": "Quatschbilder",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "4 bunte Schleifen",
+        "ding": "4 Schleifen und ein weißes Laken",
+        "notfalls": "Papierstreifen."
+       },
+       {
+        "x": "Gelbe + orange Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "{kinder} Glückssteine",
+        "ding": "{kinder} Glückssteine"
+       }
+      ]
+     },
+     {
+      "s": 5,
+      "ort": "Spuren",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "1 Zaubertafel",
+        "ding": "1 Zaubertafel für Station 5"
+       }
+      ]
+     },
+     {
+      "s": 6,
+      "ort": "Wolke",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Weißes Laken als Wolke",
+        "ding": "4 Schleifen und ein weißes Laken",
+        "notfalls": "Ein weißes Handtuch."
+       },
+       {
+        "x": "Grüne Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
+      ]
+     },
+     {
+      "s": 7,
+      "ort": "Versteck",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Fridolin im grauen Karton",
+        "ding": "Fridolin (Kuscheltier) und ein grauer Karton"
+       },
+       {
+        "x": "Blaue Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Buntes Band",
+        "ding": "Buntes Band am Versteck"
+       },
+       {
+        "x": "Schatzkiste mit Geschenken, bleibt in der Tasche",
+        "ding": "Schatzkiste, je Kind ein Geschenk"
+       },
+       {
+        "x": "Sticker, je Kind einer",
+        "ding": "Sticker, je Kind einer"
+       },
+       {
+        "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
+        "ding": "Geschenke für den Schatz: Kratzbilder und Tüten"
+       },
+       {
+        "x": "Haarreif für Fridolin",
+        "ding": "Haarreif für Fridolin"
+       }
+      ]
+     }
+    ],
+    "mit": [
+     {
+      "x": "Regenbogen-Snack",
+      "ding": "Regenbogen-Snack"
+     },
+     {
+      "x": "Wasser, Becher, Decke",
+      "ding": "Wasser, Becher, Decke"
+     }
+    ]
+   },
+   "c": {
+    "vorher": [
+     {
+      "x": "Ein Helfer als Vorausgeher",
+      "ding": "Ein Helfer als Vorausgeher"
+     },
+     {
+      "x": "Tablet startklar",
+      "ding": "Tablet oder Handy, startklar"
+     },
+     {
+      "x": "Probelauf zu Hause",
+      "ding": "Probelauf zu Hause"
+     },
+     {
+      "x": "Kiste bekleben, Karton grau anmalen",
+      "ding": "Kiste bekleben, Karton grau anmalen"
+     }
+    ],
+    "stationen": [
+     {
+      "s": 1,
+      "ort": "Start",
+      "wer": "Gruppe",
+      "d": [
+       {
+        "x": "{kinder} Haarreifen",
+        "ding": "{kinder} Haarreifen"
+       },
+       {
+        "x": "{kinder} Tattoos",
+        "ding": "{kinder} Tattoos"
+       },
+       {
+        "x": "2 kleinste Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
+      ]
+     },
+     {
+      "s": 2,
+      "ort": "Küche",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Rote Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       }
+      ]
+     },
+     {
+      "s": 3,
+      "ort": "Flur",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Blaues Handtuch als Fluss",
+        "ding": "4 Bänder, blaues Handtuch, 3 Spuren-Zettel",
+        "notfalls": "Ein blaues Kissen."
+       },
+       {
+        "x": "Seil",
+        "ding": "Seil für Station 3"
+       }
+      ]
+     },
+     {
+      "s": 4,
+      "ort": "Treppe",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "4 Bänder am Geländer",
+        "ding": "4 Bänder, blaues Handtuch, 3 Spuren-Zettel",
+        "notfalls": "Papierstreifen."
+       },
+       {
+        "x": "Gelbe + orange Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "{kinder} Glückssteine",
+        "ding": "{kinder} Glückssteine"
+       }
+      ]
+     },
+     {
+      "s": 5,
+      "ort": "Türen",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "3 Spuren-Zettel",
+        "ding": "4 Bänder, blaues Handtuch, 3 Spuren-Zettel",
+        "notfalls": "Spuren mit Stift auf Zettel malen."
+       },
+       {
+        "x": "1 Zaubertafel",
+        "ding": "1 Zaubertafel für Station 5"
+       }
+      ]
+     },
+     {
+      "s": 6,
+      "ort": "Kissenberg",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Grüne Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Etwas Weißes als Wolke",
+        "ding": "Etwas Weißes als Wolke"
+       }
+      ]
+     },
+     {
+      "s": 7,
+      "ort": "Sofa",
+      "wer": "Vorausgeher",
+      "d": [
+       {
+        "x": "Fridolin im grauen Karton",
+        "ding": "Fridolin (Kuscheltier) und ein grauer Karton"
+       },
+       {
+        "x": "Blaue Bögen",
+        "ding": "Bögen in Rot, Gelb, Grün, Blau"
+       },
+       {
+        "x": "Buntes Band",
+        "ding": "Buntes Band am Versteck"
+       },
+       {
+        "x": "Schatzkiste mit Geschenken, bleibt in der Tasche",
+        "ding": "Schatzkiste, je Kind ein Geschenk"
+       },
+       {
+        "x": "Sticker, je Kind einer",
+        "ding": "Sticker, je Kind einer"
+       },
+       {
+        "x": "Geschenke für den Schatz: Kratzbilder und Tüten",
+        "ding": "Geschenke für den Schatz: Kratzbilder und Tüten"
+       },
+       {
+        "x": "Haarreif für Fridolin",
+        "ding": "Haarreif für Fridolin"
+       }
+      ]
+     }
+    ],
+    "mit": [
+     {
+      "x": "Regenbogen-Snack",
+      "ding": "Regenbogen-Snack"
+     },
+     {
+      "x": "Wasser und Becher",
+      "ding": "Wasser, Becher, Decke"
+     }
+    ]
+   }
+  },
+  "basteln": [
+   {
+    "x": "Sticker in {kinder} Stücke schneiden",
+    "min": 5,
+    "noetig": true,
+    "ohne": "Klebezettel nehmen, je Kind einen."
+   },
+   {
+    "x": "Schatzkiste bekleben",
+    "min": 20,
+    "ohne": "Den Schuhkarton so lassen. Wichtig ist, was drin ist."
+   },
+   {
+    "x": "Fuchsbau grau anmalen",
+    "min": 15,
+    "ohne": "Irgendein Karton. Fridolin sitzt trotzdem drin."
+   },
+   {
+    "x": "Urkunden drucken",
+    "min": 5,
+    "braucht": "Drucker",
+    "ohne": "Weglassen. Nach der Party schickst du den Danke-Link, darin ist die Urkunde jedes Kindes zum Speichern."
+   },
+   {
+    "x": "Einladungen drucken",
+    "min": 5,
+    "braucht": "Drucker",
+    "ohne": "Nicht nötig: Der Einladungslink per WhatsApp reicht."
+   },
+   {
+    "x": "Echte Hinweise vorbereiten: 4 Schleifen, Laken, rote Kreide",
+    "min": 10,
+    "nur": [
+     "b"
+    ],
+    "ohne": "Extra aus: Die Kinder sehen die Hinweise nur im Spiegel."
+   }
+  ],
+  "regel": "Nötig ist, was Funkel anspricht oder was die Kinder im Spiel tun (UNICORN-66), immer mit Notlösung. Extras kommen im Spiel nicht vor. „liste“ ordnet beides nach Station; „ding“ zeigt auf den Eintrag in noetig/extras (Notlösung, Einkauf)."
  },
  "gaben": [
   {
    "i": "start",
    "was": "Kindertattoo",
-   "wie": "Funkels Zeichen zum Ankommen. Zu Hause wieder abwischen.",
+   "wie": "Funkels Zeichen zum Ankommen.",
    "art": "Verkleidung"
   },
   {
@@ -526,7 +1229,7 @@
   {
    "i": 4,
    "was": "Eine Zaubertafel für alle",
-   "wie": "Reihum malen sie die Fuchspfote ab. Danach einsammeln, am Ende kommt sie einem Kind in die Tüte.",
+   "wie": "Reihum malen sie die Spur aus dem Gedächtnis darauf. Danach einsammeln, am Ende kommt sie einem Kind in die Tüte.",
    "art": "Nur ausleihen"
   },
   {
@@ -538,12 +1241,23 @@
   {
    "i": "ende",
    "was": "Schatzkiste",
-   "wie": "Je Kind ein Kratzbild mit Zeichenschablone und eine Zaubertafel. Verteilt wird nach dem Essen.",
+   "wie": "Was ihr hineingelegt habt. Am Ziel öffnen und anschauen, verteilt wird nach dem Essen.",
    "art": "Schatz"
   }
  ],
  "preisStand": "2026-11-04",
  "utensilien": [
+  {
+   "id": "u12",
+   "name": "Geschenktüten (Einhorn, mit Griffen)",
+   "menge": "je Kind",
+   "wann": "Schatz",
+   "asin": "B0GVMKLS6L",
+   "packung": 12,
+   "preis": 7.49,
+   "link": "https://www.amazon.de/dp/B0GVMKLS6L",
+   "hinweis": "Zum Verpacken der Geschenke: In jede Tüte kommt, was ein Kind am Ende aus dem Schatz bekommt."
+  },
   {
    "id": "u0",
    "name": "Haarreif mit Einhorn-Horn",
@@ -710,7 +1424,7 @@
    },
    "3": {
     "0": {
-     "a": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Lauft am Zaun entlang und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Bild für Bild am Zaun entlang, dann das Gelbe antippen!",
+     "a": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Lauft langsam weiter und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Bild für Bild weiterlaufen, dann das Gelbe antippen!",
      "b": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Lauft von Schleife zu Schleife und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Von Schleife zu Schleife, dann das Gelbe antippen!",
      "c": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Geht von Band zu Band am Geländer und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Von Band zu Band, dann das Gelbe antippen!"
     },
@@ -722,11 +1436,11 @@
    },
    "4": {
     "0": {
-     "a": "Ups! Das war ein Forschungspups. Spurenkunde! Schaut euch die drei Spuren im Spiegel ganz genau an. Welche passt zu den kleinen Pfoten? Ein Kind tippt auf die richtige Spur. Also nochmal: Die richtige Spur antippen!",
-     "c": "Ups! Das war ein Forschungspups. Spurenkunde! Vor den drei Türen liegen Spurenkarten. Welche passt zu den kleinen Pfoten? Ein Kind tippt im Spiegel auf die richtige Spur. Also nochmal: Die richtige Spur antippen!"
+     "a": "Ups! Das war ein Forschungspups. Spurenkunde! Merkt euch die Spur im Spiegel ganz genau, gleich kommt der Nebel. Dann sucht die Zaubertafel und malt die Spur darauf. Also nochmal: Spur merken, malen, antippen!",
+     "c": "Ups! Das war ein Forschungspups. Spurenkunde! Merkt euch die Spur im Spiegel ganz genau, gleich kommt der Nebel. Dann sucht die passende Karte vor den Türen. Also nochmal: Spur merken, Karte finden, antippen!"
     },
     "1": {
-     "a": "Verzeihung! Der Fuchs hat hier eine Zaubertafel verloren. Schaut euch gut um! Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen. Schön ordentlich, wie ein echter Forscher! Also nochmal: Zaubertafel finden, Pfote gemeinsam abmalen!",
+     "a": "Verzeihung! Ein Fuchs war das, ganz wie auf eurer Zaubertafel. Schön gemalt, wie echte Forscher! Also nochmal: Tafel einstecken, Fuchsspur folgen!",
      "c": "Verzeihung! Hinter der Fuchs-Tür liegt eine Zaubertafel. Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen. Schön ordentlich, wie ein echter Forscher! Also nochmal: Hinter die Fuchs-Tür, Pfote gemeinsam abmalen!"
     }
    },
@@ -757,8 +1471,8 @@
    "moehre": "Falsch! Eine Möhre ist in echt orange. Nicht gelb!",
    "elefant": "Falsch! Elefanten sind in echt grau. Törööö!",
    "kuh": "Falsch! Kühe sind in echt schwarz und weiß. Muh!",
-   "hase": "Hoppel, hoppel! Das war der Hase. Hat ein Hase so kleine Pfoten?",
-   "ente": "Quak, quak! Das war die Ente. Macht ein Fuchs Quak?"
+   "hase": "Hoppel, hoppel! Das ist die Hasenspur. War eure Spur so lang?",
+   "ente": "Quak, quak! Das ist die Entenspur. War eure Spur so spitz?"
   },
   "figuren": {
    "kakapups": {
@@ -834,7 +1548,7 @@
    },
    "3": {
     "0": {
-     "a": "Lauft am Zaun entlang und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
+     "a": "Lauft langsam weiter und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
      "b": "Lauft von Schleife zu Schleife und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
      "c": "Geht von Band zu Band am Geländer und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist."
     },
@@ -846,11 +1560,11 @@
    },
    "4": {
     "0": {
-     "a": "Schaut euch die drei Spuren im Spiegel ganz genau an. Welche passt zu den kleinen Pfoten? Ein Kind tippt auf die richtige Spur.",
-     "c": "Vor den drei Türen liegen Spurenkarten. Welche passt zu den kleinen Pfoten? Ein Kind tippt im Spiegel auf die richtige Spur."
+     "a": "Merkt euch die Spur im Spiegel ganz genau! Dann kommt der Nebel. Sucht die Zaubertafel, malt die Spur darauf und tippt auf die Spur, die ihr gemalt habt.",
+     "c": "Merkt euch die Spur im Spiegel ganz genau! Dann kommt der Nebel. Sucht die passende Spurenkarte vor den Türen und tippt die Spur im Spiegel an."
     },
     "1": {
-     "a": "Der Fuchs hat hier eine Zaubertafel verloren. Schaut euch gut um! Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen.",
+     "a": "Ein Fuchs war das! Steckt die Zaubertafel ein und lauft der Fuchsspur hinterher.",
      "c": "Hinter der Fuchs-Tür liegt eine Zaubertafel. Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen."
     }
    },
@@ -894,7 +1608,7 @@
     "c": "Alle ans Seil, über den Fluss!"
    },
    "3.0": {
-    "a": "Bild für Bild am Zaun entlang, dann das Gelbe antippen!",
+    "a": "Bild für Bild weiterlaufen, dann das Gelbe antippen!",
     "b": "Von Schleife zu Schleife, dann das Gelbe antippen!",
     "c": "Von Band zu Band, dann das Gelbe antippen!"
    },
@@ -904,10 +1618,11 @@
     "c": "Bögen aus der Schüssel holen, jeder einen Glücksstein!"
    },
    "4.0": {
-    "a": "Die richtige Spur antippen!"
+    "a": "Spur merken, malen, antippen!",
+    "c": "Spur merken, Karte finden, antippen!"
    },
    "4.1": {
-    "a": "Zaubertafel finden, Pfote gemeinsam abmalen!",
+    "a": "Tafel einstecken, Fuchsspur folgen!",
     "c": "Hinter die Fuchs-Tür, Pfote gemeinsam abmalen!"
    },
    "5.0": {
@@ -953,7 +1668,7 @@
     "3.0": "Hihi, die Bilder sind ja ganz verdreht. Wie meine Fühler!",
     "3.1": "Ich trag den Glücksstein! Uff, zu schwer. Hihi!",
     "4.0": "Ameisen haben sechs Beine. Aber das hier sind keine Ameisenspuren!",
-    "4.1": "Ich male meine Fühler ab. Hihi! Ihr malt die Pfote.",
+    "4.1": "Hihi! Ein Fuchs! Den hätte ich nie erkannt.",
     "5.0": "Hihi, psst! Ich kann gaaanz leise kichern.",
     "5.1": "Ich bin schon da! Ich bin nämlich ganz klein. Hihi!",
     "6.0": "Hihi, so viele Farben! Mir wird ganz schwindelig.",
@@ -983,7 +1698,7 @@
     "3.0": "Yo, der Spiegel ist voll verrückt geworden. Kein Stress.",
     "3.1": "Respekt, Leute! Jetzt kommt die Belohnung.",
     "4.0": "Detektiv-Modus an, Sonnenbrille auf!",
-    "4.1": "Krass gemacht! Jetzt wird gemalt.",
+    "4.1": "Krass gemacht! Fall gelöst.",
     "5.0": "Psst, ganz cool bleiben, Leute.",
     "5.1": "Ninja-Modus, Leute. Ganz lässig schleichen.",
     "6.0": "Yo, das Finale! Jetzt wird es richtig cool.",
@@ -1010,8 +1725,8 @@
    "moehre": "Eine Möhre ist in echt orange. Nicht gelb!",
    "elefant": "Elefanten sind in echt grau. Törööö!",
    "kuh": "Kühe sind in echt schwarz und weiß. Muh!",
-   "hase": "Das war der Hase. Hat ein Hase so kleine Pfoten?",
-   "ente": "Das war die Ente. Macht ein Fuchs Quak?"
+   "hase": "Das ist die Hasenspur. War eure Spur so lang?",
+   "ente": "Das ist die Entenspur. War eure Spur so spitz?"
   }
  },
  "info": {
@@ -1201,7 +1916,7 @@
    "a": [
     [
      "Tun",
-     "Hinter der Brücke zum Zaun gehen"
+     "Hinter der Brücke weiter zur nächsten Station"
     ],
     [
      "Dort",
@@ -1237,7 +1952,7 @@
     ],
     [
      "Tun",
-     "Bei jedem ein paar Schritte am Zaun weiter"
+     "Bei jedem ein paar Schritte weitergehen"
     ],
     [
      "Rufen",
@@ -1349,11 +2064,11 @@
    "a": [
     [
      "Tun",
-     "Bis zur Kreuzung gehen (Erdweg, keine Spuren am Boden)"
+     "Zur nächsten Station gehen. Am Boden gibt es hier keine Spuren"
     ],
     [
      "Ziel",
-     "Mitten auf die Kreuzung"
+     "Ein Platz, an dem alle in Ruhe stehen bleiben"
     ]
    ],
    "c": [
@@ -1371,49 +2086,57 @@
    "a": [
     [
      "Tun",
-     "Die drei Spuren im Spiegel genau anschauen"
+     "„Spur zeigen“ tippen, alle merken sich die Spur"
+    ],
+    [
+     "Dann",
+     "Nebel, die Spur ist weg"
     ],
     [
      "Finden",
-     "Die Spur, die zu den kleinen Pfoten passt"
+     "Die Zaubertafel, hier in der Nähe versteckt"
+    ],
+    [
+     "Tun",
+     "Reihum malt jedes Kind ein Stück der Spur aus dem Gedächtnis"
+    ],
+    [
+     "Weiter",
+     "„Fertig gemalt“, dann tippt ein Kind die gemalte Spur an"
     ],
     [
      "Lösung",
      "Der Fuchs"
-    ],
-    [
-     "Weiter",
-     "Ein Kind tippt im Spiegel die Fuchsspur an"
     ]
    ],
    "c": [
     [
      "Tun",
-     "Die Spurenkarten vor den drei Türen anschauen"
+     "„Spur zeigen“ tippen, alle merken sich die Spur"
+    ],
+    [
+     "Dann",
+     "Nebel, die Spur ist weg"
     ],
     [
      "Finden",
-     "Die Spur, die zu den kleinen Pfoten passt"
+     "Die passende Spurenkarte vor den drei Türen"
+    ],
+    [
+     "Weiter",
+     "Ein Kind tippt die Spur im Spiegel an"
     ],
     [
      "Lösung",
      "Der Fuchs"
-    ],
-    [
-     "Weiter",
-     "Ein Kind tippt im Spiegel die Fuchsspur an"
     ]
    ]
   },
   "4.1": {
    "a": [
     [
-     "Finden",
-     "Eine Zaubertafel, irgendwo hier versteckt"
-    ],
-    [
      "Tun",
-     "Reihum malt jedes Kind ein Stück der Fuchspfote"
+     "Tafel neben den Spiegel halten und vergleichen"
     ],
     [
      "Danach",
@@ -1447,11 +2170,11 @@
    "a": [
     [
      "Tun",
-     "Zum Berg gehen (Erdweg, keine Spuren am Boden)"
+     "Leise zur nächsten Station gehen"
     ],
     [
      "Leise",
-     "Auf dem Berg schläft eine Regenwolke"
+     "Dort schläft eine Regenwolke"
     ]
    ],
    "c": [
@@ -1533,7 +2256,7 @@
    "a": [
     [
      "Tun",
-     "Den Berg hinauf zur Parkbank bei den Bäumen"
+     "Zum letzten Ort gehen"
     ],
     [
      "Dort",
@@ -1629,7 +2352,11 @@
     ],
     [
      "Finden",
-     "Schatzkiste mit Kratzbildern, Zeichenschablonen und Zaubertafeln"
+     "Die Schatzkiste mit euren Geschenken"
+    ],
+    [
+     "Tun",
+     "Kiste zusammen öffnen und anschauen, verteilt wird zu Hause"
     ],
     [
      "Weiter",
@@ -1653,12 +2380,51 @@
    "a": [
     [
      "Tun",
-     "Tattoos abwischen"
+     "Gruppenfoto machen, am besten mit dem Handy"
     ],
     [
      "Danach",
-     "Schatz verteilen nach dem Essen"
+     "Urkunden verteilen, den Schatz gibt es nach dem Essen"
     ]
+   ]
+  }
+ },
+ "namenSaetze": {
+  "version": 1,
+  "hinweis": "Funkel kennt das Kind (UNICORN-50, ADR-28): nur {name} als Variable, neutral formuliert. Jede Textänderung erzeugt neue Aufnahmen (Credits).",
+  "stellen": [
+   {
+    "id": "gruss",
+    "titel": "An der Haustür",
+    "varianten": [
+     "Heute ist ein ganz besonderer Tag: Wir feiern den Geburtstag von {name}! {name}, heute hilfst du mir ganz besonders.",
+     "Wisst ihr, wessen Geburtstag wir heute feiern? Den von {name}! Hallo {name}, wie schön, dass du heute mit mir auf Schatzsuche gehst.",
+     "Heute feiern wir {name}! {name}, mit dir an meiner Seite finden wir den Schatz bestimmt."
+    ]
+   },
+   {
+    "id": "schatz",
+    "titel": "Beim Schatz",
+    "varianten": [
+     "Alles Liebe zum Geburtstag, {name}!",
+     "Herzlichen Glückwunsch zum Geburtstag, {name}!",
+     "Hurra, heute feiern wir dich, {name}! Alles, alles Liebe zum Geburtstag!"
+    ]
+   },
+   {
+    "id": "abschied",
+    "titel": "Zu Hause",
+    "varianten": [
+     "Tschüss, {name}! Feier schön weiter, du Geburtstags-Einhorn.",
+     "Mach’s gut, {name}! Mit dir hat die Schatzsuche besonders viel Spaß gemacht.",
+     "Auf Wiedersehen, {name}! Ich zaubere dir noch einen Regenbogen in deinen Geburtstag."
+    ]
+   }
+  ],
+  "alter": {
+   "nach": "schatz",
+   "varianten": [
+    "Und weißt du was? {alter} Jahre, wie toll! Ich wünsche dir ein neues Lebensjahr, so bunt wie mein Regenbogen."
    ]
   }
  }

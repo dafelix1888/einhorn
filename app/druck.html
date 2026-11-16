@@ -30,9 +30,6 @@
 .urkunde p{font-size:16pt;margin:3mm 0;max-width:150mm}
 .urkunde .unterschrift{margin-top:auto;font-size:13pt;color:#5A5073}
 .urkunde .unterschrift b{display:block;font-size:26pt;color:#241A3D;font-style:italic}
-/* Wolke */
-.wolke{display:grid;place-items:center;height:100%}
-.wolke svg{width:92%}
 @page{size:A4;margin:0}
 @media print{
   body{background:#fff}
@@ -58,7 +55,6 @@
   <p class="leise" style="font-size:.88rem;margin-top:6px">Steht nur im Einladungslink, damit Gast-Eltern per WhatsApp zusagen können.</p>
   <div class="auswahl" id="auswahl"></div>
   <div class="reihe"><button class="knopf klein" id="link">Einladungslink teilen</button><button class="knopf leer klein" id="text">Einladung als Text kopieren</button></div>
-  <p class="leise" id="hinweis" style="margin-top:10px"></p>
 </div>
 <div class="vorschau" id="vorschau"></div>
 <div class="toast" id="toast" hidden></div>
@@ -69,7 +65,7 @@
 (function(){
   'use strict';
   var q=new URLSearchParams(location.search), thema=(q.get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
-  var tour=null, info=null, party=Party.lesen(thema), plan=Party.plan(thema), an={einladung:true, urkunde:true, wolke:true};
+  var tour=null, info=null, party=Party.lesen(thema), plan=Party.plan(thema), an={einladung:true, urkunde:true};
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3000); }
@@ -83,7 +79,6 @@
   $('tel').value=party.telefon || '';
   $('hinweis-gaeste').value=Party.gaesteHinweis(party);
 
-  var WOLKE="<svg viewBox='0 0 1000 620' xmlns='http://www.w3.org/2000/svg'><path d='M220 520 Q90 520 90 420 Q90 320 200 310 Q200 180 340 170 Q400 70 520 90 Q640 60 700 170 Q840 160 860 290 Q960 310 950 410 Q940 520 820 520 Z' fill='#fff' stroke='#7A8CA8' stroke-width='14' stroke-linejoin='round'/><path d='M370 360 q40 30 80 0 M560 360 q40 30 80 0' fill='none' stroke='#241A3D' stroke-width='14' stroke-linecap='round'/><ellipse cx='330' cy='420' rx='34' ry='18' fill='#F4B6D2'/><ellipse cx='680' cy='420' rx='34' ry='18' fill='#F4B6D2'/><path d='M470 450 q35 22 70 0' fill='none' stroke='#241A3D' stroke-width='12' stroke-linecap='round'/><text x='790' y='150' font-family='Trebuchet MS, Arial' font-weight='800' font-size='70' fill='#7A8CA8'>z</text><text x='850' y='90' font-family='Trebuchet MS, Arial' font-weight='800' font-size='96' fill='#7A8CA8'>Z</text><text x='920' y='40' font-family='Trebuchet MS, Arial' font-weight='800' font-size='56' fill='#7A8CA8'>z</text></svg>";
 
   function einladung(){
     var draussen=party.ort!=='drinnen';
@@ -100,13 +95,11 @@
       '<div class="unterschrift"><b>Funkel</b>Einhorn und Hüterin des Regenbogens</div></div></section>';
     return h;
   }
-  function wolke(){ return '<section class="blatt quer" id="wolke"><div class="wolke">'+WOLKE+'</div></section>'; }
 
   function zeichnen(){
-    var teile=[['einladung','Einladungen (2 pro Blatt)'],['urkunde','Urkunden ('+party.kinder+' Stück)']].concat(v==='a'?[['wolke','Schlafende Wolke (Station 6, gern auf A3)']]:[]);
+    var teile=[['einladung','Einladungen (2 pro Blatt)'],['urkunde','Urkunden ('+party.kinder+' Stück)']];
     $('auswahl').innerHTML=teile.map(function(t){ return '<label><input type="checkbox" data-teil="'+t[0]+'"'+(an[t[0]]?' checked':'')+'> '+t[1]+'</label>'; }).join('');
-    $('hinweis').textContent=v==='a' ? 'Die Wolke auf A3 drucken oder im Copyshop vergrößern. Auf A4 geht es auch, dann steht sie etwas kleiner am Hügel.' : v==='b' ? 'Ohne Ausdrucke: Statt der Wolke ein weißes Laken nehmen.' : 'Drinnen: Statt der Wolke ein weißes Kissen oder Laken auf dem Kissenberg.';
-    $('vorschau').innerHTML=(an.einladung?einladung():'')+(an.urkunde?urkunden():'')+(v==='a'&&an.wolke?wolke():'');
+    $('vorschau').innerHTML=(an.einladung?einladung():'')+(an.urkunde?urkunden():'');
   }
   function textFuerChat(){
     return name+' wird '+alter+'! 🦄\n\nWir laden zu Funkels Regenbogen-Abenteuer ein, einer Einhorn-Schnitzeljagd mit sprechendem Zauberspiegel.\n\n'+
@@ -132,7 +125,7 @@
   });
   Promise.all([fetch('themen/'+thema+'/tour.json').then(function(r){ return r.json(); }), fetch('themen/index.json').then(function(r){ return r.json(); })]).then(function(r){
     tour=r[0]; info=r[1].themen.filter(function(t){ return t.id===thema; })[0]; zeichnen();
-    if(location.hash==='#einladung'){ an.urkunde=false; an.wolke=false; zeichnen(); }
+    if(location.hash==='#einladung'){ an.urkunde=false; zeichnen(); }
   });
 })();
 </script>

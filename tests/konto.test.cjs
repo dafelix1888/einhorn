@@ -2,6 +2,7 @@
 const { chromium } = require('playwright');
 const S='https://test.supabase.co', B=''+(process.env.BASIS||'http://localhost:8765')+'/app/';
 const db={parties:{}, links:{}, aufbau:{}, namen:{}}, mails=[];
+require('../app/namen-kern.js'); const NK=globalThis.NamenKern, NV=JSON.parse(require('fs').readFileSync(require('path').join(__dirname,'..','app/themen/einhorn/tour.json'),'utf8')).namenSaetze;
 let stimmeAus=true;   // erst ohne Schlüssel (UNICORN-8)
 function nutzer(req){ const a=req.headers()['authorization']||''; return a.startsWith('Bearer AT-') ? 'U-'+a.slice(10) : null; }
 async function mock(route){
@@ -14,19 +15,21 @@ async function mock(route){
   if(u.pathname==='/rest/v1/rpc/link_lesen'){ const l=db.links[body.t]; return j(200, l?{rolle:l.rolle, daten:l.daten}:null); }
   if(u.pathname==='/rest/v1/rpc/aufbau_setzen'){ const l=db.links[body.t]; if(!l||l.rolle!=='vorausgeher') return j(200,null); const st={}; for(const k in body.stationen) if(/^\d{1,2}$/.test(k)&&body.stationen[k]===true) st[k]=true; db.aufbau[l.party_id]={stationen:st, aktualisiert:new Date().toISOString()}; return j(200,{stationen:st}); }
   if(u.pathname==='/rest/v1/rpc/aufbau_lesen'){ const l=db.links[body.t]; if(!l||l.rolle==='gast') return j(200,null); const a=db.aufbau[l.party_id]||{stationen:{},aktualisiert:null}; return j(200,a); }
-  if(u.pathname==='/functions/v1/namen'){
+  if(u.pathname==='/functions/v1/namen'){   // wie die Edge Function (UNICORN-49/51): erstes Einsprechen frei, danach 3-mal
+    const mk=(sz,name,aus)=>{ const mp3=require('fs').readFileSync(require('path').join(__dirname,'..','app/themen/einhorn/hoerprobe.mp3')).toString('base64'); const r={}; for(const k in sz) r[k]={text:sz[k].zeigen,name,aussprache:aus,variante:sz[k].variante,b64:mp3}; return r; };
     if(body.aktion==='holen'){ const l=db.links[body.t]; if(!l||l.rolle!=='spiel') return j(404,{fehler:'Link geht nicht'}); const n=db.namen[l.party_id]; if(!n) return j(200,{hash:null}); if(body.hash===n.hash) return j(200,{hash:n.hash,gleich:true}); return j(200,{hash:n.hash,saetze:n.saetze}); }
     const p=db.parties[body.party_id]; if(!me||!p||p.owner!==me) return j(401,{fehler:'Nicht angemeldet oder fremde Party'});
-    const n=db.namen[body.party_id]||{erzeugungen:0};
-    if(body.aktion==='stand') return j(200,{max:3,uebrig:3-n.erzeugungen,hash:n.hash||null,texte:n.saetze?{gruss:n.saetze.gruss.text,schatz:n.saetze.schatz.text,abschied:n.saetze.abschied.text}:null,name:n.saetze?n.saetze.gruss.name:'',aussprache:''});
-    if(!/^[\p{L}][\p{L} '-]{0,29}$/u.test(body.name)) return j(400,{fehler:'Bitte nur einen Vornamen mit Buchstaben eingeben.'});
-    if(n.saetze && n.saetze.gruss.name===body.name) return j(200,{max:3,uebrig:3-n.erzeugungen,hash:n.hash,saetze:n.saetze,gleich:true});   // gleicher Text kostet nichts
-    if(n.erzeugungen>=3) return j(402,{fehler:'Alle 3 Erzeugungen sind verbraucht.',uebrig:0});
-    if(stimmeAus) return j(503,{fehler:'Die Stimme ist noch nicht eingerichtet.'});   // wie live ohne ELEVENLABS_API_KEY
-    const mp3=require('fs').readFileSync(require('path').join(__dirname,'..','app/themen/einhorn/hoerprobe.mp3')).toString('base64');
-    const mk=t=>({text:t,name:body.name,aussprache:body.aussprache,b64:mp3});
-    db.namen[body.party_id]={erzeugungen:n.erzeugungen+1,hash:'h'+(n.erzeugungen+1),saetze:{gruss:mk('Und heute ist ein ganz besonderer Tag: '+body.name+' hat Geburtstag!'),schatz:mk('Alles Liebe, '+body.name+'!'),abschied:mk('Tschüss, '+body.name+'!')}};
-    const z=db.namen[body.party_id]; return j(200,{max:3,uebrig:3-z.erzeugungen,hash:z.hash,saetze:z.saetze});
+    const n=db.namen[body.party_id]||{erzeugungen:0}, wahl=n.saetze?Object.fromEntries(Object.entries(n.saetze).map(([k,v])=>[k,v.variante])):{};
+    const st=x=>({max:3,uebrig:NK.uebrig(n.erzeugungen),erstes:n.erzeugungen===0,...x});
+    if(body.aktion==='stand') return j(200,st({hash:n.hash||null,texte:n.saetze?Object.fromEntries(Object.entries(n.saetze).map(([k,v])=>[k,v.text])):null,name:n.saetze?n.saetze.gruss.name:'',aussprache:n.saetze?n.saetze.gruss.aussprache:'',alter:n.alter||null,wahl}));
+    const f=NK.pruefeName(body.name); if(f) return j(400,{fehler:f});
+    const art=n.saetze&&['betonung','worte'].includes(body.art)?body.art:'neu';
+    const sz=NK.bilden(NV,{name:body.name,aussprache:body.aussprache,alter:body.alter,wahl:art==='worte'?NK.naechsteWahl(NV,wahl):wahl});
+    if(art==='neu' && n.saetze && n.saetze.gruss.name===body.name && n.saetze.gruss.aussprache===(body.aussprache||'') && n.alter===(body.alter||null)) return j(200,st({hash:n.hash,saetze:n.saetze,gleich:true}));   // gleicher Text kostet nichts
+    if(n.erzeugungen>0 && NK.uebrig(n.erzeugungen)<=0) return j(402,st({fehler:'Alle 3 Mal neu erzeugen sind verbraucht.'}));
+    if(stimmeAus) return j(503,{fehler:'Die Stimme ist noch nicht eingerichtet.'});   // wie live ohne Secret ELEVENLABS
+    db.namen[body.party_id]={erzeugungen:n.erzeugungen+1,hash:'h'+(n.erzeugungen+1),alter:body.alter||null,saetze:mk(sz,body.name,body.aussprache||''),arten:(n.arten||[]).concat(art)};
+    const z=db.namen[body.party_id]; return j(200,{max:3,uebrig:NK.uebrig(z.erzeugungen),hash:z.hash,saetze:z.saetze});
   }
   if(!me) return j(401,{message:'permission denied'});
   if(u.pathname==='/rest/v1/parties'){
@@ -82,26 +85,48 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(/einladung\.html\?k=[\w-]{24}$/.test(links.e) && /&k=/.test(links.v) && /&k=/.test(links.s) && !/plan=|e=/.test(links.e+links.v+links.s), 'Links nur mit Schlüssel');
 
   // Funkel kennt das Kind (UNICORN-33): im Überblick sichtbar, Karte oben im Schritt „Tablet startklar machen“
-  pruefe(/Funkel sagt „Emma“/.test(await a.locator('.namen-pille').innerText()) && /ausprobieren/.test(await a.locator('.namen-pille').innerText()), 'Überblick: Hinweis „Funkel sagt „Emma“ · jetzt ausprobieren“');
+  pruefe(/Funkel sagt „Emma“/.test(await a.locator('.namen-pille').innerText()) && /Hörprobe/.test(await a.locator('.namen-pille').innerText()), 'Überblick: Hinweis „Funkel sagt „Emma“ · Hörprobe“');
   await a.click('.namen-pille');
+  await a.evaluate(()=>{ HTMLMediaElement.prototype.play=function(){ return Promise.resolve(); }; });   // Ton im Test nicht abspielen: verhält sich lokal und in der CI gleich
   await a.waitForSelector('#namen-name', {timeout:5000}); await a.waitForTimeout(200);
-  pruefe(/#s-geraet$/.test(a.url()) && await a.locator('#namen').evaluate(e=>{ const r=e.getBoundingClientRect(); const n=document.querySelector('.leiste-oben'), u=n?n.getBoundingClientRect().bottom:0; return r.top>=u-2 && r.top<window.innerHeight/2; }), 'Tipp führt direkt zur Namens-Karte');
-  pruefe(await a.evaluate(()=>{ const s=document.querySelector('.schritt-ansicht'), k=document.getElementById('namen-karte'), kn=s.querySelector('.kachel'); return !!k && (!kn || (k.compareDocumentPosition(kn) & Node.DOCUMENT_POSITION_FOLLOWING)); }), 'Namens-Karte steht oben im Schritt');
-  pruefe(/Funkel kennt Emma/.test(await a.locator('.teile').innerText()) && await a.locator('[data-teil="namen"]').getAttribute('aria-pressed')==='false', 'Teilschritt „Funkel kennt Emma“ sichtbar, noch offen');
+  pruefe(/#namen$/.test(a.url()) && /Funkel kennt Emma/.test(await a.locator('.namen-ansicht h1').innerText()), 'Tipp öffnet die eigene Ansicht „Funkel kennt Emma“ (#namen, UNICORN-56)');
+  pruefe(await a.locator('.nm-buehne .nm-funkel').count()===1 && /Emma/.test(await a.locator('#nm-untertitel').innerText()), 'Funkel erscheint, sein Satz mit Emma ist eingeblendet');
+  pruefe(await a.locator('.nm-strahl .nm-p').count()>=8 && await a.locator('.nm-strahl .nm-p.nm-name').count()===3 && /Emma!/.test(await a.locator('.nm-strahl').innerText()), 'Zeitstrahl: ganze Tour, drei Namens-Stellen markiert');
+  pruefe(await a.locator('.nm-moment').count()===3 && /Hallo, ihr Einhorn-Helfer/.test(await a.locator('.nm-moment').first().innerText()) && /gemopst/.test(await a.locator('.nm-moment').first().innerText()), 'Ganzer gesprochener Text: davor, Namens-Satz, danach');
+  pruefe(await a.locator('.nm-satz mark').first().innerText()==='Emma', 'Name im Satz hervorgehoben');
   pruefe(await a.inputValue('#namen-name')==='Emma', 'Namens-Karte mit Vorname');
-  await a.click('#namen-los'); await a.waitForSelector('.namen-fehler', {timeout:5000});
-  pruefe(/noch nicht eingerichtet/.test(await a.locator('#namen-karte').innerText()) && /Noch 3 von 3/.test(await a.locator('#namen-karte').innerText()), 'Ohne Schlüssel: verständliche Meldung, nichts verbraucht');
+  pruefe(/Geburtstag von Emma/.test(await a.locator('#namen-karte').innerText()) && /etwa 10 Sekunden/.test(await a.locator('#namen-karte').innerText()), 'Sätze stehen sofort da (Vorschau), erstes Einsprechen frei (UNICORN-51)');
+  await a.click('[data-namen-los="neu"]'); await a.waitForSelector('#namen-fehler:not([hidden])', {timeout:5000});
+  pruefe(/gerade nicht erreichbar/.test(await a.locator('#namen-karte').innerText()) && Object.keys(db.namen).length===0, 'Ohne Schlüssel: verständliche Meldung, nichts verbraucht');
   stimmeAus=false;
-  await a.click('#namen-los'); await a.waitForSelector('[data-namen-hoeren="gruss"]', {timeout:5000});
-  pruefe(/Emma hat Geburtstag/.test(await a.locator('#namen-karte').innerText()) && /Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()), 'Sätze erzeugt, noch 2 übrig');
-  await a.waitForFunction(()=>(document.querySelector('[data-teil="namen"]')||{}).getAttribute && document.querySelector('[data-teil="namen"]').getAttribute('aria-pressed')==='true', null, {timeout:5000}).catch(()=>{});
-  pruefe(await a.locator('[data-teil="namen"]').getAttribute('aria-pressed')==='true', 'Nach dem Einsprechen ist „Funkel kennt Emma“ abgehakt');
+  await a.click('[data-namen-los="neu"]'); await a.waitForSelector('[data-namen-alle]', {timeout:5000});
+  const kt=await a.locator('#namen-karte').innerText();
+  pruefe(/Geburtstag von Emma/.test(kt) && /5 Jahre, wie toll!/.test(kt) && /Noch 3 von 3/.test(kt), 'Sätze erzeugt, mit Alters-Satz, erstes zählt nicht: noch 3');
+  pruefe(await a.locator('[data-namen-alle]').count()===1 && await a.locator('[data-namen-ganz]').count()===3, 'Danach: „Alle drei Stellen anhören“ und je Stelle „Mit Geschichte“');
+  {
+    await a.waitForSelector('.nm-moment.spricht', {timeout:4000}).catch(function(){});   // auf langsamen Rechnern (GitHub) startet die Wiedergabe etwas später
+    pruefe(await a.locator('.nm-moment.spricht').count()===1 && /■ Stopp/.test(await a.locator('#nm-haupt').innerText()), 'Nach dem Einsprechen spricht Funkel gleich los');
+    await a.click('[data-namen-alle]'); await a.waitForTimeout(100);
+    pruefe(await a.locator('.nm-moment.spricht').count()===0, 'Tipp auf „Stopp“ hält an');
+  }
+  await a.click('[data-namen-alle]'); await a.waitForTimeout(150);
+  pruefe(await a.locator('.nm-moment.spricht').count()===1 && await a.locator('.nm-p.nm-name.spricht').count()===1, 'Beim Anhören ist die Stelle im Zeitstrahl und im Text markiert');
+  await a.click('[data-namen-alle]'); await a.waitForTimeout(100);
+  pruefe(await a.locator('.nm-moment.spricht').count()===0, 'Zweiter Tipp hält an');
   pruefe(!(await a.evaluate(()=>Party.aufgaben(Party.lesen('einhorn'), null, null).filter(x=>x.id==='geraet')[0].fertig)), 'Extra-Teil hakt den Schritt nicht allein ab');
-  await a.click('#namen-los'); await a.waitForFunction(()=>!document.querySelector('#namen-los') || !document.querySelector('#namen-los').disabled);
-  await a.waitForTimeout(300);
-  pruefe(/Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()) && db.namen[Object.keys(db.namen)[0]].erzeugungen===1, 'Gleicher Name noch einmal: zählt nicht');
-  await a.locator('#namen-karte').screenshot({path:'namen-karte.png'});
+  pruefe(await a.locator('[data-namen-los="betonung"]').count()===1 && await a.locator('[data-namen-los="worte"]').count()===1, 'Danach: „Andere Betonung“ und „Andere Worte“');
+  await a.click('[data-namen-los="worte"]'); await a.waitForFunction(()=>/Noch 2 von 3/.test(document.getElementById('namen-karte').innerText), null, {timeout:5000}).catch(()=>{});
+  pruefe(/Noch 2 von 3/.test(await a.locator('#namen-karte').innerText()) && !/Wir feiern den Geburtstag von Emma/.test(await a.locator('#namen-karte').innerText()), 'Andere Worte: neue Variante, zählt einmal');
+  await a.fill('#namen-name','Ida'); await a.waitForTimeout(100);
+  pruefe(/Ida/.test(await a.locator('#namen-texte').innerText()) && await a.locator('[data-namen-los="neu"]').count()===1 && await a.locator('[data-namen-ganz]').count()===0, 'Name tippen: Sätze sofort mit „Ida“, Knopf „Neu einsprechen“');
+  await a.fill('#namen-name','Arsch'); await a.click('[data-namen-los="neu"]'); await a.waitForTimeout(200);
+  pruefe(/nicht sagen/.test(await a.locator('#namen-fehler').innerText()) && db.namen[Object.keys(db.namen)[0]].erzeugungen===2, 'Gesperrter Name: Meldung im Gerät, nichts verbraucht');
+  await a.fill('#namen-name','Emma'); await a.waitForTimeout(100);
+  await a.waitForTimeout(300); await a.locator('#namen').screenshot({path:'namen-karte.png'});
   await a.click('#zum-ueberblick'); await a.waitForSelector('.namen-pille.da', {timeout:3000}).catch(()=>{});
+  await a.click('[data-oeffne="geraet"]'); await a.waitForSelector('[data-teil="namen"]', {timeout:3000});
+  pruefe(await a.locator('[data-teil="namen"]').getAttribute('aria-pressed')==='true' && await a.locator('.kachel[data-oeffne="namen"]').count()===1, 'Tablet-Schritt: „Funkel kennt Emma“ abgehakt, Kachel führt zur Ansicht');
+  await a.click('#zum-ueberblick'); await a.waitForSelector('.namen-pille', {timeout:3000});
   pruefe(/Funkel kennt Emma/.test(await a.locator('.namen-pille').innerText()) && /anhören/.test(await a.locator('.namen-pille').innerText()), 'Überblick danach: „Funkel kennt Emma · Anhören“');
   // Änderung wird nachgespeichert
   await a.click('[data-oeffne="einladen"]');
@@ -122,6 +147,13 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(await v.evaluate(()=>{ const pl=JSON.parse(localStorage.getItem('sj.plan.einhorn')); return pl.stationen.length===2 && !JSON.parse(localStorage.getItem('sj.party.einhorn')).server; }), 'Vorausgeher hat Route, keine Schlüssel');
   pruefe(await v.evaluate(()=>JSON.parse(localStorage.getItem('sj.link.einhorn')).rolle==='vorausgeher'), 'Vorausgeher-Link gemerkt');
   pruefe(/live/.test(await v.locator('#live-hinweis').innerText()), 'Vorausgeher: Hinweis live');
+  // UNICORN-36: Der Schlüssel entscheidet über die Seite. Vorausgeher-Schlüssel an der Spiel-Adresse landet auf der Vorausgeher-Seite, Tablet-Schlüssel an der Vorausgeher-Adresse im Spiel.
+  const kV=new URL(links.v).searchParams.get('k'), kS=new URL(links.s).searchParams.get('k');
+  pruefe(/vorausgeher\.html/.test(links.v) && /spiel\.html/.test(links.s) && kV!==kS, 'Vorausgeher-Link zeigt auf die Vorausgeher-Seite, Tablet-Link aufs Spiel');
+  const v2=await geraet(); await v2.goto(B+'spiel.html?thema=einhorn&k='+kV); await v2.waitForURL(u=>/vorausgeher\.html/.test(u.toString()) && !/k=/.test(u.toString()), {timeout:8000}); await v2.waitForTimeout(800);
+  pruefe(await v2.locator('#live-hinweis').count()===1 && await v2.locator('[data-weiter]').count()>0, 'Vorausgeher-Schlüssel an der Spiel-Adresse: Aufbau-Liste statt Tour-Start');
+  const s2=await geraet(); await s2.goto(B+'vorausgeher.html?thema=einhorn&k='+kS); await s2.waitForURL(u=>/spiel\.html/.test(u.toString()) && !/k=/.test(u.toString()), {timeout:8000});
+  pruefe(await s2.evaluate(()=>JSON.parse(localStorage.getItem('sj.link.einhorn')).rolle==='spiel'), 'Tablet-Schlüssel an der Vorausgeher-Adresse: Spiel');
   await v.locator('[data-weiter]').first().click(); await v.waitForTimeout(800);
   pruefe(Object.values(db.aufbau)[0] && Object.keys(Object.values(db.aufbau)[0].stationen).length===1, 'Haken landet auf dem Server');
   // Tablet
@@ -132,9 +164,9 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   console.log('   Tablet zeigt:', live); pruefe(/bis Station 2 aufgebaut|alles aufgebaut/.test(live), 'Tablet sieht den Aufbau live');
   await s.screenshot({path:'konto-tablet.png'});
   await s.waitForTimeout(800);
-  const nk=await s.evaluate(()=>{ const k=__zs.clips(); return ['n.gruss','n.schatz','n.abschied'].map(x=>k.includes(x)); });
-  pruefe(nk.every(Boolean), 'Tablet hat die drei Namens-Sätze');
-  pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='end'; const a=__zs.akt(); return a.zweit && a.zweit.key==='n.schatz' && a.zweit.zweit.key==='ende.b'; }), 'Schatz: Namens-Satz in der Kette');
+  const nk=await s.evaluate(()=>{ const k=__zs.clips(); return ['n.gruss','n.schatz','n.alter','n.abschied'].map(x=>k.includes(x)); });
+  pruefe(nk.every(Boolean), 'Tablet hat die drei Namens-Sätze und den Alters-Satz');
+  pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='end'; const a=__zs.akt(); return a.zweit && a.zweit.key==='n.schatz' && a.zweit.zweit.key==='n.alter' && a.zweit.zweit.zweit.key==='ende.b'; }), 'Schatz: Namens-Satz, dann Alters-Satz in der Kette');
   pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='scene'; st.idx=0; st.step=0; const a=__zs.akt(); return a.zweit.key==='n.gruss' && a.zweit.zweit.key==='s0.b'; }), 'Begrüßung: Namens-Satz zwischen Teil 1 und 2');
   pruefe(await s.evaluate(()=>{ const st=__zs.state(); st.phase='heim'; st.step=1; return __zs.akt().zweit.key==='n.abschied'; }), 'Abschied: Namens-Satz am Ende');
   // UNICORN-38: Ein neuer Haken kommt ohne Neuladen in wenigen Sekunden an, auf dem Tablet und auf der Party-Seite der Eltern

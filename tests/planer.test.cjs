@@ -54,6 +54,7 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42
     await c.route('https://tile.openstreetmap.org/**', r=>r.fulfill({status:200, contentType:'image/png', body:PNG}));
     const p=await c.newPage(); p.on('pageerror',e=>errs.push(e.message));
     await p.goto(B+'planer.html?thema=einhorn'); await p.evaluate(()=>localStorage.clear()); await p.reload(); await p.waitForTimeout(600);
+    await p.click('[data-spielart="draussen"]');   // UNICORN-47: zuerst die Spielart
     await p.fill('#adresse','Musterweg 1'); await p.waitForTimeout(700);
     const vorschlag=await p.locator('#vorschlaege li[data-i]').count();
     if(vorschlagNehmen){ await p.click('#vorschlaege li[data-i="0"]'); await p.waitForTimeout(300); }
@@ -62,12 +63,17 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42
     await p.waitForFunction(()=>{ try{ const pl=JSON.parse(localStorage.getItem('sj.plan.einhorn')||'null'); return !!(document.querySelector('#speichern') && document.querySelector('#speichern').offsetParent); }catch(e){ return false; } }, null, {timeout:30000}).catch(()=>{});
     const status=await p.locator('#status').innerText().catch(()=>'');
     const sichtbar=await p.locator('#speichern').isVisible().catch(()=>false);
-    let stationen=0;
+    let stationen=0, info=null;
+    if(sichtbar){   // UNICORN-64: Infos je Station, Tipp hinter dem Info-Knopf
+      await p.click('#liste button[data-i="4"]', {force:true}).catch(()=>{}); await p.waitForTimeout(150);
+      info=await p.evaluate(()=>({titel:document.getElementById('st-titel').textContent, was:(document.querySelector('#station .st-was')||{}).textContent||'', ort:(document.querySelector('#station .st-ort')||{}).textContent||'',
+        tippZu:!document.querySelector('.tipp-info').open, liste:document.querySelectorAll('#liste .li-info').length}));
+    }
     if(sichtbar){ await p.click('#speichern'); await p.waitForURL(/party\.html/, {timeout:5000}).catch(()=>{});
       stationen=await p.evaluate(()=>{ const pl=JSON.parse(localStorage.getItem('sj.plan.einhorn')||'null'); return pl&&pl.stationen?pl.stationen.length:0; }); }
     const ev=await p.evaluate(()=>JSON.parse(sessionStorage.getItem('ev')||'[]')).catch(()=>[]);
     await c.close();
-    return {log, vorschlag, status, sichtbar, stationen, url:p.url(), ev};
+    return {log, vorschlag, status, sichtbar, stationen, url:p.url(), ev, info};
   }
 
   const a=await lauf(true);
@@ -81,6 +87,8 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42
   // Vorschlag gewählt: Kartendaten laden schon vor „Route planen“ und werden nur einmal geholt (UNICORN-7)
   const v=await lauf(true, true);
   ok(v.sichtbar && v.stationen===7, 'mit gewähltem Vorschlag: Route mit 7 Stationen');
+  ok(v.info && /^Station \d/.test(v.info.titel) && v.info.was.length>20 && /^Passt gut: /.test(v.info.ort), 'Station antippen: was dort passiert und welcher Ort passt (UNICORN-64)');
+  ok(v.info && v.info.tippZu && v.info.liste>=17, 'Tipp zugeklappt hinter dem Info-Knopf, Liste mit Infos je Station');
   ok(v.log.indexOf('karte/overpass')>-1 && v.log.indexOf('karte/overpass')<v.log.indexOf('klick'), 'Kartendaten werden beim Wählen der Adresse vorgeladen');
   ok(v.log.filter(x=>x==='karte/overpass').length===1, 'Kartendaten nur einmal geholt ('+v.log.filter(x=>x==='karte/overpass').length+')');
 

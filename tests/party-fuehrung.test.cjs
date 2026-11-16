@@ -15,9 +15,9 @@ let fehler=0; function ok(b, t){ console.log((b?'OK   ':'FEHLER ')+t); if(!b) fe
 
   // Überblick
   const titel=await p.locator('.weg .titel b').allInnerTexts();
-  ok(titel.length===6 && titel[0]==='Alles bestellen' && titel[1]==='Gäste einladen', 'Überblick: 6 Schritte, Bestellen zuerst, Einladen danach');
+  ok(titel.length===6 && titel[0]==='Material besorgen' && titel[1]==='Gäste einladen', 'Überblick: 6 Schritte, Bestellen zuerst, Einladen danach');
   ok(await anzahl('.bogen .b')===6 && await anzahl('.bogen .b.an')===0, 'Regenbogen mit 6 Bögen, noch keiner leuchtet');
-  ok(await anzahl('.station.dran')===1 && /Als Nächstes/i.test(await p.locator('.station.dran').innerText()) && /Alles bestellen/.test(await p.locator('.station.dran').innerText()), '„Als Nächstes“ zeigt auf Bestellen');
+  ok(await anzahl('.station.dran')===1 && /Als Nächstes/i.test(await p.locator('.station.dran').innerText()) && /Material besorgen/.test(await p.locator('.station.dran').innerText()), '„Als Nächstes“ zeigt auf Bestellen');
   const zeiten=await p.locator('.weg .zeit').allInnerTexts();
   ok(zeiten[0]==='am besten gleich' && zeiten[1]==='wann du magst' && !zeiten.some(z=>/fällig/.test(z)), 'Zeithinweise freundlich, kein „fällig“');
   ok(await p.locator('.station').last().evaluate(e=>e.getBoundingClientRect().bottom<=window.innerHeight), 'Alle 6 Schritte passen auf einen Bildschirm');
@@ -38,7 +38,7 @@ let fehler=0; function ok(b, t){ console.log((b?'OK   ':'FEHLER ')+t); if(!b) fe
   // Springen über die Leiste, ohne Umweg über den Überblick
   await p.click('.punkte [data-oeffne="partytag"]'); await p.waitForSelector('#s-partytag');
   ok(await p.locator('#vg-link').isVisible() && /vorgeht/.test(await p.locator('#vg-link').innerText()), 'Partytag: Vorausgeher-Link mit Erklärung');
-  ok(await p.locator('#umschalten').isVisible() && await anzahl('.teile [data-teil]')===3, 'Partytag: Plan B und drei Teilschritte zum Abhaken');
+  ok(await p.locator('#umschalten').isVisible() && await anzahl('.teile [data-teil]')===3 && !/Vortag/.test(await p.locator('.teile').innerText()), 'Partytag draußen: Plan B und drei Teilschritte, keine Generalprobe am Vortag (UNICORN-76)');
   await p.click('.blaettern [data-oeffne="geraet"]'); await p.waitForSelector('#s-geraet');
   ok(await p.locator('#teilen').isVisible() && /anderen Gerät/.test(await p.locator('#teilen').innerText()), 'Blättern zum Tablet-Schritt, Tablet-Link erklärt');
   await p.goBack(); await p.waitForSelector('.held');

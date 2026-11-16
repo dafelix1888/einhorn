@@ -1,0 +1,169 @@
+<!-- Erzähler-Figuren, Kopie aus app/spiel.html (#kaka). Nicht von Hand ändern: node tests/erzaehler-figuren.test.cjs --schreiben -->
+<svg viewBox="0 0 240 300" class="kk" data-figur="kakapups">
+          <defs>
+            <radialGradient id="kk-braun" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#C07A3E"/><stop offset=".55" stop-color="#9A5B2C"/><stop offset="1" stop-color="#7A4420"/></radialGradient>
+            <linearGradient id="kk-kittel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E6E1F0"/></linearGradient>
+            <radialGradient id="kk-wolke" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#C9E36B" stop-opacity=".95"/><stop offset="1" stop-color="#9BC23A" stop-opacity=".55"/></radialGradient>
+          </defs>
+          <g class="kk-wolke" fill="url(#kk-wolke)">
+            <circle cx="40" cy="262" r="26"/><circle cx="20" cy="236" r="18"/><circle cx="62" cy="240" r="20"/><circle cx="14" cy="270" r="15"/>
+            <path d="M10 214 q6 -10 0 -20 M30 206 q6 -10 0 -20 M50 212 q6 -10 0 -20" fill="none" stroke="#7FA22B" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <g class="kk-koerper">
+            <path d="M48 300 C50 252 70 222 120 218 C170 222 190 252 192 300 Z" fill="url(#kk-kittel)" stroke="#4E22A0" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M96 222 L120 268 L144 222" fill="none" stroke="#4E22A0" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M108 226 L120 250 L132 226 Z" fill="#7C5CC4"/>
+            <circle cx="120" cy="278" r="4" fill="#4E22A0"/><circle cx="120" cy="294" r="4" fill="#4E22A0"/>
+            <rect x="146" y="258" width="26" height="22" rx="4" fill="#fff" stroke="#4E22A0" stroke-width="3"/>
+            <rect x="151" y="244" width="5" height="20" rx="2" fill="#3B82F6"/><rect x="160" y="248" width="5" height="16" rx="2" fill="#E5484D"/>
+          </g>
+          <g class="kk-kopf">
+            <g class="kk-haare" fill="#D5D8DE" stroke="#8A8F98" stroke-width="3" stroke-linejoin="round">
+              <path d="M62 150 l-26 -18 l18 -2 l-22 -22 l24 6 l-10 -24 l26 20 Z"/>
+              <path d="M178 150 l26 -18 l-18 -2 l22 -22 l-24 6 l10 -24 l-26 20 Z"/>
+              <path d="M84 112 l-14 -26 l16 8 l-2 -24 l16 22 Z"/>
+              <path d="M156 112 l14 -26 l-16 8 l2 -24 l-16 22 Z"/>
+            </g>
+            <g class="kk-haufen-kopf" stroke="#5A3215" stroke-width="4" stroke-linejoin="round">
+              <path d="M120 66 C128 70 140 74 138 88 C150 92 162 100 160 116 L80 116 C78 100 92 92 104 90 C102 78 110 70 120 66 Z" fill="url(#kk-braun)"/>
+              <path d="M74 114 C64 120 58 134 62 148 L178 148 C182 134 176 120 166 114 C150 108 90 108 74 114 Z" fill="url(#kk-braun)"/>
+              <path d="M58 146 C40 152 34 172 42 190 C52 214 90 222 120 222 C150 222 188 214 198 190 C206 172 200 152 182 146 C160 140 80 140 58 146 Z" fill="url(#kk-braun)"/>
+              <path d="M92 84 q10 -8 22 -4 M86 124 q16 -8 34 -6 M70 160 q20 -8 40 -6" fill="none" stroke="#D99A5E" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+            </g>
+            <g class="kk-brauen" fill="#E2E4E8" stroke="#8A8F98" stroke-width="2.5">
+              <path class="kk-braue-l" d="M74 124 q12 -14 34 -6 q-4 8 -12 6 q-10 -4 -22 0 Z"/>
+              <path class="kk-braue-r" d="M166 124 q-12 -14 -34 -6 q4 8 12 6 q10 -4 22 0 Z"/>
+            </g>
+            <g class="kk-augen">
+              <g class="kk-auge" data-x="96" data-y="152" transform="translate(96 152)"><ellipse rx="17" ry="20" fill="#fff" stroke="#2A1B4D" stroke-width="3"/><ellipse class="kk-pupille" cx="3" cy="3" rx="8" ry="10" fill="#2A1B4D"/><circle cx="0" cy="-2" r="3.2" fill="#fff"/></g>
+              <g class="kk-auge" data-x="144" data-y="152" transform="translate(144 152)"><ellipse rx="17" ry="20" fill="#fff" stroke="#2A1B4D" stroke-width="3"/><ellipse class="kk-pupille" cx="-3" cy="3" rx="8" ry="10" fill="#2A1B4D"/><circle cx="-6" cy="-2" r="3.2" fill="#fff"/></g>
+            </g>
+            <g class="kk-brille" fill="none" stroke="#6B7280" stroke-width="3.5">
+              <circle cx="96" cy="152" r="24"/><circle cx="144" cy="152" r="24"/><path d="M120 150 q0 -6 0 0"/><path d="M118 148 q2 -5 4 0" stroke-width="4"/>
+              <path d="M72 148 l-12 -4 M168 148 l12 -4"/>
+              <path d="M84 138 q6 -6 12 -6" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+            </g>
+            <g class="kk-bart" fill="#E9EBEF" stroke="#8A8F98" stroke-width="3" stroke-linejoin="round">
+              <path d="M70 196 C66 218 80 232 92 234 C94 248 108 256 120 252 C132 256 146 248 148 234 C160 232 174 218 170 196 C150 210 90 210 70 196 Z"/>
+            </g>
+            <g class="kk-mund" transform="translate(120 198)">
+              <ellipse class="kk-mund-innen" rx="17" ry="4" fill="#3B1A0A" stroke="#5A3215" stroke-width="2.5"/>
+              <ellipse class="kk-zunge" cx="0" cy="3" rx="9" ry="3" fill="#FF7AA8"/>
+            </g>
+            <g class="kk-schnurrbart" fill="#E9EBEF" stroke="#8A8F98" stroke-width="3" stroke-linejoin="round">
+              <path d="M120 186 C110 178 92 178 84 188 C80 194 86 200 92 196 C100 190 110 192 120 194 C130 192 140 190 148 196 C154 200 160 194 156 188 C148 178 130 178 120 186 Z"/>
+            </g>
+          </g>
+          <g class="kk-mini">
+            <path d="M206 286 c-14 0 -18 -8 -12 -14 c-6 -6 0 -14 8 -14 c0 -8 8 -12 12 -18 c6 6 10 12 8 18 c8 0 12 8 6 14 c6 6 2 14 -12 14 Z" fill="url(#kk-braun)" stroke="#5A3215" stroke-width="3" stroke-linejoin="round"/>
+            <circle cx="206" cy="268" r="2.5" fill="#fff"/><circle cx="216" cy="268" r="2.5" fill="#fff"/>
+            <path class="kk-glitzer" d="M190 236 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z M228 248 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill="#F2C94C"/>
+          </g>
+        </svg>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="rudi" hidden>
+          <g class="kk-koerper">
+            <path d="M196 290 C226 280 232 250 214 236" fill="none" stroke="#F4A6B8" stroke-width="7" stroke-linecap="round"/>
+            <path d="M62 300 C64 256 86 230 120 228 C154 230 176 256 178 300 Z" fill="#9CA3AF" stroke="#4B5563" stroke-width="4"/>
+            <path d="M92 300 C94 270 104 252 120 250 C136 252 146 270 148 300 Z" fill="#D1D5DB"/>
+            <g transform="translate(150 252) rotate(-12)"><rect width="34" height="40" rx="3" fill="#FFFBEA" stroke="#4B5563" stroke-width="3"/><path d="M6 10h20M6 18h22M6 26h14" stroke="#9CA3AF" stroke-width="2.5"/></g>
+          </g>
+          <g class="kk-kopf">
+            <g fill="#9CA3AF" stroke="#4B5563" stroke-width="4"><circle cx="66" cy="104" r="34"/><circle cx="174" cy="104" r="34"/></g>
+            <circle cx="66" cy="104" r="20" fill="#F9C5D1"/><circle cx="174" cy="104" r="20" fill="#F9C5D1"/>
+            <path d="M120 96 C162 96 184 128 180 160 C176 196 146 222 120 222 C94 222 64 196 60 160 C56 128 78 96 120 96 Z" fill="#B4BAC4" stroke="#4B5563" stroke-width="4"/>
+            <path d="M120 150 C142 150 156 170 156 186 C156 206 138 216 120 216 C102 216 84 206 84 186 C84 170 98 150 120 150 Z" fill="#D1D5DB"/>
+            <g class="kk-brauen" fill="none" stroke="#4B5563" stroke-width="4" stroke-linecap="round"><path d="M82 126 q14 -10 28 2"/><path d="M158 126 q-14 -10 -28 2"/></g>
+            <g class="kk-auge" data-x="98" data-y="146" transform="translate(98 146)"><ellipse rx="14" ry="16" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="2" cy="2" r="7" fill="#1F2937"/><circle cx="-1" cy="-2" r="2.5" fill="#fff"/></g>
+            <g class="kk-auge" data-x="142" data-y="146" transform="translate(142 146)"><ellipse rx="14" ry="16" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="-2" cy="2" r="7" fill="#1F2937"/><circle cx="-5" cy="-2" r="2.5" fill="#fff"/></g>
+            <g stroke="#4B5563" stroke-width="2.5" stroke-linecap="round"><path d="M96 176 l-34 -6 M96 182 l-36 4 M144 176 l34 -6 M144 182 l36 4"/></g>
+            <ellipse cx="120" cy="172" rx="11" ry="8" fill="#F472B6" stroke="#9D174D" stroke-width="2.5"/>
+            <g class="kk-mund" transform="translate(120 196)"><ellipse class="kk-mund-innen" rx="14" ry="4" fill="#4A1D2A" stroke="#4B5563" stroke-width="2.5"/><ellipse class="kk-zunge" cx="0" cy="3" rx="7" ry="3" fill="#FB7185"/></g>
+            <g fill="#fff" stroke="#4B5563" stroke-width="2"><rect x="112" y="188" width="8" height="10" rx="2"/><rect x="120" y="188" width="8" height="10" rx="2"/></g>
+          </g>
+          <g class="kk-extra" font-family="var(--font-display),sans-serif" font-weight="800" fill="#7C3AED" stroke="#fff" stroke-width="2" paint-order="stroke">
+            <text x="44" y="64" font-size="34">?</text><text x="112" y="44" font-size="44">?</text><text x="182" y="62" font-size="30">?</text>
+          </g>
+        </svg>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="alfonso" hidden>
+          <g class="kk-koerper">
+            <ellipse cx="120" cy="272" rx="44" ry="34" fill="#C2410C" stroke="#7C2D12" stroke-width="4"/>
+            <g stroke="#7C2D12" stroke-width="6" stroke-linecap="round" fill="none"><path d="M80 262 q-26 -6 -34 -26"/><path d="M160 262 q26 -6 34 -26"/><path d="M82 286 q-24 6 -36 0"/><path d="M158 286 q24 6 36 0"/></g>
+            <ellipse cx="120" cy="268" rx="20" ry="14" fill="#FB923C" opacity=".6"/>
+          </g>
+          <g class="kk-kopf">
+            <g class="kk-fuehler kk-extra-dauer" fill="none" stroke="#7C2D12" stroke-width="5" stroke-linecap="round">
+              <path class="kk-fl" d="M100 104 C92 72 70 62 60 44"/><path class="kk-fr" d="M140 104 C148 72 170 62 180 44"/>
+            </g>
+            <circle cx="60" cy="44" r="10" fill="#F43F5E" stroke="#7C2D12" stroke-width="3"/><circle cx="180" cy="44" r="10" fill="#F43F5E" stroke="#7C2D12" stroke-width="3"/>
+            <circle cx="120" cy="164" r="70" fill="#EA580C" stroke="#7C2D12" stroke-width="4"/>
+            <ellipse cx="96" cy="130" rx="22" ry="12" fill="#FDBA74" opacity=".55"/>
+            <g class="kk-brauen" fill="none" stroke="#7C2D12" stroke-width="4" stroke-linecap="round"><path d="M76 118 q14 -14 30 -4"/><path d="M164 118 q-14 -14 -30 -4"/></g>
+            <g class="kk-auge" data-x="96" data-y="148" transform="translate(96 148)"><ellipse rx="20" ry="23" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="5" cy="4" r="10" fill="#1F2937"/><circle cx="1" cy="-1" r="3.5" fill="#fff"/></g>
+            <g class="kk-auge" data-x="144" data-y="148" transform="translate(144 148)"><ellipse rx="20" ry="23" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="-7" cy="6" r="10" fill="#1F2937"/><circle cx="-11" cy="1" r="3.5" fill="#fff"/></g>
+            <circle cx="76" cy="186" r="11" fill="#FB7185" opacity=".6"/><circle cx="164" cy="186" r="11" fill="#FB7185" opacity=".6"/>
+            <g class="kk-mund" transform="translate(120 196)"><ellipse class="kk-mund-innen" rx="26" ry="5" fill="#4A1D2A" stroke="#7C2D12" stroke-width="3"/><ellipse class="kk-zunge" cx="0" cy="3" rx="12" ry="3" fill="#FB7185"/></g>
+            <path d="M92 190 q28 18 56 0" fill="none" stroke="#7C2D12" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <g class="kk-extra" fill="none" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"><path d="M30 120 l-14 -8 M26 140 h-16 M30 160 l-14 8"/><path d="M210 120 l14 -8 M214 140 h16 M210 160 l14 8"/></g>
+        </svg>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="bruno" hidden>
+          <g class="kk-koerper">
+            <path d="M44 300 C46 246 76 220 120 218 C164 220 194 246 196 300 Z" fill="#8B5E3C" stroke="#4A2E1A" stroke-width="4"/>
+            <ellipse cx="120" cy="282" rx="44" ry="34" fill="#C89B6D"/>
+          </g>
+          <g class="kk-kopf">
+            <g fill="#8B5E3C" stroke="#4A2E1A" stroke-width="4"><circle cx="58" cy="92" r="28"/><circle cx="182" cy="92" r="28"/></g>
+            <circle cx="58" cy="92" r="14" fill="#C89B6D"/><circle cx="182" cy="92" r="14" fill="#C89B6D"/>
+            <ellipse cx="120" cy="150" rx="82" ry="74" fill="#9A6A44" stroke="#4A2E1A" stroke-width="4"/>
+            <ellipse cx="120" cy="190" rx="44" ry="34" fill="#D9B48A" stroke="#4A2E1A" stroke-width="3"/>
+            <g class="kk-brauen" fill="#4A2E1A"><path d="M72 120 l36 10 l-2 7 l-36 -8 Z"/><path d="M168 120 l-36 10 l2 7 l36 -8 Z"/></g>
+            <g class="kk-auge" data-x="94" data-y="146" transform="translate(94 146)"><ellipse rx="13" ry="13" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="1" cy="3" r="7" fill="#1F2937"/><path d="M-14 -4 h28 v-12 h-28 Z" fill="#9A6A44"/><path d="M-14 -4 h28" stroke="#4A2E1A" stroke-width="3"/></g>
+            <g class="kk-auge" data-x="146" data-y="146" transform="translate(146 146)"><ellipse rx="13" ry="13" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="-1" cy="3" r="7" fill="#1F2937"/><path d="M-14 -4 h28 v-12 h-28 Z" fill="#9A6A44"/><path d="M-14 -4 h28" stroke="#4A2E1A" stroke-width="3"/></g>
+            <ellipse cx="120" cy="174" rx="16" ry="11" fill="#1F2937"/><ellipse cx="114" cy="170" rx="5" ry="3" fill="#fff" opacity=".6"/>
+            <g class="kk-mund" transform="translate(120 204)"><ellipse class="kk-mund-innen" rx="18" ry="4" fill="#3B1A0A" stroke="#4A2E1A" stroke-width="3"/><ellipse class="kk-zunge" cx="0" cy="3" rx="9" ry="3" fill="#FB7185"/></g>
+          </g>
+          <g class="kk-extra" fill="none" stroke="#4A2E1A" stroke-width="4" stroke-linecap="round" opacity=".8"><path d="M190 190 q10 -6 0 -12 q-10 -6 0 -12"/><path d="M206 196 q12 -8 0 -16 q-12 -8 0 -16"/><path d="M50 190 q-10 -6 0 -12 q10 -6 0 -12"/></g>
+        </svg>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="charly" hidden>
+          <g class="kk-koerper">
+            <path d="M48 300 C50 252 78 226 120 224 C162 226 190 252 192 300 Z" fill="#3B82F6" stroke="#1E3A8A" stroke-width="4"/>
+            <g fill="#FACC15"><circle cx="86" cy="270" r="9"/><circle cx="154" cy="262" r="9"/><circle cx="120" cy="290" r="9"/></g>
+            <path d="M96 228 l24 14 l24 -14 v26 l-24 -12 l-24 12 Z" fill="#E11D48" stroke="#881337" stroke-width="3" stroke-linejoin="round"/>
+          </g>
+          <g class="kk-kopf">
+            <g fill="#22C55E" stroke="#14532D" stroke-width="3"><circle cx="54" cy="132" r="22"/><circle cx="46" cy="160" r="20"/><circle cx="58" cy="106" r="18"/><circle cx="186" cy="132" r="22"/><circle cx="194" cy="160" r="20"/><circle cx="182" cy="106" r="18"/></g>
+            <ellipse cx="120" cy="152" rx="66" ry="70" fill="#FFF7ED" stroke="#7C2D12" stroke-width="4"/>
+            <g transform="translate(120 96)"><path d="M-62 4 C-56 -14 56 -14 62 4 C40 -2 -40 -2 -62 4 Z" fill="#111827"/><rect x="-50" y="-8" width="40" height="22" rx="10" fill="#111827"/><rect x="10" y="-8" width="40" height="22" rx="10" fill="#111827"/><path d="M-40 -2 l10 0" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+            <g class="kk-brauen" fill="none" stroke="#7C2D12" stroke-width="4" stroke-linecap="round"><path d="M80 126 q14 -6 28 0"/><path d="M132 126 q14 -6 28 0"/></g>
+            <g class="kk-auge" data-x="96" data-y="146" transform="translate(96 146)"><ellipse rx="13" ry="14" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="2" cy="3" r="6.5" fill="#1F2937"/><path d="M-14 -3 h28 v-12 h-28 Z" fill="#FFF7ED"/><path d="M-14 -3 h28" stroke="#7C2D12" stroke-width="3"/></g>
+            <g class="kk-auge" data-x="144" data-y="146" transform="translate(144 146)"><ellipse rx="13" ry="14" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="-2" cy="3" r="6.5" fill="#1F2937"/><path d="M-14 -3 h28 v-12 h-28 Z" fill="#FFF7ED"/><path d="M-14 -3 h28" stroke="#7C2D12" stroke-width="3"/></g>
+            <path d="M80 190 C96 214 144 214 160 190" fill="#FCA5A5" stroke="#B91C1C" stroke-width="3" opacity=".7"/>
+            <g class="kk-mund" transform="translate(120 200)"><ellipse class="kk-mund-innen" rx="22" ry="5" fill="#7F1D1D" stroke="#B91C1C" stroke-width="3"/><ellipse class="kk-zunge" cx="0" cy="3" rx="10" ry="3" fill="#FB7185"/></g>
+            <circle cx="120" cy="172" r="15" fill="#EF4444" stroke="#991B1B" stroke-width="3"/><circle cx="115" cy="167" r="4" fill="#fff" opacity=".8"/>
+          </g>
+          <g class="kk-extra">
+            <g transform="translate(176 56) rotate(20)"><path d="M0 0 l34 -14 v28 Z" fill="#FACC15" stroke="#854D0E" stroke-width="3" stroke-linejoin="round"/><circle cx="-8" cy="0" r="12" fill="#EF4444" stroke="#991B1B" stroke-width="3"/></g>
+            <g fill="#2563EB"><path d="M40 70 v-24 l14 -4 v22" stroke="#2563EB" stroke-width="3" fill="none"/><circle cx="36" cy="70" r="6"/><circle cx="50" cy="66" r="6"/><path d="M92 40 v-20" stroke="#2563EB" stroke-width="3"/><circle cx="88" cy="40" r="6"/></g>
+          </g>
+        </svg>
+        <svg viewBox="0 0 240 300" class="kk" data-figur="dagobert" hidden>
+          <g class="kk-koerper">
+            <path d="M46 300 C48 250 78 224 120 222 C162 224 192 250 194 300 Z" fill="#6B7280" stroke="#1F2937" stroke-width="4"/>
+            <ellipse cx="120" cy="284" rx="40" ry="30" fill="#E5E7EB"/>
+          </g>
+          <g class="kk-kopf">
+            <g fill="#6B7280" stroke="#1F2937" stroke-width="4"><circle cx="64" cy="98" r="20"/><circle cx="176" cy="98" r="20"/></g>
+            <path d="M120 82 C170 82 196 120 192 156 C188 196 152 226 120 226 C88 226 52 196 48 156 C44 120 70 82 120 82 Z" fill="#9CA3AF" stroke="#1F2937" stroke-width="4"/>
+            <path d="M120 84 C134 84 142 120 140 150 L138 200 C134 212 106 212 102 200 L100 150 C98 120 106 84 120 84 Z" fill="#F9FAFB"/>
+            <path d="M84 96 C70 120 72 150 88 176 L104 168 C100 140 100 116 104 94 Z" fill="#111827"/><path d="M156 96 C170 120 168 150 152 176 L136 168 C140 140 140 116 136 94 Z" fill="#111827"/>
+            <ellipse cx="146" cy="84" rx="14" ry="9" fill="#F9A8D4" stroke="#BE185D" stroke-width="2.5" class="kk-beule"/>
+            <g class="kk-brauen" fill="none" stroke="#F9FAFB" stroke-width="4" stroke-linecap="round"><path d="M80 122 q12 -10 24 -2"/><path d="M160 120 q-12 -6 -24 4"/></g>
+            <g class="kk-auge" data-x="98" data-y="146" transform="translate(98 146)"><ellipse rx="14" ry="16" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="6" cy="4" r="7" fill="#1F2937"/><circle cx="4" cy="1" r="2.5" fill="#fff"/></g>
+            <g class="kk-auge" data-x="142" data-y="146" transform="translate(142 146)"><ellipse rx="14" ry="16" fill="#fff" stroke="#1F2937" stroke-width="3"/><circle cx="-6" cy="4" r="7" fill="#1F2937"/><circle cx="-8" cy="1" r="2.5" fill="#fff"/></g>
+            <ellipse cx="120" cy="180" rx="13" ry="9" fill="#1F2937"/><ellipse cx="115" cy="177" rx="4" ry="2.5" fill="#fff" opacity=".6"/>
+            <g class="kk-mund" transform="translate(120 202)"><ellipse class="kk-mund-innen" rx="16" ry="4" fill="#4A1D2A" stroke="#1F2937" stroke-width="2.5"/><ellipse class="kk-zunge" cx="6" cy="6" rx="8" ry="5" fill="#FB7185" stroke="#BE185D" stroke-width="2"/></g>
+          </g>
+          <g class="kk-extra" fill="#FACC15" stroke="#A16207" stroke-width="2">
+            <path d="M80 50 l4 9 10 1 -8 6 3 10 -9 -6 -9 6 3 -10 -8 -6 10 -1 Z"/><path d="M150 30 l4 9 10 1 -8 6 3 10 -9 -6 -9 6 3 -10 -8 -6 10 -1 Z"/><path d="M190 64 l3 7 8 1 -6 5 2 8 -7 -5 -7 5 2 -8 -6 -5 8 -1 Z"/>
+          </g>
+        </svg>

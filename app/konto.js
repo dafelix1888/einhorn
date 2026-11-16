@@ -18,7 +18,7 @@
   try{ if(root.KONTO_TEST){ SUPABASE_URL=root.KONTO_TEST.url; SUPABASE_KEY=root.KONTO_TEST.key; } }catch(e){}
 
   var SITZUNG='sj.konto', ROLLEN=['gast','vorausgeher','spiel'];
-  var zustand={}, uhr={};                              // je Thema: 'speichert' | 'gespeichert' | 'fehler'
+  var zustand={}, uhr={}, fehlerArt={};                              // je Thema: 'speichert' | 'gespeichert' | 'fehler'
   // Notweg: Klappt die Anmeldung aus technischen Gründen nicht (Mailversand gesperrt, Limit, Server weg),
   // läuft die App einen Tag lang wie ohne Server weiter: Daten stecken im Link, kein Anmelden nötig.
   var NOTWEG='sj.konto.notweg';
@@ -66,10 +66,16 @@
   }
   function codePruefen(email, code){
     return anfrage('/auth/v1/verify', {method:'POST', body:{type:'email', email:email, token:code}}).then(function(j){
-      var neu=j.user && j.user.created_at && Date.now()-Date.parse(j.user.created_at)<30*60000;
-      if(neu) mkMelden('signup');                      // Marketer: Stufe „Anmeldung“ (nur das Ereignis, keine E-Mail)
+      neuMelden(j.user);
       return sitzungMerken(j, email);
     });
+  }
+  // Marketer: Stufe „Anmeldung“ (nur das Ereignis, keine E-Mail). Gilt für beide Wege, Code und Link aus der Mail,
+  // und je Konto und Gerät nur einmal. Vorher fehlte der Link-Weg: neue Konten kamen an, `signup` nie (UNICORN-36, STRAT-34).
+  function neuMelden(u){
+    if(!u || !u.id || !u.created_at || Date.now()-Date.parse(u.created_at)>=30*60000) return;
+    if(lies('sj.konto.signup')===u.id) return;
+    schreib('sj.konto.signup', u.id); mkMelden('signup');
   }
   // Ereignis an Marketer (gleiche Schnittstelle wie m.js, ohne Cookies, nichts auf dem Gerät).
   // Seiten mit m.js nutzen dessen track(); das Spiel lädt m.js bewusst nicht und schickt nur seine wenigen Ereignisse direkt.
@@ -91,18 +97,23 @@
     try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
     if(!j.refresh_token) return null;
     sitzungMerken(j);
-    return anfrage('/auth/v1/user', {token:j.access_token}).then(function(u){ var s=sitzung(); s.email=u.email; s.id=u.id; schreib(SITZUNG, s); return s; }, function(){ return sitzung(); });
+    return anfrage('/auth/v1/user', {token:j.access_token}).then(function(u){ var s=sitzung(); s.email=u.email; s.id=u.id; schreib(SITZUNG, s); neuMelden(u); return s; }, function(){ return sitzung(); });
   }
 
   // ---------- Party speichern ----------
   function schluessel(p){                              // Server-ID und je Rolle ein Link-Schlüssel, einmal pro Party
-    if(p.server && p.server.id && p.server.k) return false;
+    var ich=(sitzung()||{}).id;
+    // Gehört die gespeicherte Party einem anderen Konto (vorher auf diesem Gerät mit anderer E-Mail gespeichert)? Dann eigene Kopie (PBIM-30)
+    if(p.server && p.server.id && p.server.k && !(ich && p.server.owner && p.server.owner!==ich)) return false;
     p.server={id:uuid(), k:{}}; ROLLEN.forEach(function(r){ p.server.k[r]=zufall(18); }); return true;
   }
   function stand(o){ var s=JSON.stringify(o), h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return s.length+':'+h; }
   function sync(thema, erzwingen){
     if(!angemeldet() || !root.Party) return Promise.resolve(false);
     var p=Party.lesen(thema); if(!p || p.fremd) return Promise.resolve(false);   // fremde Party (aus einem Link) gehört nicht diesem Konto (PBIM-24)
+    var ich=(sitzung()||{}).id;
+    var kopie=erzwingen==='neu';
+    if(kopie){ delete p.server; erzwingen=true; }   // Server lehnte ab, weil die ID einem anderen Konto gehört
     var pl=Party.plan(thema);
     if(schluessel(p)) schreib('sj.party.'+thema, p);
     var daten={gast:Party.einladungsDaten(p, pl), vorausgeher:Party.planKern(pl, p), spiel:Party.planKern(pl, p)};
@@ -114,8 +125,13 @@
         body:{id:p.server.id, thema:thema, party:p, plan:pl, datum:/^\d{4}-\d\d-\d\d$/.test(p.datum||'')?p.datum:null}})
       .then(function(){ return anfrage('/rest/v1/links?on_conflict=token', {method:'POST', token:t, prefer:'resolution=merge-duplicates,return=minimal',
         body:ROLLEN.map(function(r){ return {token:p.server.k[r], party_id:p.server.id, rolle:r, daten:daten[r]}; })}); });
-    }).then(function(){ schreib('sj.konto.stand.'+thema, st); zustand[thema]='gespeichert'; zeichnen(thema); return true; },
-      function(e){ zustand[thema]=sitzung()?'fehler':null; zeichnen(thema); throw e; });
+    }).then(function(){
+      if(ich && p.server.owner!==ich){ p.server.owner=ich; schreib('sj.party.'+thema, p); st=stand([p, pl, daten]); }
+      schreib('sj.konto.stand.'+thema, st); zustand[thema]='gespeichert'; fehlerArt[thema]=''; zeichnen(thema); return true; },
+      function(e){
+        // Ältere Partys ohne vermerkten Besitzer: 403 = Eintrag gehört einem anderen Konto → einmal als eigene Kopie speichern (PBIM-30)
+        if(e && e.status===403 && !kopie && !(p.server && p.server.owner===ich)){ zustand[thema]=null; return sync(thema, 'neu'); }
+        zustand[thema]=sitzung()?'fehler':null; fehlerArt[thema]=e && e.status ? 'server' : 'netz'; zeichnen(thema); throw e; });
   }
   function merken(thema){                              // nach jeder Änderung: kurz warten, dann speichern
     if(!angemeldet()) return;
@@ -167,7 +183,12 @@
         meldung('Dieser Link geht nicht mehr', 'Er wurde ersetzt oder die Party ist vorbei. Bitte die Eltern um einen neuen Link.'); return; }
       Party.ausLinkUebernehmen(thema, r.daten, k);
       schreib('sj.link.'+thema, {k:k, rolle:r.rolle});         // für die Live-Haken des Vorausgehers
-      q.delete('k'); location.replace(location.pathname+'?'+q.toString()+location.hash);
+      q.delete('k');
+      // Der Link entscheidet über die Seite, nicht die Adresse (UNICORN-36): Vorausgeher-Schlüssel auf der Spiel-Seite
+      // (oder umgekehrt) führt zur passenden Seite. Sonst sähe der Vorausgeher nur den Tour-Start ohne Aufbau-Liste.
+      var datei=location.pathname.replace(/^.*\//,''), soll=r.rolle==='vorausgeher' ? 'vorausgeher.html' : 'spiel.html';
+      var pfad=(datei==='spiel.html' || datei==='vorausgeher.html') && datei!==soll ? location.pathname.replace(/[^/]*$/, soll) : location.pathname;
+      location.replace(pfad+'?'+q.toString()+(pfad===location.pathname ? location.hash : ''));
     }, function(){ meldung('Kein Netz', 'Zum ersten Öffnen braucht der Link Internet. Danach geht die Tour auch ohne.'); });
     return true;
   }
@@ -198,6 +219,7 @@
     var t=aufbauSchluessel(thema); if(!aktiv() || !t) return Promise.resolve(null);
     return anfrage('/rest/v1/rpc/aufbau_lesen', {method:'POST', body:{t:t}});
   }
+  // Alle ms Millisekunden nachsehen, solange die Seite sichtbar ist. cb bekommt {stationen, aktualisiert}.
   // Nachsehen, solange die Seite sichtbar ist. cb bekommt {stationen, aktualisiert}.
   // Am Partytag und solange der Vorausgeher gerade unterwegs ist alle 5 s, sonst höchstens alle 10 s (UNICORN-38).
   // Beim Zurückkehren auf die Seite und sobald wieder Netz da ist: sofort.
@@ -231,9 +253,9 @@
     var id=partyId(thema); if(!angemeldet() || !id) return Promise.resolve(null);
     return sync(thema)['catch'](function(){}).then(function(){ return namenAnfrage({aktion:'stand', party_id:id}, true); });
   }
-  function namenErzeugen(thema, name, aussprache, alter){
+  function namenErzeugen(thema, name, aussprache, alter, art){
     var id=partyId(thema); if(!angemeldet() || !id) return Promise.reject(new Error('Bitte zuerst speichern.'));
-    return sync(thema)['catch'](function(){}).then(function(){ return namenAnfrage({aktion:'erzeugen', party_id:id, name:name, aussprache:aussprache, alter:alter}, true); });
+    return sync(thema)['catch'](function(){}).then(function(){ return namenAnfrage({aktion:'erzeugen', party_id:id, name:name, aussprache:aussprache, alter:alter, art:art||'neu'}, true); });
   }
   // Fürs Spiel: Sätze mit dem Tablet-Schlüssel holen (eigener Link oder der Schlüssel der eigenen Party)
   function namenHolen(thema, hash){
@@ -334,7 +356,7 @@
     if(!s || !p || !p.server) return '<div class="konto" id="konto-karte"><b>Noch nicht gespeichert</b>'+
       '<p>Die Party liegt nur auf diesem Gerät. Zum Teilen speichern wir sie geschützt: Nur wer einen Link von euch bekommt, sieht Treffpunkt oder Route. Gast-Eltern brauchen kein Konto.</p>'+
       '<button type="button" class="knopf mittel" data-konto="anmelden">Speichern und teilen</button></div>';
-    var st=z==='speichert'?'<span class="stand">Speichert …</span>':z==='fehler'?'<span class="stand schlecht">Nicht gespeichert, kein Netz?</span>':'<span class="stand gut">Gespeichert</span>';
+    var st=z==='speichert'?'<span class="stand">Speichert …</span>':z==='fehler'?'<span class="stand schlecht">'+(fehlerArt[thema]==='server'?'Nicht gespeichert, bitte neu laden':'Nicht gespeichert, kein Netz?')+'</span>':'<span class="stand gut">Gespeichert</span>';
     function zeile(r, n){ return '<div class="zeile"><span>'+n+'</span><button type="button" class="knopf klein leer" data-konto-neu="'+r+'">Neuer Link</button></div>'; }
     return '<div class="konto" id="konto-karte"><div class="zeile" style="border:0;padding-top:0"><b>Geschützt gespeichert</b>'+st+'</div>'+
       '<p>Angemeldet als '+esc(s.email)+'. Jeder Link zeigt nur, was er braucht: die Einladung Termin und Treffpunkt, Vorausgeher und Tablet die Route. 30 Tage nach der Party wird alles gelöscht.</p>'+
@@ -380,7 +402,7 @@
     }
     function schritt2(fehler){
       dlg.innerHTML='<form method="dialog" id="kd2"><div class="kd-held" style="width:72px;height:72px"><span class="ic" style="color:#fff">'+IC.brief.replace(/20/g,'34')+'</span></div><h2>Code eingeben</h2>'+
-        '<p class="unter">Gerade an <span class="mail">'+esc(email)+'</span> geschickt.<br>Nichts da? Schau im Spam-Ordner nach.</p>'+
+        '<p class="unter">Gerade an <span class="mail">'+esc(email)+'</span> geschickt.<br>Nichts da? Schau im Spam-Ordner nach.<br>Bitte den Code eintippen. Der Link in der Mail öffnet oft einen anderen Browser, dann bist du nur dort angemeldet.</p>'+
         '<input class="code" id="kd-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Code" aria-label="Code aus der E-Mail" required>'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+
         '<button class="los" id="kd-ok" type="submit">Anmelden</button><button class="neben" type="button" id="kd-zurueck">Andere E-Mail</button></form>';
@@ -399,6 +421,15 @@
             dlg.querySelector('#kd-f').textContent='Der Code stimmt nicht oder ist abgelaufen.'; });
       };
       setTimeout(function(){ feld.focus(); }, 60);
+      // Anmeldung über den Link in der Mail (anderer Tab, gleicher Browser): hier von selbst weitermachen,
+      // damit die Party gespeichert wird und niemand vor dem Code-Feld hängen bleibt (Fund von Felix, 12. November).
+      var durch=false, schauen=function(){
+        if(durch || !dlg.open || !dlg.querySelector('#kd2')){ if(!dlg.open || !dlg.querySelector('#kd2')) aufraeumen(); return; }
+        if(!angemeldet()) return;
+        durch=true; aufraeumen(); var b=dlg.querySelector('#kd-ok'); b.disabled=true; b.textContent='Angemeldet …';
+        angemeldetWeiter(thema).then(function(){ fertig(); }, function(){ fertig(); });
+      }, aufraeumen=function(){ root.removeEventListener('storage', schauen); root.removeEventListener('focus', schauen); document.removeEventListener('visibilitychange', schauen); };
+      root.addEventListener('storage', schauen); root.addEventListener('focus', schauen); document.addEventListener('visibilitychange', schauen);
     }
     function stoerung(e){
       try{ if(root.FehlerMelden) root.FehlerMelden('Anmeldung gestört: '+((e&&e.status)||'kein Netz')+' '+((e&&(e.code||e.message))||''), 'konto.js'); }catch(x){}
@@ -582,8 +613,13 @@
     }
   });
 
-  var mailLink=null;
+  var mailLink=null, mailLinkGenutzt=false;
   try{ mailLink=linkAusMail(); }catch(e){}
+  // Kommt jemand über den Mail-Link auf einer Seite an, die danach nicht selbst speichert (Spiel, Planer): Party trotzdem sichern.
+  if(mailLink) mailLink.then(function(){ setTimeout(function(){
+    if(mailLinkGenutzt || !root.Party) return;
+    var th=(new URLSearchParams(location.search).get('thema')||'').replace(/[^a-z0-9-]/gi,''); if(th) sync(th, true)['catch'](function(){});
+  }, 1500); }, function(){});
 
   root.Konto={eigeneOeffnen:eigeneOeffnen, fremdHinweis:fremdHinweis, notweg:notweg, mkMelden:mkMelden, aktiv:aktiv, angemeldet:angemeldet, sitzung:sitzung, bereit:bereit, sync:sync, merken:merken, holen:holen, neuerLink:neuerLink,
     serverLoeschen:serverLoeschen, linkLesen:linkLesen, einloesen:einloesen, karte:karte, fenster:fenster, abmelden:abmelden,
@@ -591,5 +627,5 @@
     antwortGeben:antwortGeben, einladungGesehen:einladungGesehen, gaeste:gaeste, gaesteGemerkt:gaesteGemerkt, gastEntfernen:gastEntfernen, gaesteKurz:gaesteKurz, gaesteZeile:gaesteZeile,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,
     linkRolle:linkRolle, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
-    codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};
+    codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ mailLinkGenutzt=true; return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};
 })(this);

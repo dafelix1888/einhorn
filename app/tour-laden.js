@@ -30,21 +30,24 @@
   function fuellen(t, w){ return String(t).replace(/\{(\w+)\}/g, function(m,k){ return w[k]!=null ? w[k] : m; }); }
 
   function anwenden(tour, plan, config){
-    var tp={stand:'', punkteCode:null, variante:null, liveUrl:config.liveUrl||''};
+    var tp={stand:'', punkteCode:null, variante:null, erz:null, erzStand:'', liveUrl:config.liveUrl||''};
     var kinder=(plan && plan.kinder) || tour.kinder.standard;
     function liste(l){ return l.map(function(g){ return {t:g.t, items:g.items.map(function(x){ return fuellen(x,{kinder:kinder}); })}; }); }
     tour.vorbereitung.gemeinsam=liste(tour.vorbereitung.gemeinsam);
+    var vl=tour.vorbereitung.liste||{}; Object.keys(vl).forEach(function(k){ ['vorher','mit'].forEach(function(g){ (vl[k][g]||[]).forEach(function(i){ i.x=fuellen(i.x,{kinder:kinder}); i.ding=fuellen(i.ding,{kinder:kinder}); }); }); (vl[k].stationen||[]).forEach(function(r){ r.d.forEach(function(i){ i.x=fuellen(i.x,{kinder:kinder}); i.ding=fuellen(i.ding,{kinder:kinder}); }); }); });
+    ['noetig','extras'].forEach(function(k){ (tour.vorbereitung[k]||[]).forEach(function(x){ x.x=fuellen(x.x,{kinder:kinder}); }); });
     Object.keys(tour.vorbereitung.variante).forEach(function(k){ tour.vorbereitung.variante[k]=liste(tour.vorbereitung.variante[k]); });
     tour.gaben.forEach(function(g){ g.wie=fuellen(g.wie,{kinder:kinder}); });
     if(plan){
       tp.stand=plan.stand||''; tp.variante=plan.variante||null; if(plan.liveUrl) tp.liveUrl=plan.liveUrl;
+      tp.erz=plan.erz||null; tp.erzStand=plan.erzStand||'';        // Erzähler aus der Party (UNICORN-54)
       var st=plan.stationen||[], code=[];
       tour.stationen.forEach(function(s,i){
         var p=st[i]; if(i===0) return;
         code.push(p && typeof p.lat==='number' ? [p.lat,p.lng] : null);
         if(!p) return;
-        if(p.name) s.name=p.name;
-        if(p.wo) s.wo=p.wo;
+        if(p.name){ s.name=p.name; s.wo=p.wo||''; }   // geplanter Ort hat Vorrang, die feste Ortszeile stammt vom Original (UNICORN-78)
+        else if(p.wo) s.wo=p.wo;
         if(s.ansage && (p.an || p.zu)) s.ansageText=fuellen(s.ansage,{an:p.an||p.zu, zu:p.zu||p.an});
       });
       if(code.some(Boolean)) tp.punkteCode=JSON.stringify(code);

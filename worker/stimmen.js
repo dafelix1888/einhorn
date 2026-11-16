@@ -12,6 +12,8 @@ const THEMEN = {
     vorlagen: [
       'Die Hufspuren führen {zu}.', 'Die Regenbogenbrücke wartet {an}.', 'Der Zaun beginnt {an}.',
       'Die Kreuzung ist {an}.', 'Der Wolkenberg ist {an}.', 'Die Parkbank steht {an}.',
+      // seit UNICORN-64 (passen zu den ortsneutralen Sätzen davor); die alten bleiben für noch nicht aktualisierte Geräte
+      'Die Bilder warten {an}.', 'Das nächste Rätsel wartet {an}.', 'Die Regenwolke schläft {an}.', 'Der letzte Ort ist {an}.',
     ],
   },
 };

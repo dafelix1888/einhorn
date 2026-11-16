@@ -22,7 +22,8 @@
 .weg span{color:var(--leise)}
 .weg .ort{color:var(--text);font-size:1.15rem;font-weight:700}
 .fokus .knopf{align-self:flex-start;min-height:44px;display:inline-flex;align-items:center;gap:8px}
-.fokus .knopf svg{width:18px;height:18px}
+.fokus .knopf svg,.danach .knopf svg{width:18px;height:18px}
+.danach .knopf{min-height:44px;display:inline-flex;align-items:center;gap:8px}
 .hinlegen{background:var(--karte);border-radius:16px;padding:14px;margin-bottom:12px}
 .hinlegen>b{display:block;margin-bottom:4px}
 .hinlegen label{display:flex;gap:12px;align-items:center;min-height:44px;padding:6px 0;border-top:1px solid var(--linie);font-weight:400;margin:0;cursor:pointer}
@@ -33,6 +34,9 @@
 .fertig-karte{background:#123321;border-radius:20px;padding:20px;margin-bottom:14px}
 .fertig-karte h1{font-size:1.5rem;margin:0 0 6px}
 .fertig-karte p{color:#B9E8C9;margin:0}
+.danach ol{margin:8px 0 4px;padding-left:20px}.danach li{margin:6px 0;line-height:1.4}.danach .leise{display:block;font-size:.88rem;color:var(--leise,#B3A9C4)}
+.danach .such-titel{font-weight:700;margin:12px 0 4px}.danach .such{list-style:none;margin:0 0 12px;padding:0}.danach .such li{display:flex;gap:8px;align-items:baseline;margin:4px 0;font-size:.92rem}
+.nr-klein{flex:0 0 22px;height:22px;border-radius:50%;background:#2F2740;display:inline-flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700}
 details.alle{background:var(--karte);border-radius:16px;margin:0 0 14px}
 details.alle summary{list-style:none;cursor:pointer;min-height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-weight:800}
 details.alle summary::-webkit-details-marker{display:none}
@@ -78,19 +82,22 @@ details.alle[open] summary svg{transform:rotate(180deg)}
   function km(m){ return m>=1000 ? (m/1000).toFixed(1).replace('.',',')+' km' : Math.round(m)+' m'; }
   if(!party){ $('seite').innerHTML='<h1>Vorausgeher</h1><p class="leise">Auf diesem Handy ist noch keine Party. Bitte die Gastgeber um den Link für den Vorausgeher.</p>'; return; }
   var v=Party.variante(party), drinnen=v==='c';
+  var selbst=/[?&]modus=selbst(&|$)/.test(location.search);   // ohne Vorausgeher: Eltern bauen selbst auf (UNICORN-73)
   party.aufgebaut=party.aufgebaut||{};
   // Haken „hingelegt“ je Sache: nur auf diesem Handy, eigener Schlüssel (ein neuer Plan-Link überschreibt ihn nicht)
   var GELEGT='sj.gelegt.'+thema, gelegt={};
   try{ gelegt=JSON.parse(localStorage.getItem(GELEGT)||'{}')||{}; }catch(e){}
 
   // Was wohin: Packliste der Vorausgeher-Tasche den Stationen zuordnen
+  var behalten={};
   function wasWohin(){
-    var gr=(tour.vorbereitung.variante[v]||[]).filter(function(g){ return /Vorausgeher/.test(g.t); })[0], je={};
+    var gr=(tour.vorbereitung.variante[v]||[]).filter(function(g){ return /Vorausgeher/.test(g.t); })[0], je={}; behalten={};
     (gr?gr.items:[]).forEach(function(it){
       var t=it.replace(/\{kinder\}/g, party.kinder), m=t.match(/\(Station (\d)\)\s*$/), i=null;
       if(m){ i=+m[1]-1; t=t.replace(m[0],'').trim(); }
       else { var r=t.match(/\(([^)]+)\)\s*$/); if(r && RAUM[r[1]]!=null){ i=RAUM[r[1]]; t=t.replace(r[0],'').trim(); } }
       if(i==null) i=tour.stationen.length-1;
+      if(/nicht hinlegen/.test(t)){ (behalten[i]=behalten[i]||[]).push(t.replace(/:.*$/,'')); return; }   // Schatzkiste bleibt in der Tasche (UNICORN-74)
       (je[i]=je[i]||[]).push(t);
     });
     return je;
@@ -101,7 +108,8 @@ details.alle[open] summary svg{transform:rotate(180deg)}
       if(i===0) return null;
       var o=tour.varianten[v] && tour.varianten[v].st && tour.varianten[v].st[i] || {};
       var p=st[i]||{};
-      return {i:i, titel:s.title||(s.steps&&s.steps[0].title)||'', name:drinnen?(o.wo||s.wo):(p.name||s.name), wo:o.wo||s.wo, lat:p.lat, lng:p.lng, sachen:je[i]||[], vorOrt:o.vorOrt||s.vorOrt};
+      return {i:i, titel:s.title||(s.steps&&s.steps[0].title)||'', name:drinnen?(o.wo||s.wo):(p.name||s.name), wo:(!drinnen && p.name && !o.wo) ? '' : (o.wo||s.wo),   // geplanter Ort hat Vorrang (UNICORN-78)
+                lat:p.lat, lng:p.lng, sachen:je[i]||[], behalten:behalten[i]||[], vorOrt:o.vorOrt||s.vorOrt};
     }).filter(Boolean);
   }
   function hinlaufLink(s){ return 'https://www.google.com/maps/dir/?api=1&travelmode=walking&destination='+s.lat+','+s.lng; }
@@ -111,6 +119,7 @@ details.alle[open] summary svg{transform:rotate(180deg)}
   function startText(){
     var d=Party.datum(party); if(!d) return '';
     var min=Math.round((d-Date.now())/60000);
+    if(selbst) return min<=0 ? 'Die Party <b>läuft</b>' : min<=180 ? 'Gäste kommen in <b>'+min+' Min.</b>' : Party.tageBis(party)===0 ? 'Gäste kommen um <b>'+esc(party.start)+' Uhr</b>' : 'Party am <b>'+esc(Party.datumText(d))+'</b>';
     if(min<=0) return 'Gruppe ist <b>unterwegs</b>';
     if(min<=120) return 'Gruppe startet in <b>'+min+' Min.</b>';
     if(Party.tageBis(party)===0) return 'Gruppe startet um <b>'+esc(party.start)+' Uhr</b>';
@@ -120,13 +129,14 @@ details.alle[open] summary svg{transform:rotate(180deg)}
   // Grundgerüst einmal bauen; danach nur die Teile neu, die sich ändern (die Karte bleibt stehen)
   function geruest(){
     $('seite').innerHTML=
-      '<div class="kopf"><b>Vorausgeher</b><span class="pille" id="start"></span></div>'+
+      '<div class="kopf"><b>'+(selbst?'Stationen aufbauen':'Vorausgeher')+'</b><span class="pille" id="start"></span></div>'+
       '<div class="balken" id="balken" role="img"></div>'+
-      '<p class="unter">'+esc(party.kind&&party.kind.name?party.kind.name+'s Party · ':'')+'Losgehen um '+Party.uhr(party,-20)+' Uhr. '+(drinnen?'Station 6 und 7 bei geschlossener Tür aufbauen.':'Mit der Tasche vorgehen und Station für Station aufbauen.')+'</p>'+
+      '<p class="unter">'+esc(party.kind&&party.kind.name?party.kind.name+'s Party · ':'')+(selbst?'Aufbauen ab '+Party.uhr(party,-75)+' Uhr. Mit der Tasche Station für Station aufbauen.':'Losgehen um '+Party.uhr(party,-20)+' Uhr. '+(drinnen?'Station 6 und 7 bei geschlossener Tür aufbauen.':'Mit der Tasche vorgehen und Station für Station aufbauen.'))+'</p>'+
+      (drinnen?'':'<p class="hinweis">Die Sachen liegen eine Weile allein. Such Stellen abseits vom Weg.</p>')+
       '<div id="fokus"></div>'+
       '<details class="alle" id="alle"><summary><span id="alleTitel">Alle Stationen</span>'+PFEIL+'</summary><div class="alle-innen">'+(drinnen?'':'<div id="karte"></div>')+'<div id="liste"></div></div></details>'+
       '<p class="hinweis" id="live-hinweis">'+(window.Konto && Konto.linkRolle(thema)==='vorausgeher' ? 'Das Tablet sieht deine Haken live.' : 'Die Haken sieht nur dieses Handy.')+'</p>'+
-      '<p class="hinweis"><a href="landing.html?utm_source=vorausgeher">Was ist Schatzweg?</a></p>';
+      (selbst?'<p class="hinweis"><a href="party.html?thema='+thema+'">Zurück zur Party</a></p>':'<p class="hinweis"><a href="landing.html?utm_source=vorausgeher">Was ist Schatzweg?</a></p>');
     $('alle').addEventListener('toggle', function(){ if($('alle').open && !drinnen){ if(karte===null) karteBauen(); else if(karte) karte.invalidateSize(); } });
   }
 
@@ -146,11 +156,20 @@ details.alle[open] summary svg{transform:rotate(180deg)}
         (n.lat!=null && !drinnen ? '<a class="knopf leer" target="_blank" rel="noopener" href="'+hinlaufLink(n)+'">'+PIN+'Hinlaufen mit Karte</a>' : '')+'</section>';
       h+='<div class="hinlegen"><b>Hier hinlegen</b>'+
         (n.sachen.length ? n.sachen.map(function(x,k){ var id=n.i+':'+k; return '<label><input type="checkbox" data-gelegt="'+id+'"'+(gelegt[id]?' checked':'')+'><span>'+esc(x)+'</span></label>'; }).join('') : '<p class="leise" style="margin:6px 0 0">Nichts aufbauen, nur vorbeigehen.</p>')+
+        (n.behalten.length ? '<p class="gruppe"><b>Nicht hinlegen:</b> '+esc(n.behalten.join(', '))+'. Bleibt in der Tasche, bis die Kinder kleben.</p>' : '')+
         (n.vorOrt ? '<p class="gruppe">Für die Gruppe: '+esc(n.vorOrt)+'</p>' : '')+'</div>';
       h+='<button type="button" class="weiter" data-weiter="'+n.i+'">Station steht, weiter</button>';
     } else {
-      var letzte=l[l.length-1];
-      h+='<section class="fertig-karte"><h1>Alles aufgebaut!</h1><p>Warte an der letzten Station'+(letzte?' ('+esc(letzte.name)+')':'')+' und versteck dich, wenn die Gruppe kommt.</p></section>';
+      // Danach (UNICORN-70): zur Gruppe zurück und mitlaufen, damit die Kinder alles finden
+      var start=((plan&&plan.stationen)||[])[0], unterwegs=(Party.datum(party)||0)<=Date.now();
+      h+=selbst ? '<section class="fertig-karte"><h1>Alles steht!</h1><p>Zurück nach Hause, die Gäste kommen um '+esc(party.start||'')+' Uhr. Du weißt, wo alles liegt.</p></section>'
+                : '<section class="fertig-karte"><h1>Alles aufgebaut!</h1><p>Jetzt zurück zur Gruppe und mitlaufen. Du weißt, wo alles liegt.</p></section>';
+      h+='<div class="hinlegen danach"><b>So geht es weiter</b><ol>'+
+        (selbst ? '<li><b>Lass die Tasche mit der Schatzkiste nicht aus den Augen.</b> Sie kommt mit auf die Tour.</li>' : '<li><b>'+(drinnen?'Geh zur Gruppe.':'Geh der Gruppe entgegen.')+'</b> '+(drinnen?'Lass die Türen hinter dir zu.':'Lauf den Weg zurück, sie kommt dir entgegen.')+' <span class="leise">'+(unterwegs?'Die Gruppe ist schon unterwegs.':'Die Gruppe startet um '+esc(party.start||'')+' Uhr.')+'</span></li>')+
+        '<li><b>Lauf hinten mit.</b> Finden die Kinder etwas nicht, zeig unauffällig in die Richtung. Verraten nur im Notfall.</li>'+
+        '<li><b>Beim Schatz:</b> Fridolin liegt bereit. Lass die Kinder selbst suchen. Die Schatzkiste stellst du hin, während die Kinder kleben.</li></ol>'+
+        '<p class="such-titel">Das suchen die Kinder</p><ul class="such">'+Party.vorbereitungsListe(tour, v, party.kinder).gruppen.filter(function(g){ return g.art==='station' && g.wer==='Vorausgeher'; }).map(function(g){ var d=g.items.filter(function(i){ return !i.extra; }).map(function(i){ return i.x; }); return d.length ? '<li><span class="nr-klein">'+g.s+'</span>'+esc(d.join(', '))+'</li>' : ''; }).join('')+'</ul>'+
+        (start && start.lat!=null && !drinnen ? '<a class="knopf leer" target="_blank" rel="noopener" href="'+hinlaufLink(start)+'">'+PIN+'Zurück zum Start mit Karte</a>' : '')+'</div>';
     }
     $('fokus').innerHTML=h;
 

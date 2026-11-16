@@ -103,7 +103,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   // Hauptbereich: Party als Hauptblock, Abenteuer kompakt, Kreis = Mein Bereich
   await a.goto(B+'index.html'); await a.waitForSelector('.meine');
   const karte=await a.locator('.meine').innerText();
-  pruefe(/Deine Party/i.test(karte) && /In Planung/.test(karte) && /Emmas Party/.test(karte) && /Als Nächstes:\s*Alles bestellen/.test(karte), 'Hauptbereich: „Deine Party“ mit Status und nächstem Schritt');
+  pruefe(/Deine Party/i.test(karte) && /In Planung/.test(karte) && /Emmas Party/.test(karte) && /Als Nächstes:\s*Material besorgen/.test(karte), 'Hauptbereich: „Deine Party“ mit Status und nächstem Schritt');
   pruefe(await a.locator('.m-bogen path').count()===6 && await a.locator('.m-weiter').isVisible(), 'Regenbogen und Hauptknopf in der Party-Karte');
   await a.waitForFunction(()=>/1 Zusage/.test((document.getElementById('m-gaeste')||{}).textContent||''), null, {timeout:8000}).catch(()=>{});
   pruefe(/1 Zusage/.test(await a.locator('#m-gaeste').innerText()), 'Party-Karte zeigt den Gäste-Stand');

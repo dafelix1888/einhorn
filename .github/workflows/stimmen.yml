@@ -1,15 +1,17 @@
 name: Stimmen erzeugen
 
-# Läuft, wenn sich die App oder die Rollen ändern, oder per Hand unter Actions → „Stimmen erzeugen“ → Run workflow.
+# Läuft, wenn sich die Sätze (tour.json, spiel.html) oder die Rollen ändern, oder per Hand unter Actions → „Stimmen erzeugen“ → Run workflow.
+# Seit UNICORN-48 kommen die Sätze aus app/themen/einhorn/tour.json, nicht mehr aus original.html. Erzeugt werden nur geänderte Sätze.
 on:
   push:
     branches: [main]
-    paths: ['original.html', 'stimmen/**', '.github/workflows/stimmen.yml']
+    paths: ['app/themen/einhorn/tour.json', 'app/spiel.html', 'stimmen/**', '.github/workflows/stimmen.yml']
   workflow_dispatch:
 
 permissions:
   contents: write
   pages: write
+  actions: write
 
 concurrency:
   group: stimmen
@@ -25,28 +27,32 @@ jobs:
           node-version: 22
       - name: ffmpeg für den Vorlauf vor jedem Satz
         run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
-      - name: Sätze und Rollen
-        env:
-          ZAUBERWORT: ${{ secrets.ZAUBERWORT }}
-        run: node stimmen/erzeugen.mjs --liste
+      - name: Sätze, die neu erzeugt werden
+        run: node stimmen/erzeugen.mjs --neu
       - name: Stimmen bei ElevenLabs erzeugen
         env:
-          ZAUBERWORT: ${{ secrets.ZAUBERWORT }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
         run: node stimmen/erzeugen.mjs
+      - name: Hörprobe für „Funkel kennt …“ (nur wenn geändert)
+        if: success() || failure()
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: node stimmen/beispiel.mjs
       - name: Stimmen in Pakete für die App aufteilen
         if: success() || failure()
         run: node stimmen/aufteilen.mjs
       - name: Neue Stimmen-Datei einchecken
         if: success() || failure()
         run: |
-          if git diff --quiet -- funkel-stimme.json stimmen/pakete && [ -z "$(git status --porcelain stimmen/pakete)" ]; then echo "Keine Änderung."; exit 0; fi
+          if git diff --quiet -- funkel-stimme.json stimmen/pakete && [ -z "$(git status --porcelain stimmen/pakete app/themen/einhorn/namen-beispiel.mp3 app/themen/einhorn/namen-beispiel.json)" ]; then echo "Keine Änderung."; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git add funkel-stimme.json stimmen/pakete
+          git add app/themen/einhorn/namen-beispiel.mp3 app/themen/einhorn/namen-beispiel.json 2>/dev/null || true
           git commit -m "Stimmen neu erzeugt"
           git push
-          # Pushes dieses Workflows lösen GitHub Pages nicht immer selbst aus, darum ausdrücklich neu bauen
-          gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages-Neubau nicht angestoßen, die Seite aktualisiert sich beim nächsten Push."
+          # Pushes mit dem GitHub-Token starten keine anderen Workflows: Veröffentlichung (Cloudflare) und Pages ausdrücklich anstoßen
+          gh workflow run cloudflare.yml --ref main -R "${{ github.repository }}" || echo "::warning::Veröffentlichung nicht angestoßen, sie kommt mit dem nächsten Push."
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages-Neubau nicht angestoßen."
         env:
           GH_TOKEN: ${{ github.token }}

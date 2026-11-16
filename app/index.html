@@ -319,9 +319,8 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
   function vorbereitung(t, p){
     var tour=TOUR[t.id]; if(!tour) return null;
     var v=(p && p.variante) || 'a', kinder=(p && p.kinder) || tour.kinder.standard;
-    var g=tour.vorbereitung.gemeinsam, l=g.slice(0,1).concat(tour.vorbereitung.variante[v]||[], g.slice(1));
-    var haken=lies(tour.speicher+'.liste')||{}, n=0, fertig=0;
-    l.forEach(function(gr){ gr.items.forEach(function(it){ n++; if(haken[v+'|'+it.replace(/\{kinder\}/g,kinder)]) fertig++; }); });
+    var haken=lies(tour.speicher+'.liste')||{}, n=0, fertig=0;   // gezählt wird nur, was die Tour wirklich braucht
+    Party.vorbereitungsListe(tour, v, kinder).schluessel.forEach(function(k){ n++; if(haken[k]) fertig++; });   // nach Station (UNICORN-67)
     return {n:n, fertig:fertig};
   }
   function jetztHtml(){
@@ -348,7 +347,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
         (p.heimweg!=null?'<div><span>'+(p.rundkurs?'Heimweg (Runde)':'Heimweg')+'</span><b>'+km(p.heimweg)+'</b></div>':'')+
         '<div><span>Kinder</span><b>'+(p.kinder||tour.kinder&&tour.kinder.standard||'–')+'</b></div>'+
       '</div></div>'+
-      (vb?'<div class="box"><h4>Vorbereitung</h4><div class="balken"><i style="width:'+Math.round(vb.fertig/Math.max(1,vb.n)*100)+'%"></i></div><p class="unter" style="margin:0">'+vb.fertig+' von '+vb.n+' Punkten erledigt</p><div class="knopfreihe"><a class="pille" href="spiel.html?thema='+t.id+'#einrichten">Checkliste</a></div></div>':'')+
+      (vb?'<div class="box"><h4>Vorbereitung</h4><div class="balken"><i style="width:'+Math.round(vb.fertig/Math.max(1,vb.n)*100)+'%"></i></div><p class="unter" style="margin:0">'+vb.fertig+' von '+vb.n+' nötigen Dingen erledigt</p><div class="knopfreihe"><a class="pille" href="spiel.html?thema='+t.id+'#einrichten">Checkliste</a></div></div>':'')+
       '<div class="knopfreihe"><a class="voll" href="party.html?thema='+t.id+'">Weiter zur Party</a><a class="pille" href="planer.html?thema='+t.id+'">Route ändern</a></div>';
   }
 
@@ -483,7 +482,8 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       }).join('')+'</div>'+
       '<div class="paket"><div><b>Alles in einer Box</b><span>Haarreifen, Holz-Regenbogen, Glückssteine, Zaubertafeln und Sticker für '+tour.kinder.standard+' Kinder.</span></div><button class="pille" disabled>Bald im Shop</button></div>'+
       '<p class="hinweis-klein">Links zu Händlern können Partnerlinks sein. Für euch ändert sich am Preis nichts.</p></section>';
-      h+='<section class="abschnitt-d"><h2>Varianten</h2><div class="ausruestung">'+Object.keys(tour.varianten).map(function(k){ var v=tour.varianten[k]; return '<div class="ding"><div><b>'+esc(v.name)+'</b><span>'+esc(v.kurz)+'</span></div></div>'; }).join('')+'</div></section>';
+      h+='<section class="abschnitt-d"><h2>So könnt ihr spielen</h2><div class="ausruestung">'+['a','c'].filter(function(k){ return tour.varianten[k]; }).map(function(k){ var v=tour.varianten[k]; return '<div class="ding"><img src="themen/'+tour.id+'/spielart/'+esc(v.bild||k)+'.svg" alt="" width="64" height="40" style="border-radius:8px;flex:0 0 64px"><div style="flex:1"><b>'+esc(v.name)+'</b><span>'+esc(v.kurz)+'</span></div></div>'; }).join('')+
+        (tour.extra ? '<div class="ding"><img src="themen/'+tour.id+'/spielart/'+esc(tour.extra.bild)+'.svg" alt="" width="64" height="40" style="border-radius:8px;flex:0 0 64px"><div style="flex:1"><b>Extra: '+esc(tour.extra.titel)+'</b><span>'+esc(tour.extra.text)+'</span></div></div>' : '')+'</div></section>';
     } else {
       h+='<section class="abschnitt-d"><h2>Was dich erwartet</h2><p class="info">Wie bei Funkel: eine Geschichte mit eigenen Figuren und Stimmen, Rätsel im Zauberspiegel und eine Route, die sich an jeden Ort anpasst. Merke dir das Abenteuer, dann siehst du es in deiner Liste, sobald es da ist.</p></section>';
     }

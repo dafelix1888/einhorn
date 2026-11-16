@@ -106,6 +106,23 @@ button{font:inherit;color:inherit;touch-action:manipulation}
 .mirror-pic{width:76%;height:76%;display:grid;place-items:center}
 .mirror-pic svg{width:100%;height:100%;display:block}
 .mirror-pic.tap{cursor:pointer}
+.mirror-pic{position:relative}
+/* „Wer war das?“ (UNICORN-62): Nebel über der Spur, Uhr während sie zu sehen ist */
+.mirror-pic .spur-nebel{position:absolute;inset:-10%;border-radius:50%;pointer-events:none;opacity:0;transition:opacity 1.4s ease;
+  background:radial-gradient(circle at 28% 38%,rgba(255,255,255,.97),rgba(255,255,255,0) 46%),radial-gradient(circle at 72% 52%,rgba(238,232,252,.97),rgba(238,232,252,0) 50%),
+    radial-gradient(circle at 48% 76%,rgba(255,255,255,.95),rgba(255,255,255,0) 46%),radial-gradient(circle at 52% 28%,rgba(228,220,248,.95),rgba(228,220,248,0) 50%),radial-gradient(circle,rgba(246,243,253,.9),rgba(246,243,253,.6) 60%,rgba(246,243,253,0) 72%);
+  filter:blur(5px);animation:nebelZieht 8s ease-in-out infinite alternate}
+.mirror-pic.nebel .spur-nebel{opacity:1}
+.mirror-pic.nebel svg,.mirror-pic.spur-sichtbar svg{transition:filter 1.4s ease,opacity 1.4s ease}
+.mirror-pic.nebel svg{filter:blur(16px);opacity:.08}
+.mirror-pic .spur-uhr{position:absolute;left:18%;right:18%;bottom:-6%;height:7px;border-radius:4px;background:var(--lila);transform-origin:left center;animation:spurUhr linear forwards}
+@keyframes spurUhr{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@keyframes nebelZieht{from{transform:translateX(-4%) scale(1)}to{transform:translateX(4%) scale(1.06)}}
+.spur-nochmal{flex:1 1 100%;background:none;border:0;color:var(--ink-soft);font:inherit;font-size:.95rem;text-decoration:underline;text-underline-offset:3px;padding:10px;min-height:44px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){ .mirror-pic .spur-nebel{animation:none} }
+.mirror-pic svg.deko-wolke{position:absolute;top:-11%;right:16%;width:40%;height:auto;animation:wolkeSchlaf 4.5s ease-in-out infinite;filter:drop-shadow(0 3px 5px rgba(36,26,61,.18))}
+@keyframes wolkeSchlaf{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(3px) scale(1.04)}}
+@media (prefers-reduced-motion:reduce){ .mirror-pic svg.deko-wolke{animation:none} }
 .mirror-read{display:flex;align-items:baseline;justify-content:center;gap:12px;pointer-events:none}
 .mirror-read .big{font-family:var(--font-display);font-weight:800;font-size:2.3rem;line-height:1;font-variant-numeric:tabular-nums}
 .mirror-read .lab{font-family:var(--font-display);font-weight:600;font-size:1.3rem;color:var(--ink-soft)}
@@ -190,6 +207,27 @@ details.karte.achtung{border-color:#F0C6C9}
 .liste h3{margin:14px 0 4px;display:flex;align-items:baseline;gap:10px}
 .liste h3 small{font-family:var(--font-body);font-weight:400;font-size:.9rem;color:var(--ink-soft)}
 .liste h3.weg{color:var(--ink-soft);font-size:.95rem}
+.haken .notfalls{display:block;color:var(--ink-soft);font-size:.86rem;margin-top:2px;text-decoration:none}
+.haken input:checked+span .notfalls{display:none}
+.liste .vb-ansicht{margin:4px 0 8px}.liste .vb-ansicht small{font-weight:400;opacity:.75;margin-left:4px}
+.liste .vb-lead{color:var(--ink-soft);font-size:.92rem;margin:4px 0 6px}.liste .vb-fuss{font-size:.88rem;color:var(--ink-soft);margin:4px 0 6px}.liste .vb-kopf{flex-wrap:wrap}
+.liste .vb-summen{display:flex;flex-wrap:wrap;gap:4px 16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:6px 0 4px}.liste .vb-summen small{flex-basis:100%;color:var(--ink-soft);font-size:.84rem}.liste .vb-summen b{margin-right:4px}
+.haken .menge{color:var(--magic)}.haken .preiszeile{display:block;font-size:.84rem;color:var(--ink-soft);margin-top:2px}.haken input:checked+span .preiszeile{display:none}
+.haken .wofuer{display:block;font-size:.86rem;margin-top:2px;color:var(--ink)}.haken input:checked+span .wofuer{display:none}.tag-preis{font-style:normal;font-size:.76rem;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--surface);border:1px solid var(--line);margin-left:4px;vertical-align:2px;white-space:nowrap}
+.liste .vb-gruppe{border-top:1px solid var(--line);padding:10px 0 4px}.liste .vb-gruppe:first-of-type{border-top:0}
+.liste .vb-kopf{display:flex;align-items:center;gap:10px;margin-bottom:2px}.liste .vb-kopf b{font-size:1.02rem}.liste .vb-kopf small{color:var(--ink-soft);font-size:.82rem}
+.haken.extra>span{color:var(--ink-soft)}.tag-extra{font-style:normal;font-size:.72rem;font-weight:700;letter-spacing:.02em;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--ink-soft);margin-left:4px;vertical-align:2px}
+.liste details.mehr{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
+.liste details.mehr summary{cursor:pointer;font-weight:700;padding:6px 0;list-style:none;display:flex;align-items:baseline;gap:8px}.liste details.mehr summary::-webkit-details-marker{display:none}
+.liste details.mehr summary::after{content:"›";margin-left:auto;font-size:1.2rem;transition:transform .2s}.liste details.mehr[open] summary::after{transform:rotate(90deg)}
+.liste details.mehr summary small{font-weight:400;color:var(--ink-soft)}
+.liste .pk-vorher{margin:6px 0 8px;font-size:.92rem;color:var(--ink-soft)}.liste .pk-vorher b{color:var(--ink)}
+.liste ol.pk{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.liste ol.pk li{display:grid;grid-template-columns:30px 92px 1fr;gap:10px;align-items:start;padding:8px 0;border-bottom:1px solid var(--line)}
+.liste .pk-nr{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:.9rem}
+.liste .pk-ort{font-weight:700;line-height:1.2;padding-top:4px}.liste .pk-ort small{display:block;font-weight:400;font-size:.78rem;color:var(--ink-soft)}
+.liste .pk-dinge{display:flex;flex-wrap:wrap;gap:5px}.liste .pk-dinge i{font-style:normal;font-size:.88rem;padding:4px 9px;border-radius:999px;background:var(--surface);border:1px solid var(--line);line-height:1.25}
+.liste h4{margin:10px 0 2px;font-size:.95rem}.liste ul.pack{margin:0;padding-left:20px;line-height:1.4}
 .haken{display:flex;align-items:flex-start;gap:12px;padding:7px 0;cursor:pointer;line-height:1.35}
 .haken input{appearance:none;-webkit-appearance:none;flex:none;width:26px;height:26px;border:2px solid var(--line);border-radius:8px;background:var(--surface);display:grid;place-items:center;margin-top:1px}
 .haken input:checked{background:var(--magic);border-color:var(--magic)}
@@ -433,6 +471,34 @@ body.m-tour .zur-tour{display:none}
 .erw-menu button svg,.erw-menu a svg{width:22px;height:22px;flex:none;color:var(--magic-deep)}
 .erw-menu b{display:block;font-family:var(--font-display);font-weight:800;font-size:1.1rem;line-height:1.2}
 .erw-menu small{display:block;color:var(--ink-soft);font-size:.85rem;line-height:1.3}
+/* Generalprobe (UNICORN-61): Tour zum Üben, Punkte vor Ort setzen */
+.probe{width:100%;max-width:680px;text-align:left;background:linear-gradient(130deg,rgba(74,222,128,.16),var(--surface));border:1.5px solid rgba(74,222,128,.55);border-radius:18px;padding:10px 14px;color:var(--ink);font-size:.95rem;line-height:1.4}
+.probe-kopf{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.abschluss{width:100%;max-width:680px;margin:14px auto 0;text-align:left;background:linear-gradient(130deg,rgba(167,139,250,.18),var(--surface));border:1.5px solid var(--line);border-radius:18px;padding:12px 16px 14px;color:var(--ink);font-size:1rem;line-height:1.45}
+.abschluss h3{margin:0 0 6px;font-size:1.05rem}
+.abschluss ol{margin:0 0 12px;padding-left:1.3em}
+.abschluss li{margin:3px 0}
+.abschluss .link{background:none;border:0;padding:0;color:var(--ink);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.abschluss .haupt{display:flex;justify-content:center;width:100%;text-decoration:none}
+.abschluss .leise{color:var(--ink-soft);margin:0}
+.probe-chip{font-family:var(--font-display);font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 10px;border-radius:999px;background:#4ADE80;color:#062B12}
+.probe-kopf .wert{font-weight:700;font-variant-numeric:tabular-nums}
+.probe-kopf .zu{margin-left:auto;background:none;border:0;color:var(--ink-soft);font:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:40px;padding:0 4px}
+.probe p{margin:6px 0 0;color:var(--ink-soft)}
+.probe ol{margin:6px 0 0;padding-left:20px;color:var(--ink-soft)}.probe ol li{margin:2px 0}
+.probe .reihe{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.probe .btn{min-height:44px}
+.probe-wie summary{cursor:pointer;font-weight:700;color:#86EFAC;margin-top:6px;min-height:32px;display:flex;align-items:center}
+.probe [data-probe-setzen]{background:#4ADE80;color:#062B12;border-color:#4ADE80}
+.probe .gut{color:#86EFAC}.probe .mies{color:#FCD34D}
+.erw-menu .recht{margin:6px 0 2px;font-size:.8rem;text-align:center;color:var(--ink-soft)}
+.erw-menu .recht a{display:inline;padding:4px 2px;min-height:0;color:inherit;text-decoration:underline;text-underline-offset:2px}
+/* Einrichten in drei Gruppen (UNICORN-54): das Wichtige zuerst, Seltenes am Ende */
+.setup .gruppe{font-family:var(--font-display);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin:18px 4px 2px}
+.setup .gruppe:first-child{margin-top:2px}
+.setup .gruppe small{display:block;font-family:var(--font-body,inherit);text-transform:none;letter-spacing:0;font-weight:400;font-size:.9rem;margin-top:1px}
+/* Hinweis für Erwachsene bei der ersten Ankunft: steht klein in der Plakette */
+.pop-karte .pop-tipp{display:block;max-width:13em;font-size:.8rem;line-height:1.3;font-weight:400;color:var(--ink-soft)}
 @media (max-width:480px){
   .app{padding-inline:16px}
   .fortschritt{width:72px}
@@ -488,6 +554,8 @@ body.m-tour:not(.bogen-inline):not(.mehr) #bogen-wrap:not(.schwebt), body.m-star
 body.m-start .pillen{display:none!important}
 body.m-start #mirror-pic{opacity:0}
 body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
+/* Erster Bildschirm quer (Tablet): Spiegel so groß, dass Titel und Startknopf ohne Scrollen zu sehen sind (UNICORN-54) */
+@media (orientation:landscape) and (min-width:700px){ body.m-start .mirror, body.m-start .spiegel-ecke{flex-basis:clamp(260px, calc(100vh - 385px), 560px)} }
 .count.spaet{color:var(--danger)} .count.frueh{color:var(--ok)}
 .proto{width:100%;border-collapse:collapse;font-size:.92rem}
 .proto th,.proto td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -519,7 +587,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
     <div class="erw-wrap">
       <button type="button" class="zur-tour" id="tab-tour" aria-pressed="true">Zurück zur Tour</button>
       <button type="button" class="erw-btn" id="btn-erw" aria-expanded="false" aria-controls="erw-menu" aria-label="Menü für Erwachsene">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         <span class="t">Erwachsene</span>
       </button>
       <div class="erw-menu" id="erw-menu" hidden>
@@ -530,18 +598,27 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         </button>
         <button type="button" id="tab-setup" aria-pressed="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-          <span><b>Einrichten</b><small>Variante, Stimme, GPS, Vorbereitung</small></span>
+          <span><b>Einrichten</b><small>Spielart, Erzähler, GPS, Vorbereitung</small></span>
+        </button>
+        <button type="button" id="btn-hilfe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.7 2.2c-.8.5-1.3 1-1.3 2"/><path d="M12 17v.2"/></svg>
+          <span><b>Hilfe</b><small>Kurz erklärt, und was tun, wenn etwas hakt</small></span>
+        </button>
+        <button type="button" id="btn-probe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><path d="M9 10l2 2 4-4"/></svg>
+          <span><b id="probe-menu-titel">Generalprobe</b><small id="probe-menu-text">Tour zum Üben ablaufen, Punkte vor Ort einstellen</small></span>
         </button>
         <a href="./" id="erw-portal">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg>
           <span><b>Zur Party</b><small>Checkliste, Links und Einkauf. Die Tour bleibt gespeichert.</small></span>
         </a>
-        <p style="margin:6px 0 0;font-size:.8rem;text-align:center"><a href="impressum.html" style="color:inherit">Impressum</a> · <a href="datenschutz.html" style="color:inherit">Datenschutz</a></p>
+        <p class="recht"><a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a></p>
       </div>
     </div>
   </header>
 
   <div class="tour" id="view-tour">
+    <section class="probe" id="probe" hidden aria-label="Generalprobe"></section>
     <div id="bogen-wrap" class="bogen-wrap-float"></div>
     <div class="pillen"><p class="count" id="uhr" hidden></p></div>
     <div class="stage" id="stage">
@@ -553,7 +630,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         <canvas id="funkeln" aria-hidden="true"></canvas>
         <div class="mirror-pic" id="mirror-pic"></div>
         <div class="kompass" id="kompass" hidden></div>
-        <div class="pop-karte" id="pop" hidden><b>Angekommen!</b><button type="button" class="btn primary" id="btn-pop">Weiter</button><span class="seit" id="pop-seit"></span></div>
+        <div class="pop-karte" id="pop" hidden><b>Angekommen!</b><button type="button" class="btn primary" id="btn-pop">Weiter</button><span class="seit" id="pop-seit"></span><span class="pop-tipp" id="pop-tipp" hidden>Zu früh? Erst zur Stelle laufen, dann tippen.</span></div>
       </div>
       <div class="funkel3d" id="funkel3d" aria-hidden="true"></div>
       <div class="kaka" id="kaka" aria-hidden="true" hidden>
@@ -756,7 +833,6 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         <button type="button" class="btn primary haupt" id="btn-main"></button>
         <button type="button" class="btn ghost" id="btn-speak">Noch einmal hören</button>
       </div>
-      <div id="einf-platz"></div>
     </div>
     <div class="foot">
       <p class="chip" id="gps-chip"></p>
@@ -765,38 +841,25 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       <button type="button" class="btn ghost" id="btn-foto" hidden>Gruppenfoto mit Rahmen</button>
       <a class="btn ghost" id="btn-portal" href="./" hidden>Zur Party</a>
     </div>
+    <section class="abschluss" id="abschluss" hidden aria-label="So geht es weiter"></section>
   </div>
 
   <div class="setup" id="view-setup" hidden>
-    <details class="karte" id="k-variante" open>
-      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h12M3 17h8"/></svg></span><span class="tt"><b>Variante</b><span id="sum-variante"></span></span><span class="pf"></span></summary>
+    <h2 class="gruppe">So spielt ihr<small>Das Wichtige zuerst.</small></h2>
+    <details class="karte" id="k-variante">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h12M3 17h8"/></svg></span><span class="tt"><b>Spielart</b><span id="sum-variante"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Geschichte, Mitbringsel und Funkels Sätze sind in allen drei gleich. Die Variante ändert die Hinweise „Für Erwachsene“, die Orte und die Vorbereitungsliste. Indoor läuft ohne GPS.</p>
-        <div class="seg" id="variante" role="group" aria-label="Variante">
-          <button type="button" data-v="a">Outdoor, voll</button>
-          <button type="button" data-v="b">Outdoor ohne Ausdrucke</button>
-          <button type="button" data-v="c">Indoor</button>
-        </div>
-        <p class="lead" id="variante-note"></p>
-      </div>
-    </details>
-
-    <details class="karte" id="k-tour">
-      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg></span><span class="tt"><b>Tour</b><span id="sum-tour"></span></span><span class="pf"></span></summary>
-      <div class="inhalt">
-        <label class="schalter" for="auto-sag"><span class="st"><b>Funkel spricht von selbst</b><span>Aufgaben und Lösungen werden vorgelesen, sobald sie erscheinen. Die Sätze für unterwegs nie, die startest du immer selbst.</span></span><input type="checkbox" id="auto-sag"><span class="knopf"></span></label>
-        <label class="schalter" for="show-test"><span class="st"><b>Testknopf immer zeigen</b><span>Auch wenn das GPS läuft. Ohne GPS erscheint er sowieso.</span></span><input type="checkbox" id="show-test"><span class="knopf"></span></label>
-        <p class="lead">Zu einem bestimmten Schritt springst du über „Erwachsene“ oben rechts, dann „Ablauf“.</p>
-        <div class="row"><button type="button" class="btn ghost small" id="btn-einf">Einführung noch einmal zeigen</button></div>
-        <div class="row"><button type="button" class="btn ghost small" id="btn-restart">Tour von vorn beginnen</button><button type="button" class="btn ghost small" id="btn-foto-2">Gruppenfoto mit Rahmen</button></div>
-        <p class="lead">Das Gruppenfoto am besten mit dem Handy machen, das hat die bessere Kamera: dieselbe Seite dort öffnen, Knopf drücken.</p>
+        <p class="lead">Geschichte, Mitbringsel und Funkels Sätze bleiben gleich. Drinnen läuft ohne GPS, die Stationen öffnest du von Hand.</p>
+        <div id="variante"></div>
+        <div id="variante-extra" style="margin-top:12px"></div>
+        <div id="variante-note"></div>
       </div>
     </details>
 
     <details class="karte" id="k-erz">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/><path d="M19 4l2-2M21 8h2"/></svg></span><span class="tt"><b>Erzähler für die Aufgaben</b><span id="sum-erz"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Wer den Kindern nach Funkel die Aufgabe vorliest. Die Wahl gilt für alle Aufgaben; einzelne kannst du darunter anders besetzen. „Anhören“ spielt die Begrüßung der Figur.</p>
+        <p class="lead">Funkel erzählt die Geschichte, die Aufgaben liest eine zweite Figur vor. Die Wahl gilt für alle Aufgaben; einzelne kannst du darunter anders besetzen. „Anhören“ spielt die Begrüßung der Figur.</p>
         <div class="erz-wahl" id="erz-wahl"></div>
         <details class="box" id="erz-je-box">
           <summary>Einzelne Aufgaben anders besetzen</summary>
@@ -804,6 +867,30 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         </details>
       </div>
     </details>
+
+    <details class="karte" id="k-tour">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg></span><span class="tt"><b>Tour</b><span id="sum-tour"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <label class="schalter" for="auto-sag"><span class="st"><b>Funkel spricht von selbst</b><span>Aufgaben und Lösungen werden vorgelesen, sobald sie erscheinen. Die Sätze für unterwegs nie, die startest du immer selbst.</span></span><input type="checkbox" id="auto-sag"><span class="knopf"></span></label>
+        <label class="schalter" for="show-test"><span class="st"><b>„Station von Hand öffnen“ immer zeigen</b><span>Auch wenn das GPS läuft. So hilfst du nach, wenn eine Station nicht von selbst öffnet. Ohne GPS erscheint der Knopf sowieso.</span></span><input type="checkbox" id="show-test"><span class="knopf"></span></label>
+        <label class="schalter" for="tipps-an"><span class="st"><b>Tipps für Erwachsene</b><span>Kurze Hinweise beim ersten Mal, zum Beispiel wenn eine Station nicht von selbst öffnet. Jeder Tipp kommt nur einmal.</span></span><input type="checkbox" id="tipps-an"><span class="knopf"></span></label>
+        <p class="lead">Zu einem bestimmten Schritt springst du über „Erwachsene“ oben rechts, dann „Ablauf“.</p>
+        <div class="row"><button type="button" class="btn ghost small" id="btn-einf">Einführung noch einmal zeigen</button><button type="button" class="btn ghost small" id="btn-hilfe-2">Hilfe öffnen</button></div>
+        <div class="row"><button type="button" class="btn ghost small" id="btn-restart">Tour von vorn beginnen</button><button type="button" class="btn ghost small" id="btn-foto-2">Gruppenfoto mit Rahmen</button></div>
+        <p class="lead">Das Gruppenfoto am besten mit dem Handy machen, das hat die bessere Kamera: dieselbe Seite dort öffnen, Knopf drücken.</p>
+      </div>
+    </details>
+
+    <h2 class="gruppe">Vorbereiten<small>Was vor der Party fertig sein soll.</small></h2>
+    <details class="karte" id="k-vorbereitung">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="tt"><b>Vorbereitung</b><span id="sum-vorbereitung"></span></span><span class="pf"></span></summary>
+      <div class="inhalt">
+        <p class="lead">Erst besorgen, dann packen. Nötiges hat immer eine Lösung ohne Kauf. „Extra“ ist schön, aber nicht nötig.</p>
+        <div class="liste" id="liste"></div>
+        <div class="zwischen"><span class="chip" id="liste-note"></span><button type="button" class="btn quiet small" id="btn-liste-reset">Alle Haken entfernen</button></div>
+      </div>
+    </details>
+
     <details class="karte" id="k-gaben">
       <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S10 8 12 8zM12 8c2-4 6-4 6-1.5S14 8 12 8z"/></svg></span><span class="tt"><b>Wer bekommt was wo</b><span>Unterwegs nur der Glücksstein, die Geschenke am Ende</span></span><span class="pf"></span></summary>
       <div class="inhalt">
@@ -811,19 +898,39 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         <ol class="points gaben" id="gaben"></ol>
       </div>
     </details>
-    <details class="karte" id="k-vorbereitung">
-      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="tt"><b>Vorbereitung</b><span id="sum-vorbereitung"></span></span><span class="pf"></span></summary>
+
+    <details class="karte" id="k-punkte">
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="tt"><b>GPS-Punkte</b><span id="sum-punkte"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Alles, was vor der Tour erledigt sein muss, für 10 Kinder. Was an den Stationen selbst zu tun ist, zeigt die Tour unter „Für Erwachsene“, wenn es so weit ist. Haken bleiben auf diesem Gerät gespeichert.</p>
-        <div class="liste" id="liste"></div>
-        <div class="zwischen"><span class="chip" id="liste-note"></span><button type="button" class="btn quiet small" id="btn-liste-reset">Alle Haken entfernen</button></div>
+        <p class="lead"><a href="#" id="planer-link">Tour im Planer öffnen</a>: dort Adresse, Richtung und Strecke wählen, die Stationen kommen dann von selbst hierher.</p>
+        <p class="lead">Feinschliff vor Ort: Bei der Generalprobe an jeder Station stehen bleiben, warten bis das GPS genau ist, und den Punkt setzen. Die Haustür braucht keinen Punkt. Am besten mit diesem Gerät: Es ist später der Spiegel, so passen die Punkte am genauesten.</p>
+        <div class="row">
+          <button type="button" class="btn ghost small" id="btn-gps">GPS starten</button>
+          <p class="chip" id="gps-chip-2"></p>
+        </div>
+        <ol class="points" id="points"></ol>
+        <h3>Wie nah ist nah genug?</h3>
+        <p class="lead">Die Station öffnet sich, sobald das Gerät so nah am Punkt ist. Unter Bäumen lieber 25 m.</p>
+        <div class="seg" id="radius" role="group" aria-label="Abstand zum Öffnen">
+          <button type="button" data-r="10">10 m</button>
+          <button type="button" data-r="15">15 m</button>
+          <button type="button" data-r="25">25 m</button>
+        </div>
+        <h3>Punkte als Code</h3>
+        <p class="lead">Notlösung ohne Netz: Code kopieren und auf einem anderen Gerät einlesen.</p>
+        <textarea id="code" spellcheck="false" aria-label="Punkte-Code"></textarea>
+        <div class="row">
+          <button type="button" class="btn ghost small" id="btn-copy">Code kopieren</button>
+          <button type="button" class="btn ghost small" id="btn-import">Code einlesen</button>
+        </div>
       </div>
     </details>
 
+    <h2 class="gruppe">Mehr<small>Selten nötig.</small></h2>
     <details class="karte" id="k-protokoll">
-      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="tt"><b>Probelauf-Protokoll</b><span id="sum-protokoll"></span></span><span class="pf"></span></summary>
+      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="tt"><b>Protokoll der Generalprobe</b><span id="sum-protokoll"></span></span><span class="pf"></span></summary>
       <div class="inhalt">
-        <p class="lead">Bei jedem Durchlauf merkt sich der Spiegel je Station, wie lang der Weg dauerte, wie lange ihr am Pop gesammelt habt, wie genau das GPS war und ob die Station per GPS oder von Hand aufging. So siehst du nach dem Probelauf, wo es hakt.</p>
+        <p class="lead">Bei jedem Durchlauf merkt sich der Spiegel je Station, wie lang der Weg dauerte, wie lange ihr an der Station wart, wie genau das GPS war und ob die Station per GPS oder von Hand aufging. So siehst du nach der Generalprobe, wo es hakt.</p>
         <div id="protokoll"></div>
         <div class="row"><button type="button" class="btn quiet small" id="btn-proto-reset">Protokoll löschen</button></div>
       </div>
@@ -875,33 +982,6 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
           </div>
         </div>
         <p class="lead" id="voice-note" hidden></p>
-      </div>
-    </details>
-
-    <details class="karte" id="k-punkte">
-      <summary><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="tt"><b>GPS-Punkte</b><span id="sum-punkte"></span></span><span class="pf"></span></summary>
-      <div class="inhalt">
-        <p class="lead"><a href="#" id="planer-link">Tour im Planer öffnen</a>: dort Adresse, Richtung und Strecke wählen, die Stationen kommen dann von selbst hierher.</p>
-        <p class="lead">Feinschliff vor Ort: Beim Probelauf an jeder Station stehen bleiben, warten bis das GPS genau ist, und den Punkt setzen. Die Haustür braucht keinen Punkt.</p>
-        <div class="row">
-          <button type="button" class="btn ghost small" id="btn-gps">GPS starten</button>
-          <p class="chip" id="gps-chip-2"></p>
-        </div>
-        <ol class="points" id="points"></ol>
-        <h3>Wie nah ist nah genug?</h3>
-        <p class="lead">Die Station öffnet sich, sobald das Gerät so nah am Punkt ist. Unter Bäumen lieber 25 m.</p>
-        <div class="seg" id="radius" role="group" aria-label="Abstand zum Öffnen">
-          <button type="button" data-r="10">10 m</button>
-          <button type="button" data-r="15">15 m</button>
-          <button type="button" data-r="25">25 m</button>
-        </div>
-        <h3>Punkte als Code</h3>
-        <p class="lead">Notlösung ohne Netz: Code kopieren und auf einem anderen Gerät einlesen.</p>
-        <textarea id="code" spellcheck="false" aria-label="Punkte-Code"></textarea>
-        <div class="row">
-          <button type="button" class="btn ghost small" id="btn-copy">Code kopieren</button>
-          <button type="button" class="btn ghost small" id="btn-import">Code einlesen</button>
-        </div>
       </div>
     </details>
 
@@ -966,11 +1046,11 @@ function indoor(){ return state.variante==='c'; }
 /* ---------- Vorbereitungsliste ---------- */
 var LISTE_GEMEINSAM=TOUR.vorbereitung.gemeinsam, LISTE_VARIANTE=TOUR.vorbereitung.variante;
 var LISTE_ALT={};
-function LISTE_AKTUELL(){ return LISTE_GEMEINSAM.slice(0,1).concat(LISTE_VARIANTE[state.variante]||LISTE_VARIANTE.a, LISTE_GEMEINSAM.slice(1)); }
+function LISTE_AKTUELL(){ return (LISTE_VARIANTE[state.variante]||LISTE_VARIANTE.a).concat(LISTE_GEMEINSAM); }   // Packliste für den Tag
 var LISTE_KEY=TOUR.speicher+'.liste';
 var haken={};
 try{ haken=JSON.parse(localStorage.getItem(LISTE_KEY)||'{}')||{}; }catch(e){ haken={}; }
-(function(){ var um=false; for(var k in haken){ if(/^[abc]\.\d+\.\d+$/.test(k)){ if(haken[k] && LISTE_ALT[k]) haken[LISTE_ALT[k]]=true; delete haken[k]; um=true; } } if(um) hakenSave(); })();
+(function(){ var um=false; for(var k in haken){ if(/^b\|/.test(k)){ if(haken[k]) haken['a'+k.slice(1)]=true; delete haken[k]; um=true; continue; } if(/^[abc]\.\d+\.\d+$/.test(k)){ if(haken[k] && LISTE_ALT[k]) haken[LISTE_ALT[k]]=true; delete haken[k]; um=true; } } if(um) hakenSave(); })();
 function hakenSave(){ try{ localStorage.setItem(LISTE_KEY, JSON.stringify(haken)); }catch(e){} }
 var GABEN=TOUR.gaben;                             // i = Station (0-basiert), 'start' = Ankommen, 'ende' = Schatz
 function renderGaben(){
@@ -978,29 +1058,66 @@ function renderGaben(){
   GABEN.forEach(function(g){
     var nr, ort;
     if(g.i==='start'){ nr='–'; ort='Ankommen an der Haustür'; }
-    else if(g.i==='ende'){ nr='★'; ort='Am Ende: '+stv(N-1).wo; }
-    else { nr=String(g.i+1); ort='Station '+(g.i+1)+' · '+(g.i===0?STATIONS[0].name:indoor()?stv(g.i).wo:STATIONS[g.i].name+', '+stv(g.i).wo); }
+    else if(g.i==='ende'){ nr='★'; ort='Am Ende: '+(stv(N-1).wo||STATIONS[N-1].name); }
+    else { nr=String(g.i+1); ort='Station '+(g.i+1)+' · '+(g.i===0?STATIONS[0].name:indoor()?stv(g.i).wo:STATIONS[g.i].name+(stv(g.i).wo?', '+stv(g.i).wo:'')); }
     h+='<li><span class="nr">'+nr+'</span><div class="txt"><div class="nm">'+esc(g.was)+' <span class="art'+(g.art==='Schatz'?' schatz':'')+'">'+esc(g.art)+'</span></div><div class="wo">'+esc(ort)+'</div><div class="st">'+esc(g.wie)+'</div></div></li>';
   });
   $('gaben').innerHTML=h;
 }
+// Vorbereitung: zuerst nur, was die Tour wirklich braucht (mit Notlösung), Extras und Packliste aufklappbar
+function fuerVariante(l){ return (l||[]).filter(function(x){ return !x.nur || x.nur.indexOf(state.variante)>=0; }); }
+function hakenVar(){ return state.variante==='b' ? 'a' : state.variante; }   // Extra an oder aus: dieselben Haken
+function hakenZeile(text, notfalls, extra, id, mehr){
+  id=id||hakenVar()+'|'+text; var an=!!haken[id], m=mehr||{};
+  return '<label class="haken'+(extra?' extra':'')+'"><input type="checkbox" data-haken="'+esc(id)+'"'+(an?' checked':'')+'><span>'+esc(text)+(extra?' <em class="tag-extra">Extra</em>':'')+(m.preis?' <em class="tag-preis">ca. '+esc(Party.euro(m.preis))+'</em>':'')+
+    (m.wofuer?'<small class="wofuer">'+esc(m.wofuer)+'</small>':'')+(notfalls?'<small class="notfalls">'+(m.sonst||'Sonst')+': '+esc(notfalls)+'</small>':'')+'</span></label>';
+}
+function pkFarbe(s){ return ['#8B5CF6','#EF4444','#F97316','#EAB308','#22C55E','#16A34A','#3B82F6'][s-1]||'#8B5CF6'; }
+// Vorbereitung (UNICORN-67/68): Umschalter „Besorgen“ (jedes Ding einmal: wofür, Preis, selbst machen) und „Packen“ (nach Station)
+var VB_ANSICHT_KEY=TOUR.speicher+'.vb-ansicht', vbAnsicht='besorgen';
+try{ vbAnsicht=localStorage.getItem(VB_ANSICHT_KEY)==='packen' ? 'packen' : 'besorgen'; }catch(e){}
+function besorgParty(){                          // Party auf diesem Gerät, sonst ein Stellvertreter mit Kinderzahl und Spielart
+  var p=null; try{ p=Party.lesen(TOUR.id); }catch(e){}
+  if(p && !p.fremd) return p;
+  var k=(TPLAN && TPLAN.kinder) || (TOUR.kinder||{}).standard || 8, h=haken;
+  var e={}; Object.keys(h).forEach(function(x){ if(/^ek\|/.test(x) && h[x]) e[x.slice(3)]=true; });
+  return {kinder:k, ort:indoor()?'drinnen':'draussen', ausdrucke:state.variante!=='b', einkauf:e, einkaufWie:{}, stellvertreter:true};
+}
 function renderListe(){
-  var h='', n=0, g=0;
-  var LISTE=LISTE_AKTUELL();
-  LISTE.forEach(function(grp,gi){
-    h+='<h3'+(grp.w?' class="weg"':'')+'>'+esc(grp.t)+'</h3>';
-    grp.items.forEach(function(it,ii){
-      var id=state.variante+'|'+it, an=!!haken[id]; g++; if(an) n++;
-      h+='<label class="haken"><input type="checkbox" data-haken="'+id+'"'+(an?' checked':'')+'><span>'+esc(it)+'</span></label>';
-    });
-  });
+  var P=Party.vorbereitungsListe(TOUR, state.variante), bp=besorgParty(), B=Party.besorgen(bp, TOUR), offen=$('liste').querySelectorAll('details[open]'), auf={};
+  Array.prototype.forEach.call(offen, function(d){ auf[d.id]=true; });
+  function zaehl(l){ return l.filter(function(k){ return haken[k]; }).length; }
+  var gB=B.noetig.length+B.ohne.length, nB=B.noetig.filter(function(x){ return x.fertig; }).length+zaehl(B.ohne.map(function(x){ return x.key; })), nP=zaehl(P.schluessel);
+  var h='<div class="seg vb-ansicht" role="group" aria-label="Ansicht"><button type="button" data-vb="besorgen" aria-pressed="'+(vbAnsicht==='besorgen')+'">Besorgen <small>'+nB+'/'+gB+'</small></button><button type="button" data-vb="packen" aria-pressed="'+(vbAnsicht==='packen')+'">Packen <small>'+nP+'/'+P.noetig+'</small></button></div>';
+  if(vbAnsicht==='besorgen'){
+    var s=B.summen;
+    h+='<p class="vb-lead">Dieselbe Einkaufsliste wie in der Party, mit denselben Preisen. Haken heißt: ist da oder bestellt.</p>';
+    if(s.nAlles) h+='<div class="vb-summen"><span><b>Alles bestellen</b> ca. '+esc(Party.euro(s.alles))+'</span><span><b>Nur das Nötige</b> ca. '+esc(Party.euro(s.noetig))+'</span><small>Mit Notlösungen von zu Hause kostet es gar nichts. Bestellen geht in der Party: <a href="party.html?thema='+encodeURIComponent(TOUR.id)+'#s-bestellen">zur Einkaufsliste</a></small></div>';
+    function zeile(x){
+      var sonst=x.notfalls ? (/^Weglassen/.test(x.notfalls)?'':'Sonst: ')+x.notfalls : '', wie={not:'Mit Notlösung', weg:'Weggelassen'}[x.wie]||'';
+      return '<label class="haken'+(x.noetig?'':' extra')+'"><input type="checkbox" data-ek="'+esc(x.id)+'"'+(x.fertig?' checked':'')+'><span><b class="menge">'+x.menge+'×</b> '+esc(x.name)+(x.noetig?'':' <em class="tag-extra">Extra</em>')+
+        (x.wofuer?'<small class="wofuer">'+esc(x.wofuer)+'</small>':'')+'<small class="preiszeile">'+esc(wie||Party.preisText(x))+'</small>'+(sonst?'<small class="notfalls">'+esc(sonst)+'</small>':'')+'</span></label>';
+    }
+    if(B.noetig.length) h+='<section class="vb-gruppe"><div class="vb-kopf"><b>Braucht die Tour</b><small>'+B.noetig.length+'</small></div>'+B.noetig.map(zeile).join('')+'</section>';
+    if(B.ohne.length) h+='<section class="vb-gruppe"><div class="vb-kopf"><b>Ohne Einkauf</b><small>'+B.ohne.length+'</small></div>'+B.ohne.map(function(i){ return hakenZeile(i.x, i.notfalls, false, i.key, {wofuer:i.wofuer}); }).join('')+'</section>';
+    if(B.extras.length) h+='<section class="vb-gruppe"><div class="vb-kopf"><b>Extras, die es schöner machen</b><small>'+B.extras.length+'</small></div>'+B.extras.map(zeile).join('')+'</section>';
+  } else {
+    h+='<p class="vb-lead">Was an welche Station kommt und wer es hinbringt. Abhaken, wenn es eingepackt ist.</p>';
+    h+=P.gruppen.map(function(gr){
+      var kopf = gr.art==='station' ? '<div class="vb-kopf"><span class="pk-nr" style="background:'+pkFarbe(gr.s)+'">'+gr.s+'</span><b>'+esc(gr.ort)+'</b><small>'+esc(gr.wer)+'</small></div>'
+                                    : '<div class="vb-kopf"><b>'+esc(gr.titel)+'</b></div>';
+      return '<section class="vb-gruppe">'+kopf+gr.items.map(function(i){ return hakenZeile(i.x, i.notfalls, i.extra, i.key); }).join('')+'</section>';
+    }).join('');
+  }
+  if(!indoor()) h+='<details class="mehr" id="vb-extras"'+(auf['vb-extras']?' open':'')+'><summary>Mehr Erlebnis</summary>'+Spielart.extraKarte(TOUR, state.variante==='b', 'extra-vb')+'</details>';
   $('liste').innerHTML=h;
-  $('liste-note').textContent=n+' von '+g+' erledigt'; $('liste-note').className='chip '+(n===g?'on':'');
-  $('sum-vorbereitung').textContent = n+' von '+g+' Punkten erledigt';
+  var n=vbAnsicht==='besorgen'?nB:nP, g=vbAnsicht==='besorgen'?gB:P.noetig;
+  $('liste-note').textContent=n+' von '+g+' nötigen '+(vbAnsicht==='besorgen'?'besorgt':'gepackt'); $('liste-note').className='chip '+(n===g?'on':'');
+  $('sum-vorbereitung').textContent='Besorgt '+nB+' von '+gB+' · gepackt '+nP+' von '+P.noetig;
 }
 
 /* ---------- Zustand ---------- */
-function frisch(){ return {points:STATIONS.map(function(){ return null; }), idx:0, phase:'start', step:0, radius:15, showTest:true, autoSag:true, kamera:false, variante:TPLAN.variante||'a', startZeit:null, heim:null, voice:null, pitch:1.15, recRate:1.15, erz:'kakapups', erzJe:{}}; }
+function frisch(){ return {points:STATIONS.map(function(){ return null; }), idx:0, phase:'start', step:0, radius:15, showTest:true, autoSag:true, kamera:false, variante:TPLAN.variante||'a', startZeit:null, heim:null, probe:false, voice:null, pitch:1.15, recRate:1.15, erz:'kakapups', erzJe:{}, erzStand:''}; }
 var PUNKTE_CODE=TPLAN.punkteCode||null;   // Stationen 2 bis N aus dem Tourplaner
 var PUNKTE_STAND=TPLAN.stand||'';   // neuer Plan: jedes Gerät übernimmt die Punkte einmal
 function load(){
@@ -1012,12 +1129,14 @@ function load(){
       if(o && o.idx>=0 && o.idx<N) s.idx=o.idx|0;
       if(o && ['start','seek','scene','end'].indexOf(o.phase)>=0) s.phase=o.phase;
       if(o && o.step>=0 && o.step<4) s.step=o.step|0;
+      if(o && ['','zeigen','nebel','wahl'].indexOf(o.spur)>=0){ s.spur=o.spur; s.spurBis=+o.spurBis||0; s.spurNach=['nebel','wahl'].indexOf(o.spurNach)>=0 ? o.spurNach : ''; }   // „Wer war das?“ (UNICORN-62)
       if(o && [10,15,25].indexOf(o.radius)>=0) s.radius=o.radius;
       if(o && typeof o.showTest==='boolean') s.showTest=o.showTest;
       if(o && typeof o.autoSag==='boolean') s.autoSag=o.autoSag;
       if(o && typeof o.kamera==='boolean') s.kamera=o.kamera;
       if(o && VARIANTEN[o.variante]) s.variante=o.variante;
       if(o && typeof o.startZeit==='number') s.startZeit=o.startZeit;
+      if(o && typeof o.probe==='boolean') s.probe=o.probe;
       if(o && o.heim && typeof o.heim.lat==='number') s.heim=o.heim;
       if(o && typeof o.voice==='string') s.voice=o.voice;
       if(o && [1,1.15,1.35].indexOf(o.pitch)>=0) s.pitch=o.pitch;
@@ -1029,6 +1148,10 @@ function load(){
   }catch(e){}
   if(!o || o.punkteStand!==PUNKTE_STAND){ if(PUNKTE_CODE){ try{ s.points=codeEin(PUNKTE_CODE); }catch(e){} } if(TPLAN.variante && VARIANTEN[TPLAN.variante]) s.variante=TPLAN.variante; }   // neuer Plan: Punkte und Variante einmal übernehmen   // hinterlegte Punkte einmal übernehmen
   s.punkteStand=PUNKTE_STAND;
+  // Erzähler aus der Party (UNICORN-54): gilt, bis hier unter „Einrichten“ ein anderer gewählt wird oder die Party ihn wieder ändert
+  if(o && typeof o.erzStand==='string') s.erzStand=o.erzStand;
+  if(TPLAN.erz && TOUR.erzaehler.reihe.indexOf(TPLAN.erz)>=0 && s.erzStand!==(TPLAN.erzStand||'')) s.erz=TPLAN.erz;
+  s.erzStand=TPLAN.erzStand||'';
   s.points[0]=null;
   return s;
 }
@@ -1088,7 +1211,8 @@ function sprechEndeFokus(){              // aus sprechKnopf: alle sind fertig
 /* ---------- Mitscrollen Ende ---------- */
 function modusZeigen(){
   var m=modus(), b=document.body;
-  if(m!==letzterModus){ var vorher=letzterModus; mehrAn=false; letzterModus=m; if(vorher) fokusPlanen(); }
+  if(m!==letzterModus){ var vorher=letzterModus; mehrAn=false; letzterModus=m; if(vorher) fokusPlanen();
+    if(m==='laufen' && view==='tour' && state.phase==='seek' && !manuell() && state.showTest && window.Einfuehrung) Einfuehrung.tipp('unterwegs'); }
   ['start','ende','da','laufen','sammeln','szene'].forEach(function(x){ b.classList.toggle('m-'+x, x===m && view==='tour'); });
   b.classList.toggle('m-tour', view==='tour');
   b.classList.toggle('mehr', mehrAn);
@@ -1096,7 +1220,31 @@ function modusZeigen(){
 }
 var trackTaps={};          // angetippte falsche Spuren in der Spuren-Szene
 var trackMsg='';
-var galN=0;                // Zaun-Station, Outdoor voll: welches Bild der Spiegel gerade zeigt (4 = alle gesehen)
+var galN=0;                // Station 4, Draußen ohne Extra: welches Bild der Spiegel gerade zeigt (4 = alle gesehen)
+// „Wer war das?“ (UNICORN-62): Spur kurz zeigen, Nebel, aus dem Gedächtnis malen, dann vergleichen.
+// state.spur: '' bereit (Nebel), 'zeigen' (Spur sichtbar), 'nebel' (draußen: malen), 'wahl' (Spuren antippen)
+function spurMerken(){ var st=STATIONS[state.idx]; return state.phase==='scene' && !!st && st.kind==='wahl' && !!st.merken && state.step===0; }
+var spurUhr=null;
+function spurZeigen(nochmal){
+  if(!spurMerken()) return;
+  tonAn(); still(); clearTimeout(spurUhr);
+  var m=STATIONS[state.idx].merken;
+  state.spurNach = state.spur==='wahl' ? 'wahl' : (indoor() ? 'wahl' : 'nebel');
+  state.spur='zeigen'; state.spurBis=Date.now()+(nochmal ? 3 : (m.sekunden||5))*1000;
+  klang(KLANG_ZAUBER); save(); render(); spurUhrStellen();
+}
+function spurUhrStellen(){
+  clearTimeout(spurUhr);
+  if(!spurMerken() || state.spur!=='zeigen') return;
+  spurUhr=setTimeout(function(){
+    if(!spurMerken() || state.spur!=='zeigen') return;
+    state.spur=state.spurNach || (indoor() ? 'wahl' : 'nebel'); save(); render();
+  }, Math.max(0, (state.spurBis||0)-Date.now()));
+}
+function spurGemalt(){ if(!spurMerken() || state.spur!=='nebel') return; tonAn(); still(); state.spur='wahl'; save(); render(); }
+function ausgeblendet(t){                // Schritt gehört nicht zur gewählten Variante
+  return !!(t.teil || (t.nurOhne && state.variante==='a') || (t.mit && state.variante!=='a') || (t.nurDrinnen && !indoor()) || (t.nurDraussen && indoor()));
+}
 function galerieAktiv(){
   var st=STATIONS[state.idx];
   return state.variante==='a' && state.phase==='scene' && st.pic==='galerie' && state.step===0 && galN<st.optionen.length;
@@ -1381,6 +1529,7 @@ function clipsVomServer(){                 // Stimmen-Pakete: Geschichte plus nu
   })['catch'](function(){});
 }
 function dbDel(key){ delete clips[key]; delete puffer[key]; try{ if(idb) idb.transaction('clips','readwrite').objectStore('clips')['delete'](key); }catch(e){} }
+var DEKO_WOLKE='<svg class="deko-wolke" viewBox="0 0 1000 620" role="img" aria-label="Schlafende Wolke"><path d="M220 520 Q90 520 90 420 Q90 320 200 310 Q200 180 340 170 Q400 70 520 90 Q640 60 700 170 Q840 160 860 290 Q960 310 950 410 Q940 520 820 520 Z" fill="#fff" stroke="#7A8CA8" stroke-width="14" stroke-linejoin="round"/><path d="M370 360 q40 30 80 0 M560 360 q40 30 80 0" fill="none" stroke="#241A3D" stroke-width="14" stroke-linecap="round"/><ellipse cx="330" cy="420" rx="34" ry="18" fill="#F4B6D2"/><ellipse cx="680" cy="420" rx="34" ry="18" fill="#F4B6D2"/><path d="M470 450 q35 22 70 0" fill="none" stroke="#241A3D" stroke-width="12" stroke-linecap="round"/><text x="790" y="150" font-family="Trebuchet MS, Arial" font-weight="800" font-size="70" fill="#7A8CA8">z</text><text x="850" y="90" font-family="Trebuchet MS, Arial" font-weight="800" font-size="96" fill="#7A8CA8">Z</text></svg>';
 var IOS=/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
 var clipUrl=null;
 function stopClip(){
@@ -1827,7 +1976,7 @@ function protoWarte(sek){ var l=proto.length && proto[proto.length-1].eintraege;
 function mmss(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+':'+(s%60<10?'0':'')+(s%60); }
 function renderProtokoll(){
   var box=$('protokoll'), sum=$('sum-protokoll');
-  if(!proto.length){ box.innerHTML='<p class="lead">Noch kein Durchlauf. Das Protokoll füllt sich beim Probelauf von selbst.</p>'; sum.textContent='Noch kein Durchlauf'; return; }
+  if(!proto.length){ box.innerHTML='<p class="lead">Noch kein Durchlauf. Das Protokoll füllt sich bei der Generalprobe von selbst.</p>'; sum.textContent='Noch kein Durchlauf'; return; }
   var h='';
   proto.slice().reverse().slice(0,3).forEach(function(r,ri){
     var d=new Date(r.start), ges=r.eintraege.reduce(function(a,e){ return a+e.dauer+(e.warte||0); },0);
@@ -1945,16 +2094,17 @@ function konfSchritt(){
 
 /* ---------- Ablauf ---------- */
 function aufwecken(){ tonAn(); wachBleiben(); gpsStart(); state.phase='scene'; state.idx=0; state.step=0; state.startZeit=jetztMs(); state.heim=null; protoNeu(); klang(KLANG_DA); save(); render(); toast('Jetzt erklingt ein Zauberklang. Bleibt es still: Stummschalter und Lautstärke prüfen.'); if(window.Einfuehrung) Einfuehrung.hinweis(); }
-var ankunft=false, ankunftT=null, wartet=false, wartetSeit=0, popTimer=null;
+var ankunft=false, ankunftT=null, wartet=false, wartetSeit=0, popTimer=null, ankunftPerGps=false;
 function popAus(){ if(popTimer){ clearInterval(popTimer); popTimer=null; } $('pop-seit').textContent=''; }   // wartet: angekommen, Kinder sammeln sich, Station öffnet erst auf „Weiter“
 function ankommen(modus){               // drei Sekunden blinken, dann das Pop mit „Weiter“
   if(ankunft || wartet || state.phase!=='seek') return;
-  ankunft=true; naeheZiel=1; funkelZiel=1;
+  ankunft=true; naeheZiel=1; funkelZiel=1; ankunftPerGps=modus==='gps';
   protoEintrag({i:state.idx, modus:modus||'hand', acc:fix?Math.round(fix.acc):null, dauer:Math.round((jetztMs()-seekSeit)/1000), zeit:jetztMs()});
   klang(KLANG_DA); try{ if(navigator.vibrate) navigator.vibrate([120,80,120,80,300]); }catch(e){}
   $('stage').classList.add('da'); live(); funkelStart();
   ankunftT=setTimeout(function(){
     ankunftT=null; ankunft=false; wartet=true; wartetSeit=jetztMs();
+    $('pop-tipp').hidden=!(ankunftPerGps && window.Einfuehrung && Einfuehrung.tippOffen('ankunft'));   // nur beim ersten Mal
     klang(KLANG_ZAUBER); render(); konfetti(90, .5, .4);
     popTimer=setInterval(function(){ var sek=Math.round((jetztMs()-wartetSeit)/1000); $('pop-seit').textContent = sek>=5 ? 'Alle da? Seit '+sek+' s' : ''; }, 1000);
   }, ruhig ? 700 : 3000);
@@ -1962,14 +2112,15 @@ function ankommen(modus){               // drei Sekunden blinken, dann das Pop m
 function stationOeffnen(){               // „Weiter“ im Pop: jetzt liest Funkel die Aufgabe vor
   if(!wartet) return;
   tonAn(); wartet=false; popAus();
+  if(!$('pop-tipp').hidden){ $('pop-tipp').hidden=true; if(window.Einfuehrung) Einfuehrung.tippMerken('ankunft'); }
   protoWarte(Math.round((jetztMs()-wartetSeit)/1000));
-  state.phase='scene'; state.step=0; trackTaps={}; galN=0; trackMsg=''; save(); render();
+  state.phase='scene'; state.step=0; state.spur=''; trackTaps={}; galN=0; trackMsg=''; save(); render();
 }
-function ankunftAbbrechen(){ if(ankunftT){ clearTimeout(ankunftT); ankunftT=null; } ankunft=false; wartet=false; popAus(); }
+function ankunftAbbrechen(){ if(ankunftT){ clearTimeout(ankunftT); ankunftT=null; } ankunft=false; wartet=false; popAus(); $('pop-tipp').hidden=true; }
 function weiter(){
   still();
   if(state.idx>=N-1){ state.phase='end'; state.step=0; klang(KLANG_ENDE); konfetti(160, .5, .3); setTimeout(function(){ konfetti(120, .2, .35); konfetti(120, .8, .35); }, 500); }
-  else { state.idx+=1; state.phase='seek'; state.step=0; naeheIst=0; naeheZiel=0; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0; }
+  else { state.idx+=1; state.phase='seek'; state.step=0; state.spur=''; naeheIst=0; naeheZiel=0; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0; }
   save(); render(); pruefeAnkunft();
 }
 function verzaubern(){
@@ -1985,23 +2136,25 @@ function verzaubern(){
 var startGemeldet=false;
 function startPruefen(weiter){
   var K=window.Konto, th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
-  var los=function(){ weiter(); if(K && K.mkMelden && !startGemeldet){ startGemeldet=true; K.mkMelden('activated', {rolle:(K.linkRolle&&K.linkRolle(th))||'eltern'}); } };   // Marketer: Tour gestartet
+  // Marketer (UNICORN-79): echte Tour = activated (mit route), Generalprobe = probe_started. Die Probe setzt in Marketer sonst den Status „activated“ und zählt fürs Gate (STRAT-12).
+  var los=function(){ weiter(); if(K && K.mkMelden && !startGemeldet){ startGemeldet=true; var rolle=(K.linkRolle&&K.linkRolle(th))||'eltern';
+    if(state.probe) K.mkMelden('probe_started', {rolle:rolle}); else K.mkMelden('activated', {rolle:rolle, route:!!(indoor() || gesetzt())}); } };
   if(!K || !K.aktiv() || K.linkRolle(th) || K.angemeldet()){ los(); return; }
   var f=function(e){ if(e.detail && e.detail.art==='angemeldet'){ window.removeEventListener('konto', f); toast('Angemeldet. Jetzt „Spiegel aufwecken“ tippen.'); } };
   window.addEventListener('konto', f);
-  K.fenster(th, {titel:'Bevor Funkel loslegt', text:'Einmal kurz anmelden, dann geht eure Tour los.', fertig:'Jetzt „Spiegel aufwecken“ tippen. Funkel wartet schon.', weiter:los});
+  K.fenster(th, {titel:'Bevor Funkel loslegt', text:'Einmal kurz anmelden, dann geht eure Tour los. Schon angemeldet, aber in einem anderen Browser? Dann hier einfach noch einmal mit Code.', fertig:'Jetzt „Spiegel aufwecken“ tippen. Funkel wartet schon.', weiter:los});
 }
 function haupt(){
   tonAn();
   if(state.phase==='start'){ startPruefen(aufwecken); return; }
   if(state.phase==='seek'){ if(wartet) stationOeffnen(); else ankommen('hand'); return; }
   if(state.phase==='end'){ heimStart(); return; }
-  if(state.phase==='heim'){ if(state.step===0) heimAngekommen(); else vonVorn(); return; }
+  if(state.phase==='heim'){ if(state.step===0) heimAngekommen(); return; }   // von vorn nur noch über „Erwachsene“ (UNICORN-75)
   if(state.phase!=='scene') return;
   var st=STATIONS[state.idx];
   if(st.kind==='plain'){ weiter(); }
   else if(st.kind==='recolor'){ if(state.step===0) verzaubern(); else weiter(); }
-  else if(st.kind==='wahl'){ if(galerieAktiv()){ galN++; still(); klang(KLANG_ZAUBER); render(); var mp=$('mirror-pic'); mp.classList.remove('neu'); void mp.offsetWidth; mp.classList.add('neu'); return; } if(state.step>=1) weiter(); }
+  else if(st.kind==='wahl'){ if(spurMerken()){ if(!state.spur) spurZeigen(); else if(state.spur==='nebel') spurGemalt(); return; } if(galerieAktiv()){ galN++; still(); klang(KLANG_ZAUBER); render(); var mp=$('mirror-pic'); mp.classList.remove('neu'); void mp.offsetWidth; mp.classList.add('neu'); return; } if(state.step>=1) weiter(); }
   else if(st.kind==='finale'){
     if(state.step<st.steps.length-1){ state.step+=1; still(); klang(KLANG_ZAUBER); save(); render(); }
     else weiter();
@@ -2010,6 +2163,7 @@ function haupt(){
 function spurTipp(id){
   var st=STATIONS[state.idx];
   if(state.phase!=='scene' || st.kind!=='wahl' || state.step!==0) return;
+  if(spurMerken() && state.spur!=='wahl') return;
   tonAn();
   var t=st.optionen.filter(function(x){ return x.id===id; })[0]; if(!t) return;
   if(t.ja){ state.step=1; klang(KLANG_ZAUBER); save(); render(); konfetti(50, .5, .45); }
@@ -2024,15 +2178,19 @@ var heimMarke=Infinity;
 function heimAngekommen(){
   if(state.phase!=='heim' || state.step>=1) return;
   tonAn(); state.step=1; klang(KLANG_ENDE); konfetti(140, .5, .35); save(); render();
+  if(!state.probe && window.Party){ var th0=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), pa=Party.lesen(th0);   // Party-Übersicht zeigt danach „Nach der Party“ (UNICORN-75)
+    if(pa && !pa.fremd){ pa.tourEnde=new Date().toISOString(); Party.speichern(pa); if(window.Konto && Konto.merken) try{ Konto.merken(th0); }catch(e){} } }
+  if(!state.probe && window.Konto && Konto.mkMelden){ var th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
+    Konto.mkMelden('completed', {rolle:(Konto.linkRolle&&Konto.linkRolle(th))||'eltern'}); }   // Marketer: Tour bis nach Hause gespielt (UNICORN-79)
 }
 function gehZu(n){                      // Sprung aus dem Ablauf-Faden zu einem beliebigen Schritt
   var t=TEXTE[n]; if(!t) return;
   tonAn(); still(); ankunftAbbrechen(); trackTaps={}; galN=0; trackMsg=''; naeheIst=0; naeheZiel=0; heimMarke=Infinity;
-  state.idx=t.i; state.phase=t.phase; state.step=t.step; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0;
+  state.idx=t.i; state.phase=t.phase; state.step=t.step; state.spur=t.spur||''; seekSeit=jetztMs(); verlassen=false; minD=Infinity; hinweis=null; hinweisKlang=false; imRadiusSeit=0;
   if(t.phase!=='start'){ wachBleiben(); gpsStart(); }
   save(); zeige('tour'); render(); pruefeAnkunft();
 }
-function vonVorn(){ ankunftAbbrechen(); still(); state.idx=0; state.phase='start'; state.step=0; trackTaps={}; galN=0; trackMsg=''; save(); render(); zeige('tour'); }
+function vonVorn(){ ankunftAbbrechen(); still(); state.idx=0; state.phase='start'; state.step=0; state.spur=''; trackTaps={}; galN=0; trackMsg=''; save(); render(); zeige('tour'); }
 function allesLoeschen(){
   ankunftAbbrechen(); still(); state.points=[null,null,null,null,null,null,null]; state.idx=0; state.phase='start'; state.step=0; save(); render();
   toast('Alle Punkte gelöscht. Die Tour steht wieder am Anfang.');
@@ -2052,7 +2210,13 @@ function texte(){                       // alle Schritte der Tour in Reihenfolge
       if(st.say2){ l.push({key:'s'+i+'.a', label:n+' · '+st.title+', Teil 1', kurz:st.title, text:st.say, i:i, phase:'scene', step:0, zweit:'s'+i+'.b'}); l.push({key:'s'+i+'.b', label:n+' · '+st.title+', Teil 2', kurz:st.title+', Teil 2', text:st.say2, i:i, phase:'scene', step:0, teil:true}); }
       else l.push({key:'s'+i+'.frage', label:n+' · '+st.title, kurz:st.title, text:st.say, i:i, phase:'scene', step:0, mit:!!(st.ohne&&st.ohne.say)});
       if(st.ohne&&st.ohne.say) l.push({key:'s'+i+'.frage.ohne', label:n+' · '+st.title+' (ohne Ausdrucke)', kurz:st.title, text:st.ohne.say, i:i, phase:'scene', step:0, nurOhne:true});
-      if(st.after) l.push({key:'s'+i+'.antwort', label:n+' · Lösung', kurz:'Lösung', text:st.after, i:i, phase:'scene', step:1, mit:!!(st.ohne&&st.ohne.after)});
+      if(st.merken){ var mk=st.merken, md=mk.drinnen||{};
+        if(mk.malen) l.push({key:'s'+i+'.malen', label:n+' · Spur malen', kurz:'Spur malen', text:mk.malen, i:i, phase:'scene', step:0, spur:'nebel', nurDraussen:true});
+        if(mk.vergleich) l.push({key:'s'+i+'.vergleich', label:n+' · Spur vergleichen', kurz:'Vergleichen', text:mk.vergleich, i:i, phase:'scene', step:0, spur:'wahl', nurDraussen:!!md.vergleich});
+        if(md.vergleich) l.push({key:'s'+i+'.vergleich.drinnen', label:n+' · Spur vergleichen (drinnen)', kurz:'Vergleichen', text:md.vergleich, i:i, phase:'scene', step:0, spur:'wahl', nurDrinnen:true});
+      }
+      if(st.after) l.push({key:'s'+i+'.antwort', label:n+' · Lösung', kurz:'Lösung', text:st.after, i:i, phase:'scene', step:1, mit:!!(st.ohne&&st.ohne.after), nurDraussen:!!(st.merken&&st.merken.drinnen&&st.merken.drinnen.after)});
+      if(st.merken&&st.merken.drinnen&&st.merken.drinnen.after) l.push({key:'s'+i+'.antwort.drinnen', label:n+' · Lösung (drinnen)', kurz:'Lösung', text:st.merken.drinnen.after, i:i, phase:'scene', step:1, nurDrinnen:true});
       if(st.ohne&&st.ohne.after) l.push({key:'s'+i+'.antwort.ohne', label:n+' · Lösung (ohne Ausdrucke)', kurz:'Lösung', text:st.ohne.after, i:i, phase:'scene', step:1, nurOhne:true});
     }
   });
@@ -2065,7 +2229,7 @@ function texte(){                       // alle Schritte der Tour in Reihenfolge
 var TEXTE=texte();
 /* ---------- Kakapups ---------- */
 // Professor Kakapups liest die Aufgaben für die Kinder vor. Vorher pupst er und legt ein Häufchen.
-// Je Station und Schritt: a = Outdoor voll; b, c nur, wo die Kinder etwas anderes tun sollen.
+// Je Station und Schritt: a = Draußen; b (Extra Hinweise am Weg), c (Drinnen) nur, wo die Kinder etwas anderes tun sollen.
 var KAKA=TOUR.erzaehler.kaka, KAKA_NEIN=TOUR.erzaehler.kakaNein;
 function kakaTexte(){                    // alle Sätze, die Kakapups spricht, mit Schlüssel
   var l=[];
@@ -2101,7 +2265,7 @@ function erzTexte(){                     // alle Sätze der neuen Erzähler, fü
 /* ---------- Kurz-Info ---------- */
 // Was konkret zu tun oder zu finden ist, in Stichpunkten hinter dem Info-Knopf.
 // Schlüssel: 'start', 'w'+Station (unterwegs), Station+'.'+Schritt, 'ende', 'heim', 'heim.ende'.
-// Je Eintrag a = Outdoor voll; b, c nur, wo es abweicht. Jede Zeile: [Stichwort, Text].
+// Je Eintrag a = Draußen; b (Extra Hinweise am Weg), c (Drinnen) nur, wo es abweicht. Jede Zeile: [Stichwort, Text].
 var INFO=TOUR.info;
 function infoKey(){
   var ph=state.phase;
@@ -2137,15 +2301,22 @@ function infoZeigen(){
 
 var KEYPOS={}; TEXTE.forEach(function(t,n){ KEYPOS[t.key]=n; });
 function pos(){ return KEYPOS[akt().key]; }
-// Funkel kennt das Kind: eingesprochene Namens-Sätze (n.gruss, n.schatz, n.abschied) hängen sich in die Kette ein.
+// Funkel kennt das Kind: eingesprochene Namens-Sätze (n.gruss, n.schatz, n.alter, n.abschied) hängen sich in die Kette ein.
+// n.alter (UNICORN-50) ist der eigene Alters-Satz direkt nach dem Geburtstagsgruß.
 function mitName(nk, rest){ var c=clips[nk]; return c ? {key:nk, text:c.h||'', zweit:rest||null} : (rest||null); }
 function akt(){                         // der Satz, der gerade dran ist
   if(state.phase==='start') return {key:'start', text:T_START};
-  if(state.phase==='end') return {key:'ende.a', text:T_ENDE, zweit:mitName('n.schatz', {key:'ende.b', text:T_ENDE2})};
+  if(state.phase==='end') return {key:'ende.a', text:T_ENDE, zweit:mitName('n.schatz', mitName('n.alter', {key:'ende.b', text:T_ENDE2}))};
   if(state.phase==='heim') return state.step>=1 ? {key:'heim.ende', text:T_HEIM2, zweit:mitName('n.abschied')} : {key:'heim', text:T_HEIM};
   var i=state.idx, st=STATIONS[i], o=(state.variante!=='a' && st.ohne) ? st.ohne : null;   // ohne Ausdrucke: eigene Sätze
   if(state.phase==='seek') return o&&o.seek ? {key:'s'+i+'.weg.ohne', text:o.seek} : {key:'s'+i+'.weg', text:st.seek};
   if(st.kind==='finale') return {key:'s'+i+'.f'+state.step, text:st.steps[state.step].say};
+  if(st.merken){ var mk=st.merken, md=mk.drinnen||{};
+    if(state.step>=1) return indoor()&&md.after ? {key:'s'+i+'.antwort.drinnen', text:md.after} : {key:'s'+i+'.antwort', text:st.after};
+    if(state.spur==='nebel' && mk.malen) return {key:'s'+i+'.malen', text:mk.malen};
+    if(state.spur==='wahl') return indoor()&&md.vergleich ? {key:'s'+i+'.vergleich.drinnen', text:md.vergleich} : {key:'s'+i+'.vergleich', text:mk.vergleich};
+    return {key:'s'+i+'.frage', text:st.say};
+  }
   if(st.after && state.step>=1) return o&&o.after ? {key:'s'+i+'.antwort.ohne', text:o.after} : {key:'s'+i+'.antwort', text:st.after};
   if(o&&o.say && !st.say2) return {key:'s'+i+'.frage.ohne', text:o.say};
   if(st.say2) return {key:'s'+i+'.a', text:st.say, zweit:i===0 ? mitName('n.gruss', {key:'s0.b', text:st.say2}) : {key:'s'+i+'.b', text:st.say2}};
@@ -2157,18 +2328,18 @@ function hauptText(){                   // Beschriftung des einen Hauptknopfs, l
   var ph=state.phase, st=STATIONS[state.idx];
   if(ph==='start') return 'Spiegel aufwecken';
   if(ph==='end') return 'Heimweg starten';
-  if(ph==='heim') return state.step>=1 ? 'Zurück zum Anfang' : (manuell() ? 'Zu Hause angekommen' : '');
+  if(ph==='heim') return state.step>=1 ? '' : (manuell() ? 'Zu Hause angekommen' : '');   // am Ende kein Knopf, der die Tour zurücksetzt (UNICORN-75)
   if(ph==='seek') return (manuell() && !ankunft && !wartet) ? 'Station öffnen' : '';
   if(st.kind==='plain') return st.go;
   if(st.kind==='recolor') return state.step===0 ? 'Bild verzaubern' : 'Bögen gefunden, weiter';
-  if(st.kind==='wahl'){ if(galerieAktiv()) return galN<st.optionen.length-1 ? 'Nächstes Bild' : 'Alle vier gesehen'; return state.step>=1 ? st.go : ''; }
+  if(st.kind==='wahl'){ if(spurMerken()) return !state.spur ? (st.merken.zeigenGo||'Spur zeigen') : state.spur==='nebel' ? (st.merken.malenGo||'Fertig gemalt') : ''; if(galerieAktiv()) return galN<st.optionen.length-1 ? 'Nächstes Bild' : 'Alle vier gesehen'; return state.step>=1 ? st.go : ''; }
   return st.steps[state.step].go;
 }
 function jetzt(){                       // was der Erzähler in diesem Moment tun soll
   var ph=state.phase, st=stv(state.idx);
-  if(ph==='start') return indoor() ? 'Variante Indoor: Stationen öffnest du von Hand. Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : gesetzt() ? 'Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : 'Zum Ausprobieren „Spiegel aufwecken“ tippen. Für die echte Tour vorher unter „Einrichten“ die Punkte setzen.';
-  if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Währenddessen kommt die Schatzkiste zur Parkbank. Darin liegen Kratzbilder, Zaubertafeln und Zeichenschablonen. Nach Schatz und Snack „Heimweg starten“.';
-  if(ph==='heim') return state.step>=1 ? 'Geschafft! Tattoos abwischen, den Schatz gibt es nach dem Essen.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
+  if(ph==='start') return indoor() ? 'Drinnen: Stationen öffnest du von Hand. Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : gesetzt() ? 'Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : 'Zum Ausprobieren „Spiegel aufwecken“ tippen. Für die echte Tour vorher unter „Einrichten“ die Punkte setzen.';
+  if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Jetzt die Schatzkiste hinstellen. Kiste zusammen öffnen und staunen, verteilt wird zu Hause. Nach Schatz und Snack „Heimweg starten“.';   // eine Regel für die Schatzkiste (UNICORN-74)
+  if(ph==='heim') return state.step>=1 ? 'Geschafft! Ihr seid zu Hause.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
   if(ph==='seek'){
     if(ankunft) return 'Angekommen!';
     if(wartet) return 'Alle Kinder einsammeln. Wenn alle schauen, „Weiter“ tippen, dann liest Funkel die Aufgabe vor.';
@@ -2185,7 +2356,8 @@ function jetzt(){                       // was der Erzähler in diesem Moment tu
   if(st.kind==='recolor') return state.step===0 ? 'Die Kinder rufen, was nicht stimmt. Dann aufs Bild oder auf „Bild verzaubern“ tippen.' : lin+st.dann;
   if(st.kind==='wahl'){
     if(galerieAktiv()){ var go=st.optionen[galN], m=st.optionen.length;
-      return 'Bild '+(galN+1)+' von '+m+': '+go.name+'. Die Kinder rufen, was falsch ist und welche Farbe es in echt hat. '+(galN<m-1 ? 'Dann ein paar Schritte am Zaun weiter und „Nächstes Bild“ tippen.' : 'Dann „Alle vier gesehen“ tippen.'); }
+      return 'Bild '+(galN+1)+' von '+m+': '+go.name+'. Die Kinder rufen, was falsch ist und welche Farbe es in echt hat. '+(galN<m-1 ? 'Dann ein paar Schritte weitergehen und „Nächstes Bild“ tippen.' : 'Dann „Alle vier gesehen“ tippen.'); }
+    if(spurMerken()) return !state.spur ? st.frage : state.spur==='zeigen' ? 'Alle schauen genau hin. Gleich kommt der Nebel.' : state.spur==='nebel' ? st.frageNebel : st.frageWahl;
     return state.step===0 ? st.frage : lin+st.dann;
   }
   return st.steps[state.step].dann;
@@ -2273,8 +2445,13 @@ function render(keepPic){
   $('btn-speak').hidden=!(kannSprechen || Object.keys(clips).length);
   sprechKnopf();
 
+  if(ph==='scene' && st && st.deko==='wolke' && pic) pic+=DEKO_WOLKE;   // die Wolke schläft nur im Spiegel, kein Requisit nötig (UNICORN-41)
   var mp=$('mirror-pic');
+  var nebel = spurMerken() && state.spur!=='zeigen';
+  if(spurMerken() && pic) pic+='<div class="spur-nebel" aria-hidden="true"></div>'+(state.spur==='zeigen' ? '<div class="spur-uhr" style="animation-duration:'+Math.max(.3,((state.spurBis||0)-Date.now())/1000)+'s"></div>' : '');
   if(!keepPic) mp.innerHTML=pic;
+  mp.classList.toggle('nebel', nebel);
+  mp.classList.toggle('spur-sichtbar', spurMerken() && state.spur==='zeigen');
   var uw=unterwegs();
   mp.hidden = uw;
   mp.classList.toggle('tap', tap);
@@ -2293,18 +2470,23 @@ function render(keepPic){
   linseStart();
 
   var ch=$('choices');
-  if(ph==='scene' && st.kind==='wahl' && !galerieAktiv()){
+  var spurWarten = spurMerken() && state.spur!=='wahl';
+  if(ph==='scene' && st.kind==='wahl' && !galerieAktiv() && spurWarten){
+    ch.hidden = state.spur!=='nebel';
+    ch.innerHTML = state.spur==='nebel' ? '<button type="button" class="spur-nochmal" data-spur-nochmal>Spur noch einmal zeigen</button>' : '';
+  } else if(ph==='scene' && st.kind==='wahl' && !galerieAktiv()){
     ch.hidden=false;
     ch.innerHTML=st.optionen.map(function(o){
       var geloest=state.step>=1, zeigen = !!st.namenOffen || geloest || !!trackTaps[o.id];
       var cls='choice'+(o.ja && geloest ? ' richtig' : (!o.ja && (trackTaps[o.id]||geloest) ? ' falsch' : ''));
       var bild = st.pic==='pfote' ? '<svg viewBox="0 0 200 200" aria-hidden="true">'+SPUR[o.id]+'</svg>' : PIC[o.id](o.ja && geloest ? o.richtig : o.farbe);
       return '<button type="button" class="'+cls+'" data-id="'+o.id+'" aria-label="'+esc(zeigen ? o.name : 'Spur antippen')+'">'+bild+'<span>'+(zeigen ? esc(o.name) : '?')+'</span></button>';
-    }).join('');
+    }).join('')+(spurMerken() ? '<button type="button" class="spur-nochmal" data-spur-nochmal>Spur noch einmal zeigen</button>' : '');
   } else { ch.hidden=true; ch.innerHTML=''; }
 
   renderSetup();
   live();
+  spurUhrStellen();
   funkelStart();
   if(fadenOffen) renderFaden();
   var k=akt().key, alt=letzterKey; letzterKey=k;        // neuen Schritt von selbst sprechen
@@ -2314,8 +2496,9 @@ function render(keepPic){
     sty.classList.remove('neu'); mp2.classList.remove('neu'); void sty.offsetWidth; sty.classList.add('neu'); if(!keepPic) mp2.classList.add('neu');
   }
   $('stage').classList.toggle('atmet', uw && !ankunft && !wartet);
-  $('btn-foto').hidden = !(ph==='end' || ph==='heim');
-  $('btn-portal').hidden = !(ph==='heim' && state.step>=1) || !hatParty();   // nach der Tour zurück zur Party (nur wo es eine gibt, nicht auf dem Tablet per Link)
+  $('btn-foto').hidden = !(ph==='end' || (ph==='heim' && state.step===0) || (ph==='heim' && state.probe));   // am Ende steht das Foto in der Abschlusskarte (UNICORN-75)
+  $('btn-portal').hidden = true;                         // „Zur Party“ steht am Ende in der Abschlusskarte (UNICORN-75)
+  abschlussZeigen(ph==='heim' && state.step>=1 && !state.probe);
   if(alt!==null && k!==alt && k!=='start' && ph!=='seek' && state.autoSag && beruehrt && view==='tour') sagen();   // unterwegs nie von selbst: erst sammeln, dann tippen
 }
 function chipText(){
@@ -2340,9 +2523,7 @@ function renderFaden(){
   }
   var station=-1;
   TEXTE.forEach(function(t,n){
-    if(t.teil) return;
-    if(t.nurOhne && state.variante==='a') return;
-    if(t.mit && state.variante!=='a') return;
+    if(ausgeblendet(t)) return;
     if(t.phase==='start'){ h+=zeile(n,'ende',t.kurz,t.text); return; }
     if(t.phase==='end' || t.phase==='heim'){ h+=zeile(n,'ende',t.kurz,t.text); return; }
     if(t.i!==station){ station=t.i; var st=STATIONS[t.i]; h+=zeile(n,'kopf',(t.i+1)+' · '+st.name,'', st.arc ? FARBE[st.arc] : null); }
@@ -2354,7 +2535,7 @@ function fadenZeigen(an){
   fadenOffen=an;
   $('faden').hidden=!an; $('backdrop').hidden=!an;
   document.body.classList.toggle('faden-offen', an);
-  $('btn-ablauf').setAttribute('aria-expanded', String(an));
+  $('btn-ablauf').setAttribute('aria-expanded', String(an)); angebotPflegen();
   if(an){
     renderFaden();
     var sc=$('faden-scroll'), c=sc.querySelector('[aria-current="step"]');
@@ -2365,6 +2546,7 @@ function fadenZeigen(an){
 }
 var funkelZiel=0.12;
 function live(){
+  probeZeichnen();
   var mt=hauptText(); $('btn-main').textContent=mt; $('btn-main').hidden=!mt;
   modusZeigen();
   $('jetzt-was').textContent=jetzt();
@@ -2375,7 +2557,7 @@ function live(){
     $('btn-aufgabe-txt').textContent = ka ? ERZ[ka.fig].kurz+' liest vor' : 'Funkel liest vor';
   }
   infoZeigen();
-  var nx=TEXTE[pos()+1]; while(nx && (nx.teil || (nx.nurOhne && state.variante==='a') || (nx.mit && state.variante!=='a'))) nx=TEXTE[KEYPOS[nx.key]+1];
+  var nx=TEXTE[pos()+1]; while(nx && ausgeblendet(nx)) nx=TEXTE[KEYPOS[nx.key]+1];
   $('jetzt-dann').textContent = (state.phase==='heim' || !nx) ? '' : 'Danach: '+nx.label;
   $('btn-linse').hidden=!linseAn();
   sprechKnopf();
@@ -2462,10 +2644,14 @@ function renderSetup(){
   var rb=document.querySelectorAll('#radius button');
   for(var r=0;r<rb.length;r++) rb[r].setAttribute('aria-pressed', String(+rb[r].getAttribute('data-r')===state.radius));
   $('show-test').checked=state.showTest; $('auto-sag').checked=state.autoSag; $('kamera-an').checked=state.kamera;
-  var vb=document.querySelectorAll('#variante button'); for(var vi=0;vi<vb.length;vi++) vb[vi].setAttribute('aria-pressed', String(vb[vi].getAttribute('data-v')===state.variante));
+  $('tipps-an').checked=!window.Einfuehrung || Einfuehrung.tippsAn();
+  if($('variante').getAttribute('data-v')!==state.variante){            // Spielart (UNICORN-47): Draußen/Drinnen, draußen das Extra
+    $('variante').setAttribute('data-v', state.variante);
+    $('variante').innerHTML=Spielart.karten(TOUR, state.variante);
+    $('variante-extra').innerHTML=indoor() ? '' : Spielart.extraKarte(TOUR, state.variante==='b', 'extra-hinweise');
+  }
   $('sum-variante').textContent=VARIANTEN[state.variante].name+': '+VARIANTEN[state.variante].kurz;
-  $('variante-note').textContent = state.variante==='a' ? 'Mit Ausdrucken an einigen Stationen. Die Quatschbilder am Zaun und die Spuren an der Kreuzung zeigt nur der Spiegel, dort hängt und liegt nichts. Das GPS öffnet die Stationen.' : state.variante==='b' ? 'Bilder zeigt nur der Spiegel. Am Zaun hängen vier bunte Bänder, die Spuren an der Kreuzung zeigt nur der Spiegel, die Wolke ist ein Bettlaken. Das GPS öffnet die Stationen.' : 'Die Stationen sind Räume, der Vorausgeher legt sie nach. Jede Station öffnest du von Hand, das GPS bleibt aus.';
-  $('sum-tour').textContent=(state.autoSag?'Funkel spricht von selbst':'Funkel spricht auf Tipp')+(state.showTest?', Testknopf an':'');
+  $('sum-tour').textContent=(state.autoSag?'Funkel spricht von selbst':'Funkel spricht auf Tipp')+', Tipps '+(!window.Einfuehrung || Einfuehrung.tippsAn()?'an':'aus');
   $('sum-kamera').textContent = state.kamera ? 'An: Kamerabild und Zauberlinse' : 'Aus';
   $('sum-punkte').textContent = gesetzt()+' von '+(N-1)+' Punkten gesetzt, öffnet bei '+state.radius+' m';
   seg('rec-rate', state.recRate); seg('pitch', state.pitch);
@@ -2508,6 +2694,7 @@ function zeige(v){
   $('tab-tour').setAttribute('aria-pressed', String(v==='tour')); $('tab-setup').setAttribute('aria-pressed', String(v==='setup'));
   try{ modusZeigen(); }catch(e){}
   try{ if(location.hash!=='#'+(v==='setup'?'einrichten':'tour')) history.replaceState(null,'','#'+(v==='setup'?'einrichten':'tour')); }catch(e){}
+  angebotPflegen(); probeZeichnen();
   funkelStart();
 }
 var toastT=null;
@@ -2553,19 +2740,37 @@ $('btn-mehr').addEventListener('click', function(){ mehrAn=!mehrAn; modusZeigen(
 $('btn-nochmal').addEventListener('click', function(){ if(sprichtGerade()){ still(); sprechKnopf(); return; } sagen(); });
 $('btn-speak').addEventListener('click', function(){ if(sprichtGerade()){ still(); sprechKnopf(); return; } sagen(); });
 $('btn-test').addEventListener('click', test);
-$('choices').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('.choice') : null; if(b) spurTipp(b.getAttribute('data-id')); });
+$('choices').addEventListener('click', function(e){ if(e.target.closest && e.target.closest('[data-spur-nochmal]')){ spurZeigen(true); return; } var b=e.target.closest ? e.target.closest('.choice') : null; if(b) spurTipp(b.getAttribute('data-id')); });
 $('btn-gps').addEventListener('click', function(){ wachBleiben(); gpsStart(); });
 $('points').addEventListener('click', function(e){
   var b=e.target.closest ? e.target.closest('button[data-set]') : null; if(!b || !fix) return;
-  var i=+b.getAttribute('data-set');
-  if(!fixFrisch()){ toast('Das GPS hat seit '+Math.round(fixAlter()/1000)+' s keine neue Position. Unter freiem Himmel kurz warten, dann setzen.'); return; }
-  if(fix.acc>40){ toast('Das GPS ist zu ungenau (±'+Math.round(fix.acc)+' m). Kurz stehen bleiben, bis es unter 40 m ist.'); return; }
-  state.points[i]={lat:fix.lat, lng:fix.lng, acc:fix.acc}; save(); render();
-  toast(fix.acc>25 ? 'Punkt '+(i+1)+' gesetzt, aber das GPS ist ungenau (±'+Math.round(fix.acc)+' m). Besser kurz warten und neu setzen.' : 'Punkt '+(i+1)+' gesetzt.');
+  punktHier(+b.getAttribute('data-set'));
 });
+// Punkt einer Station auf den jetzigen Standort setzen (Einrichten → GPS-Punkte und Generalprobe)
+function punktHier(i){
+  if(!fix){ toast('Noch kein GPS. Unter freiem Himmel kurz warten.'); return false; }
+  if(!fixFrisch()){ toast('Das GPS hat seit '+Math.round(fixAlter()/1000)+' s keine neue Position. Unter freiem Himmel kurz warten, dann setzen.'); return false; }
+  if(fix.acc>40){ toast('Das GPS ist zu ungenau (±'+Math.round(fix.acc)+' m). Kurz stehen bleiben, bis es unter 40 m ist.'); return false; }
+  state.points[i]={lat:fix.lat, lng:fix.lng, acc:fix.acc}; save(); render();
+  toast(fix.acc>25 ? 'Punkt '+(i+1)+' gesetzt, aber das GPS ist ungenau (±'+Math.round(fix.acc)+' m). Besser kurz warten und neu setzen.' : 'Punkt '+(i+1)+' gesetzt. Er gilt für dieses Gerät.');
+  return true;
+}
 $('radius').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-r]') : null; if(!b) return; state.radius=+b.getAttribute('data-r'); save(); render(); });
 $('show-test').addEventListener('change', function(){ state.showTest=this.checked; save(); render(); });
-$('variante').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-v]') : null; if(!b) return; state.variante=b.getAttribute('data-v'); save(); renderListe(); render(); toast('Variante: '+VARIANTEN[state.variante].name); });
+// Spielart wechseln: Spiel, Party auf diesem Gerät und Hinweis, was sich ändert (UNICORN-47)
+function spielartSetzen(v){
+  var alt=state.variante; if(!VARIANTEN[v] || v===alt) return;
+  state.variante=v;
+  try{
+    var p=window.Party && Party.lesen(TOUR.id);
+    if(p && !p.fremd){ p.ort=Spielart.ort(v); p.ausdrucke=!Spielart.hinweise(v); Party.speichern(p); var pl=Party.plan(TOUR.id); if(pl && pl.stand) state.punkteStand=pl.stand; }   // eigene Punkte behalten
+  }catch(e){}
+  save(); renderListe(); render();
+  $('variante-note').innerHTML=Spielart.wechsel(TOUR, alt, v); $('k-variante').open=true;
+  toast('Spielart: '+VARIANTEN[v].name);
+}
+$('variante').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('button[data-spielart]') : null; if(!b) return; var o=b.getAttribute('data-spielart'); spielartSetzen(Spielart.aus(o, o==='draussen' && state.variante==='b')); });
+document.addEventListener('change', function(e){ var t=e.target; if(t && (t.id==='extra-hinweise' || t.id==='extra-vb')) spielartSetzen(t.checked ? 'b' : 'a'); });
 $('kamera-an').addEventListener('change', function(){
   var box=this;
   if(!box.checked){ state.kamera=false; save(); kameraAus(); render(); return; }
@@ -2580,7 +2785,12 @@ $('erz-wahl').addEventListener('click', function(e){
   var h=e.target.closest ? e.target.closest('[data-hoer]') : null;
   if(h){ e.stopPropagation(); tonAn(); still(); var f=h.getAttribute('data-hoer'), t=erzSatz(f, 0, 0, 'a'); if(t){ t.fig=f; kakaAuftritt(t); } return; }
   var b=e.target.closest ? e.target.closest('[data-erz]') : null; if(!b) return;
-  state.erz=b.getAttribute('data-erz'); save(); renderErz(); clipsVomServer();
+  state.erz=b.getAttribute('data-erz');
+  try{
+    var p=window.Party && Party.lesen(TOUR.id);
+    if(p && !p.fremd && p.erz!==state.erz){ p.erz=state.erz; Party.speichern(p); var pl=Party.plan(TOUR.id); if(pl && pl.erzStand) state.erzStand=pl.erzStand; }
+  }catch(e){}
+  save(); renderErz(); clipsVomServer();
 });
 $('erz-wahl').addEventListener('keydown', function(e){ if((e.key==='Enter'||e.key===' ') && e.target.hasAttribute && e.target.hasAttribute('data-erz')){ e.preventDefault(); e.target.click(); } });
 $('erz-je').addEventListener('click', function(e){
@@ -2597,7 +2807,8 @@ $('erz-je').addEventListener('change', function(e){
 });
 $('auto-sag').addEventListener('change', function(){ state.autoSag=this.checked; save(); render(); });
 $('btn-pop').addEventListener('click', stationOeffnen);
-$('btn-foto').addEventListener('click', fotoAuf); $('btn-foto-2').addEventListener('click', fotoAuf);
+$('btn-foto').addEventListener('click', fotoAuf);
+$('abschluss').addEventListener('click', function(e){ if(e.target.closest && e.target.closest('[data-abschluss-foto]')) fotoAuf(); if(e.target.closest && e.target.closest('#abschluss-party')) save(); }); $('btn-foto-2').addEventListener('click', fotoAuf);
 $('foto-zu').addEventListener('click', fotoZu); $('foto-knips').addEventListener('click', fotoKnips);
 $('foto-wechsel').addEventListener('click', function(){ fotoSeite = fotoSeite==='user' ? 'environment' : 'user'; $('foto-video').classList.toggle('spiegeln', fotoSeite==='user'); fotoKamera(); });
 $('foto-nochmal').addEventListener('click', function(){ fotoAuf(); });
@@ -2605,8 +2816,92 @@ $('foto-teilen').addEventListener('click', fotoTeilen);
 $('btn-proto-reset').addEventListener('click', function(){ proto=[]; protoSave(); renderProtokoll(); toast('Protokoll gelöscht.'); });
 $('btn-linse').addEventListener('click', function(){ state.kamera=false; save(); kameraAus(); render(); toast('Kamera ist aus. Unter „Einrichten“ lässt sie sich wieder einschalten.'); });
 $('btn-ablauf').addEventListener('click', function(){ erwMenu(false); fadenZeigen(!fadenOffen); });
+function spielOrt(){ return indoor() ? 'drinnen' : 'draussen'; }
+// „Zum ersten Mal hier?“ hängt unter „Erwachsene“: nur auf dem ersten Bildschirm, und nie über dem offenen Menü oder dem Ablauf
+function angebotPflegen(){
+  if(!window.Einfuehrung) return;
+  if(view==='tour' && state.phase==='start' && $('erw-menu').hidden && !fadenOffen) Einfuehrung.anbieten({ort:spielOrt()}); else Einfuehrung.angebotWeg();
+}
+function hilfeAuf(){ erwMenu(false); if(window.Einfuehrung) Einfuehrung.hilfe({ort:spielOrt()}); }
+$('btn-hilfe').addEventListener('click', hilfeAuf); $('btn-hilfe-2').addEventListener('click', hilfeAuf);
+$('tipps-an').addEventListener('change', function(){ if(window.Einfuehrung) Einfuehrung.tippsSetzen(this.checked); toast(this.checked ? 'Tipps sind an.' : 'Tipps sind aus.'); });
+document.addEventListener('einfuehrung', function(){ $('tipps-an').checked=Einfuehrung.tippsAn(); toast('Keine Tipps mehr. Unter „Einrichten“ → „Tour“ schaltest du sie wieder ein.'); });
+// ---------- Generalprobe (UNICORN-61) ----------
+// Die Tour einmal so durchspielen wie am Partytag, mit Abstand und GPS-Genauigkeit im Blick und „Punkt hier setzen“.
+// Am Ende: wie jede Station geöffnet hat (aus dem Probelauf-Protokoll), dann zurück auf Anfang. Die Punkte bleiben.
+var probeSchluessel='', probeSicher=false;
+function probeWert(){
+  if(indoor()) return '';
+  if(gps!=='an' || !fix) return gps==='keins' ? 'Kein GPS auf diesem Gerät' : 'GPS sucht …';
+  var d=abstand();
+  return (d!=null && unterwegs() ? 'noch '+Math.round(d)+' m · ' : '')+'GPS ±'+Math.round(fix.acc)+' m';
+}
+function probeErgebnis(){
+  var r=proto.length ? proto[proto.length-1] : null, l=((r && r.eintraege)||[]).filter(function(x){ return typeof x.i==='number' && x.modus; });
+  var hand=l.filter(function(x){ return x.modus!=='gps'; }).length;
+  return '<p><b>Geschafft!</b> So haben die Stationen geöffnet:</p>'+
+    (l.length ? '<ol>'+l.map(function(x){ return '<li>Station '+(x.i+1)+': '+(x.modus==='gps' ? '<span class="gut">von selbst</span>' : '<span class="mies">von Hand</span>')+(x.acc!=null?' · GPS ±'+x.acc+' m':'')+(x.dauer?' · '+mmss(x.dauer)+' Min. Weg':'')+'</li>'; }).join('')+'</ol>' : '<p>Keine Station mitgeschrieben.</p>')+
+    (indoor() ? '' : hand ? '<p>Wo „von Hand“ steht, lohnt es sich, den Punkt vor Ort neu zu setzen. Oder unter „Einrichten“ → „GPS-Punkte“ den Abstand auf 25 m stellen.</p>' : '<p>Alles hat von selbst geöffnet. So kann die Party kommen.</p>')+
+    '<div class="reihe"><button type="button" class="btn small" id="probe-fertig">Tour auf Anfang, Punkte behalten</button></div>';
+}
+function probeHtml(){
+  var ph=state.phase, i=state.idx, drin=indoor(), nr=i+1;
+  var kopf='<div class="probe-kopf"><span class="probe-chip">Generalprobe</span><span class="wert" id="probe-wert"></span><button type="button" class="zu" id="probe-ende">Beenden</button></div>';
+  if(ph==='start') return kopf+'<p>Lauf die Tour einmal so ab wie am Partytag. Nichts davon zählt, am Ende steht alles wieder am Anfang.</p><details class="probe-wie"><summary>So geht’s</summary><ol>'+
+    (drin ? '<li>In jedem Raum „Station öffnen“ tippen.</li><li>Prüfen, ob dort alles bereitliegt.</li>'
+          : '<li>Unterwegs zeigt diese Leiste, wie weit es noch ist und wie genau das GPS ist.</li><li>Öffnet eine Station zu früh oder gar nicht: an die richtige Stelle stellen und „Punkt hier setzen“ tippen.</li><li>Am Ende siehst du, wie jede Station geklappt hat.</li>')+
+    '</ol><p>Fein einstellen kannst du unter „Erwachsene“ → „Einrichten“: '+(drin?'Erzähler und Spielart.':'Abstand zum Öffnen (10, 15 oder 25 m), Erzähler und Spielart.')+'</p></details>';
+  if(ph==='end' || ph==='heim'){ probeAbhaken(); return kopf+probeErgebnis(); }
+  if(drin) return kopf+'<p>Station '+nr+': '+(ph==='seek' ? 'Geht in den nächsten Raum und tippt „Station öffnen“.' : 'Liegt hier alles bereit?')+'</p>';
+  if(ph==='seek') return kopf+'<p>Unterwegs zu Station '+nr+'. '+(wartet ? 'Angekommen. Stimmt die Stelle? Sonst hier neu setzen.' : 'Steht ihr an der richtigen Stelle, aber nichts öffnet sich? Dann den Punkt hier setzen.')+'</p>'+
+    '<div class="reihe"><button type="button" class="btn small" data-probe-setzen="'+i+'">Punkt '+nr+' hier setzen</button></div>';
+  if(i===0) return kopf+'<p>Start an der Haustür. Die Haustür braucht keinen Punkt.</p>';
+  return kopf+'<p>Station '+nr+' ist offen. Hat sie an der richtigen Stelle geöffnet? Sonst stell dich dorthin und setz den Punkt neu.</p>'+
+    '<div class="reihe"><button type="button" class="btn small ghost" data-probe-setzen="'+i+'">Punkt '+nr+' hier neu setzen</button></div>';
+}
+function probeZeichnen(){
+  var el=$('probe'); if(!el) return;
+  var t=$('probe-menu-titel'); if(t){ t.textContent=state.probe?'Generalprobe beenden':'Generalprobe'; if(!probeSicher) $('probe-menu-text').textContent=state.probe?'Zurück auf Anfang, die Punkte bleiben':'Tour zum Üben ablaufen, Punkte vor Ort einstellen'; }
+  if(!state.probe || view!=='tour'){ el.hidden=true; probeSchluessel=''; return; }
+  el.hidden=false;
+  var key=[state.phase, state.idx, wartet?1:0, indoor()?1:0].join('|');
+  if(key!==probeSchluessel){ probeSchluessel=key; el.innerHTML=probeHtml(); }
+  var w=$('probe-wert'); if(w) w.textContent=probeWert();
+}
+// Zu Ende gespielte Generalprobe hakt den Schritt in der Party ab (UNICORN-76), nur auf dem Gerät mit der eigenen Party
+var probeAbgehakt=false;
+function probeAbhaken(){
+  if(probeAbgehakt || !window.Party) return; probeAbgehakt=true;
+  var th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), p=Party.lesen(th);
+  if(!p || p.fremd) return;
+  p.erledigt=p.erledigt||{};
+  if(indoor()) p.erledigt.generalprobe=true; else { p.erledigt.probelauf=true; p.probeRoute=Party.routeSchluessel(Party.plan(th)); }
+  Party.speichern(p); if(window.Konto && Konto.merken) try{ Konto.merken(th); }catch(e){}
+}
+function probeBeenden(){ state.probe=false; probeSicher=false; vonVorn(); toast('Generalprobe beendet. Die Tour steht wieder am Anfang, deine Punkte bleiben.'); }
+function probeStarten(){
+  probeSicher=false; erwMenu(false); fadenZeigen(false);
+  if(state.phase!=='start') vonVorn();
+  state.probe=true; save(); gpsStart(); zeige('tour'); render(); live();
+  toast(indoor() ? 'Generalprobe: Spiel die Tour einmal durch.' : 'Generalprobe: Lauf los. Unterwegs setzt du jeden Punkt mit einem Tipp.');
+}
+$('probe').addEventListener('click', function(e){
+  var b=e.target.closest ? e.target.closest('[data-probe-setzen]') : null;
+  if(b){ punktHier(+b.getAttribute('data-probe-setzen')); live(); return; }
+  if(e.target.closest && e.target.closest('#probe-ende, #probe-fertig')) probeBeenden();
+});
+$('btn-probe').addEventListener('click', function(){
+  if(state.probe){ erwMenu(false); probeBeenden(); return; }
+  if(state.phase!=='start' && !probeSicher){ probeSicher=true; $('probe-menu-text').textContent='Startet die Tour von vorn. Zum Bestätigen noch einmal tippen.'; return; }
+  probeStarten();
+});
+// Link mit ?probe=1 (Party → „Generalprobe am Vortag“, „Route ablaufen“)
+if(/[?&]probe=1(&|$)/.test(location.search) && !state.probe){
+  if(state.phase==='start'){ state.probe=true; save(); setTimeout(function(){ gpsStart(); live(); }, 0); }
+  else setTimeout(function(){ toast('Die Tour läuft gerade. Unter „Erwachsene“ → „Generalprobe“ startest du die Probe von vorn.'); }, 600);
+}
 /* Menü für Erwachsene: Ablauf und Einrichten liegen dahinter, damit Kinder nicht versehentlich hineintippen */
-function erwMenu(an){ $('erw-menu').hidden=!an; $('btn-erw').setAttribute('aria-expanded', String(an)); if(an){ try{ $('btn-ablauf').focus({preventScroll:true}); }catch(e){} } }
+function erwMenu(an){ $('erw-menu').hidden=!an; $('btn-erw').setAttribute('aria-expanded', String(an)); angebotPflegen(); if(an){ try{ $('btn-ablauf').focus({preventScroll:true}); }catch(e){} } }
 $('btn-erw').addEventListener('click', function(e){ e.stopPropagation(); erwMenu($('erw-menu').hidden); });
 $('tab-setup').addEventListener('click', function(){ erwMenu(false); });
 document.addEventListener('click', function(e){ if(!$('erw-menu').hidden && !(e.target.closest && e.target.closest('.erw-wrap'))){ e.preventDefault(); e.stopPropagation(); erwMenu(false); } }, true);   // Tipp daneben schließt nur das Menü, löst nichts darunter aus
@@ -2635,15 +2930,41 @@ $('voice').addEventListener('change', function(){ state.voice=this.value||null; 
 $('btn-probe').addEventListener('click', function(){ tonAn(); still(); sprich('Hallo, ich bin Funkel, das Einhorn! Folgt den Hufspuren.'); });
 $('btn-restart').addEventListener('click', vonVorn);
 // „Zur Party“ nur auf Geräten mit eigener Party (UNICORN-25); Tablet per Link sieht keinen Weg in die Plattform
+// Abschlusskarte (UNICORN-75): was jetzt und was morgen dran ist. Auf dem Tablet per Link ohne eigene Party nur der Hinweis aufs Handy.
+function abschlussZeigen(an){
+  var el=$('abschluss'); if(!el) return;
+  if(!an){ el.hidden=true; return; }
+  var eigen=hatParty(), t=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,'');
+  el.innerHTML='<h3>So geht es weiter</h3><ol>'+
+    '<li><button type="button" class="link" data-abschluss-foto>Gruppenfoto machen</button>, am besten mit dem Handy</li>'+
+    '<li>Urkunden verteilen</li><li>Schatz nach dem Essen verteilen</li><li>Morgen: Danke an die Gäste schicken</li></ol>'+
+    (eigen ? '<a class="btn primary haupt" id="abschluss-party" href="'+esc(window.Weg ? Weg.heim(t) : 'party.html?thema='+t)+'">Zur Party</a>'
+           : '<p class="leise">Auf dem Handy der Gastgeber geht es weiter.</p>');
+  el.hidden=false;
+}
 function hatParty(){ var t=new URLSearchParams(location.search).get('thema')||'einhorn'; return !!(window.Weg && Weg.party(t)); }
-(function(){ var t=new URLSearchParams(location.search).get('thema')||'einhorn'; ['erw-portal','btn-portal'].forEach(function(id){ if(window.Weg) $(id).href=Weg.heim(t); }); if(!hatParty()) $('erw-portal').hidden=true; })();
+// „Zur Party“ (UNICORN-71): immer für Eltern, nur auf dem Tablet- oder Vorausgeher-Link ohne eigene Party nicht
+(function(){ var t=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), K=window.Konto;
+  ['erw-portal','btn-portal'].forEach(function(id){ if(window.Weg) $(id).href=Weg.heim(t); });
+  if(hatParty()) return;
+  if(K && K.linkRolle && K.linkRolle(t)){ $('erw-portal').hidden=true; return; }
+  $('erw-portal').href='party.html?thema='+encodeURIComponent(t);
+  var an=K && K.angemeldet && K.angemeldet();
+  $('erw-portal').querySelector('b').textContent=an?'Zur Party':'Party planen';
+  $('erw-portal').querySelector('small').textContent=an?'Deine Party aus dem Konto öffnen. Die Tour bleibt gespeichert.':'Checkliste, Einkauf und Einladungen. Die Tour bleibt gespeichert.';
+})();
 ['erw-portal','btn-portal'].forEach(function(id){ $(id).addEventListener('click', function(){ save(); }); });   // Stand sichern, bevor es zur Party geht
 $('btn-copy').addEventListener('click', function(){
   var ta=$('code'); ta.value=codeAus(state.points);
   function markieren(){ ta.focus(); ta.select(); toast('Code ist markiert. Jetzt kopieren.'); }
   try{ navigator.clipboard.writeText(ta.value).then(function(){ toast('Code kopiert.'); }, markieren); }catch(e){ markieren(); }
 });
-$('liste').addEventListener('change', function(e){ var b=e.target; if(!b.hasAttribute('data-haken')) return; haken[b.getAttribute('data-haken')]=b.checked; hakenSave(); renderListe(); });
+$('liste').addEventListener('click', function(e){ var b=e.target.closest ? e.target.closest('[data-vb]') : null; if(!b) return; vbAnsicht=b.getAttribute('data-vb'); try{ localStorage.setItem(VB_ANSICHT_KEY, vbAnsicht); }catch(x){} renderListe(); });
+$('liste').addEventListener('change', function(e){ var b=e.target; if(b.hasAttribute('data-ek')){ var id=b.getAttribute('data-ek'), bp=besorgParty();
+    if(bp.stellvertreter){ haken['ek|'+id]=b.checked; hakenSave(); }
+    else { bp.einkauf=bp.einkauf||{}; bp.einkaufWie=bp.einkaufWie||{}; if(b.checked) bp.einkauf[id]=true; else { delete bp.einkauf[id]; delete bp.einkaufWie[id]; } Party.speichern(bp); }
+    renderListe(); return; }
+  if(!b.hasAttribute('data-haken')) return; haken[b.getAttribute('data-haken')]=b.checked; hakenSave(); renderListe(); });
 $('btn-liste-reset').addEventListener('click', function(){ haken={}; hakenSave(); renderListe(); });
 $('btn-clips-export').addEventListener('click', clipsExport);
 $('clips-file').addEventListener('change', function(){
@@ -2677,31 +2998,33 @@ render();
 zeige(location.hash==='#einrichten'?'setup':'tour');
 dbOpen(function(){ dbLoad(function(){ renderClips(); render(); clipsVomServer(); liveVorbereiten(); namenHolen(); }); });
 function namenHolen(){                   // Namens-Sätze vom Server (nur mit geschütztem Link), danach offline im Gerät
+  Object.keys(clips).forEach(function(k){ if(/^n\./.test(k) && typeof clips[k].rate!=='number') clips[k].rate=1; });   // ältere Namens-Sätze ohne Tempo liefen mit dem Tempo eigener Aufnahmen (1,15)
   if(!window.Konto) return;
   var th=(new URLSearchParams(location.search).get('thema')||'einhorn').replace(/[^a-z0-9-]/gi,''), hk='sj.namen.'+th, alt=null;
   try{ alt=localStorage.getItem(hk); }catch(e){}
   Konto.namenHolen(th, alt).then(function(r){
     if(!r || r.gleich) return;
-    ['gruss','schatz','abschied'].forEach(function(k){
+    ['gruss','schatz','alter','abschied'].forEach(function(k){
       var s=r.saetze && r.saetze[k];
-      if(s && s.b64) dbPut('n.'+k, {type:'audio/mpeg', buf:b64zu(s.b64), h:s.text}); else dbDel('n.'+k);
+      if(s && s.b64) dbPut('n.'+k, {type:'audio/mpeg', buf:b64zu(s.b64), h:s.text, rate:1}); else dbDel('n.'+k);   // rate 1: Namens-Sätze im selben Tempo wie Funkels feste Sätze (UNICORN-64)
     });
     try{ if(r.hash) localStorage.setItem(hk, r.hash); else localStorage.removeItem(hk); }catch(e){}
   }, function(){});
 }
 if(state.phase!=='start') gpsStart();
 
-/* Kurze Einführung für Erwachsene (UNICORN-39): vor dem ersten Start anbieten, in „Einrichten“ erneut zeigen */
-$('btn-einf').addEventListener('click', function(){ if(window.Einfuehrung) Einfuehrung.zeigen(); });
-if(window.Einfuehrung && state.phase==='start') Einfuehrung.anbieten({ziel:$('einf-platz')});
+/* Führung für Erwachsene (UNICORN-39, UNICORN-54): vor dem ersten Start anbieten, in „Einrichten“ und über „Hilfe“ jederzeit */
+$('btn-einf').addEventListener('click', function(){ if(window.Einfuehrung) Einfuehrung.zeigen({ort:spielOrt()}); });
+// Erster Bildschirm: Die Karte „Zum ersten Mal hier?“ schwebt unten, so ist sie auf Handy und Tablet ohne Scrollen zu sehen (UNICORN-54); zeige() bietet sie an
 
 /* Für den Selbsttest: reine Funktionen */
-window.__zs={proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, state:function(){ return state; }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};
+window.__zs={proto:function(){ return proto; }, heim:function(){ return state.heim; }, fotoRahmenSVG:fotoRahmenSVG, fixAlter:fixAlter, verlassen:function(){ return verlassen; }, tempo:function(k){ return tempo(clips[k]); }, umfaerben:umfaerben, kamera:function(){ return {an:!!kamStrom, bild:kamImBild(), linse:linseAn(), bilder:linseBilder}; }, peilung:peilung, kurs:function(v){ kurs=v; kursVomKompass=true; }, kompass:function(){ return {naehe:naeheIst, ziel:naeheZiel, winkel:winkelIst, da:ankunft, wartet:wartet}; }, pos:pos, jetzt:jetzt, hauptText:hauptText, meter:meter, sollOeffnen:sollOeffnen, waerme:waerme, codeAus:codeAus, codeEin:codeEin, stimmWert:stimmWert, texte:texte, akt:akt, clips:function(){ return Object.keys(clips); }, state:function(){ return state; }, gespielt:function(){ return gespielt; }, gesagt:function(){ return gesagt; }};
 };
 </script>
 
 <script src="einfuehrung.js"></script>
 <script src="party.js"></script>
+<script src="spielart.js"></script>
 <script src="konto.js"></script>
 <script src="tour-laden.js"></script>
 <script type="module" src="../funkel3d.js"></script>

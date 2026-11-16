@@ -12,11 +12,12 @@
     <a class="rund" href="landing.html" id="zurueck-eingabe" aria-label="Zurück"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></a>
     <h1 id="titel">Route planen<small id="untertitel"></small></h1>
   </div>
+  <div id="wegweiser"></div>
 
   <section class="feld" id="sek-variante">
-    <p class="titel">Wo wird gespielt?</p>
-    <div class="seg" id="variante" role="group" aria-label="Variante"></div>
-    <p class="hinweis" id="variante-kurz"></p>
+    <p class="titel">Wo spielt ihr?</p>
+    <div id="variante"></div>
+    <p class="hinweis" id="variante-kurz">Wähle zuerst, wo ihr spielt. Das kannst du später noch ändern, auch im Elternbereich des Spiels (oben rechts „Erwachsene“ → „Einrichten“).</p>
   </section>
 
   <div id="draussen" class="stapel">
@@ -68,19 +69,22 @@
 <!-- Schritt 2: Karte mit Sheet -->
 <div id="ergebnis" hidden>
   <div id="karte" aria-label="Karte mit Route"></div>
+  <div class="zieh-tipp" id="zieh-tipp" role="status" hidden><span class="zt-hand" aria-hidden="true"></span><p><b>Tipp: Stationen verschieben</b>Halte eine Station gedrückt und zieh sie an eine andere Stelle, zum Beispiel an einen Spielplatz oder eine Bank. Weg und Zeit rechnen sich neu. Die Haustür bleibt fest.</p><button type="button" class="knopf klein" id="zieh-tipp-ok">Verstanden</button></div>
   <div class="oben-leiste">
     <a class="rund" href="landing.html" id="zurueck-karte" aria-label="Zurück"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></a>
     <button type="button" class="start-pille" id="start-pille" aria-label="Start und Strecke ändern"><span id="start-text">Ab: eure Haustür</span><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
   </div>
 
   <section class="sheet" id="sheet" aria-label="Euer Weg">
-    <i class="griff" aria-hidden="true"></i>
+    <button type="button" class="griff" id="griff" aria-label="Menü kleiner machen, Karte groß zeigen" aria-expanded="true"></button>
     <div class="sheet-kopf" id="sheet-kopf" aria-live="polite">
       <h1>Euer Weg</h1>
       <span id="k-kurz">–</span>
     </div>
-    <div class="station" id="station"><b id="st-titel"></b><span id="st-text"></span></div>
-    <p class="tipp">Tipp auf eine Station, um sie anzusehen. Ziehen verschiebt sie.</p>
+    <div class="station" id="station"><b id="st-titel"></b><span id="st-text"></span>
+      <button type="button" class="vor-ort" id="hier-setzen" hidden></button>
+      <p class="vor-ort-status" id="vor-ort-status" role="status" hidden></p></div>
+    <details class="tipp-info"><summary><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>So bedienst du die Karte</summary><p class="tipp">Tipp auf eine Station, um sie anzusehen. Ziehen verschiebt sie. Nimm zum Setzen der Punkte dasselbe Gerät, das bei der Tour der Spiegel ist. Jedes Gerät misst etwas anders, so öffnen die Stationen genauer.</p></details>
     <p class="sheet-status" id="sheet-status" role="status" hidden></p>
     <div class="haupt">
       <button type="button" class="knopf leer" id="anders">Andere Route</button>
@@ -101,7 +105,7 @@
           <button type="button" class="knopf leer klein" id="teilen">Link fürs Spiel-Gerät</button>
           <button type="button" class="knopf leer klein" id="aendern">Start ändern</button>
         </div>
-        <p class="klein-text">Lila: Hinweg, grün gepunktet: Heimweg. Gestrichelte Stationen haben keinen passenden Ort gefunden: auf eine Ecke, einen Zaun oder eine Bank ziehen. Beim Loslassen rutscht die Station auf den nächsten Weg. Kartendaten © OpenStreetMap-Mitwirkende, Höhen: Open-Meteo.</p>
+        <p class="klein-text">Lila: Hinweg, grün gepunktet: Heimweg. Gestrichelte Stationen liegen an einem einfachen Wegpunkt, das passt auch so. Wer mag, zieht sie auf eine Ecke, einen Zaun oder eine Bank. Beim Loslassen rutscht die Station auf den nächsten Weg. Kartendaten © OpenStreetMap-Mitwirkende, Höhen: Open-Meteo.</p>
       </div>
     </details>
   </section>
@@ -110,6 +114,7 @@
 <div class="toast" id="toast" role="status" hidden></div>
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="planer-kern.js"></script>
+<script src="spielart.js"></script>
 <script src="party.js"></script>
 <script src="konto.js"></script>
 <script src="weg.js"></script>

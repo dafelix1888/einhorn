@@ -10,7 +10,7 @@ Das Repo enthält zwei Fassungen:
 | Datei | Zweck |
 |---|---|
 | `party.html`, `party.js` | Party-Assistent (Kind, Termin, Gäste, Ort mit Plan B) und Party-Übersicht: nächster Schritt, Zeitplan mit Kalender-Export, Einkaufsliste mit Mengen, Link fürs Tablet |
-| `druck.html` | Druckvorlagen mit Namen und Datum: Einladung (auch als Text für WhatsApp), Urkunden für alle Kinder, schlafende Wolke |
+| `druck.html` | Druckvorlagen mit Namen und Datum: Einladung (auch als Text für WhatsApp), Urkunden für alle Kinder |
 | `einladung.html` | Einladung für Gast-Eltern als Link (Daten stecken im Link): Termin, Treffpunkt, Abholzeit, Zusage per WhatsApp, Kalender, Hörprobe |
 | `vorausgeher.html` | Ansicht für den Vorausgeher: Startzeit, Karte mit Stationen und eigenem Standort, was wo hingelegt wird, Haken „aufgebaut“ (bisher nur auf dem eigenen Handy) |
 | `bereit.html` | Bereit-Check auf dem Spiel-Gerät: Ton, Stimmen offline, GPS, Akku, Sperre, Offline-Speicher |
