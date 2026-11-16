@@ -21,7 +21,7 @@ Ziel: fremde Eltern planen und spielen ohne Hilfe; Gate bis 6. Dezember 2026: 20
 - **UNICORN-80 Erinnerungs-Mail nach der Party:** Entwurf PR #189, nicht in Supabase eingespielt, wartet auf Felix.
 - Test `konto.test.cjs` („Funkel spricht gleich los“) wackelte auf GitHub, wartet jetzt auf den Start der Wiedergabe.
 
-**16. November abends, UNICORN-38:** Vorausgeher-Stand ohne Neuladen: `Konto.aufbauBeobachten` sieht am Partytag und kurz nach einem neuen Haken alle 5 s nach, sonst alle 10 s, sofort beim Zurückkehren und bei wieder Netz. Die Party-Seite zeigt im Schritt „Partytag“ unter „Link für den Vorausgeher“ „Live: N Stationen stehen“. Kein echter Push (Supabase Realtime), 0 € (STRAT-33). Service Worker v79.
+**16. November abends, UNICORN-38:** Vorausgeher-Stand ohne Neuladen: `Konto.aufbauBeobachten` sieht am Partytag und kurz nach einem neuen Haken alle 5 s nach, sonst alle 10 s, sofort beim Zurückkehren und bei wieder Netz. Die Party-Seite zeigt im Schritt „Partytag“ unter „Link für den Vorausgeher“ „Live: N Stationen stehen“. Kein echter Push (Supabase Realtime), 0 € (STRAT-33). Service Worker v81.
 
 **15. November, UNICORN-58 bis 61 (Rückmeldung Felix):**
 - **UNICORN-58 Hinweise:** Planer zeigt beim ersten Blick auf die Karte einmal „Stationen verschieben“ (`sj.planer.ziehTipp`). Assistent Schritt 1: Löschhinweis mit Datum (30 Tage nach der Feier, wie `alte_partys_loeschen`). Schritt 2: „Spielart jederzeit änderbar, auch am Partytag“. Erzähler-Schritt: Hinweis „jederzeit änderbar“ über der Auswahl. „Fertig“: „Funkel kennt …“ sagt, wer Funkel ist.

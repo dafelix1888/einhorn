@@ -201,7 +201,7 @@
       else { var n=new Date(d); n.setDate(n.getDate()+1); e.push('DTSTART;VALUE=DATE:'+tagS(d),'DTEND;VALUE=DATE:'+tagS(n)); }
       e.push('SUMMARY:'+esc(titel),'DESCRIPTION:'+esc(text),'END:VEVENT'); ev.push(e.join('\r\n'));
     }
-    var name=p.kind && p.kind.name ? (/[sßxz]$/i.test(p.kind.name) ? p.kind.name+'’' : p.kind.name+'s') : 'Unsere';
+    var name=p.kind && p.kind.name ? genitiv(p.kind.name) : 'Unsere';
     termin('party', name+' Einhorn-Party ('+tour.titel+')', 'Spiel öffnen: '+basis+'spiel.html?thema='+p.thema, datum(p), true, (tour.dauer.minuten||50)+30);
     aufgaben(p, tour, pl).forEach(function(a){
       if(a.tag===0){                                                      // Partytag: einzelne Termine mit Uhrzeit, ohne den Start (das ist die Party selbst)
@@ -223,11 +223,13 @@
   function basisUrl(){ return location.href.replace(/[?#].*$/,'').replace(/[^/]*$/,''); }
   function partyKern(p){ return {thema:p.thema, kind:p.kind, datum:p.datum, start:p.start, kinder:p.kinder, helfer:p.helfer, vorausgeher:p.vorausgeher, ort:p.ort, planB:p.planB, ausdrucke:p.ausdrucke, erz:p.erz, treffpunkt:p.treffpunkt, abholen:p.abholen, gaesteHinweis:p.gaesteHinweis}; }
   // Hinweis für Gast-Eltern (Mitbringen, bitte beachten); ohne eigenen Text draußen ein Vorschlag
-  function gaesteHinweis(p){ if(typeof p.gaesteHinweis==='string') return p.gaesteHinweis.trim(); return p.ort==='drinnen' ? '' : 'Feste Schuhe und Kleidung für draußen, bei Regen Regenjacke und Matschhose.'; }
+  function gaesteHinweis(p){ if(typeof p.gaesteHinweis==='string') return p.gaesteHinweis.trim(); return p.ort==='drinnen' ? '' : p.planB ? 'Feste Schuhe und Kleidung für draußen. Bei Regen feiern wir drinnen.' : 'Feste Schuhe und Kleidung für draußen, bei Regen Regenjacke und Matschhose.'; }   // mit Plan B (UNICORN-95)
   function planKern(pl, p){ pl=pl||{}; return {format:1, thema:p.thema, stand:pl.stand, variante:pl.variante||variante(p), kinder:pl.kinder||p.kinder, erz:p.erz||pl.erz, erzStand:pl.erzStand, adresse:pl.adresse,
       stationen:(pl.stationen||[]).map(function(s){ return {lat:s.lat, lng:s.lng, name:s.name, an:s.an, zu:s.zu}; }), party:partyKern(p)}; }
   function spielLink(p, pl){ var k=schluessel(p,'spiel'); if(k!==undefined) return k ? basisUrl()+'spiel.html?thema='+p.thema+'&k='+k : null; return basisUrl()+'spiel.html?thema='+p.thema+'&plan='+code(planKern(pl,p)); }
   function vorausgeherLink(p, pl){ var k=schluessel(p,'vorausgeher'); if(k!==undefined) return k ? basisUrl()+'vorausgeher.html?thema='+p.thema+'&k='+k : null; return basisUrl()+'vorausgeher.html?thema='+p.thema+'&plan='+code(planKern(pl,p)); }
+  // Antwortfrist (UNICORN-96): 7 Tage vor der Party; ist sie vorbei, nennen Link, Ausdruck und Text keine Frist
+  function antwortBis(p, jetzt){ var d=datum(p); d.setDate(d.getDate()-7); d.setHours(23,59,59,0); return d>=(jetzt||new Date()) ? d : null; }
   function einladungsDaten(p, pl){
     var bis=datum(p); bis.setDate(bis.getDate()-7);
     var treff=p.treffpunkt || (p.ort==='drinnen' || !pl || !pl.adresse || pl.adresse==='Mein Standort' ? 'bei uns zu Hause' : pl.adresse);
@@ -325,5 +327,7 @@
       .map(function(x){ return {x:f(x.x), wofuer:f(x.wofuer), notfalls:f(x.notfalls), key:(v==='b'?'a':v)+'|b|'+f(x.x)}; });
     return {noetig:ek.filter(function(x){ return x.noetig; }), extras:ek.filter(function(x){ return !x.noetig; }), ohne:ohne, summen:wegeSummen(ek)};
   }
-  root.Party={besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand, aufwand:aufwand};
+  // „Jonas’“, „Max’“, „Emmas“ (UNICORN-117): überall dieselbe Regel
+  function genitiv(n){ n=String(n||''); return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
+  root.Party={genitiv:genitiv, antwortBis:antwortBis, besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand, aufwand:aufwand};
 })(this);

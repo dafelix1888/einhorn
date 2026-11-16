@@ -16,7 +16,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   const bes=await p.locator('#liste').innerText();
   ok(/Braucht die Tour/.test(bes) && /Ohne Einkauf/.test(bes) && /Extras, die es schöner machen/.test(bes), 'Gruppen wie in der Party: Braucht die Tour, Ohne Einkauf, Extras');
   const hr=await p.locator('#liste .haken:has-text("Haarreif mit Einhorn-Horn")').innerText();
-  ok(/[0-9]+×/.test(hr) && /Station 1: Funkel prüft/.test(hr) && /Packung/.test(hr) && /Sonst: Papierhörner/.test(hr), 'Haarreif: Menge, wofür, Packungen und Preis, Notlösung');
+  ok(/[0-9]+×/.test(hr) && /Station 1: Nach der Einhorn-Prüfung/.test(hr) && /Packung/.test(hr) && /Sonst: Papierhörner/.test(hr), 'Haarreif: Menge, wofür, Packungen und Preis, Notlösung');
   await p.locator('#liste [data-ek="u0"]').check({force:true}); await p.waitForTimeout(150);
   ok(/1 von [0-9]+ nötigen besorgt/.test(await p.locator('#liste-note').innerText()), 'Besorgt zählt');
   await p.click('[data-vb="packen"]'); await p.waitForTimeout(150);
@@ -62,7 +62,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   const drinnen=await p.evaluate(async()=>{ const T=await (await fetch('themen/einhorn/tour.json')).json(); const L=Party.vorbereitungsListe(T,'c',8); return L.gruppen.map(g=>(g.ort||g.titel)+':'+g.items.map(i=>i.x).join('|')).join(' / '); });
   ok(/Flur:Blaues Handtuch als Fluss\|Seil/.test(drinnen) && !/Kreidespur/.test(drinnen), 'Drinnen: Handtuch-Fluss mit Seil, keine Kreidespur');
   const mitExtra=await p.evaluate(async()=>{ const T=await (await fetch('themen/einhorn/tour.json')).json(); return JSON.stringify(Party.vorbereitungsListe(T,'b',8)); });
-  ok(/4 bunte Schleifen/.test(mitExtra) && /Weißes Laken als Wolke/.test(mitExtra), 'Mit Extra „Hinweise am Weg“: Schleifen und Laken an ihrer Station');
+  ok(/4 bunte Schleifen/.test(mitExtra) && !/Laken als Wolke/.test(mitExtra) && /Etwas Weißes als Wolke/.test(mitExtra), 'Mit Extra „Hinweise am Weg“: Schleifen an ihrer Station, Weißes für die Wolke nur als Extra (UNICORN-41 B)');
 
   // Jedes Ding aus „nötig“ und „Extras“ steht in der Liste jeder Spielart, für die es gilt
   const fehlt=await p.evaluate(async()=>{ const vb=(await (await fetch('themen/einhorn/tour.json')).json()).vorbereitung, r=[];

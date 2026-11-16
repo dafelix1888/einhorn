@@ -112,8 +112,8 @@
   },
   "b": {
    "name": "Draußen + Hinweise am Weg",
-   "kurz": "Draußen, und an drei Stationen hängen echte Dinge zum Suchen.",
-   "braucht": "Kreide, ein Seil, 4 Schleifen, ein weißes Laken und ein Helfer, der vorausgeht. Ohne Helfer baust du vor der Party selbst auf, die App zeigt dir, was wohin kommt",
+   "kurz": "Draußen, und an zwei Stationen gibt es echte Dinge zum Suchen.",
+   "braucht": "Kreide, ein Seil, 4 Schleifen und ein Helfer, der vorausgeht. Ohne Helfer baust du vor der Party selbst auf, die App zeigt dir, was wohin kommt",
    "bild": "draussen",
    "st": {
     "1": {
@@ -124,10 +124,6 @@
      "wo": "Bei der ersten Schleife am Zaun",
      "frage": "Von Schleife zu Schleife laufen (blau, pink, grün, rot-weiß). Bei jeder rufen die Kinder, was im Spiegel falsch ist und welche Farbe das Ding in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
      "dann": "Hinter der grünen Schleife den gelben und den orangen Bogen holen. Hat jedes Kind seinen Glücksstein, „Bögen gefunden, weiter“ tippen."
-    },
-    "5": {
-     "wo": "Beim Bettlaken",
-     "dann": "Leise zum Laken schleichen und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen."
     },
     "6": {
      "vorOrt": "Sticker bereithalten. Die Schatzkiste bleibt noch versteckt."
@@ -176,8 +172,8 @@
  },
  "extra": {
   "titel": "Echte Hinweise am Weg",
-  "text": "Statt nur Bilder im Spiegel finden die Kinder an drei Stationen echte Dinge: 4 bunte Schleifen an einem Zaun oder Geländer, einen roten Kreidekreis und ein weißes Laken als Wolke.",
-  "braucht": "4 Schleifen, 1 weißes Laken, rote Kreide",
+  "text": "Statt nur Bilder im Spiegel finden die Kinder an zwei Stationen echte Dinge: einen roten Kreidekreis und 4 bunte Schleifen an einem Zaun oder Geländer.",
+  "braucht": "4 Schleifen, rote Kreide",
   "bild": "hinweise",
   "variante": "b"
  },
@@ -197,7 +193,7 @@
     "typ": "start"
    },
    "planer": {
-    "was": "Funkel stellt sich vor: Sein Regenbogen ist gemopst. Danach Einhorn-Prüfung mit Wiehern, Scharren und Hörnern.",
+    "was": "Funkel stellt sich vor: Sein Regenbogen ist gemopst. Danach die Einhorn-Prüfung. Nach der Prüfung bekommt jedes Kind sein Horn.",
     "ort": "Vor eurer Haustür, mit Platz für alle Kinder."
    }
   },
@@ -444,7 +440,7 @@
    },
    {
     "x": "{kinder} Haarreifen",
-    "wofuer": "Station 1: Funkel prüft, ob alle ein Horn tragen",
+    "wofuer": "Station 1: Nach der Einhorn-Prüfung bekommt jedes Kind sein Horn",
     "notfalls": "Papierhörner: Papier zur Tüte rollen, mit Haargummi befestigen.",
     "u": [
      "u0"
@@ -518,9 +514,9 @@
     ]
    },
    {
-    "x": "4 Schleifen und ein weißes Laken",
-    "wofuer": "Extra „Hinweise am Weg“: Station 2, 4 und 6",
-    "notfalls": "Papierstreifen, weißes Handtuch.",
+    "x": "4 Schleifen",
+    "wofuer": "Extra „Hinweise am Weg“: Station 4",
+    "notfalls": "Papierstreifen.",
     "nur": [
      "b"
     ]
@@ -583,6 +579,7 @@
     "wofuer": "Station 6: eine Wolke zum Anfassen",
     "nur": [
      "a",
+     "b",
      "c"
     ]
    },
@@ -650,7 +647,7 @@
       "Rote Bögen, rote Kreide für den Kreidekreis (Station 2)",
       "Vier Schleifen aus Krepp- oder Geschenkband (Blau, Pink, Grün, Rot-Weiß), gelbe und orange Bögen, Tüte mit {kinder} Glückssteinen (Station 4)",
       "Die eine Zaubertafel, in der Nähe verstecken (Station 5)",
-      "Weißes Bettlaken oder weißer Schirm als Wolke, grüne Bögen (Station 6)",
+      "Grüne Bögen (Station 6). Die Wolke schläft nur im Spiegel. Wer mag, legt etwas Weißes dazu (Laken, Kissen, Watte)",
       "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
       "Schatzkiste: bleibt in der Tasche, nicht hinlegen (Station 7)"
      ]
@@ -892,7 +889,7 @@
        },
        {
         "x": "Rote Kreide für den Kreidekreis",
-        "ding": "4 Schleifen und ein weißes Laken",
+        "ding": "4 Schleifen",
         "notfalls": "Ein Kreis aus rotem Papier."
        }
       ]
@@ -915,7 +912,7 @@
       "d": [
        {
         "x": "4 bunte Schleifen",
-        "ding": "4 Schleifen und ein weißes Laken",
+        "ding": "4 Schleifen",
         "notfalls": "Papierstreifen."
        },
        {
@@ -945,9 +942,8 @@
       "wer": "Vorausgeher",
       "d": [
        {
-        "x": "Weißes Laken als Wolke",
-        "ding": "4 Schleifen und ein weißes Laken",
-        "notfalls": "Ein weißes Handtuch."
+        "x": "Etwas Weißes als Wolke",
+        "ding": "Etwas Weißes als Wolke"
        },
        {
         "x": "Grüne Bögen",
@@ -1197,7 +1193,7 @@
     "ohne": "Nicht nötig: Der Einladungslink per WhatsApp reicht."
    },
    {
-    "x": "Echte Hinweise vorbereiten: 4 Schleifen, Laken, rote Kreide",
+    "x": "Echte Hinweise vorbereiten: 4 Schleifen, rote Kreide",
     "min": 10,
     "nur": [
      "b"
@@ -1450,7 +1446,6 @@
     },
     "1": {
      "a": "Psst, Schleichmission! Schleicht ganz leise zur Wolke und holt die grünen Bögen. Und bloß nicht pupsen! Oh. Zu spät. Also nochmal: Leise zur Wolke, grüne Bögen holen!",
-     "b": "Psst, Schleichmission! Schleicht ganz leise zum Bettlaken und holt die grünen Bögen. Und bloß nicht pupsen! Oh. Zu spät. Also nochmal: Leise zum Bettlaken, grüne Bögen holen!",
      "c": "Psst, Schleichmission! Klettert ganz leise über den Kissenberg und holt die grünen Bögen. Und bloß nicht pupsen! Oh. Zu spät. Also nochmal: Leise über den Kissenberg, grüne Bögen holen!"
     }
    },
@@ -1574,7 +1569,6 @@
     },
     "1": {
      "a": "Schleicht ganz leise zur Wolke und holt die grünen Bögen.",
-     "b": "Schleicht ganz leise zum Bettlaken und holt die grünen Bögen.",
      "c": "Klettert ganz leise über den Kissenberg und holt die grünen Bögen."
     }
    },
@@ -1630,7 +1624,6 @@
    },
    "5.1": {
     "a": "Leise zur Wolke, grüne Bögen holen!",
-    "b": "Leise zum Bettlaken, grüne Bögen holen!",
     "c": "Leise über den Kissenberg, grüne Bögen holen!"
    },
    "6.0": {
@@ -2213,20 +2206,6 @@
     [
      "Tun",
      "Ganz leise zur Wolke schleichen"
-    ],
-    [
-     "Finden",
-     "Die grünen Bögen"
-    ],
-    [
-     "Weiter",
-     "„Bögen gefunden, weiter“"
-    ]
-   ],
-   "b": [
-    [
-     "Tun",
-     "Ganz leise zum Bettlaken schleichen"
     ],
     [
      "Finden",

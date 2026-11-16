@@ -244,7 +244,7 @@
   function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){ e.hidden=true; }, 3200); }
   function heute(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
-  function genitiv(n){ return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
+  function genitiv(n){ return Party.genitiv(n); }
   function partyTitel(p){ return p.kind && p.kind.name ? genitiv(p.kind.name)+' Einhorn-Party' : 'Eure Einhorn-Party'; }
   function tageAb(d){ var h=new Date(); h.setHours(0,0,0,0); var x=new Date(d); x.setHours(0,0,0,0); return Math.round((x-h)/864e5); }
   function kurzDatum(d){ return d.toLocaleDateString('de-DE',{day:'numeric', month:'numeric'}); }
@@ -269,7 +269,7 @@
       '<circle class="rg-p" style="animation-delay:'+(0.25+i*0.12).toFixed(2)+'s" cx="'+q[0].toFixed(1)+'" cy="'+q[1].toFixed(1)+'" r="5.5" fill="'+REGENBOGEN[(i-1)%7]+'" stroke="#17121F" stroke-width="2"/>'; }).join('');
     var km=pl.strecke ? (pl.strecke/1000).toFixed(1).replace('.',',')+' km' : '';
     return '<div class="route-geschafft"><svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" aria-hidden="true"><path class="rg-weg" d="'+weg+'" pathLength="1"/>'+punkte+'</svg>'+
-      '<div><span class="rg-marke">✓ Route gespeichert</span><b>Eure Tour steht</b><span class="leise">'+(st.length-1)+' Stationen'+(km?' · '+km:'')+'</span><span class="leise">Jetzt noch kurz zur Party.</span></div></div>';
+      '<div><span class="rg-marke">✓ Route gespeichert</span><b>Eure Tour steht</b><span class="leise">'+st.length+' Stationen'+(km?' · '+km:'')+'</span><span class="leise">Jetzt noch kurz zur Party.</span></div></div>';
   }
   // Spielart im Assistenten (UNICORN-47): kommt sie schon aus dem Planer, nur anzeigen; sonst zwei Karten, beim Wechsel einer Party mit Hinweis
   var spielartOffen=false;
@@ -294,7 +294,7 @@
         '<div class="zwei"><label class="feld"><span>Wird</span><input id="alter" type="number" inputmode="numeric" value="'+esc(e.kind.alter||'')+'" placeholder="5"></label>'+
         '<label class="feld"><span>Start</span><input id="start" type="time" step="900" value="'+esc(e.start||'15:00')+'"></label></div>'+
         '<label class="feld"><span>Datum</span><input id="datum" type="date" min="'+heute()+'" value="'+esc(e.datum||'')+'"></label>'+
-        '<p class="leise" style="font-size:.92rem">Die Jagd dauert etwa '+tour.dauer.minuten+' Minuten. Name und Alter stehen auf Einladung und Urkunden. Der Name bleibt auf diesem Gerät.</p>'+
+        '<p class="leise" style="font-size:.92rem">Die Jagd dauert etwa '+tour.dauer.minuten+' Minuten. Name und Alter stehen auf Einladung und Urkunden. Bis du die Party sicherst, bleibt alles auf diesem Gerät.</p>'+
         '<p class="hinweis-loeschen"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg><span>Schatzweg löscht eure Party <b id="loesch-datum">'+loeschText(e.datum)+'</b> automatisch, mit Links, Gästeliste und Funkels Namens-Sätzen.</span></p>';
     } else if(sid()==='wo'){
       var d=e.ort==='draussen', ex=tour.extra;
@@ -598,9 +598,9 @@
   function namenBlock(l, p){
     var x=null; l.forEach(function(a){ a.teile.forEach(function(t){ if(t.id==='namen') x=t; }); });
     if(!x || !window.Namen) return '';
-    var n=esc(p.kind.name||'das Kind');
-    return '<h2 id="namen-block">Funkel sagt '+n+'s Namen</h2>'+
-      '<p class="leise klein" style="margin:-4px 0 10px">Funkel spricht '+n+' in der Tour dreimal mit Namen an: an der Haustür, beim Schatz (mit Alter) und zum Abschied zu Hause. '+(x.fertig?'Die Sätze sind eingesprochen.':'Hör rein, wie das klingt, dann sprichst du die Sätze mit '+n+'s Namen ein.')+'</p>'+
+    var n=esc(p.kind.name||'das Kind'), wessen=p.kind.name?genitiv(n):'den';
+    return '<h2 id="namen-block">Funkel sagt '+wessen+' Namen</h2>'+
+      '<p class="leise klein" style="margin:-4px 0 10px">Funkel spricht '+n+' in der Tour dreimal mit Namen an: an der Haustür, beim Schatz (mit Alter) und zum Abschied zu Hause. '+(x.fertig?'Die Sätze sind eingesprochen.':'Hör rein, wie das klingt, dann sprichst du die Sätze mit '+(p.kind.name?genitiv(n):'dem')+' Namen ein.')+'</p>'+
       '<div class="namen-zeile"><button type="button" class="knopf mittel leer" data-namen-beispiel>▶ Hörprobe mit „'+esc(Namen.BEISPIEL)+'“</button>'+
       '<button type="button" class="knopf mittel'+(x.fertig?' leer':'')+'" data-oeffne="namen">'+(x.fertig?'Eigene Sätze anhören':'Mit „'+n+'“ einsprechen')+'</button></div>';
   }
@@ -937,7 +937,7 @@
   // Fremde Party (über einen Link geöffnet, PBIM-24): hier nichts bearbeiten oder teilen, nur zurück zur eigenen
   function fremdAnsicht(){
     entwurf=null;
-    var n=party.kind&&party.kind.name ? party.kind.name+(/[sßxz]$/i.test(party.kind.name)?'’':'s')+' Party' : 'Diese Party';
+    var n=party.kind&&party.kind.name ? genitiv(party.kind.name)+' Party' : 'Diese Party';
     $('seite').innerHTML='<div class="oben"><a class="textknopf" href="landing.html" data-zurueck="landing.html">← Zurück</a><span class="marke-sw">Schatzweg</span></div>'+
       '<div class="stapel"><h1>'+esc(n)+'</h1>'+
       '<p class="leise">Diese Party ist über einen Link auf diesem Gerät und gehört jemand anderem. Ansehen und spielen geht, bearbeiten und Links teilen kann nur, wer sie angelegt hat.</p>'+
