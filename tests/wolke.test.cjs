@@ -12,6 +12,13 @@ const PARTY={format:1,thema:'einhorn',kind:{name:'Mia',alter:5},datum:'2030-06-0
   const tour=JSON.parse(lies('themen/einhorn/tour.json'));
   ok(!/\bA3\b|Wolken-Ausdruck/.test(JSON.stringify(tour)), 'Tour-Datei: kein Wolken-Ausdruck in den Listen');
 
+  // UNICORN-41, Entscheidung B: Auch mit „Hinweise am Weg“ schleichen alle zur Wolke, vorhandene Sätze der Standard-Fassung
+  const E=tour.erzaehler;
+  ok(!/Bettlaken/.test(JSON.stringify(tour)), 'Tour-Datei: kein Bettlaken mehr (Sätze, Hinweise, Listen)');
+  ok(!E.kaka['5']['1'].b && !(E.kern['5'] && E.kern['5']['1'] && E.kern['5']['1'].b) && !(E.also['5.1'] && E.also['5.1'].b), 'Erzähler an Station 6: keine eigene Fassung für „Hinweise am Weg“, es gilt „zur Wolke“');
+  ok(!(tour.varianten.b.st && tour.varianten.b.st['5']), 'Hinweise am Weg: Station 6 wie draußen ohne Extra');
+  ok(!(tour.vorbereitung.noetig.concat(tour.vorbereitung.extras).some(x=>/Laken/.test(x.x) && !(x.nur||[]).length)), 'Laken ist nirgends Pflicht');
+
   const b=await chromium.launch(), p=await b.newPage({viewport:{width:820,height:1180}});
   const fehlerSeite=[]; p.on('pageerror',e=>fehlerSeite.push(e.message));
   await p.goto(B+'party.html?thema=einhorn');
