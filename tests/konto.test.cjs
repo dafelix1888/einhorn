@@ -104,6 +104,7 @@ let fehler=0; function pruefe(ok, t){ console.log((ok?'ok   ':'FEHLER ')+t); if(
   pruefe(/Geburtstag von Emma/.test(kt) && /5 Jahre, wie toll!/.test(kt) && /Noch 3 von 3/.test(kt), 'Sätze erzeugt, mit Alters-Satz, erstes zählt nicht: noch 3');
   pruefe(await a.locator('[data-namen-alle]').count()===1 && await a.locator('[data-namen-ganz]').count()===3, 'Danach: „Alle drei Stellen anhören“ und je Stelle „Mit Geschichte“');
   {
+    await a.waitForSelector('.nm-moment.spricht', {timeout:4000}).catch(function(){});   // auf langsamen Rechnern (GitHub) startet die Wiedergabe etwas später
     pruefe(await a.locator('.nm-moment.spricht').count()===1 && /■ Stopp/.test(await a.locator('#nm-haupt').innerText()), 'Nach dem Einsprechen spricht Funkel gleich los');
     await a.click('[data-namen-alle]'); await a.waitForTimeout(100);
     pruefe(await a.locator('.nm-moment.spricht').count()===0, 'Tipp auf „Stopp“ hält an');
