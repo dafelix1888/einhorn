@@ -61,7 +61,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   const alles=await euro('alles'), noetig=await euro('noetig');
   ok(alles>0 && noetig>0 && noetig<alles, 'Zwei Wege mit Preis: alles ('+alles+' €) und nur das Nötige ('+noetig+' €)');
   ok((await p.locator('.ek-gruppe').allInnerTexts()).map(t=>t.replace(/\s*\d+$/,'')).join('|')==='Braucht die Tour|Extras, die es schöner machen', 'Liste in zwei Gruppen: nötig und Extras');
-  ok(/Sonst: Aus Pappe ausschneiden/.test(await p.textContent('#einkauf')), 'Holz-Regenbogen mit derselben Notlösung wie im Elternbereich');
+  ok(/Sonst: Aus Pappe ausschneiden/.test(await p.textContent('#einkauf')), 'Holz-Regenbogen mit derselben Notlösung wie im Spiel unter „Vorbereitung“');
   await p.click('[data-wege="noetig"]'); await p.waitForTimeout(200);
   const aus=await p.evaluate(()=>JSON.parse(localStorage.getItem('sj.party.einhorn')).einkaufAus);
   ok(aus.u5 && !aus.u0 && !aus.u1 && !aus.u3 && !aus.u2 && !aus.u9, '„Nur das Nötige“ behält alles, was im Spiel vorkommt (Haarreifen, Tattoos, Glückssteine), und wählt Geschenke ab (UNICORN-66)');

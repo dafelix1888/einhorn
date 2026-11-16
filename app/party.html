@@ -137,7 +137,7 @@
 .g-liste .t{flex:1;min-width:0}.g-liste .t b{display:block}.g-liste small{color:var(--leise);font-size:.84rem}
 .g-liste .nein .t b{color:var(--leise)}
 .g-liste .textknopf{min-height:40px;padding:0}
-/* Einkaufsliste */
+/* Material besorgen */
 .ding{display:grid;grid-template-columns:28px 1fr;gap:2px 12px;align-items:start;padding:12px 0;border-top:1px solid var(--linie)}
 .ding input{width:24px;height:24px;accent-color:var(--gruen);margin-top:2px}
 .ding .menge{font-weight:800;color:var(--akzent)}
@@ -294,7 +294,7 @@
         '<div class="zwei"><label class="feld"><span>Wird</span><input id="alter" type="number" inputmode="numeric" value="'+esc(e.kind.alter||'')+'" placeholder="5"></label>'+
         '<label class="feld"><span>Start</span><input id="start" type="time" step="900" value="'+esc(e.start||'15:00')+'"></label></div>'+
         '<label class="feld"><span>Datum</span><input id="datum" type="date" min="'+heute()+'" value="'+esc(e.datum||'')+'"></label>'+
-        '<p class="leise" style="font-size:.92rem">Die Jagd dauert etwa '+tour.dauer.minuten+' Minuten. Name und Alter stehen auf Einladung und Urkunden. Bis du die Party sicherst, bleibt alles auf diesem Gerät.</p>'+
+        '<p class="leise" style="font-size:.92rem">Die Tour dauert etwa '+tour.dauer.minuten+' Minuten. Name und Alter stehen auf Einladung und Urkunden. Bis du die Party sicherst, bleibt alles auf diesem Gerät.</p>'+
         '<p class="hinweis-loeschen"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg><span>Schatzweg löscht eure Party <b id="loesch-datum">'+loeschText(e.datum)+'</b> automatisch, mit Links, Gästeliste und Funkels Namens-Sätzen.</span></p>';
     } else if(sid()==='wo'){
       var d=e.ort==='draussen', ex=tour.extra;
@@ -429,7 +429,7 @@
     return h;
   }
 
-  // Zwei Wege (UNICORN-60): bequem alles bestellen oder sparen mit Notlösungen. Gleiche Einteilung wie „Vorbereitung“ im Elternbereich.
+  // Zwei Wege (UNICORN-60): bequem alles bestellen oder sparen mit Notlösungen. Gleiche Einteilung wie „Vorbereitung“ im Spiel.
   function wegeBox(ek){
     if(!Party.wegeSummen) return '';
     var s=Party.wegeSummen(ek), aus=party.einkaufAus||{}, offen=ek.filter(function(x){ return !x.fertig && x.lieferbar; });
@@ -571,7 +571,7 @@
     return '<nav class="leiste-oben" aria-label="So spielt ihr"><button type="button" class="textknopf" data-oeffne="" id="zum-ueberblick"><span aria-hidden="true">‹</span><span class="wort">Überblick</span></button></nav>'+
       '<section class="schritt-ansicht spiel-ansicht" id="so-spielt-ihr" style="--f:#A78BFA">'+
       '<header class="schritt-kopf"><span class="kreis gross">'+symbol('start')+'</span><div><div class="marke">Eure Tour</div><h1 tabindex="-1">So spielt ihr</h1></div></header>'+
-      '<p class="wozu">Das Wichtige zur Tour an einer Stelle. Alles lässt sich bis zum Start ändern. Feinheiten wie einzelne Aufgaben, GPS-Abstand oder die Kamera stellst du im Elternbereich ein: im Spiel oben rechts „Erwachsene“ → „Einrichten“.</p>'+
+      '<p class="wozu">Das Wichtige zur Tour an einer Stelle. Alles lässt sich bis zum Start ändern. Feinheiten wie einzelne Aufgaben, GPS-Abstand oder die Kamera stellst du im Spiel ein: oben rechts „Erwachsene“ → „Einrichten“.</p>'+
       '<h2>Wo spielt ihr?</h2>'+Spielart.karten(tour, v)+
       (draussen && tour.extra ? '<div style="margin-top:10px">'+Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise')+'</div>' : '')+
       '<div id="spiel-wechsel">'+spielWechsel+'</div>'+
@@ -673,7 +673,7 @@
       kachel({id:'einf-gps', symbol:'auge', titel:'So öffnen sich die Stationen', text:'Am Ziel von selbst. Die kurze Einführung zeigt, was du tust, wenn eine Station zu früh oder gar nicht öffnet.'}) :
       kachel({href:'spiel.html?thema='+thema+'#einrichten', haupt:true, symbol:'liste', titel:'Liste öffnen', text:'Zeigt, welche Station in welchen Raum kommt und was dort hingehört.'});
     if(a.id==='basteln') return bastelListe(p)+(draussen ? Spielart.extraKarte(tour, p.ausdrucke===false, 'extra-hinweise') : '')+kachel({href:'druck.html?thema='+thema, haupt:true, symbol:'druck', titel:'Druckvorlagen öffnen', text:'Alles zum Ausdrucken auf einer Seite: Urkunden und Einladungen.'})+
-      kachel({href:'spiel.html?thema='+thema+'#einrichten', symbol:'liste', titel:'Bastelliste öffnen', text:'Was in welche Station gehört. Dort hakst du ab, was fertig ist.'});
+      kachel({href:'spiel.html?thema='+thema+'#einrichten', symbol:'liste', titel:'Packliste öffnen', text:'Was in welche Station gehört. Dort hakst du ab, was fertig ist.'});
     if(a.id==='geraet') return (window.Namen && a.teile.some(function(x){ return x.id==='namen'; }) ? kachel({oeffne:'namen', haupt:!(p.erledigt||{}).namen, symbol:'ton', titel:'Funkel kennt '+p.kind.name, text:(p.erledigt||{}).namen?'Eingesprochen. Anhören oder ändern, bevor das Tablet die Sätze holt.':'Funkel sagt den Namen an drei Stellen. Hör dir an, wann und wie.'}) : '')+
       kachel({oeffne:'spiel', symbol:'liste', titel:'So spielt ihr: '+spielKurz(p), text:'Vor dem Laden prüfen. „Startklar“ lädt die Stimme eures Erzählers mit aufs Tablet.'})+
       kachel({href:'bereit.html?thema='+thema, haupt:true, symbol:'start', titel:'Startklar öffnen', text:'Auf dem Gerät öffnen, mit dem die Kinder spielen. Lädt die Stimmen und prüft Ton'+(draussen?', GPS':'')+' und Akku.'})+

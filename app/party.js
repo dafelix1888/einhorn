@@ -63,14 +63,14 @@
     var l=[
       // Reihenfolge (UNICORN-27): zuerst, was Lieferzeit braucht; die Einladung geht, wann man mag. Nichts ist gesperrt.
       {id:'bestellen', tag:-14, titel:'Material besorgen', kurz:'Bestellen oder von zu Hause nehmen',   // UNICORN-72: drängt nicht zum Kauf
-        text:'Zwei Wege: Alles bestellen ist am bequemsten, die Mengen passen schon zu '+p.kinder+' Kindern. Oder nur das Nötige kaufen und den Rest weglassen oder mit Dingen von zu Hause lösen. Dann kostet es wenig oder gar nichts.', knopf:'Zur Einkaufsliste', link:'#einkauf',
+        text:'Zwei Wege: Alles bestellen ist am bequemsten, die Mengen passen schon zu '+p.kinder+' Kindern. Oder nur das Nötige kaufen und den Rest weglassen oder mit Dingen von zu Hause lösen. Dann kostet es wenig oder gar nichts.', knopf:'Zum Material', link:'#einkauf',
         teile:[{id:'bestellen', titel:'Alles da oder bestellt', erkannt:allesGekauft}]},
       {id:'einladen', tag:-14, titel:'Gäste einladen', kurz:'Ein Link für alle Eltern, du siehst, wer kommt',
         text:'Ein Link für alle Gast-Eltern. Sie sehen Termin, Treffpunkt und Abholzeit und sagen dort zu oder ab. Wer kommt, siehst du hier.', knopf:'Link teilen', aktion:'gast-link',
         link:einladungsLink(p, pl)||('party.html?thema='+t+'#einladung'), teile:[{id:'einladen', titel:'Einladung geschickt'}]},
       draussen ?
         // Eine Generalprobe statt zwei Läufen (UNICORN-76): Schritt 3 ist die Probe, am Vortag bleibt draußen nichts mehr
-        {id:'route', tag:-7, titel:route?'Generalprobe':'Route planen', kurz:route?'Einmal mit dem Spiel-Gerät ablaufen'+(km?', '+km:''):'Der Planer findet die Orte für die Stationen',
+        {id:'route', tag:-7, titel:route?'Generalprobe':'Route planen', kurz:route?'Einmal mit dem Tablet ablaufen'+(km?', '+km:''):'Der Planer findet die Orte für die Stationen',
           text:route?(probe.geaendert?'Die Route hat sich seit der Generalprobe geändert. Lauf sie bitte noch einmal ab. ':'')+'Lauf die Tour einmal so ab wie am Partytag, mit dem Gerät, das der Spiegel sein wird. Der Spiegel zeigt den Abstand zur Station. Öffnet eine zu früh oder gar nicht, setzt du den Punkt mit einem Tipp neu.':'Adresse eingeben, Richtung wählen: Der Planer sucht passende Orte für die Stationen. Danach machst du einmal die Generalprobe.',
           knopf:route?'Generalprobe starten':'Route planen', link:route?'spiel.html?thema='+t+'&probe=1':'planer.html?thema='+t,
           teile:[{id:'route', titel:'Route geplant', nurAuto:true, erkannt:route}, {id:'probelauf', titel:'Einmal abgelaufen', ungueltig:probe.geaendert, text:probe.geaendert?'Route geändert, bitte noch einmal ablaufen':''}]} :
@@ -79,7 +79,7 @@
           teile:[{id:'probelauf', titel:'Räume festgelegt'}]},
       {id:'basteln', tag:-7, titel:'Basteln und drucken', kurz:bastelKurz(p, tour),
         text:bastelText(p, tour),
-        knopf:'Druckvorlagen öffnen', link:'druck.html?thema='+t, neben:{text:'Bastelliste im Spiel', link:'spiel.html?thema='+t+'#einrichten'},
+        knopf:'Druckvorlagen öffnen', link:'druck.html?thema='+t, neben:{text:'Packliste im Spiel', link:'spiel.html?thema='+t+'#einrichten'},
         teile:[{id:'basteln', titel:'Gebastelt'}, {id:'drucken', titel:'Gedruckt'}]},
       {id:'geraet', tag:-1, titel:'Tablet startklar machen', kurz:(mitNamen?'Funkel lernt den Namen, ':'')+'Stimmen laden, Ton'+(draussen?' und GPS':'')+' prüfen',
         text:(mitNamen?'Zuerst lernt Funkel den Namen: Er sagt „'+name+'“ an der Haustür, beim Schatz und zum Abschied. Dann ':'')+(mitNamen?'f':'F')+'ünf Minuten im WLAN: Stimmen laden, Ton'+(draussen?', GPS':'')+' und Akku prüfen.'+wetter, knopf:'Startklar öffnen', link:'bereit.html?thema='+t,
@@ -133,7 +133,7 @@
     for(var i=0;i<liste.length;i++){ var a=liste[i]; if(a && a.verfuegbar!==false && (a.asin||a.link)) return a; }
     return null;
   }
-  // Nötig oder Extra (UNICORN-60): dieselbe Einteilung wie „Vorbereitung“ im Elternbereich des Spiels.
+  // Nötig oder Extra (UNICORN-60): dieselbe Einteilung wie „Vorbereitung“ im Spiel (Erwachsene → Einrichten).
   // Ein Artikel ist nötig, wenn ein Eintrag aus vorbereitung.noetig (für diese Spielart) ihn nennt; dessen „Sonst“ ist die Notlösung.
   function rolle(p, tour, id){
     var vb=tour.vorbereitung||{}, v=variante(p), r={noetig:false, notfalls:'', genannt:false};
@@ -304,7 +304,7 @@
     if(l.mit&&l.mit.length) r.gruppen.push({art:'mit', titel:'Mitnehmen', items:dinge(l.mit)});
     return r;
   }
-  // Besorgen (UNICORN-69): dieselbe Einkaufsliste wie in der Party (Artikel, Packungen, Preise, „erledigt“),
+  // Besorgen (UNICORN-69): dasselbe Material wie in der Party (Artikel, Packungen, Preise, „erledigt“),
   // dazu je Artikel „wofür“ und die nötigen Dinge ohne Einkauf. Eine Quelle für Party und Spiel.
   function wofuerVon(tour, v, id){
     var vb=tour.vorbereitung||{}, w='';

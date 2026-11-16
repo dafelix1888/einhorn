@@ -2,7 +2,7 @@
  "format": 1,
  "id": "einhorn",
  "titel": "Funkels Regenbogen",
- "untertitel": "Eine Einhorn-Schnitzeljagd mit Zauberspiegel",
+ "untertitel": "Eine Einhorn-Schatzsuche mit Zauberspiegel",
  "kurz": "Über Nacht ist Funkels Regenbogen verschwunden, und alle Farben sind durcheinander. Die Kinder folgen Hufspuren, lösen Farbrätsel im Zauberspiegel, sammeln die Bögen ein und finden heraus, wer sie gemopst hat.",
  "alter": "3 bis 6 Jahre",
  "kinder": {
@@ -595,7 +595,7 @@
     "wofuer": "Pause unterwegs"
    },
    {
-    "x": "Probelauf zu Hause",
+    "x": "Generalprobe zu Hause",
     "wofuer": "Damit drinnen alles klappt",
     "nur": [
      "c"
@@ -1013,8 +1013,8 @@
       "ding": "Tablet oder Handy, startklar"
      },
      {
-      "x": "Probelauf zu Hause",
-      "ding": "Probelauf zu Hause"
+      "x": "Generalprobe zu Hause",
+      "ding": "Generalprobe zu Hause"
      },
      {
       "x": "Kiste bekleben, Karton grau anmalen",
