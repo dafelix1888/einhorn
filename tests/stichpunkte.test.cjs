@@ -15,5 +15,16 @@ tour.stationen.forEach((s,i)=>{
 const tafel=tour.gaben.find(g=>/Zaubertafel/.test(g.was));
 ok(tafel && /Gedächtnis/.test(tafel.wie) && !/abmalen|malen sie die Fuchspfote/.test(tafel.wie), '„Wer bekommt was wo“: Zaubertafel aus dem Gedächtnis');
 
+// Keine Ortsreste vom Original-Geburtstag in Stichpunkten ohne Extra (UNICORN-78). Das Extra (b) braucht bewusst einen Zaun.
+const ORT=/\b(Erdweg|Parkbank|Berg|Zaun|Zauns|Kreuzung|Hügel)\b/;
+const ortsreste=Object.entries(info).filter(([k,e])=>ORT.test(text(e.a))).map(([k])=>k);
+ok(!ortsreste.length, 'Stichpunkte ohne Extra ohne Zaun, Berg, Parkbank, Kreuzung'+(ortsreste.length?': '+ortsreste.join(', '):''));
+const tasche=tour.vorbereitung.variante.a.map(b=>b.items.join(' ')).join(' ');
+ok(!ORT.test(tasche), 'Vorausgeher-Tasche ohne Extra ohne feste Orte');
+ok(/etwas Rotes/.test(tasche) && /auffällt/.test(tasche), 'Ohne Extra: rote Bögen neben etwas Rotes, gelbe an eine Stelle, die auffällt');
+const spiel=fs.readFileSync(path.join(__dirname,'..','app/spiel.html'),'utf8');
+ok(!/am Zaun weiter|zur Parkbank/.test(spiel), 'Hauptzeilen im Spiel ohne Zaun und Parkbank');
+ok(/'Letzte Station'/.test(fs.readFileSync(path.join(__dirname,'..','app/planer-kern.js'),'utf8')), 'Planer: Ersatz-Wegpunkt am Ziel heißt „Letzte Station“');
+
 if(fehler){ console.log(fehler+' FEHLER'); process.exit(1); }
 console.log('ALLES OK');

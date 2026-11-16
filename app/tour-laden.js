@@ -46,8 +46,8 @@
         var p=st[i]; if(i===0) return;
         code.push(p && typeof p.lat==='number' ? [p.lat,p.lng] : null);
         if(!p) return;
-        if(p.name) s.name=p.name;
-        if(p.wo) s.wo=p.wo;
+        if(p.name){ s.name=p.name; s.wo=p.wo||''; }   // geplanter Ort hat Vorrang, die feste Ortszeile stammt vom Original (UNICORN-78)
+        else if(p.wo) s.wo=p.wo;
         if(s.ansage && (p.an || p.zu)) s.ansageText=fuellen(s.ansage,{an:p.an||p.zu, zu:p.zu||p.an});
       });
       if(code.some(Boolean)) tp.punkteCode=JSON.stringify(code);

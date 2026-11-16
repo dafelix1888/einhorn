@@ -126,7 +126,7 @@
      "dann": "Hinter der grünen Schleife den gelben und den orangen Bogen holen. Hat jedes Kind seinen Glücksstein, „Bögen gefunden, weiter“ tippen."
     },
     "5": {
-     "wo": "Unten am Hügel, beim Bettlaken",
+     "wo": "Beim Bettlaken",
      "dann": "Leise zum Laken schleichen und die grünen Bögen holen. Danach „Bögen gefunden, weiter“ tippen."
     },
     "6": {
@@ -627,9 +627,9 @@
     {
      "t": "Packen: Vorausgeher-Tasche",
      "items": [
-      "Rote Bögen (Station 2)",
-      "Gelbe und orange Bögen und die Tüte mit {kinder} Glückssteinen, irgendwo am Zaun verstecken (Station 4)",
-      "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
+      "Rote Bögen, neben etwas Rotes legen, zum Beispiel Briefkasten oder Blume. Gibt es nichts Rotes, ein rotes Tuch dazulegen (Station 2)",
+      "Gelbe und orange Bögen und die Tüte mit {kinder} Glückssteinen, an einer Stelle verstecken, die auffällt (Station 4)",
+      "Die eine Zaubertafel, in der Nähe verstecken (Station 5)",
       "Grüne Bögen (Station 6). Die Wolke schläft nur im Spiegel. Wer mag, legt etwas Weißes dazu (Laken, Kissen, Watte)",
       "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
       "Schatzkiste (Station 7)"
@@ -649,7 +649,7 @@
      "items": [
       "Rote Bögen, rote Kreide für den Kreidekreis (Station 2)",
       "Vier Schleifen aus Krepp- oder Geschenkband (Blau, Pink, Grün, Rot-Weiß), gelbe und orange Bögen, Tüte mit {kinder} Glückssteinen (Station 4)",
-      "Die eine Zaubertafel, irgendwo an der Kreuzung verstecken (Station 5)",
+      "Die eine Zaubertafel, in der Nähe verstecken (Station 5)",
       "Weißes Bettlaken oder weißer Schirm als Wolke, grüne Bögen (Station 6)",
       "Grauer Karton mit Fridolin, blaue Bögen, Plastiktüte, buntes Band (Station 7)",
       "Schatzkiste (Station 7)"
@@ -1916,7 +1916,7 @@
    "a": [
     [
      "Tun",
-     "Hinter der Brücke zum Zaun gehen"
+     "Hinter der Brücke weiter zur nächsten Station"
     ],
     [
      "Dort",
@@ -1952,7 +1952,7 @@
     ],
     [
      "Tun",
-     "Bei jedem ein paar Schritte am Zaun weiter"
+     "Bei jedem ein paar Schritte weitergehen"
     ],
     [
      "Rufen",
@@ -2064,11 +2064,11 @@
    "a": [
     [
      "Tun",
-     "Bis zur Kreuzung gehen (Erdweg, keine Spuren am Boden)"
+     "Zur nächsten Station gehen. Am Boden gibt es hier keine Spuren"
     ],
     [
      "Ziel",
-     "Mitten auf die Kreuzung"
+     "Ein Platz, an dem alle in Ruhe stehen bleiben"
     ]
    ],
    "c": [
@@ -2170,11 +2170,11 @@
    "a": [
     [
      "Tun",
-     "Zum Berg gehen (Erdweg, keine Spuren am Boden)"
+     "Leise zur nächsten Station gehen"
     ],
     [
      "Leise",
-     "Auf dem Berg schläft eine Regenwolke"
+     "Dort schläft eine Regenwolke"
     ]
    ],
    "c": [
@@ -2256,7 +2256,7 @@
    "a": [
     [
      "Tun",
-     "Den Berg hinauf zur Parkbank bei den Bäumen"
+     "Zum letzten Ort gehen"
     ],
     [
      "Dort",
