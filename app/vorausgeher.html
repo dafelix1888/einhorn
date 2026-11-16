@@ -22,7 +22,8 @@
 .weg span{color:var(--leise)}
 .weg .ort{color:var(--text);font-size:1.15rem;font-weight:700}
 .fokus .knopf{align-self:flex-start;min-height:44px;display:inline-flex;align-items:center;gap:8px}
-.fokus .knopf svg{width:18px;height:18px}
+.fokus .knopf svg,.danach .knopf svg{width:18px;height:18px}
+.danach .knopf{min-height:44px;display:inline-flex;align-items:center;gap:8px}
 .hinlegen{background:var(--karte);border-radius:16px;padding:14px;margin-bottom:12px}
 .hinlegen>b{display:block;margin-bottom:4px}
 .hinlegen label{display:flex;gap:12px;align-items:center;min-height:44px;padding:6px 0;border-top:1px solid var(--linie);font-weight:400;margin:0;cursor:pointer}
@@ -33,6 +34,9 @@
 .fertig-karte{background:#123321;border-radius:20px;padding:20px;margin-bottom:14px}
 .fertig-karte h1{font-size:1.5rem;margin:0 0 6px}
 .fertig-karte p{color:#B9E8C9;margin:0}
+.danach ol{margin:8px 0 4px;padding-left:20px}.danach li{margin:6px 0;line-height:1.4}.danach .leise{display:block;font-size:.88rem;color:var(--leise,#B3A9C4)}
+.danach .such-titel{font-weight:700;margin:12px 0 4px}.danach .such{list-style:none;margin:0 0 12px;padding:0}.danach .such li{display:flex;gap:8px;align-items:baseline;margin:4px 0;font-size:.92rem}
+.nr-klein{flex:0 0 22px;height:22px;border-radius:50%;background:#2F2740;display:inline-flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700}
 details.alle{background:var(--karte);border-radius:16px;margin:0 0 14px}
 details.alle summary{list-style:none;cursor:pointer;min-height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-weight:800}
 details.alle summary::-webkit-details-marker{display:none}
@@ -149,8 +153,15 @@ details.alle[open] summary svg{transform:rotate(180deg)}
         (n.vorOrt ? '<p class="gruppe">Für die Gruppe: '+esc(n.vorOrt)+'</p>' : '')+'</div>';
       h+='<button type="button" class="weiter" data-weiter="'+n.i+'">Station steht, weiter</button>';
     } else {
-      var letzte=l[l.length-1];
-      h+='<section class="fertig-karte"><h1>Alles aufgebaut!</h1><p>Warte an der letzten Station'+(letzte?' ('+esc(letzte.name)+')':'')+' und versteck dich, wenn die Gruppe kommt.</p></section>';
+      // Danach (UNICORN-70): zur Gruppe zurück und mitlaufen, damit die Kinder alles finden
+      var start=((plan&&plan.stationen)||[])[0], unterwegs=(Party.datum(party)||0)<=Date.now();
+      h+='<section class="fertig-karte"><h1>Alles aufgebaut!</h1><p>Jetzt zurück zur Gruppe und mitlaufen. Du weißt, wo alles liegt.</p></section>';
+      h+='<div class="hinlegen danach"><b>So geht es weiter</b><ol>'+
+        '<li><b>'+(drinnen?'Geh zur Gruppe.':'Geh der Gruppe entgegen.')+'</b> '+(drinnen?'Lass die Türen hinter dir zu.':'Lauf den Weg zurück, sie kommt dir entgegen.')+' <span class="leise">'+(unterwegs?'Die Gruppe ist schon unterwegs.':'Die Gruppe startet um '+esc(party.start||'')+' Uhr.')+'</span></li>'+
+        '<li><b>Lauf hinten mit.</b> Finden die Kinder etwas nicht, zeig unauffällig in die Richtung. Verraten nur im Notfall.</li>'+
+        '<li><b>Beim Schatz:</b> Fridolin und die Schatzkiste liegen bereit. Lass die Kinder selbst suchen.</li></ol>'+
+        '<p class="such-titel">Das suchen die Kinder</p><ul class="such">'+Party.vorbereitungsListe(tour, v, party.kinder).gruppen.filter(function(g){ return g.art==='station' && g.wer==='Vorausgeher'; }).map(function(g){ var d=g.items.filter(function(i){ return !i.extra; }).map(function(i){ return i.x; }); return d.length ? '<li><span class="nr-klein">'+g.s+'</span>'+esc(d.join(', '))+'</li>' : ''; }).join('')+'</ul>'+
+        (start && start.lat!=null && !drinnen ? '<a class="knopf leer" target="_blank" rel="noopener" href="'+hinlaufLink(start)+'">'+PIN+'Zurück zum Start mit Karte</a>' : '')+'</div>';
     }
     $('fokus').innerHTML=h;
 
