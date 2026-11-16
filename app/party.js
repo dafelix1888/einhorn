@@ -167,7 +167,9 @@
     function sum(a){ return a.reduce(function(t, x){ return t+x.summe; }, 0); }
     var b=tour ? basteln(p, tour) : [], d=(tour && tour.dauer)||{}, v=d.meterProMinute||35, st=d.stationenMinuten!=null?d.stationenMinuten:35;
     var tourMin=pl && pl.strecke ? st+Math.round(pl.strecke/v) : (d.minuten||50), heimMin=pl && pl.heimweg ? Math.round(pl.heimweg/v) : 0;
-    return {alles:sum(kauf), noetig:sum(kauf.filter(function(x){ return x.noetig; })), bastelAlle:bastelMin(b), bastelNoetig:bastelMin(b, true),
+    // Mitgebsel (UNICORN-72, Entscheidung B): was je Kind gekauft wird und die Kinder behalten
+    var jeKind={}; ((tour && tour.utensilien) || []).forEach(function(u){ if(u.menge==='je Kind') jeKind[u.id]=1; });
+    return {alles:sum(kauf), noetig:sum(kauf.filter(function(x){ return x.noetig; })), mitgebsel:sum(kauf.filter(function(x){ return jeKind[x.id]; })), bastelAlle:bastelMin(b), bastelNoetig:bastelMin(b, true),
       tourMin:tourMin, heimMin:heimMin, vorlaufMin:p.ort!=='drinnen' && !p.vorausgeher ? 90 : 60};
   }
   // Basteln und drucken (UNICORN-60): Aufwand je Aufgabe, was nötig ist und was ohne passiert
