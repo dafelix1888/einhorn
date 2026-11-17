@@ -1456,8 +1456,7 @@
    },
    "4": {
     "0": {
-     "a": "Ups! Das war ein Forschungspups. Spurenkunde! Also nochmal: Spur merken, malen, antippen!",
-     "c": "Ups! Das war ein Forschungspups. Spurenkunde! Also nochmal: Spur merken, Karte finden, antippen!"
+     "a": "Ups! Das war ein Forschungspups. Spurenkunde! Also nochmal: Ganz genau hinschauen und gut merken!"
     },
     "1": {
      "a": "Verzeihung! Ein Fuchs, ganz wie auf eurer Zaubertafel. Schön gemalt, wie echte Forscher! Also nochmal: Tafel einstecken, Fuchsspur folgen!",
@@ -1587,8 +1586,7 @@
     "c": "Bögen aus der Schüssel holen, jeder einen Glücksstein!"
    },
    "4.0": {
-    "a": "Spur merken, malen, antippen!",
-    "c": "Spur merken, Karte finden, antippen!"
+    "a": "Ganz genau hinschauen und gut merken!"
    },
    "4.1": {
     "a": "Tafel einstecken, Fuchsspur folgen!",
