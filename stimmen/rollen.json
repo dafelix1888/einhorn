@@ -108,14 +108,7 @@
       "tempo": 1
     }
   },
-  "zuordnung": {
-    "spiegel": [
-      "s2.weg",
-      "s3.weg",
-      "s4.weg",
-      "s5.weg"
-    ]
-  },
+  "zuordnung": {},
   "praefix": {
     "k.": "kakapups",
     "e.rudi.": "rudi",

@@ -29,7 +29,7 @@
   "datei": "../funkel-stimme.json",
   "rollen": "stimmen/rollen.json",
   "live": {
-   "rolle": "spiegel"
+   "rolle": "funkel"
   },
   "pakete": {
    "basis": "../stimmen/pakete/einhorn-basis.json",
@@ -232,7 +232,10 @@
    "arc": null,
    "pic": "hufe",
    "vorOrt": "Seil auspacken. Ein Erwachsener geht vorn, einer hinten.",
-   "probe": ["Hier kommen wir sicher rüber", "Platz für alle"],
+   "probe": [
+    "Hier kommen wir sicher rüber",
+    "Platz für alle"
+   ],
    "vorOrtEiner": "Seil auspacken. Wartet hier, bis der Vorausgeher bei euch ist. Dann geht ein Erwachsener vorn, einer hinten.",
    "seek": "Gleich kommt die Regenbogenbrücke. Bleibt dicht zusammen!",
    "title": "Die Regenbogenbrücke",
@@ -256,7 +259,7 @@
    "arc": "gelb",
    "pic": "galerie",
    "namenOffen": true,
-   "seek": "Hinter der Brücke zeigt euch mein Spiegel Bilder mit falschen Farben!",
+   "seek": "Alle gut rübergekommen? Prima! Lauft weiter, mein Spiegel hat gleich etwas Seltsames für euch.",
    "ohne": {
     "seek": "Hinter der Brücke hat der Dieb vier bunte Bänder verloren. Lauft von Band zu Band und schaut dort in meinen Spiegel!",
     "say": "Schaut in meinen Spiegel! Vier Bilder mit falschen Farben. Bei einem davon liegen mein gelber und mein oranger Bogen. Es ist das Ding, das in echt gelb ist. Findet es heraus!",
@@ -1420,66 +1423,66 @@
   "kaka": {
    "0": {
     "0": {
-     "a": "Oh, Verzeihung! Professor Kakapups, Einhorn-Forscher. Bevor ihr Funkel helfen dürft, kommt die Einhorn-Prüfung! Erstens: Wiehert wie ein Einhorn! Zweitens: Scharrt mit dem Huf! Drittens: Wackelt mit dem Horn! Wer das schafft, bekommt seinen Einhorn-Haarreif. Also nochmal: Wiehern, scharren, wackeln!"
+     "a": "Oh, Verzeihung! Professor Kakapups, Einhorn-Forscher. Bevor ihr Funkel helfen dürft, kommt die Einhorn-Prüfung! Erstens: Wiehert wie ein Einhorn! Zweitens: Scharrt mit dem Huf! Drittens: Wackelt mit dem Horn! Wer das schafft, bekommt seinen Einhorn-Haarreif."
     }
    },
    "1": {
     "0": {
-     "a": "Hoppla, das war ich nicht! Ähem. Eine blaue Erdbeere, hochinteressant! Ruft ganz laut, welche Farbe eine Erdbeere in echt hat. Dann darf ein Kind auf das Bild tippen, und der Spiegel zaubert. Also nochmal: Ruft, welche Farbe Erdbeeren haben!"
+     "a": "Hoppla, das war ich nicht! Ähem. Eine blaue Erdbeere, hochinteressant! Ruft ganz laut, welche Farbe eine Erdbeere in echt hat. Dann darf ein Kind auf das Bild tippen, und der Spiegel zaubert."
     },
     "1": {
-     "a": "Pardon! Wissenschaftlich bewiesen: Rote Bögen liegen bei roten Dingen. Sucht etwas Rotes! Wer die roten Bögen findet, ruft ganz laut: Gefunden! Also nochmal: Rote Bögen suchen!",
-     "b": "Pardon! Wissenschaftlich bewiesen: Rote Bögen liegen bei roten Dingen. Sucht den roten Kreidekreis! Wer die roten Bögen findet, ruft ganz laut: Gefunden! Also nochmal: Zum roten Kreidekreis, rote Bögen holen!",
-     "c": "Pardon! Wissenschaftlich bewiesen: Rote Bögen liegen bei roten Dingen. Schaut mal hinter der Küchentür nach! Wer die roten Bögen findet, ruft ganz laut: Gefunden! Also nochmal: Hinter der Küchentür suchen!"
+     "a": "Pardon! Wissenschaftlich bewiesen: Wer die roten Bögen findet, ruft ganz laut: Gefunden! Also nochmal: Rote Bögen suchen!",
+     "b": "Pardon! Wissenschaftlich bewiesen: Wer die roten Bögen findet, ruft ganz laut: Gefunden! Also nochmal: Zum roten Kreidekreis, rote Bögen holen!",
+     "c": "Pardon! Wissenschaftlich bewiesen: Wer die roten Bögen findet, ruft ganz laut: Gefunden! Also nochmal: Hinter der Küchentür suchen!"
     }
    },
    "2": {
     "0": {
-     "a": "Huch, schon wieder! Achtung, Achtung! Über die Regenbogenbrücke geht es nur gemeinsam. Alle Hände ans Seil, und ja nicht loslassen! Und immer schön rufen: klipp, klopp! Also nochmal: Alle ans Seil, klipp, klopp!",
-     "c": "Huch, schon wieder! Achtung, Achtung! Über den Handtuch-Fluss geht es nur gemeinsam. Alle Hände ans Seil, und bloß keine nassen Füße! Und immer schön rufen: klipp, klopp! Also nochmal: Alle ans Seil, über den Fluss!"
+     "a": "Huch, schon wieder! Achtung, Achtung! Und ja nicht loslassen! Also nochmal: Alle ans Seil, klipp, klopp!",
+     "c": "Huch, schon wieder! Achtung, Achtung! Und bloß keine nassen Füße! Also nochmal: Alle ans Seil, über den Fluss!"
     }
    },
    "3": {
     "0": {
-     "a": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Lauft langsam weiter und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Bild für Bild weiterlaufen, dann das Gelbe antippen!",
-     "b": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Lauft von Schleife zu Schleife und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Von Schleife zu Schleife, dann das Gelbe antippen!",
-     "c": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Geht von Band zu Band am Geländer und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist. Also nochmal: Von Band zu Band, dann das Gelbe antippen!"
+     "a": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Bei jedem Bild ruft ihr, was falsch ist. Also nochmal: Bild für Bild weiterlaufen, dann das Gelbe antippen!",
+     "b": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Bei jedem Bild ruft ihr, was falsch ist. Also nochmal: Von Schleife zu Schleife, dann das Gelbe antippen!",
+     "c": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Bei jedem Bild ruft ihr, was falsch ist. Also nochmal: Von Band zu Band, dann das Gelbe antippen!"
     },
     "1": {
-     "a": "Oh, pardon! Der gelbe und der orange Bogen sind ganz in der Nähe. Schaut euch gut um. Fällt euch hier etwas auf? Und jeder nimmt sich einen Glücksstein. Aber nur einen, ich zähle mit! Also nochmal: Gut umschauen, Bögen finden, jeder einen Glücksstein!",
-     "b": "Oh, pardon! Holt den gelben und den orangen Bogen bei der grünen Schleife. Und jeder nimmt sich einen Glücksstein. Aber nur einen, ich zähle mit! Also nochmal: Bögen bei der grünen Schleife holen, jeder einen Glücksstein!",
-     "c": "Oh, pardon! Beim grünen Band steht eine Schüssel. Holt den gelben und den orangen Bogen. Und jeder nimmt sich einen Glücksstein. Aber nur einen, ich zähle mit! Also nochmal: Bögen aus der Schüssel holen, jeder einen Glücksstein!"
+     "a": "Oh, pardon! Aber nur ein Glücksstein für jeden, ich zähle mit! Also nochmal: Gut umschauen, Bögen finden, jeder einen Glücksstein!",
+     "b": "Oh, pardon! Aber nur ein Glücksstein für jeden, ich zähle mit! Also nochmal: Bögen bei der grünen Schleife holen, jeder einen Glücksstein!",
+     "c": "Oh, pardon! Aber nur ein Glücksstein für jeden, ich zähle mit! Also nochmal: Bögen aus der Schüssel holen, jeder einen Glücksstein!"
     }
    },
    "4": {
     "0": {
-     "a": "Ups! Das war ein Forschungspups. Spurenkunde! Merkt euch die Spur im Spiegel ganz genau, gleich kommt der Nebel. Dann sucht die Zaubertafel und malt die Spur darauf. Also nochmal: Spur merken, malen, antippen!",
-     "c": "Ups! Das war ein Forschungspups. Spurenkunde! Merkt euch die Spur im Spiegel ganz genau, gleich kommt der Nebel. Dann sucht die passende Karte vor den Türen. Also nochmal: Spur merken, Karte finden, antippen!"
+     "a": "Ups! Das war ein Forschungspups. Spurenkunde! Also nochmal: Spur merken, malen, antippen!",
+     "c": "Ups! Das war ein Forschungspups. Spurenkunde! Also nochmal: Spur merken, Karte finden, antippen!"
     },
     "1": {
-     "a": "Verzeihung! Ein Fuchs war das, ganz wie auf eurer Zaubertafel. Schön gemalt, wie echte Forscher! Also nochmal: Tafel einstecken, Fuchsspur folgen!",
-     "c": "Verzeihung! Hinter der Fuchs-Tür liegt eine Zaubertafel. Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen. Schön ordentlich, wie ein echter Forscher! Also nochmal: Hinter die Fuchs-Tür, Pfote gemeinsam abmalen!"
+     "a": "Verzeihung! Ein Fuchs, ganz wie auf eurer Zaubertafel. Schön gemalt, wie echte Forscher! Also nochmal: Tafel einstecken, Fuchsspur folgen!",
+     "c": "Verzeihung! Jeder malt ein Stück der Fuchspfote ab, schön ordentlich, wie ein echter Forscher! Also nochmal: Hinter die Fuchs-Tür, Pfote gemeinsam abmalen!"
     }
    },
    "5": {
     "0": {
-     "a": "Psst! Ganz leiser Pups. Flüstert, welche Farbe ein Frosch in echt hat. Dann tippt ein Kind auf das Bild. Aber ganz leise, die Wolke schläft! Also nochmal: Leise die Farbe flüstern!"
+     "a": "Psst! Ganz leiser Pups. Flüstert, welche Farbe ein Frosch in echt hat. Dann tippt ein Kind auf das Bild."
     },
     "1": {
-     "a": "Psst, Schleichmission! Schleicht ganz leise zur Wolke und holt die grünen Bögen. Und bloß nicht pupsen! Oh. Zu spät. Also nochmal: Leise zur Wolke, grüne Bögen holen!",
-     "c": "Psst, Schleichmission! Klettert ganz leise über den Kissenberg und holt die grünen Bögen. Und bloß nicht pupsen! Oh. Zu spät. Also nochmal: Leise über den Kissenberg, grüne Bögen holen!"
+     "a": "Psst, Schleichmission! Und bloß nicht pupsen! Oh. Zu spät. Also nochmal: Leise zur Wolke, grüne Bögen holen!",
+     "c": "Psst, Schleichmission! Und bloß nicht pupsen! Oh. Zu spät. Also nochmal: Leise über den Kissenberg, grüne Bögen holen!"
     }
    },
    "6": {
     "0": {
-     "a": "Hoppla! Legt alle Bögen neben den Regenbogen, schön der Reihe nach. Und dann ruft ganz laut: Welche Farbe fehlt? Also nochmal: Bögen hinlegen und rufen, welche Farbe fehlt!"
+     "a": "Hoppla! Schön der Reihe nach, bitte! Also nochmal: Bögen hinlegen und rufen, welche Farbe fehlt!"
     },
     "1": {
-     "a": "Pardon! Sucht das bunte Band! Darunter steht ein grauer Bau. Klopft mal an, vielleicht ist jemand zu Hause. Also nochmal: Das bunte Band suchen!",
-     "c": "Pardon! Schaut mal hinter dem Sofa nach! Dort steht ein grauer Bau mit einem bunten Band. Klopft mal an, vielleicht ist jemand zu Hause. Also nochmal: Hinter dem Sofa nachschauen!"
+     "a": "Pardon! Klopft mal an, vielleicht ist jemand zu Hause.",
+     "c": "Pardon! Schaut mal hinter dem Sofa nach! Klopft mal an, vielleicht ist jemand zu Hause."
     },
     "2": {
-     "a": "Ähem, Entschuldigung. Na los, legt die zwei blauen Bögen zu den anderen. Ich glaube, gleich passiert etwas Magisches! Also nochmal: Blaue Bögen dazulegen!"
+     "a": "Ähem, Entschuldigung. Ich glaube, gleich passiert etwas Magisches! Also nochmal: Blaue Bögen dazulegen!"
     }
    }
   },
@@ -1500,7 +1503,7 @@
     "name": "Rudi, die ratlose Ratte",
     "kurz": "Rudi",
     "was": "total verplant, sucht ständig seinen Zettel",
-    "also": "Äh, wo war ich? Ach ja, also nochmal:",
+    "also": "Fiep! Also, ganz kurz:",
     "nein": "Fiep! Äh, ich glaube, das war falsch."
    },
    "alfonso": {
@@ -1549,70 +1552,21 @@
    "1": {
     "0": {
      "a": "Ruft ganz laut, welche Farbe eine Erdbeere in echt hat. Dann darf ein Kind auf das Bild tippen, und der Spiegel zaubert."
-    },
-    "1": {
-     "a": "Rote Bögen liegen bei roten Dingen. Sucht etwas Rotes! Wer die roten Bögen findet, ruft ganz laut: Gefunden!",
-     "b": "Rote Bögen liegen bei roten Dingen. Sucht den roten Kreidekreis! Wer die roten Bögen findet, ruft ganz laut: Gefunden!",
-     "c": "Rote Bögen liegen bei roten Dingen. Schaut mal hinter der Küchentür nach! Wer die roten Bögen findet, ruft ganz laut: Gefunden!"
-    }
-   },
-   "2": {
-    "0": {
-     "a": "Über die Regenbogenbrücke geht es nur gemeinsam. Alle Hände ans Seil, und ja nicht loslassen! Und immer schön rufen: klipp, klopp!",
-     "c": "Über den Handtuch-Fluss geht es nur gemeinsam. Alle Hände ans Seil, und bloß keine nassen Füße! Und immer schön rufen: klipp, klopp!"
-    }
-   },
-   "3": {
-    "0": {
-     "a": "Lauft langsam weiter und schaut in den Spiegel. Bei jedem Bild ruft ihr, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
-     "b": "Lauft von Schleife zu Schleife und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist.",
-     "c": "Geht von Band zu Band am Geländer und schaut jedes Mal in den Spiegel. Ruft, was falsch ist und welche Farbe es in echt hat. Zum Schluss tippt ein Kind auf das Ding, das in echt gelb ist."
-    },
-    "1": {
-     "a": "Der gelbe und der orange Bogen sind ganz in der Nähe. Schaut euch gut um. Fällt euch hier etwas auf? Und jeder nimmt sich einen Glücksstein. Aber nur einen!",
-     "b": "Holt den gelben und den orangen Bogen bei der grünen Schleife. Und jeder nimmt sich einen Glücksstein. Aber nur einen!",
-     "c": "Beim grünen Band steht eine Schüssel. Holt den gelben und den orangen Bogen. Und jeder nimmt sich einen Glücksstein. Aber nur einen!"
-    }
-   },
-   "4": {
-    "0": {
-     "a": "Merkt euch die Spur im Spiegel ganz genau! Dann kommt der Nebel. Sucht die Zaubertafel, malt die Spur darauf und tippt auf die Spur, die ihr gemalt habt.",
-     "c": "Merkt euch die Spur im Spiegel ganz genau! Dann kommt der Nebel. Sucht die passende Spurenkarte vor den Türen und tippt die Spur im Spiegel an."
-    },
-    "1": {
-     "a": "Ein Fuchs war das! Steckt die Zaubertafel ein und lauft der Fuchsspur hinterher.",
-     "c": "Hinter der Fuchs-Tür liegt eine Zaubertafel. Jeder malt ein Stück der Fuchspfote ab, einer nach dem anderen."
     }
    },
    "5": {
     "0": {
-     "a": "Flüstert, welche Farbe ein Frosch in echt hat. Dann tippt ein Kind auf das Bild. Aber ganz leise, die Wolke schläft!"
-    },
-    "1": {
-     "a": "Schleicht ganz leise zur Wolke und holt die grünen Bögen.",
-     "c": "Klettert ganz leise über den Kissenberg und holt die grünen Bögen."
+     "a": "Flüstert, welche Farbe ein Frosch in echt hat. Dann tippt ein Kind auf das Bild."
     }
    },
    "6": {
-    "0": {
-     "a": "Legt alle Bögen neben den Regenbogen, schön der Reihe nach. Und dann ruft ganz laut: Welche Farbe fehlt?"
-    },
     "1": {
-     "a": "Sucht das bunte Band! Darunter steht ein grauer Bau. Klopft mal an, vielleicht ist jemand zu Hause.",
-     "c": "Schaut mal hinter dem Sofa nach! Dort steht ein grauer Bau mit einem bunten Band. Klopft mal an, vielleicht ist jemand zu Hause."
-    },
-    "2": {
-     "a": "Na los, legt die zwei blauen Bögen zu den anderen. Ich glaube, gleich passiert etwas Magisches!"
+     "a": "Klopft mal an, vielleicht ist jemand zu Hause.",
+     "c": "Schaut mal hinter dem Sofa nach! Klopft mal an, vielleicht ist jemand zu Hause."
     }
    }
   },
   "also": {
-   "0.0": {
-    "a": "Wiehern, scharren, wackeln!"
-   },
-   "1.0": {
-    "a": "Ruft, welche Farbe Erdbeeren haben!"
-   },
    "1.1": {
     "a": "Rote Bögen suchen!",
     "b": "Zum roten Kreidekreis, rote Bögen holen!",
@@ -1640,19 +1594,12 @@
     "a": "Tafel einstecken, Fuchsspur folgen!",
     "c": "Hinter die Fuchs-Tür, Pfote gemeinsam abmalen!"
    },
-   "5.0": {
-    "a": "Leise die Farbe flüstern!"
-   },
    "5.1": {
     "a": "Leise zur Wolke, grüne Bögen holen!",
     "c": "Leise über den Kissenberg, grüne Bögen holen!"
    },
    "6.0": {
     "a": "Bögen hinlegen und rufen, welche Farbe fehlt!"
-   },
-   "6.1": {
-    "a": "Das bunte Band suchen!",
-    "c": "Hinter dem Sofa nachschauen!"
    },
    "6.2": {
     "a": "Blaue Bögen dazulegen!"
