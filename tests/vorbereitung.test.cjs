@@ -33,7 +33,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   await q.goto(S+'/app/spiel.html?thema=einhorn#einrichten'); await q.waitForSelector('#liste .vb-summen', {state:'attached'}); await q.evaluate(()=>{ document.getElementById('k-vorbereitung').open=true; }); await q.waitForTimeout(150);
   const sum=await q.locator('#liste .vb-summen').innerText();
   const zahl=(t,w)=>(t.match(new RegExp(w+'[^0-9]*([0-9.]+,[0-9]{2})'))||[])[1];
-  ok(zahl(wege,'Alles bestellen') && zahl(wege,'Alles bestellen')===zahl(sum,'Alles bestellen') && zahl(wege,'Nur das Nötige')===zahl(sum,'Nur das Nötige'), 'Gleiche Summen wie in der Party ('+zahl(sum,'Alles bestellen')+' € / '+zahl(sum,'Nur das Nötige')+' €)');
+  ok(zahl(wege,'Alles') && zahl(wege,'Alles')===zahl(sum,'Alles bestellen') && zahl(wege,'Nur Nötiges')===zahl(sum,'Nur das Nötige'), 'Gleiche Summen wie in der Party ('+zahl(sum,'Alles bestellen')+' € / '+zahl(sum,'Nur das Nötige')+' €)');
   await q.locator('#liste [data-ek="u0"]').check({force:true}); await q.waitForTimeout(150);
   ok((await q.evaluate(()=>JSON.parse(localStorage.getItem('sj.party.einhorn')).einkauf.u0))===true, 'Haken im Spiel = „erledigt“ in der Party');
   await c2.close();

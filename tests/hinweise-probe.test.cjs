@@ -59,8 +59,8 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
   await p.goto(B+'party.html?thema=einhorn#einkauf'); await p.waitForSelector('.wege');
   const euro=async s=>+((await p.textContent('[data-wege="'+s+'"] .betrag')).replace(/[^0-9,]/g,'').replace(',','.'));
   const alles=await euro('alles'), noetig=await euro('noetig');
-  ok(alles>0 && noetig>0 && noetig<alles, 'Zwei Wege mit Preis: alles ('+alles+' €) und nur das Nötige ('+noetig+' €)');
-  ok((await p.locator('.ek-gruppe').allInnerTexts()).map(t=>t.replace(/\s*\d+$/,'')).join('|')==='Braucht die Tour|Extras, die es schöner machen|Von zu Hause', 'Liste in Gruppen: nötig, Extras, von zu Hause (UNICORN-92)');
+  ok(alles>0 && noetig>0 && noetig<alles, 'Wege mit Preis: alles ('+alles+' €) und nur das Nötige ('+noetig+' €)');
+  ok((await p.locator('.ek-gruppe').allInnerTexts()).map(t=>t.replace(/^(Von zu Hause)\s*\d+$/,'$1')).join('|')==='Ganze Tour|Station 1|Weg zu Station 2|Station 3|Station 4|Station 5|Station 7|Schatz|Von zu Hause', 'Liste nach Stationen, dann von zu Hause (UNICORN-92, UNICORN-124)');
   ok(/Sonst: Aus Pappe ausschneiden/.test(await p.textContent('#einkauf')), 'Holz-Regenbogen mit derselben Notlösung wie im Spiel unter „Vorbereitung“');
   await p.click('[data-wege="noetig"]'); await p.waitForTimeout(200);
   const aus=await p.evaluate(()=>JSON.parse(localStorage.getItem('sj.party.einhorn')).einkaufAus);

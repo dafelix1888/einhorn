@@ -186,9 +186,12 @@
 .vorein .schalter label{margin:0;font-weight:400;flex:1;cursor:pointer}
 .vorein .schalter label b{display:block}
 .vorein .schalter label span{color:var(--leise);font-size:.9rem}
-.wege{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}.wege-titel,.wege-fuss{grid-column:1/-1;margin:0}.wege-titel{font-size:.92rem;color:var(--leise)}.wege-titel b{display:block;color:var(--text);font-size:1.05rem}
-.weg-k{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--karte);border:2px solid var(--linie);border-radius:16px;padding:12px;color:inherit;font:inherit;cursor:pointer}
-.weg-k.an{border-color:var(--akzent);background:color-mix(in srgb,var(--akzent) 14%,var(--karte))}.weg-k .betrag{font-size:1.25rem;font-weight:800;color:var(--akzent)}.weg-k small{color:var(--leise);font-size:.82rem;line-height:1.35}
+.wege{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:4px 0 6px}.wege-fuss{grid-column:1/-1;margin:2px 0 0}
+.weg-k{display:flex;flex-direction:column;align-items:center;gap:0;text-align:center;background:var(--karte);border:2px solid var(--linie);border-radius:12px;padding:6px 4px;min-height:48px;color:inherit;font:inherit;font-size:.85rem;line-height:1.2;cursor:pointer}
+.weg-k.an{border-color:var(--akzent);background:color-mix(in srgb,var(--akzent) 14%,var(--karte))}.weg-k .betrag{font-size:.82rem;font-weight:700;color:var(--akzent)}
+.ek-titel{font-size:1.15rem;margin:20px 0 2px}
+.ding .dh{display:block;transition:opacity .2s}.ding.aus .dh{opacity:.45}.ding.aus input{opacity:.7}
+.tag-extra{font-style:normal;font-size:.72rem;font-weight:700;color:var(--leise);border:1px solid var(--linie);border-radius:999px;padding:1px 7px;vertical-align:2px}
 .ek-gruppe{font-size:1.05rem;margin:18px 0 2px}.ek-gruppe small{color:var(--leise);font-weight:600}.ek-satz{margin:0 0 8px}
 .ding .sonst{color:#A7F3D0;font-size:.88rem}.ding .wie{font-size:.8rem;color:var(--leise);margin-right:6px}
 .bastel{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:8px}.bastel li{background:var(--karte);border-radius:14px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:2px 12px}
@@ -386,7 +389,7 @@
   }
 
   // ---------- Einkauf: Preis je Artikel und Summe ----------
-  function einkaufZeile(x){
+  function einkaufZeile(x, text){
     var box = x.fertig ? '<span class="punkt-ok" aria-hidden="true"></span>'
       : x.lieferbar && Party.imKorb ? '<input type="checkbox" id="k-'+x.id+'" data-waehle="'+x.id+'"'+(x.gewaehlt?' checked':'')+' aria-label="'+esc(x.name)+' für den Warenkorb auswählen">'
       : '<span></span>';
@@ -396,7 +399,8 @@
         (x.zuHause ? '' : x.noetig ? (alsNot?'<button type="button" class="textknopf" data-kauf="'+x.id+'" data-wie="not">Notlösung</button>':'') : '<button type="button" class="textknopf" data-kauf="'+x.id+'" data-wie="'+(alsNot?'not':'weg')+'">'+(alsNot?'Notlösung':'Lass ich weg')+'</button>')+'</span>';
     var weglassbar=/^Weglassen\.?\s*/.test(x.notfalls||''), rest=weglassbar ? x.notfalls.replace(/^Weglassen\.?\s*/,'') : '';
     var sonst = x.notfalls && !x.fertig ? '<br><span class="sonst">'+(weglassbar ? 'Geht auch ohne'+(rest?': '+esc(rest):'.') : 'Sonst: '+esc(x.notfalls))+'</span>' : x.fertig && x.wie==='not' && x.notfalls ? '<br><span class="sonst">'+esc(x.notfalls)+'</span>' : '';
-    return '<div class="ding'+(x.fertig?' fertig':'')+'">'+box+'<label'+(x.lieferbar&&!x.fertig?' for="k-'+x.id+'"':'')+' style="margin:0;font-weight:400"><span class="menge">'+x.menge+'×</span> '+esc(x.name)+'<br><span>'+esc(Party.wofuerVon(tour, Party.variante(party), x.id)||x.wann)+(x.hinweis?' · '+esc(x.hinweis):'')+'</span><br><span>'+preisText(x)+'</span>'+sonst+'</label>'+knopf+'</div>';
+    var aus=!x.fertig && x.lieferbar && x.gewaehlt===false, wofuer=text!=null ? text : (Party.wofuerVon(tour, Party.variante(party), x.id)||x.wann);   // nicht ausgewählt: leicht grau (UNICORN-124)
+    return '<div class="ding'+(x.fertig?' fertig':'')+(aus?' aus':'')+'">'+box+'<label'+(x.lieferbar&&!x.fertig?' for="k-'+x.id+'"':'')+' style="margin:0;font-weight:400"><span class="dh"><span class="menge">'+x.menge+'×</span> '+esc(x.name)+(x.noetig?'':' <em class="tag-extra">Extra</em>')+(wofuer||x.hinweis?'<br><span>'+esc(wofuer||'')+(x.hinweis?(wofuer?' · ':'')+esc(x.hinweis):'')+'</span>':'')+'<br><span>'+preisText(x)+'</span></span>'+sonst+'</label>'+knopf+'</div>';
   }
   function preisText(x){
     if(x.zuHause) return 'Hat man meist zu Hause';
@@ -440,8 +444,7 @@
     if(waehlbar.length && !r){
       h+='<div class="summe-box"><div><span class="leise" style="font-size:.85rem">'+w.length+' von '+waehlbar.length+' Artikeln ausgewählt, ca.</span><span class="betrag">'+Party.euro(Party.einkaufSumme(ek))+'</span>'+
         '<small>Amazon-Preise vom '+new Date(tour.preisStand).toLocaleDateString('de-DE')+', ohne Versand. Die App öffnet einen Artikel nach dem anderen bei Amazon.</small></div>'+
-        '<div class="reihe"><button type="button" class="knopf mittel leer" id="alle-waehlen">'+(w.length===waehlbar.length?'Keine auswählen':'Alle auswählen')+'</button>'+
-        (w.length?'<button type="button" class="knopf mittel" id="in-korb">'+w.length+' Artikel nacheinander in den Warenkorb</button>':'<span class="knopf mittel still" aria-disabled="true">Nichts ausgewählt</span>')+'</div></div>';
+        (w.length?'<div class="reihe"><button type="button" class="knopf mittel" id="in-korb">'+w.length+' Artikel nacheinander in den Warenkorb</button></div>':'<p class="leise klein" style="margin:8px 0 0">Nichts zu bestellen. Bei jedem Teil steht, womit es auch geht.</p>')+'</div>';
     }
     if(weg.length){
       h+='<div class="karte" style="border:2px solid #B45309;margin-bottom:10px"><b>Nicht gefunden</b><br><span class="leise">'+esc(weg.map(function(x){ return x.name; }).join(', '))+' '+(weg.length>1?'sind':'ist')+' bei Amazon gerade nicht lieferbar und kommt nicht in den Warenkorb.</span>'+
@@ -451,16 +454,23 @@
     return h;
   }
 
-  // Zwei Wege (UNICORN-60): bequem alles bestellen oder sparen mit Notlösungen. Gleiche Einteilung wie „Vorbereitung“ im Spiel.
+  // Drei Wege (UNICORN-60, UNICORN-124): klein direkt über der Liste. Die Liste zeigt immer alles, Nicht-Gewähltes leicht grau.
   function wegeBox(ek){
     if(!Party.wegeSummen) return '';
     var s=Party.wegeSummen(ek), aus=party.einkaufAus||{}, offen=ek.filter(function(x){ return !x.fertig && x.lieferbar; });
     if(!offen.length) return '';
-    var alles=offen.every(function(x){ return !aus[x.id]; }), nurNoetig=!alles && offen.every(function(x){ return !x.noetig === !!aus[x.id]; });
-    return '<div class="wege"><p class="wege-titel"><b>Zwei Wege</b> Du entscheidest, wie viel du ausgibst. Beides passt zur Geschichte.</p>'+
-      '<button type="button" class="weg-k'+(alles?' an':'')+'" data-wege="alles" aria-pressed="'+alles+'"><b>Alles bestellen</b><span class="betrag">ca. '+Party.euro(s.alles)+'</span><small>Am wenigsten Aufwand. Kommt meist in 1 bis 3 Tagen.</small></button>'+
-      '<button type="button" class="weg-k'+(nurNoetig?' an':'')+'" data-wege="noetig" aria-pressed="'+nurNoetig+'"><b>Nur das Nötige</b><span class="betrag">ca. '+Party.euro(s.noetig)+'</span><small>Extras weglassen. Mit Notlösungen von zu Hause kostet es gar nichts.</small></button>'+
-      '<p class="leise klein wege-fuss">Dieselbe Einteilung mit Notlösungen steht im Spiel unter „Erwachsene“ → „Einrichten“ → „Vorbereitung“.</p></div>';
+    var alles=offen.every(function(x){ return !aus[x.id]; }), nichts=offen.every(function(x){ return !!aus[x.id]; }),
+        nurNoetig=!alles && !nichts && offen.every(function(x){ return !x.noetig === !!aus[x.id]; });
+    function k(id, an, titel, betrag){ return '<button type="button" class="weg-k'+(an?' an':'')+'" data-wege="'+id+'" aria-pressed="'+an+'"><b>'+titel+'</b><span class="betrag">'+betrag+'</span></button>'; }
+    return '<div class="wege" role="group" aria-label="Wie viel kaufen?">'+
+      k('alles', alles, 'Alles', 'ca. '+Party.euro(s.alles))+k('noetig', nurNoetig, 'Nur Nötiges', 'ca. '+Party.euro(s.noetig))+k('nichts', nichts, 'Nichts kaufen', '0 €')+
+      '<p class="leise klein wege-fuss">'+(nichts ? 'Für jedes nötige Teil steht grün, womit es auch geht.' : nurNoetig ? 'Grau: Extras, die du weglässt. Die Geschichte geht auch ohne.' : alles ? 'Am wenigsten Aufwand. Kommt meist in 1 bis 3 Tagen.' : 'Eigene Auswahl. Grau kaufst du nicht.')+'</p></div>';
+  }
+  function einkaufListe(ek){
+    var offen=ek.filter(function(x){ return !x.fertig; }); if(!offen.length) return '';
+    return Party.einkaufGruppen(offen, tour, Party.variante(party)).map(function(g){
+      return '<h2 class="ek-gruppe">'+esc(g.titel)+'</h2>'+g.items.map(function(e){ return einkaufZeile(e.x, e.text); }).join('');
+    }).join('');
   }
   function einkaufNeu(){ party=Party.speichern(party); var y=window.scrollY; uebersicht(); window.scrollTo(0,y); }
 
@@ -690,10 +700,8 @@
     var draussen=p.ort!=='drinnen', live=window.Konto && Konto.aktiv && Konto.aktiv(), h='';
     if(a.id==='bestellen'){
       var ek=Party.einkauf(p, tour), fehlt=ek.filter(function(x){ return !x.fertig; }).length;
-      var offenN=ek.filter(function(x){ return !x.fertig && x.noetig; }), offenE=ek.filter(function(x){ return !x.fertig && !x.noetig; });
-      return (fehlt?wegeBox(ek):'')+einkaufKopf(ek)+
-        (offenN.length?'<h2 class="ek-gruppe">Braucht die Tour <small>'+offenN.length+'</small></h2><p class="leise klein ek-satz">Für jedes Teil gibt es eine Notlösung von zu Hause. Tippe „Notlösung“, dann ist es erledigt. Was schon da ist: „Hab ich schon“.</p>'+offenN.map(einkaufZeile).join(''):'')+
-        (offenE.length?'<h2 class="ek-gruppe">Extras, die es schöner machen <small>'+offenE.length+'</small></h2><p class="leise klein ek-satz">Schön, aber nicht nötig. Die Geschichte funktioniert auch ohne.</p>'+offenE.map(einkaufZeile).join(''):'')+
+      // Reihenfolge wie die Tour, nach Stationen (UNICORN-124). Drei Wege klein direkt darüber.
+      return einkaufKopf(ek)+(fehlt?'<h2 class="ek-titel">Was die Tour braucht</h2><p class="leise klein ek-satz">In der Reihenfolge der Tour. „Extra“ ist schön, aber nicht nötig. Was schon da ist: „Hab ich schon“.</p>'+wegeBox(ek):'')+einkaufListe(ek)+
         zuHauseBlock(p)+
         (ek.some(function(x){ return x.fertig; }) ? '<details class="erledigt-liste"'+(fehlt?'':' open')+'><summary>Schon da oder bestellt ('+ek.filter(function(x){ return x.fertig; }).length+')</summary>'+ek.filter(function(x){ return x.fertig; }).map(einkaufZeile).join('')+'</details>' : '');
     }
@@ -928,9 +936,9 @@
       if(k.hasAttribute('data-kauf')){ var kid=k.getAttribute('data-kauf'); party.einkauf[kid]=true; if(k.getAttribute('data-wie')) party.einkaufWie[kid]=k.getAttribute('data-wie'); else delete party.einkaufWie[kid]; }
       else { delete party.einkauf[k.getAttribute('data-kauf-zurueck')]; delete party.einkaufWie[k.getAttribute('data-kauf-zurueck')]; }
       einkaufNeu(); return; }
-    if((b=t.closest('[data-wege]'))){                  // Zwei Wege (UNICORN-60): alles oder nur das Nötige auswählen
-      var ew=Party.einkauf(party, tour); party.einkaufAus={};
-      if(b.getAttribute('data-wege')==='noetig') ew.forEach(function(x){ if(!x.fertig && x.lieferbar && !x.noetig) party.einkaufAus[x.id]=true; });
+    if((b=t.closest('[data-wege]'))){                  // Drei Wege (UNICORN-60, UNICORN-124): alles, nur das Nötige oder nichts kaufen
+      var ew=Party.einkauf(party, tour), wg=b.getAttribute('data-wege'); party.einkaufAus={};
+      ew.forEach(function(x){ if(!x.fertig && x.lieferbar && (wg==='nichts' || wg==='noetig' && !x.noetig)) party.einkaufAus[x.id]=true; });
       einkaufNeu(); return; }
     if(t.closest('#alle-waehlen')){
       var ek=Party.einkauf(party, tour), alle=ek.filter(Party.imKorb).length===ek.filter(function(x){ return !x.fertig && x.lieferbar; }).length;
