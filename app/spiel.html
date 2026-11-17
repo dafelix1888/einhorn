@@ -863,6 +863,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
       <div class="foto-jetzt" id="foto-jetzt" hidden><p><b>Jetzt ein Gruppenfoto!</b> Alle mit Horn, der Regenbogen ist komplett, Fridolin ist dabei. Am besten mit dem Handy, das hat die bessere Kamera.</p><button type="button" class="btn ghost small" id="btn-foto-jetzt">Gruppenfoto mit Rahmen</button></div>
       <div class="actions">
         <button type="button" class="btn primary haupt" id="btn-main"></button>
+        <button type="button" class="btn quiet" id="btn-ohneheim" hidden>Ohne Heimweg beenden</button>
         <button type="button" class="btn ghost" id="btn-speak">Noch einmal hören</button>
       </div>
     </div>
@@ -1163,7 +1164,7 @@ function load(){
     if(raw){ o=JSON.parse(raw);
       if(o && Array.isArray(o.points) && o.points.length===N){ s.points=o.points.map(okPoint); }
       if(o && o.idx>=0 && o.idx<N) s.idx=o.idx|0;
-      if(o && ['start','seek','scene','end'].indexOf(o.phase)>=0) s.phase=o.phase;
+      if(o && ['start','seek','scene','end','heim'].indexOf(o.phase)>=0) s.phase=o.phase;   // Heimweg übersteht Neuladen (UNICORN-123)
       if(o && o.step>=0 && o.step<4) s.step=o.step|0;
       if(o && ['','zeigen','nebel','wahl'].indexOf(o.spur)>=0){ s.spur=o.spur; s.spurBis=+o.spurBis||0; s.spurNach=['nebel','wahl'].indexOf(o.spurNach)>=0 ? o.spurNach : ''; }   // „Wer war das?“ (UNICORN-62)
       if(o && [10,15,25].indexOf(o.radius)>=0) s.radius=o.radius;
@@ -1182,6 +1183,7 @@ function load(){
       if(o && o.erzJe && typeof o.erzJe==='object'){ s.erzJe={}; Object.keys(o.erzJe).forEach(function(k){ if(/^\d\.\d$/.test(k) && FIGUREN.indexOf(o.erzJe[k])>=0) s.erzJe[k]=o.erzJe[k]; }); }
     }
   }catch(e){}
+  if(s.phase==='heim' && s.step>=1){ s.phase='start'; s.step=0; s.idx=0; }   // nur der laufende Heimweg übersteht Neuladen, fertige Tour beginnt neu (UNICORN-123)
   if(!o || o.punkteStand!==PUNKTE_STAND){ if(PUNKTE_CODE){ try{ s.points=codeEin(PUNKTE_CODE); }catch(e){} } if(TPLAN.variante && VARIANTEN[TPLAN.variante]) s.variante=TPLAN.variante; }   // neuer Plan: Punkte und Variante einmal übernehmen   // hinterlegte Punkte einmal übernehmen
   s.punkteStand=PUNKTE_STAND;
   // Erzähler aus der Party (UNICORN-54): gilt, bis hier unter „Einrichten“ ein anderer gewählt wird oder die Party ihn wieder ändert
@@ -2211,6 +2213,11 @@ function heimStart(){                   // nach dem Schatz: Sprünge bis zur Hau
   wachBleiben(); gpsStart(); save(); render(); pruefeAnkunft();
 }
 var heimMarke=Infinity;
+function handHeim(){                    // kleiner Knopf unter dem Spiegel: Heimweg überspringen oder beenden (UNICORN-123)
+  if(state.phase==='heim' && state.step===0 && !manuell()) return 'Zu Hause angekommen';
+  return '';
+}
+function ohneHeimweg(){ if(state.phase==='end'){ still(); state.phase='heim'; state.step=0; } heimAngekommen(); }
 function heimAngekommen(){
   if(state.phase!=='heim' || state.step>=1) return;
   tonAn(); state.step=1; klang(KLANG_ENDE); konfetti(140, .5, .35); save(); render();
@@ -2377,8 +2384,8 @@ function hauptText(){                   // Beschriftung des einen Hauptknopfs, l
 function jetzt(){                       // was der Erzähler in diesem Moment tun soll
   var ph=state.phase, st=stv(state.idx);
   if(ph==='start') return indoor() ? 'Drinnen: Stationen öffnest du von Hand. Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : gesetzt() ? 'Wenn alle Kinder da sind, „Spiegel aufwecken“ tippen.' : 'Zum Ausprobieren „Spiegel aufwecken“ tippen. Für die echte Tour vorher unter „Einrichten“ die Punkte setzen.';
-  if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Jetzt die Schatzkiste hinstellen. Kiste zusammen öffnen und staunen, verteilt wird zu Hause. Nach Schatz und Snack „Heimweg starten“.';   // eine Regel für die Schatzkiste (UNICORN-74)
-  if(ph==='heim') return state.step>=1 ? 'Geschafft! Ihr seid zu Hause. Jetzt den Schatz verteilen und jedem Kind seine Urkunde geben.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
+  if(ph==='end') return 'Alle bekleben Fridolins grauen Bau mit Stickern. Jetzt die Schatzkiste hinstellen. Kiste zusammen öffnen und staunen, verteilt wird zu Hause. Nach Schatz und Snack „Heimweg starten“. Sind alle schon müde: „Ohne Heimweg beenden“.';   // eine Regel für die Schatzkiste (UNICORN-74)
+  if(ph==='heim') return state.step>=1 ? 'Geschafft! Ihr seid zu Hause. Jetzt den Schatz verteilen und jedem Kind seine Urkunde geben.' : (state.heim ? 'Alle hüpfen nach Hause, der Spiegel zählt die Sprünge bis zur Haustür. Dort öffnet er sich von selbst. Sonst „Zu Hause angekommen“ tippen.' : 'Alle hüpfen nach Hause. Der Spiegel kennt die Haustür nicht (kein GPS beim Start), darum an der Tür „Zu Hause angekommen“ tippen.');
   if(ph==='seek'){
     if(ankunft) return 'Angekommen!';
     if(wartet) return 'Alle Kinder einsammeln. Wenn alle schauen, „Weiter“ tippen, dann liest Funkel die Aufgabe vor.';
@@ -2607,9 +2614,11 @@ function live(){
   $('btn-linse').hidden=!linseAn();
   sprechKnopf();
   $('btn-test').hidden = !(state.showTest && state.phase==='seek' && !manuell() && !ankunft && !wartet);
-  $('btn-hand').hidden = $('btn-test').hidden && !(hinweis && state.phase==='seek' && !ankunft && !wartet);
-  $('btn-hand').textContent = hinweis==='fastda' ? 'Wir sind da' : hinweis==='vorbei' ? 'Station hier öffnen' : 'Station von Hand öffnen';
-  $('btn-hand').classList.toggle('hinweis', !!hinweis);
+  $('btn-ohneheim').hidden = state.phase!=='end';
+  var heimHand=handHeim();   // Heimweg von Hand beenden (UNICORN-123)
+  $('btn-hand').hidden = !heimHand && $('btn-test').hidden && !(hinweis && state.phase==='seek' && !ankunft && !wartet);
+  $('btn-hand').textContent = heimHand || (hinweis==='fastda' ? 'Wir sind da' : hinweis==='vorbei' ? 'Station hier öffnen' : 'Station von Hand öffnen');
+  $('btn-hand').classList.toggle('hinweis', !heimHand && !!hinweis);
   var c=chipText();
   ['gps-chip','gps-chip-2'].forEach(function(id){ var el=$(id); el.className='chip '+c[0]; el.textContent=c[1]; });
   $('btn-gps').hidden = gps==='an' || gps==='sucht';
@@ -2780,11 +2789,12 @@ $('tab-setup').addEventListener('click', function(){ zeige('setup'); });
 $('btn-main').addEventListener('click', haupt);
 $('mirror').addEventListener('click', function(){ if(tonLaeuft){ still(); toast('Funkel ist still.'); return; } verzaubern(); });
 $('btn-pop').addEventListener('click', function(e){ e.stopPropagation(); });
-$('btn-hand').addEventListener('click', function(){ tonAn(); if(state.phase==='seek') ankommen(hinweis||'hand'); });
+$('btn-hand').addEventListener('click', function(){ tonAn(); if(state.phase==='seek') ankommen(hinweis||'hand'); else if(handHeim()) ohneHeimweg(); });
 $('btn-mehr').addEventListener('click', function(){ mehrAn=!mehrAn; modusZeigen(); if(!mehrAn) fokusSpiegel(); });
 $('btn-nochmal').addEventListener('click', function(){ if(sprichtGerade()){ still(); sprechKnopf(); return; } sagen(); });
 $('btn-speak').addEventListener('click', function(){ if(sprichtGerade()){ still(); sprechKnopf(); return; } sagen(); });
 $('btn-test').addEventListener('click', test);
+$('btn-ohneheim').addEventListener('click', function(){ tonAn(); ohneHeimweg(); });
 $('choices').addEventListener('click', function(e){ if(e.target.closest && e.target.closest('[data-spur-nochmal]')){ spurZeigen(true); return; } var b=e.target.closest ? e.target.closest('.choice') : null; if(b) spurTipp(b.getAttribute('data-id')); });
 $('btn-gps').addEventListener('click', function(){ wachBleiben(); gpsStart(); });
 $('points').addEventListener('click', function(e){
