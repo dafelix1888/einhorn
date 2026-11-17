@@ -307,6 +307,8 @@
       h+='<h1>Wer ist dabei, wo spielt ihr?</h1>'+
         '<div class="zaehlzeile"><b>Kinder</b><div class="zaehler"><button type="button" data-z="kinder" data-d="-1" aria-label="Weniger Kinder">–</button><b aria-live="polite">'+e.kinder+'</b><button type="button" data-z="kinder" data-d="1" aria-label="Mehr Kinder">+</button></div></div>'+
         '<div class="zaehlzeile"><b>Erwachsene</b><div class="zaehler"><button type="button" data-z="helfer" data-d="-1" aria-label="Weniger Erwachsene">–</button><b aria-live="polite">'+e.helfer+'</b><button type="button" data-z="helfer" data-d="1" aria-label="Mehr Erwachsene">+</button></div></div>'+
+        // Viele Kinder (UNICORN-120): mehr Hände an der Straße
+        (e.kinder>15 && (e.helfer||2)<3 ? '<p class="leise klein erw-hinweis">Bei mehr als 15 Kindern nehmt lieber drei oder mehr Erwachsene mit. An der Straße hält jeder Erwachsene ein Seil.</p>' : '')+
         (Party.einerBeiGruppe(e) ? '<p class="leise klein erw-hinweis">Mit Vorausgeher ist anfangs nur ein Erwachsener bei den Kindern. An der Straße (Station 3) wartet ihr auf den Vorausgeher. Oder ihr nehmt einen dritten Erwachsenen mit.</p>' : '')+
         spielartWahl(e)+
         '<details class="vorein" id="vorein"'+(voreinOffen?' open':'')+'><summary><b>Schon voreingestellt <em>'+(voreinOffen?'Fertig':'Ändern')+'</em></b><span>'+esc(voreinText(e))+'.</span></summary>'+

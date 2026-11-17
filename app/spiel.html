@@ -23,7 +23,7 @@ html:not(.entwickler) .nur-entwickler{display:none!important}
 }
 /* Helle Inseln: im Spiegel, auf den Bildkarten und im schwebenden Regenbogen gilt die alte helle Palette,
    weil Bilder, Kompass und 3D-Funkel auf hellem Grund gezeichnet sind. */
-.mirror,.choice,#bogen-wrap.schwebt{
+.mirror,.choice{
   --surface:#FFFFFF; --ink:#241A3D; --ink-soft:#5A5073; --line:#D8D2E6;
   --magic:#6B35C9; --magic-deep:#4E22A0; --magic-schatten:#4E22A0; --magic-ink:#FFFFFF; --magic-hell:#8D5DF2; --tint:#E6DEF7;
   --fehlt:#CFC9DD; --ok:#1F7A45; --warn:#9A5A08; --danger:#B3262E; color:var(--ink); color-scheme:light}
@@ -427,6 +427,21 @@ h2{color:var(--magic-deep)}
 .pop-karte b{font-size:min(2rem,8.5vw);font-size:15cqi;line-height:1.05;white-space:nowrap}
 .pop-karte .btn{font-size:min(1.3rem,5.5vw);font-size:10cqi;padding:.55em 1.4em;margin-top:7cqi;max-width:100%}
 .pop-karte .seit{font-size:min(.9rem,3.6vw);font-size:6cqi;margin-top:4cqi;min-height:1.3em;line-height:1.3}
+/* „Angekommen!“ schöner (UNICORN-121): Goldring wie der Spiegel, Stern, Stationsnummer, weiches Einblenden */
+.pop-karte{isolation:isolate;border:0;
+  background:radial-gradient(circle at 50% 38%,#FFFFFF 0,#FBF7FF 45%,#EFE5FF 78%,#E3D4FF 100%);
+  box-shadow:0 18px 44px rgba(46,18,110,.45),0 0 0 5cqi rgba(255,242,194,.18),inset 0 -6cqi 14cqi rgba(167,139,250,.18)}
+.pop-karte::before{content:"";position:absolute;inset:-3cqi;border-radius:50%;z-index:-1;
+  background:conic-gradient(from 20deg,#EBCB78,#FFF2C2,#C9973A,#EBCB78,#FFF6D8,#B8862B,#EBCB78);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3.2cqi),#000 calc(100% - 3cqi));mask:radial-gradient(farthest-side,transparent calc(100% - 3.2cqi),#000 calc(100% - 3cqi))}
+.pop-karte .pop-stern{width:13cqi;height:13cqi;fill:#F2B90F;filter:drop-shadow(0 0 2.5cqi rgba(242,185,15,.65));margin-bottom:1cqi}
+.pop-karte .pop-nr{font-family:var(--font-display);font-weight:800;font-size:6.2cqi;letter-spacing:.08em;text-transform:uppercase;color:#8D5DF2;margin-bottom:.5cqi}
+.pop-karte b{font-family:var(--font-display);font-weight:800;filter:drop-shadow(0 1px 0 rgba(255,255,255,.9))}
+.pop-karte:not([hidden]){animation:popRein .6s cubic-bezier(.2,1.5,.4,1) both}
+.pop-karte:not([hidden]) .pop-stern{animation:sternFunkeln 1.8s ease-in-out .5s infinite}
+@keyframes popRein{from{opacity:0;transform:scale(.6)}}
+@keyframes sternFunkeln{50%{transform:scale(1.18) rotate(12deg);filter:drop-shadow(0 0 4cqi rgba(242,185,15,.9))}}
+@media (prefers-reduced-motion:reduce){ .pop-karte:not([hidden]),.pop-karte:not([hidden]) .pop-stern{animation:none} }
 .skala.voll svg{animation:skalaGlanz 1.2s ease-in-out infinite}
 @keyframes skalaGlanz{50%{filter:brightness(1.18)}}
 #konfetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:11}
@@ -548,9 +563,19 @@ body.m-sammeln:not(.mehr) #btn-aufgabe, body.m-laufen:not(.mehr) #btn-aufgabe{di
 body.m-laufen:not(.mehr) .tour{gap:18px}
 /* Regenbogen: nur im Finale und am Schluss fest im Bild; kommt ein Bogen dazu, schwebt er kurz oben ein */
 body.m-tour:not(.bogen-inline):not(.mehr) #bogen-wrap:not(.schwebt), body.m-start #bogen-wrap:not(.schwebt){display:none!important}
-#bogen-wrap.schwebt{position:fixed;left:0;right:0;margin:0 auto;top:calc(10px + env(safe-area-inset-top,0px));width:min(78vw,340px);z-index:7;
-  background:rgba(255,255,255,.92);border-radius:26px;padding:14px 16px 10px;box-shadow:0 14px 36px rgba(78,34,160,.25);pointer-events:none;
+/* Schwebender Regenbogen wie in der Party-Übersicht (UNICORN-121): dunkle Karte mit violettem Schein, fehlende Bögen leise in ihrer Farbe */
+#bogen-wrap.schwebt{position:fixed;left:0;right:0;margin:0 auto;top:calc(10px + env(safe-area-inset-top,0px));width:min(78vw,320px);z-index:7;
+  background:radial-gradient(130% 90% at 50% 0,rgba(167,139,250,.30),rgba(167,139,250,0) 70%),#1C1628;border:1px solid rgba(196,178,255,.16);
+  border-radius:24px;padding:16px 18px 12px;box-shadow:0 18px 40px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.2);pointer-events:none;color:var(--ink);
   animation:schwebRein .5s cubic-bezier(.2,1.3,.4,1) both}
+#bogen-wrap.schwebt .arc{stroke:var(--c);opacity:.16;transition:opacity .9s, stroke-width .4s}
+#bogen-wrap.schwebt .arc.da{opacity:1;filter:drop-shadow(0 0 3px rgba(255,255,255,.28))}
+#bogen-wrap.schwebt .arc.kern{opacity:.22}
+#bogen-wrap.schwebt .arc.kern.da{opacity:1}
+#bogen-wrap.schwebt .arc.such{opacity:.85}
+#bogen-wrap .schweb-text{display:none}
+#bogen-wrap.schwebt .schweb-text{display:block;margin:8px 0 0;text-align:center;font-size:.95rem;line-height:1.3;color:var(--ink-soft)}
+#bogen-wrap.schwebt .schweb-text b{color:var(--ink)}
 #bogen-wrap.schwebt.raus{animation:schwebRaus .5s ease both}
 #bogen-wrap.schwebt .bogen{width:100%}
 @keyframes schwebRein{from{opacity:0;transform:translateY(-30px) scale(.9)}}
@@ -636,7 +661,7 @@ body.m-start .funkel3d{transform:translate(4%,6%) scale(1.02)}
         <canvas id="funkeln" aria-hidden="true"></canvas>
         <div class="mirror-pic" id="mirror-pic"></div>
         <div class="kompass" id="kompass" hidden></div>
-        <div class="pop-karte" id="pop" hidden><b>Angekommen!</b><button type="button" class="btn primary" id="btn-pop">Weiter</button><span class="seit" id="pop-seit"></span><span class="pop-tipp" id="pop-tipp" hidden>Zu früh? Erst zur Stelle laufen, dann tippen.</span></div>
+        <div class="pop-karte" id="pop" hidden><svg class="pop-stern" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2c1.6 9.4 8.6 16.4 18 18-9.4 1.6-16.4 8.6-18 18-1.6-9.4-8.6-16.4-18-18 9.4-1.6 16.4-8.6 18-18z"/></svg><span class="pop-nr" id="pop-nr"></span><b>Angekommen!</b><button type="button" class="btn primary" id="btn-pop">Weiter</button><span class="seit" id="pop-seit"></span><span class="pop-tipp" id="pop-tipp" hidden>Zu früh? Erst zur Stelle laufen, dann tippen.</span></div>
       </div>
       <div class="funkel3d" id="funkel3d" aria-hidden="true"></div>
       <div class="kaka" id="kaka" aria-hidden="true" hidden>
@@ -2424,6 +2449,10 @@ function bogenSchweben(){                // Regenbogen schwebt kurz oben ein, oh
   var w=$('bogen-wrap'); if(!w) return;
   Object.keys(neueBoegen).forEach(function(a){ var el=w.querySelectorAll('.arc.'+a); for(var q=0;q<el.length;q++){ el[q].classList.remove('neu'); void el[q].getBoundingClientRect(); el[q].classList.add('neu'); } });
   neueBoegen={};
+  // Satz unter dem Bogen wie in der Party-Übersicht („1 von 6 Bögen leuchten“)
+  var f=arcsFound(), n=ARCS.filter(function(a){ return f[a]; }).length, t=w.querySelector('.schweb-text');
+  if(!t){ t=document.createElement('p'); t.className='schweb-text'; w.appendChild(t); }
+  t.innerHTML = n>=ARCS.length ? '<b>Alle '+ARCS.length+' Farben sind zurück!</b>' : '<b>'+n+' von '+ARCS.length+' Farben</b> sind zurück. Noch '+(ARCS.length-n)+'.';
   clearTimeout(schwebTimer); clearTimeout(schwebTimer2);
   w.classList.remove('raus'); w.classList.add('schwebt');
   schwebTimer=setTimeout(function(){ w.classList.add('raus'); schwebTimer2=setTimeout(function(){ w.classList.remove('schwebt','raus'); }, 500); }, 4200);
@@ -2472,6 +2501,7 @@ function render(keepPic){
   $('stage').classList.toggle('mit-skala', uw);
   $('stage').classList.toggle('da', ankunft && ph==='seek');
   $('pop').hidden = !(wartet && ph==='seek');
+  if(!$('pop').hidden) $('pop-nr').textContent='Station '+(state.idx+1);
   $('kompass').hidden = !uw || wartet;
   kameraPflege();
   var linse=linseAn();
