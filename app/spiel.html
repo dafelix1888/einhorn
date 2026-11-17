@@ -1737,7 +1737,7 @@ var gesagt=0;
 function sagen(){                       // der Satz des Schritts; ein zweiter Teil folgt nach einer kurzen Pause
   tonAn(); var a=akt(); gehoert[a.key]=true; gesagt++; still();
   var kk=kakaSatz(), mg=kakaGen, ek=kk ? kk.key : '';
-  if(kk && erzSchon[ek]) kk=null;          // der Erzähler kommt je Schritt nur einmal von selbst, „Noch einmal hören“ wiederholt nur Funkel (UNICORN-125)
+  if(kk && (erzSchon[ek] || LEISE.indexOf(state.idx+'.'+state.step)>=0)) kk=null;          // der Erzähler kommt je Schritt nur einmal von selbst, „Noch einmal hören“ wiederholt nur Funkel (UNICORN-125)
   function danach(){ if(!kk || mg!==kakaGen) return; erzSchon[ek]=true; erzFolgt=true; sprechKnopf(); kakaNach(600, mg, function(){ kakaAuftritt(kk); }); }
   var zw=a.zweit || (a.live && clips[a.live] && !indoor() ? {key:a.live, text:a.liveText} : null);   // Ortsansage nur draußen und nur, wenn sie live erzeugt wurde
   function weiter(z){                    // Kette: Satz, kurze Pause, nächster Teil (auch Namens-Sätze)
@@ -2278,7 +2278,7 @@ var TEXTE=texte();
 /* ---------- Kakapups ---------- */
 // Professor Kakapups liest die Aufgaben für die Kinder vor. Vorher pupst er und legt ein Häufchen.
 // Je Station und Schritt: a = Draußen; b (Extra Hinweise am Weg), c (Drinnen) nur, wo die Kinder etwas anderes tun sollen.
-var KAKA=TOUR.erzaehler.kaka, KAKA_NEIN=TOUR.erzaehler.kakaNein;
+var KAKA=TOUR.erzaehler.kaka, KAKA_NEIN=TOUR.erzaehler.kakaNein, LEISE=TOUR.erzaehler.leise||[];   // leise: Funkels letzter Satz ist schon die Aufgabe, der Erzähler kommt dort nur über seinen Knopf (UNICORN-126)
 function kakaTexte(){                    // alle Sätze, die Kakapups spricht, mit Schlüssel
   var l=[];
   Object.keys(KAKA).forEach(function(i){ Object.keys(KAKA[i]).forEach(function(s){ var e=KAKA[i][s];

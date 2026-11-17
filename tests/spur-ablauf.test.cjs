@@ -1,4 +1,4 @@
-// „Wer war das?“ (UNICORN-125): je Knopfdruck, wer was sagt. Erzähler je Schritt nur einmal, Malen und Vergleich nur Funkel.
+// „Wer war das?“ (UNICORN-125, UNICORN-126): je Knopfdruck, wer was sagt. Hier spricht nur Funkel von selbst; der Erzähler kommt über seinen Knopf.
 const { chromium } = require('playwright');
 const S='http://localhost:8765';
 let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehler++; };
@@ -17,7 +17,9 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
     const tipp=async sel=>{ await p.evaluate(()=>LOG.length=0); await p.click(sel); await p.waitForTimeout(2200); return p.evaluate(()=>LOG.slice()); };
     const E=l=>l.filter(x=>x.w==='Erzähler'), wo=ind?'Drinnen':'Draußen';
     let l=await tipp('#btn-speak');
-    ok(l[0].k==='s4.frage' && E(l).length===1 && !/malen|antippen|Tafel|Karte/.test(E(l)[0].t), wo+': Ankunft: Funkel, dann einmal Erzähler, ohne Malen vorwegzunehmen');
+    ok(l.length===1 && l[0].k==='s4.frage', wo+': Ankunft: nur Funkel, Erzähler kommt hier nicht von selbst (UNICORN-126)');
+    l=await tipp('#btn-aufgabe');
+    ok(E(l).length===1 && !/malen|antippen|Tafel|Karte/.test(E(l)[0].t), wo+': Erzähler-Knopf: einmal, ohne Malen vorwegzunehmen');
     l=await tipp('#btn-speak');
     ok(l.length===1 && l[0].w==='Funkel', wo+': Nochmal anhören wiederholt nur Funkel');
     await tipp('#btn-main'); await p.waitForTimeout(5200);   // Spur zeigen, 5 s, Nebel
@@ -28,7 +30,7 @@ let fehler=0; const ok=(b,t)=>{ console.log((b?'ok   ':'FEHL ')+t); if(!b) fehle
       ok(l.length===1 && l[0].k==='s4.vergleich', wo+': „Fertig gemalt“: nur Funkel, kein Erzähler');
     }
     l=await tipp('#choices .choice[data-id="fuchs"]');
-    ok(l[0].w==='Funkel' && /Fuchs/.test(l[0].t) && E(l).length===1, wo+': Fuchs: Funkel, dann einmal Erzähler');
+    ok(l.length===1 && l[0].w==='Funkel' && /Fuchs/.test(l[0].t), wo+': Fuchs: nur Funkel (UNICORN-126)');
     ok(await p.locator('#btn-aufgabe').isVisible(), wo+': Erzähler-Knopf bleibt zum Nachhören');
     ok(!pf.length, wo+': keine Seitenfehler'+(pf.length?': '+pf.join(' | '):''));
     await c.close();

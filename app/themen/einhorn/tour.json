@@ -185,8 +185,8 @@
    "arc": "lila",
    "pic": "horn",
    "title": "Funkels Botschaft",
-   "say": "Hallo, ihr Einhorn-Helfer! Ihr tragt ja schon mein Zeichen. Ich bin Funkel und wohne im Wald hinter euren Häusern. Jeden Morgen male ich mit meinem Regenbogen die Farben in die Welt. Und das hier ist mein Zauberspiegel! Durch ihn kann ich euch sehen und mit euch sprechen. Er zeigt euch den Weg, und an jeder Station hat er ein Rätsel für euch.",
-   "say2": "Und stellt euch vor: In der Nacht hat jemand meinen Regenbogen gemopst! Jetzt sind alle Farben durcheinander. Nur die zwei kleinsten Bögen habe ich noch. Setzt eure Hörner auf und folgt meinen Hufspuren!",
+   "say": "Hallo, ihr Einhorn-Helfer! Ihr tragt ja schon mein Zeichen. Ich bin Funkel und wohne im Wald hinter euren Häusern. Jeden Morgen male ich mit meinem Regenbogen die Farben in die Welt. Mein Zauberspiegel zeigt euch den Weg, und an jeder Station wartet ein Rätsel.",
+   "say2": "Und stellt euch vor: In der Nacht hat jemand meinen Regenbogen gemopst! Jetzt sind alle Farben durcheinander. Nur die zwei kleinsten Bögen habe ich noch. Helft ihr mir?",
    "task": "Einhorn-Prüfung machen: wiehern, mit dem Huf scharren, mit dem Horn wackeln. Wer besteht, bekommt seinen Haarreif mit Horn. Danach „Prüfung bestanden, los!“ tippen.",
    "go": "Prüfung bestanden, los!",
    "ort": {
@@ -295,7 +295,7 @@
      "nein": "Kühe sind in echt schwarz und weiß. Muh!"
     }
    ],
-   "after": "Richtig, die Sonne ist gelb! Mein gelber und mein oranger Bogen sind ganz in der Nähe. Schaut euch gut um. Fällt euch hier etwas auf? Für jeden ist auch ein Glücksstein dabei. Der macht mutig für den Wald.",
+   "after": "Richtig, die Sonne ist gelb! Mein gelber und mein oranger Bogen sind ganz in der Nähe. Schaut euch gut um! Für jeden ist auch ein Glücksstein dabei. Der macht mutig für den Wald.",
    "go": "Bögen gefunden, weiter",
    "dann": "Die Kinder schauen sich um und finden den gelben und den orangen Bogen und für jeden einen Glücksstein. Dann „Bögen gefunden, weiter“ tippen.",
    "ort": {
@@ -324,7 +324,7 @@
    "merken": {
     "sekunden": 5,
     "zeigenGo": "Spur zeigen",
-    "malen": "Der Nebel ist da! Schnell, der Dieb hat hier eine Zaubertafel verloren. Sucht sie und malt die Spur darauf, so wie ihr sie euch gemerkt habt. Jeder malt ein Stück!",
+    "malen": "Der Nebel ist da! Schnell, der Dieb hat hier eine Zaubertafel verloren. Sucht sie und malt die Spur darauf. Jeder malt ein Stück!",
     "malenGo": "Fertig gemalt",
     "vergleich": "Zeigt mir eure Zaubertafel! Haltet sie neben meinen Spiegel. Welche Spur habt ihr gemalt?",
     "drinnen": {
@@ -1530,7 +1530,7 @@
     "name": "Dagobert, der dusslige Dachs",
     "kurz": "Dagobert",
     "was": "stolpert und bringt alles durcheinander",
-    "also": "Moment, das wiederhol ich lieber. Also nochmal:",
+    "also": "Also nochmal:",
     "nein": "Oh, das hätte ich auch getippt. Aber:"
    }
   },
@@ -1565,6 +1565,7 @@
     }
    }
   },
+  "leise": ["2.0", "4.0", "4.1", "5.1", "6.0", "6.2"],
   "also": {
    "1.1": {
     "a": "Rote Bögen suchen!",
