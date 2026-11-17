@@ -6,6 +6,8 @@ const THEMEN = {
   einhorn: {
     modell: 'eleven_multilingual_v2',
     rollen: {
+      // Ortsansagen spricht seit UNICORN-122 Funkel selbst (wie die Wegsätze davor); „spiegel“ bleibt für alte Geräte
+      funkel: { voice_id: 'cgSgspJ2msm6clMCkdW9', einstellungen: { stability: 0.6, similarity_boost: 0.8, style: 0.2, use_speaker_boost: true } },
       spiegel: { voice_id: 'JBFqnCBsd6RMkjVDRZzb', einstellungen: { stability: 0.5, similarity_boost: 0.75, style: 0.4, use_speaker_boost: true } },
     },
     // aus tour.json: stationen[].ansage; {an}/{zu} wird durch einen Ortsnamen ersetzt
