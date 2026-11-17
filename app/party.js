@@ -82,7 +82,7 @@
     var l=[
       // Reihenfolge (UNICORN-27): zuerst, was Lieferzeit braucht; die Einladung geht, wann man mag. Nichts ist gesperrt.
       {id:'bestellen', tag:-14, titel:'Material besorgen', kurz:'Bestellen oder von zu Hause nehmen',   // UNICORN-72: drängt nicht zum Kauf
-        text:'Zwei Wege: Alles bestellen ist am bequemsten, die Mengen passen schon zu '+p.kinder+' Kindern. Oder nur das Nötige kaufen und den Rest weglassen oder mit Dingen von zu Hause lösen. Dann kostet es wenig oder gar nichts.', knopf:'Zum Material', link:'#einkauf',
+        text:'Drei Wege: Alles bestellen ist am bequemsten, die Mengen passen schon zu '+p.kinder+' Kindern. Nur das Nötige kostet weniger. Oder nichts kaufen und alles mit Dingen von zu Hause lösen.', knopf:'Zum Material', link:'#einkauf',
         teile:[{id:'bestellen', titel:'Alles da oder bestellt', erkannt:allesGekauft}]},
       {id:'einladen', tag:-14, titel:'Gäste einladen', kurz:'Ein Link für alle Eltern, du siehst, wer kommt',
         text:'Ein Link für alle Gast-Eltern. Sie sehen Termin, Treffpunkt und Abholzeit und sagen dort zu oder ab. Wer kommt, siehst du hier.', knopf:'Link teilen', aktion:'gast-link',
@@ -363,6 +363,22 @@
     (vb.extras||[]).forEach(function(x){ if(!w && (x.u||[]).indexOf(id)>=0) w=x.wofuer||''; });
     return w;
   }
+  // Material nach Ablauf sortiert und nach Stationen gruppiert (UNICORN-124)
+  function einkaufOrt(tour, v, x){
+    var w=wofuerVon(tour, v, x.id)||'', m=/^Station (\d+):\s*/.exec(w), n=m ? +m[1] : 0, wann=String(x.wann||'');
+    if(m) return {ord:n, titel:'Station '+n, text:w.slice(m[0].length)};
+    if(/bis Station (\d+)/.test(w)) return {ord:+RegExp.$1-0.5, titel:'Weg zu Station '+RegExp.$1, text:w};
+    if(/^Station (\d+)/.test(wann)) return {ord:+RegExp.$1, titel:'Station '+RegExp.$1, text:w};
+    if(/^Stationen/.test(wann)) return {ord:0.5, titel:'Ganze Tour', text:w};
+    if(/^Ankommen/.test(wann)) return {ord:0, titel:'Ankommen', text:w};
+    if(/^Schatz/.test(wann)) return {ord:99, titel:'Schatz', text:w};
+    return {ord:50, titel:wann||'Sonstiges', text:w};
+  }
+  function einkaufGruppen(l, tour, v){
+    var g={}, o=[];
+    l.forEach(function(x, i){ var a=einkaufOrt(tour, v, x); if(!g[a.titel]){ g[a.titel]={titel:a.titel, ord:a.ord, i:i, items:[]}; o.push(g[a.titel]); } g[a.titel].items.push({x:x, text:a.text}); });
+    return o.sort(function(a, b){ return a.ord-b.ord || a.i-b.i; });
+  }
   function preisText(x){                         // gleiche Preiszeile in Party und Spiel
     if(x.zuHause) return 'Hat man meist zu Hause';
     if(!x.asin) return '';
@@ -388,5 +404,5 @@
   }
   // „Jonas’“, „Max’“, „Emmas“ (UNICORN-117): überall dieselbe Regel
   function genitiv(n){ n=String(n||''); return /[sßxz]$/i.test(n) ? n+'’' : n+'s'; }
-  root.Party={vonZuHause:vonZuHause, kreide:kreide, kreideText:kreideText, packHaken:packHaken, packSetzen:packSetzen, packStand:packStand, einerBeiGruppe:einerBeiGruppe, vorOrt:vorOrt, treffpunkt:treffpunkt, tourVersatz:tourVersatz, tourUhr:tourUhr, dauer:dauer, abholVorschlag:abholVorschlag, abholen:abholen, genitiv:genitiv, antwortBis:antwortBis, besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand, aufwand:aufwand};
+  root.Party={einkaufOrt:einkaufOrt, einkaufGruppen:einkaufGruppen, vonZuHause:vonZuHause, kreide:kreide, kreideText:kreideText, packHaken:packHaken, packSetzen:packSetzen, packStand:packStand, einerBeiGruppe:einerBeiGruppe, vorOrt:vorOrt, treffpunkt:treffpunkt, tourVersatz:tourVersatz, tourUhr:tourUhr, dauer:dauer, abholVorschlag:abholVorschlag, abholen:abholen, genitiv:genitiv, antwortBis:antwortBis, besorgen:besorgen, preisText:preisText, wofuerVon:wofuerVon, vorbereitungsListe:vorbereitungsListe, wegeSummen:wegeSummen, basteln:basteln, artikelWahl:artikelWahl, imKorb:imKorb, einkaufSumme:einkaufSumme, euro:euro, warenkorbLink:warenkorbLink, lesen:lesen, plan:plan, fremd:fremd, eigeneGesichert:eigeneGesichert, eigeneZurueck:eigeneZurueck, eigenerSchluessel:eigenerSchluessel, speichern:speichern, loeschen:loeschen, variante:variante, datum:datum, tageBis:tageBis, uhr:uhr, datumText:datumText, aufgaben:aufgaben, naechste:naechste, abhaken:abhaken, einkauf:einkauf, ics:ics, code:code, decode:decode, spielLink:spielLink, vorausgeherLink:vorausgeherLink, einladungsLink:einladungsLink, einladungsDaten:einladungsDaten, dankeLink:dankeLink, planKern:planKern, ausLinkUebernehmen:ausLinkUebernehmen, gaesteHinweis:gaesteHinweis, routeSchluessel:routeSchluessel, probeStand:probeStand, aufwand:aufwand};
 })(this);
