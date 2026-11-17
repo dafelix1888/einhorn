@@ -173,7 +173,7 @@
   }
   function einkauf(p, tour){
     return tour.utensilien.map(function(u, i){
-      var m=String(u.menge), n=/je Kind \+ ?(\d+)/.test(m) ? p.kinder+(+RegExp.$1) : /je Kind/.test(m) ? p.kinder : +m||1;
+      var m=String(u.menge), n=/je Kind \+ ?(\d+)/.test(m) ? p.kinder+(+RegExp.$1) : /je Kind/.test(m) ? p.kinder : /^(\d+) je (\d+) Kinder$/.test(m) ? (+RegExp.$1)*Math.ceil(p.kinder/(+RegExp.$2)) : +m||1;   // „1 je 15 Kinder“: ab 16 Kindern zwei (UNICORN-120)
       var a=artikelWahl(u)||{}, preis=a.asin ? (a.preis!==undefined ? a.preis : null) : undefined;
       var link=a.link || (a.asin ? 'https://www.amazon.de/dp/'+a.asin : undefined);
       var id=u.id||'u'+i, packungen=a.asin ? Math.max(1, Math.ceil(n/(a.packung||n))) : 0;

@@ -16,7 +16,7 @@
 .held>h1{font-size:1.45rem;line-height:1.15;margin:0}
 .held>.leise{font-size:.92rem;margin-top:3px}
 .held .countdown{position:absolute;top:-12px;right:14px;transform:rotate(3deg);background:var(--akzent);color:#160C2B;font-weight:800;border-radius:999px;padding:4px 11px;font-size:.82rem;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.4)}
-.bogen{position:relative;width:min(210px,62%);margin:8px auto 0}
+.bogen{position:relative;width:min(196px,58%);margin:6px auto 0}
 .bogen svg{display:block;width:100%;height:auto;overflow:visible}
 .bogen .b{fill:none;stroke-width:6.5;stroke-linecap:round;opacity:.16}
 .bogen .b.an{opacity:1;filter:drop-shadow(0 0 3px rgba(255,255,255,.28))}
@@ -60,7 +60,7 @@
 .station{position:relative}
 .station::before{content:"";position:absolute;left:21px;top:0;bottom:0;border-left:2px dotted #43385A}
 .station:first-child::before{top:50%}.station:last-child::before{bottom:50%}
-.station>button{position:relative;display:grid;grid-template-columns:44px 1fr 12px;gap:12px;align-items:center;width:100%;min-height:52px;padding:4px 6px 4px 0;background:none;border:0;border-radius:18px;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.station>button{position:relative;display:grid;grid-template-columns:44px 1fr 12px;gap:12px;align-items:center;width:100%;min-height:48px;padding:2px 6px 2px 0;background:none;border:0;border-radius:18px;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .kreis{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--f);color:var(--f);background:var(--bg);flex:0 0 auto}
 .kreis svg{width:22px;height:22px}
 .station.fertig .kreis{background:var(--f);color:#160C2B}
@@ -307,6 +307,8 @@
       h+='<h1>Wer ist dabei, wo spielt ihr?</h1>'+
         '<div class="zaehlzeile"><b>Kinder</b><div class="zaehler"><button type="button" data-z="kinder" data-d="-1" aria-label="Weniger Kinder">–</button><b aria-live="polite">'+e.kinder+'</b><button type="button" data-z="kinder" data-d="1" aria-label="Mehr Kinder">+</button></div></div>'+
         '<div class="zaehlzeile"><b>Erwachsene</b><div class="zaehler"><button type="button" data-z="helfer" data-d="-1" aria-label="Weniger Erwachsene">–</button><b aria-live="polite">'+e.helfer+'</b><button type="button" data-z="helfer" data-d="1" aria-label="Mehr Erwachsene">+</button></div></div>'+
+        // Viele Kinder (UNICORN-120): mehr Hände an der Straße
+        (e.kinder>15 && (e.helfer||2)<3 ? '<p class="leise klein erw-hinweis">Bei mehr als 15 Kindern nehmt lieber drei oder mehr Erwachsene mit. An der Straße hält jeder Erwachsene ein Seil.</p>' : '')+
         (Party.einerBeiGruppe(e) ? '<p class="leise klein erw-hinweis">Mit Vorausgeher ist anfangs nur ein Erwachsener bei den Kindern. An der Straße (Station 3) wartet ihr auf den Vorausgeher. Oder ihr nehmt einen dritten Erwachsenen mit.</p>' : '')+
         spielartWahl(e)+
         '<details class="vorein" id="vorein"'+(voreinOffen?' open':'')+'><summary><b>Schon voreingestellt <em>'+(voreinOffen?'Fertig':'Ändern')+'</em></b><span>'+esc(voreinText(e))+'.</span></summary>'+

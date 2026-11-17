@@ -7,7 +7,7 @@
  "alter": "3 bis 6 Jahre",
  "kinder": {
   "min": 3,
-  "max": 12,
+  "max": 30,
   "standard": 10
  },
  "dauer": {
@@ -1370,7 +1370,7 @@
   {
    "id": "u9",
    "name": "Seil",
-   "menge": 1,
+   "menge": "1 je 15 Kinder",
    "wann": "Station 3",
    "asin": "B0C17QJRY8",
    "packung": 1,
