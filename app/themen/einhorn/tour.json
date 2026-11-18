@@ -257,7 +257,6 @@
    "wo": "Am Anfang des Zauns",
    "kind": "wahl",
    "arc": "gelb",
-   "pic": "galerie",
    "namenOffen": true,
    "seek": "Alle gut rübergekommen? Prima! Lauft weiter, mein Spiegel hat gleich etwas Seltsames für euch.",
    "ohne": {
@@ -266,8 +265,8 @@
     "after": "Richtig, die Sonne ist gelb! Sucht beim grünen Band. Dort liegen mein gelber und mein oranger Bogen, und für jeden ein Glücksstein. Der macht mutig für den Wald."
    },
    "title": "Die Quatschbilder",
-   "say": "Schaut nur, was ohne meinen Regenbogen passiert ist! Mein Spiegel zeigt euch vier Bilder mit falschen Farben, eins nach dem anderen. Lauft dabei langsam weiter. Eins davon ist in echt gelb. Findet es heraus!",
-   "frage": "Alle vier Bilder gesehen. Jetzt tippt ein Kind auf das Ding, das in echt gelb ist.",
+   "say": "Schaut nur, was ohne meinen Regenbogen passiert ist! Mein Spiegel zeigt euch vier Quatschbilder. Ruft bei jedem, was falsch ist! Eins davon ist in echt gelb. Findet es heraus!",
+   "frage": "Die Kinder rufen bei jedem Bild, was falsch ist und welche Farbe es in echt hat. Dann tippt ein Kind auf das Ding, das in echt gelb ist.",
    "optionen": [
     {
      "id": "moehre",
@@ -1444,7 +1443,7 @@
    },
    "3": {
     "0": {
-     "a": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Bei jedem Bild ruft ihr, was falsch ist. Also nochmal: Bild für Bild weiterlaufen, dann das Gelbe antippen!",
+     "a": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Also nochmal: Bei jedem Bild rufen, was falsch ist, dann das Gelbe antippen!",
      "b": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Bei jedem Bild ruft ihr, was falsch ist. Also nochmal: Von Schleife zu Schleife, dann das Gelbe antippen!",
      "c": "Entschuldigung, das waren die Bohnen. Forschungsauftrag! Bei jedem Bild ruft ihr, was falsch ist. Also nochmal: Von Band zu Band, dann das Gelbe antippen!"
     },
@@ -1577,7 +1576,7 @@
     "c": "Alle ans Seil, über den Fluss!"
    },
    "3.0": {
-    "a": "Bild für Bild weiterlaufen, dann das Gelbe antippen!",
+    "a": "Bei jedem Bild rufen, was falsch ist, dann das Gelbe antippen!",
     "b": "Von Schleife zu Schleife, dann das Gelbe antippen!",
     "c": "Von Band zu Band, dann das Gelbe antippen!"
    },
@@ -1928,7 +1927,7 @@
     ],
     [
      "Weiter",
-     "„Nächstes Bild“, am Ende tippt ein Kind die Sonne an"
+     "Alle vier Bilder sind gleich da, ein Kind tippt die Sonne an"
     ]
    ],
    "b": [
