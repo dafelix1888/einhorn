@@ -205,19 +205,23 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
 .mk-sterne svg{display:block;width:100%;height:100%}
 .desk .meinung-karte{max-width:420px}
 .buehne{border-radius:18px;overflow:hidden;background:linear-gradient(180deg,var(--farbe,#7C5BD6),#2A2140)}
-.buehne > a img{width:100%;aspect-ratio:1/1;max-height:340px;object-fit:cover;display:block}
-.buehne .unten{padding:16px}
+.buehne .b-oben{display:flex;gap:14px;align-items:center;padding:14px 14px 0}
+.buehne .b-oben > a{flex:0 0 auto}
+.buehne .b-oben img{width:112px;height:112px;border-radius:14px;object-fit:cover;display:block}
+.buehne .b-text{min-width:0}
+.buehne .unten{padding:12px 14px 14px}
+.start-k{font-size:1.15rem;margin:4px 0 -8px}.start-k span{display:block;color:var(--leise);font-size:.85rem;font-weight:400;margin-top:2px}
 .buehne .frei{background:var(--gruen);color:#062B12;border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:800}
-.buehne h1{font-size:1.8rem;line-height:1.05;margin:10px 0 6px}
-.buehne p{margin:0 0 14px;color:#E2DAF2}
+.buehne h1{font-size:1.35rem;line-height:1.1;margin:6px 0 4px}
+.buehne p{margin:0;color:#E2DAF2;font-size:.92rem;line-height:1.35}
 .buehne .knoepfe{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .buehne .voll{min-height:48px;display:inline-flex;align-items:center}
 .probeknopf{width:48px;height:48px;border-radius:50%;border:1.5px solid #E2DAF2;background:none;display:grid;place-items:center;flex:0 0 auto}
 .probeknopf svg{width:20px;height:20px}
 .buehne .klein0{color:#E2DAF2;font-size:.85rem}
 .zahlen{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center}
-.zahlen div{background:var(--karte);border-radius:12px;padding:10px 6px}
-.zahlen b{display:block;font-size:1.2rem}
+.zahlen div{background:var(--karte);border-radius:12px;padding:8px 4px}
+.zahlen b{display:block;font-size:1.05rem}
 .zahlen span{color:var(--leise);font-size:.78rem}
 .reihe-bald h2{font-size:1.15rem;margin:6px 0 12px}
 .reihe-bald .band{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
@@ -409,9 +413,12 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
         (t.hoerprobe?'<button type="button" class="probeknopf" data-probe="'+t.id+'" aria-label="Hörprobe abspielen">'+PLAY+'</button>':'')+'</div></section>';
     } else if(t){
       var pa2=party(t.id), tour=TOUR[t.id]||{};
-      h+='<section class="buehne" style="--farbe:'+esc(t.farbe||'#7C5BD6')+'"><a href="#/abenteuer/'+t.id+'" aria-label="'+esc(t.titel)+': mehr erfahren"><img src="'+t.cover+'" alt=""></a><div class="unten">'+
-        (t.preis?'<span class="frei">'+esc(t.preis)+'</span>':'')+'<h1>'+esc(t.titel)+'</h1><p>'+esc(t.untertitel)+'. '+esc(t.alter)+', '+(t.orte.indexOf('draussen')>=0?'ab eurer Haustür.':'in der Wohnung.')+'</p>'+
-        '<div class="knoepfe"><a class="voll" href="'+ziel(t.id)+'">'+(pa2?'Zur Party':'Party planen')+'</a>'+
+      // kompakt (UNICORN-128): nimmt nicht mehr den ganzen Bildschirm ein; „Jetzt spielbar · 1 Abenteuer“ und „Bald“ direkt darunter zeigen, dass es das eine ist
+      var anzahl=THEMEN.filter(verfuegbar).length;
+      h+='<h2 class="start-k">Jetzt spielbar <span>'+(anzahl===1?'unser erstes Abenteuer':anzahl+' Abenteuer')+'</span></h2>'+
+        '<section class="buehne" style="--farbe:'+esc(t.farbe||'#7C5BD6')+'"><div class="b-oben"><a href="#/abenteuer/'+t.id+'" aria-label="'+esc(t.titel)+': mehr erfahren"><img src="'+t.cover+'" alt=""></a><div class="b-text">'+
+        (t.preis?'<span class="frei">'+esc(t.preis)+'</span>':'')+'<h1>'+esc(t.titel)+'</h1><p>'+esc(t.untertitel)+'. '+esc(t.alter)+', '+(t.orte.indexOf('draussen')>=0?'ab eurer Haustür.':'in der Wohnung.')+'</p></div></div>'+
+        '<div class="unten"><div class="knoepfe"><a class="voll" href="'+ziel(t.id)+'">'+(pa2?'Zur Party':'Party planen')+'</a>'+
         (t.hoerprobe?'<button type="button" class="probeknopf" data-probe="'+t.id+'" aria-label="Hörprobe abspielen">'+PLAY+'</button><span class="klein0">Hörprobe, 21 Sek.</span>':'')+'</div></div></section>'+
         '<div class="zahlen"><div><b>15 Min.</b><span>zum Planen</span></div><div><b>6</b><span>Schritte bis zur Party</span></div><div><b>'+(tour.dauer&&tour.dauer.minuten||t.minuten)+' Min.</b><span>Abenteuer</span></div></div>';
     }
@@ -420,7 +427,7 @@ h2.abschnitt{font-size:1.45rem;margin:30px 0 14px}
       return '<a href="#/abenteuer/'+x.id+'"><img src="'+x.cover+'" alt="" loading="lazy"><b>'+esc(x.titel)+'</b><span>'+esc(x.alter)+'</span></a>';
     }).join('')+'</div></section>' : '';
     var figurHtml='<section class="reihe-bald"><h2>Charaktere</h2>'+figurReihe(figuren())+'</section>';
-    return '<div class="handy">'+h+(tp ? baldHtml+figurHtml : figurHtml+baldHtml)+meinungKarte()+'</div>';
+    return '<div class="handy">'+h+baldHtml+figurHtml+meinungKarte()+'</div>';   // „Bald“ immer direkt unter dem spielbaren Abenteuer (UNICORN-128)
   }
   // Feedback zur App (UNICORN-30): Tipp auf einen Stern öffnet das Fenster mit dieser Wahl
   var STERN='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z"/></svg>';
