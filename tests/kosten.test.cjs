@@ -11,7 +11,8 @@ const zahl=t=>{ const m=String(t).match(/(\d+),(\d\d)\s*€/); return m ? +(m[1]
   await p.goto(B);
   const st=[0,1,2,3,4,5,6].map(i=>({lat:53.55+i*0.001, lng:10.0+i*0.001, name:'Ort '+i}));
   const plan={format:1,thema:'einhorn',variante:'a',kinder:8,stationen:st,strecke:1400,heimweg:350};
-  const inTagen=n=>new Date(Date.now()+n*864e5).toISOString().slice(0,10);
+  // Ortsdatum statt UTC: Die Tests laufen mit TZ=Europe/Berlin, zwischen 0 und 1 Uhr (Winter) wäre das UTC-Datum einen Tag zurück.
+  const inTagen=n=>{ const d=new Date(Date.now()+n*864e5); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
   const entwurf=(d,vg)=>({format:1,thema:'einhorn',kind:{name:'Mia',alter:5},datum:d,start:'15:00',kinder:8,helfer:2,vorausgeher:vg,ort:'draussen',planB:true,ausdrucke:true,erledigt:{},einkauf:{},erstellt:new Date().toISOString()});
   const zumEnde=async(e)=>{ await p.evaluate(([e,pl])=>{ localStorage.clear(); localStorage.setItem('sj.plan.einhorn', JSON.stringify(pl)); sessionStorage.setItem('sj.entwurf.einhorn', JSON.stringify({e:e, s:3})); }, [e,plan]);
     await p.goto('about:blank'); await p.goto(B+'party.html?thema=einhorn#schritt-4'); await p.waitForSelector('.aufwand'); return p.locator('.aufwand').innerText(); };
