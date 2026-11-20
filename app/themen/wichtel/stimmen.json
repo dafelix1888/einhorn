@@ -1,58 +1,93 @@
 {
   "zweck": "Stimmen-Plan für Wichtel Bommi (UNICORN-134). Erzeugt wird im Muster (UNICORN-135) und in der Serie (UNICORN-138). Modell wie die Einhorn-Tour.",
-  "modell": "eleven_multilingual_v2",
+  "modell": "eleven_v4",
   "erzaehler": "bommi",
   "figuren": {
     "bommi": {
       "beschreibung": "Bommi: junger Wichtel, hell, frech, leicht kratzig, schnell, mit Grinsen in der Stimme",
-      "voice_id": null,
-      "herkunft": "neu",
+      "voice_id": "svptHMXByWlhGYcu3wTj",
+      "herkunft": "neu, Entwurf mit eleven_ttv_v3 (UNICORN-135), gespeichert als „Bommi (Wichtel)“",
       "proben": [
         {
-          "name": "A frech",
-          "entwurf": "Young German boy elf, about eight years old, bright and cheeky voice with a slight raspy edge, fast and playful, grinning while speaking, warm and friendly, never shrill."
+          "name": "Probe 1",
+          "datei": "muster/bommi-probe-1.mp3",
+          "generated_voice_id": "svptHMXByWlhGYcu3wTj"
         },
         {
-          "name": "B kratzig",
-          "entwurf": "Small mischievous German forest elf, light boyish voice with a noticeable scratchy, slightly hoarse texture, lively and curious, a little breathless with excitement, warm storyteller for young children."
+          "name": "Probe 2",
+          "datei": "muster/bommi-probe-2.mp3",
+          "generated_voice_id": "adumkUva8lee4MuAYQzF"
         },
         {
-          "name": "C bibliothek",
-          "voice_id": "Im1tDIlzaGXABXZ9xEzu",
-          "entwurf": "Vorhandene Bibliotheks-Stimme „Pipp – Süßes Fantasiewesen“: hoch, weich, verspielt, tollpatschig. Kostet keine Entwurfs-Punkte."
+          "name": "Probe 3",
+          "datei": "muster/bommi-probe-3.mp3",
+          "generated_voice_id": "ZwDpfl1wu8HtCNPpnDUC"
         }
       ],
-      "probesatz": "Psst! Ich bin's, Bommi. Heute Nacht bin ich bei euch eingezogen. Darf ich bleiben?"
+      "probesatz": "Psst! Ich bin's, Bommi. Heute Nacht bin ich bei euch eingezogen. Darf ich bleiben?",
+      "gewaehlt": "Probe 1: hellste und lebhafteste der drei (mittlere Tonhöhe etwa 275 Hz, große Spannweite), leicht kratzig, ohne schrill zu werden. Probe 2 klang tief und erwachsen, Probe 3 lag dazwischen.",
+      "modell": "eleven_v4",
+      "proben_beschreibung": "Small mischievous fairy-tale forest elf character for a German children's audiobook. Light, bright, cheeky voice with a slight raspy edge, fast and playful, grinning while speaking, warm and friendly, never shrill. Native German.",
+      "hinweis": "Eine Altersangabe im Stimmen-Entwurf („about eight years old“) wird von ElevenLabs abgelehnt. Ohne Alter beschreiben."
     },
     "kruemel": {
       "beschreibung": "Krümel, die Hausmaus: hoch, schüchtern, leise, piepsig",
       "voice_id": "eRExbYUuATnn9e2um0J1",
       "herkunft": "Bibliothek: Kunibert Cuddle (hoch, niedlich, weich)",
-      "einstellungen": { "stability": 0.5, "similarity_boost": 0.8, "style": 0.3, "use_speaker_boost": true, "speed": 0.95 }
+      "einstellungen": {
+        "stability": 0.5,
+        "similarity_boost": 0.8,
+        "style": 0.3,
+        "use_speaker_boost": true,
+        "speed": 0.95
+      }
     },
     "flitz": {
       "beschreibung": "Flitz, das Eichhörnchen: blitzschnell, hibbelig, vergisst mitten im Satz alles",
       "voice_id": "JSV4pJFuHRMCWZTxkpoQ",
       "herkunft": "Einhorn-Tour: Rudi (nervös, verplant, quiekt)",
-      "einstellungen": { "stability": 0.45, "similarity_boost": 0.8, "style": 0.45, "use_speaker_boost": true, "speed": 1.1 }
+      "einstellungen": {
+        "stability": 0.45,
+        "similarity_boost": 0.8,
+        "style": 0.45,
+        "use_speaker_boost": true,
+        "speed": 1.1
+      }
     },
     "brummel": {
       "beschreibung": "Brummel, der Igel: tief, brummig, verschlafen, weiches Herz",
       "voice_id": "pfvZahoGcT3NdpxRuNkg",
       "herkunft": "Einhorn-Tour: Bruno (tief, brummig, gemütlich)",
-      "einstellungen": { "stability": 0.55, "similarity_boost": 0.8, "style": 0.3, "use_speaker_boost": true, "speed": 0.95 }
+      "einstellungen": {
+        "stability": 0.55,
+        "similarity_boost": 0.8,
+        "style": 0.3,
+        "use_speaker_boost": true,
+        "speed": 0.95
+      }
     },
     "tiri": {
       "beschreibung": "Tiri, das Rotkehlchen: klar, schnell, freundlich direkt",
       "voice_id": "Jpm0FNvrnzdW3k4rnWVH",
       "herkunft": "Bibliothek: Rika Sturm (jung, klar, warm)",
-      "einstellungen": { "stability": 0.5, "similarity_boost": 0.8, "style": 0.35, "use_speaker_boost": true, "speed": 1.05 }
+      "einstellungen": {
+        "stability": 0.5,
+        "similarity_boost": 0.8,
+        "style": 0.35,
+        "use_speaker_boost": true,
+        "speed": 1.05
+      }
     },
     "fina": {
       "beschreibung": "Fina, Bommis Cousine: helles Mädchen, erst stolz, dann leise und traurig",
       "voice_id": "HwlyvBfjL4YoUAPEjX6e",
       "herkunft": "Einhorn-Tour: Alfonso (hoch, kichernd). Klingt sie im Muster zu albern, nimmt die Serie eine neue Stimme (Entwurf wie bei Bommi).",
-      "einstellungen": { "stability": 0.55, "similarity_boost": 0.8, "style": 0.3, "use_speaker_boost": true }
+      "einstellungen": {
+        "stability": 0.55,
+        "similarity_boost": 0.8,
+        "style": 0.3,
+        "use_speaker_boost": true
+      }
     },
     "oma": {
       "beschreibung": "Oma Mooswinkel spricht nie selbst. Bommi liest ihre Briefe vor.",
@@ -60,5 +95,5 @@
       "herkunft": "keine eigene Stimme"
     }
   },
-  "melodie": "Kurze Bommi-Melodie (2 bis 3 Sekunden, Glöckchen und Pizzicato, verschmitzt) am Anfang jedes Videos, einmal erzeugt im Muster."
+  "melodie": "muster/bommi-melodie.mp3: 5 Sekunden, Glöckchen und Pizzicato, eleven_text_to_sound_v3 (17 Punkte). Am Anfang jedes Videos."
 }
