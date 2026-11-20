@@ -2,6 +2,10 @@
 
 Stand: 16. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern liegt als Doc: [Funkels Regenbogen: Der Weg der Eltern von der Idee bis zur Party](https://claude.ai/artifact/Rv6JHqm9HHZwYvbYvxeJ99). Alle Screens der App als Design-Canvas mit Beispieldaten: [Zauberspiegel Plattform](https://claude.ai/artifact/XNvrQ353tpt5keUtxokatT).
 
+## Wichtel Bommi (Schwerpunkt bis Start 27. November, STRAT-46)
+
+**20. November nachts, UNICORN-134:** Grundlagen in `app/themen/wichtel/`: `figurenblatt.md` (Stil, Größen, 6 Figuren plus Oma Mooswinkel, Bommel-Farben je Geschichte), `stimmen.json` (Stimmen-Plan: Bommi neu mit drei Proben, Flitz = Rudi, Brummel = Bruno, Fina = Alfonso aus der Einhorn-Tour, Krümel und Tiri aus der Bibliothek), `geschichten.json` (alle 8 Geschichten: Video-Text, 5 Bilder mit Text und Bildbeschreibung, Sätze der Figuren, Aufbau in 3 Schritten, Mini-Brief; dazu der Trailer). Nr. 1 fertig, Rest Entwurf. `tests/wichtel-texte.test.cjs` prüft Wortzahlen, feste Sätze, Omas Satz, verbotene Wörter. In Bildschirmtexten „Material“ statt „Einkaufsliste“ (Wortliste), Frage dazu an Strategist in UNICORN-134.
+
 ## Ziel und Arbeitsreihenfolge (STRAT-14)
 
 Ziel: fremde Eltern planen und spielen ohne Hilfe; Gate bis 6. Dezember 2026: 20 `signup`, 5 fremde `activated`. Stand 9. November, Teil Einhorn erledigt:

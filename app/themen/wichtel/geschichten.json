@@ -1,0 +1,364 @@
+{
+  "zweck": "Texte für Wichtel Bommi (UNICORN-134). Vorgaben: STRAT-42 (Skizze), STRAT-44 (Details). Stil und Figuren: figurenblatt.md. Prüfung: tests/wichtel-texte.test.cjs.",
+  "stand": "Nr. 1 fertig, Nr. 2 bis 8 und Trailer im Entwurf",
+  "regeln": {
+    "video_anfang": "Psst! Ich bin's, Bommi.",
+    "video_ende": "Und wie das ausging? Blättert weiter!",
+    "geschichte_ende": "Wo ein Bommel liegt, war ich da.",
+    "video_woerter": [70, 80],
+    "geschichte_woerter": [200, 230],
+    "bildformat": "hochkant 9:16, Stil und Figuren nach figurenblatt.md, Kamera auf Bommis Augenhöhe"
+  },
+  "geschichten": [
+    {
+      "nr": 1,
+      "id": "einzug",
+      "titel": "Bommi zieht ein",
+      "pflicht": true,
+      "stand": "fertig",
+      "wert": "Willkommen heißen, Mut zum Hallo",
+      "haken": "Bommi kennt niemanden und hat Angst, dass er nicht bleiben darf.",
+      "oma": "Ein Zuhause fängt mit einem Hallo an.",
+      "mitmachen": "Ein Willkommensschild für Bommis Tür malen.",
+      "bommel": "rot",
+      "video": "Psst! Ich bin's, Bommi. Heute Nacht bin ich bei euch eingezogen. Mit meinem Koffer stand ich im Schnee vor eurer Haustür. Riesig war die! Drinnen hab ich mich gleich verlaufen. Erst bin ich in einen Hausschuh geplumpst, dann in einen Blumentopf und dann, hoppla, in die Keksdose. Jetzt sitze ich vor meiner neuen kleinen Tür. Aber ich kenne hier niemanden. Darf ich überhaupt bleiben? Ich trau mich nicht mal anzuklopfen. Und wie das ausging? Blättert weiter!",
+      "bilder": [
+        {
+          "text": "Mitten in der Nacht stand ich mit meinem Koffer vor eurer Haustür. Der Schnee reichte mir bis zum Bauch, und die Tür war so hoch wie ein Berg. Zum Glück passt ein kleiner Wichtel wie ich durch jeden Spalt.",
+          "bild": "Nacht, Schneefall. Bommi steht klein mit seinem braunen Koffer im tiefen Schnee vor einer riesigen hölzernen Haustür mit Tannenkranz. Warmes Licht fällt durch den Türspalt. Bommi schaut staunend nach oben."
+        },
+        {
+          "text": "Drinnen war alles riesig. Ich bin in einen Hausschuh gefallen, in einen Blumentopf und zuletzt in die Keksdose. Dabei habe ich einen Bommel von meinem Schuh verloren, und Puderzucker klebte an meiner Mütze.",
+          "bild": "Flur und Küche aus Bommis Sicht, drei kleine Szenen ineinander: Bommi purzelt kopfüber in einen riesigen karierten Hausschuh, steckt bis zur Hüfte in einem Blumentopf, sitzt in einer offenen Keksdose zwischen Plätzchen so groß wie Tische. Puderzucker auf der Mütze, am linken Schuh fehlt der Bommel, er liegt am Boden."
+        },
+        {
+          "text": "Dann fand ich meine kleine Tür. Ich saß davor und dachte: Hier kennt mich keiner. Was, wenn ich nicht bleiben darf? Ich hob die Hand zum Anklopfen und ließ sie wieder sinken.",
+          "bild": "Eine kleine rote Wichteltür unten an der Wand, daneben ein Umzugskarton. Bommi sitzt allein auf seinem Koffer davor, die Hand halb gehoben, der Mützenzipfel hängt traurig herunter. Weiches Licht einer Lichterkette."
+        },
+        {
+          "text": "Da flatterte Tiri herein, das Rotkehlchen mit der Posttasche. „Geradeheraus gesagt: Du siehst ängstlich aus. Hier ist ein Brief für dich.“ Er war von Oma Mooswinkel. Darin stand: „Ein Zuhause fängt mit einem Hallo an.“",
+          "bild": "Tiri landet mit ausgebreiteten Flügeln auf Bommis Koffer und hält ihm mit dem Schnabel einen gelblichen Brief mit gezeichneter Moosranke hin. Bommi schaut überrascht, die Augenbraue hoch.",
+          "stimmen": [{ "figur": "tiri", "satz": "Geradeheraus gesagt: Du siehst ängstlich aus. Hier ist ein Brief für dich." }]
+        },
+        {
+          "text": "Also sage ich es jetzt ganz laut: Hallo, ich bin Bommi! Darf ich bei euch bleiben? Wenn ja, malt mir ein Willkommensschild für meine Tür. Oma sagt, ein Bommel wächst, wenn man etwas Gutes tut. Und Hallo sagen, obwohl man Angst hat, ist etwas Gutes. Seht ihr? Da liegt schon der erste Bommel für unsere Kette. Wo ein Bommel liegt, war ich da.",
+          "bild": "Bommi steht mutig vor seiner Tür, winkt mit beiden Armen und grinst schief. Neben ihm eine rote Wollschnur, an der ein einzelner roter Bommel hängt. Ein leeres Holzschild lehnt an der Tür."
+        }
+      ],
+      "aufbau": [
+        "Wichteltür unten an eine Wand stellen oder kleben, den kleinen Karton davor.",
+        "Etwas Puderzucker oder Mehl auf den Boden streuen, einen Hausschuh umgekippt daneben legen.",
+        "Den Brief von Oma Mooswinkel, die Wollschnur und einen roten Bommel vor die Tür legen."
+      ],
+      "brief": "Lieber Bommi, ein Bommel wächst nicht von allein. Er wächst, wenn du etwas Gutes tust. Ein Zuhause fängt mit einem Hallo an. Deine Oma Mooswinkel"
+    },
+    {
+      "nr": 2,
+      "id": "keks-krimi",
+      "titel": "Der Keks-Krümel-Krimi",
+      "pflicht": false,
+      "stand": "entwurf",
+      "wert": "Teilen, nicht vorschnell beschuldigen",
+      "haken": "Bommi wird zu Unrecht beschuldigt und ist beleidigt. Dann ist er selbst kurz davor, Krümel anzuschreien.",
+      "oma": "Halbiert schmeckt ein Keks doppelt.",
+      "mitmachen": "Einen Keks für Krümel hinlegen.",
+      "bommel": "hellbraun",
+      "video": "Psst! Ich bin's, Bommi. Heute Nacht ist etwas passiert. Die Keksdose stand offen, und überall lagen Krümel. Alle haben auf mich gezeigt! Denn direkt neben der Dose lag ein Bommel von meinem Schuh. Aber ich war's nicht, ehrlich! Also habe ich meine Lupe geholt und bin der Krümelspur gefolgt. Unter dem Sofa durch, um das Tischbein herum, bis hinter den Schrank. Und dort hat etwas geraschelt. Und wie das ausging? Blättert weiter!",
+      "bilder": [
+        {
+          "text": "Heute Nacht stand die Keksdose offen. Überall lagen Krümel, quer über den Tisch und bis hinunter auf den Boden. Wer hatte da heimlich genascht? Ich jedenfalls nicht, ich war ja gerade erst aufgewacht und hatte noch ganz verstrubbelte Haare.",
+          "bild": "Eine offene Mini-Keksdose auf einem Holztisch, Plätzchen so groß wie Wagenräder. Eine Spur aus Krümeln führt über die Tischkante nach unten. Nachtstimmung, Kerzenlicht."
+        },
+        {
+          "text": "Alle schauten mich an. Direkt neben der Dose lag nämlich ein Bommel von meinem Schuh. „Ich war es nicht!“, rief ich und stampfte so fest auf, dass meine Mütze wackelte. Ich war richtig beleidigt.",
+          "bild": "Bommi mit verschränkten Armen und rotem Kopf, Flitz und Tiri schauen ihn mit großen Augen an. Neben der Keksdose liegt ein kleiner weißer Bommel, an Bommis linkem Schuh fehlt er."
+        },
+        {
+          "text": "Also wurde ich Detektiv. Mit der Lupe folgte ich der Krümelspur unter dem Sofa durch und um das Tischbein herum. Hinter dem Schrank raschelte es. Ich holte tief Luft und wollte gerade ganz laut losschimpfen: „Hab ich dich, du Keksdieb!“",
+          "bild": "Bommi kriecht mit einer großen Lupe gebückt einer Krümelspur nach, unter einem riesigen Sofa hindurch. Am linken Schuh fehlt der Bommel. Hinter einem Schrankfuß ragt ein dünner Mäuseschwanz mit Schleife hervor."
+        },
+        {
+          "text": "Da saß Krümel, die kleine Hausmaus, mit einem Keks im Arm und zitterte. „Gibt's was zu essen? Ich hatte so Hunger und hab mich nicht getraut zu fragen.“ Da war mein Ärger auf einmal weg.",
+          "bild": "Krümel hinter dem Schrank, sie hält mit beiden Pfoten einen Keks so groß wie sie selbst, die rosa Ohren nach hinten gelegt. Bommi steht vor ihr, sein Gesicht wird weich.",
+          "stimmen": [{ "figur": "kruemel", "satz": "Gibt's was zu essen? Ich hatte so Hunger und hab mich nicht getraut zu fragen." }]
+        },
+        {
+          "text": "Ich brach den letzten Keks in zwei Hälften, eine für Krümel und eine für mich. Oma Mooswinkel sagt: „Halbiert schmeckt ein Keks doppelt.“ Und sie hat recht! Fürs Teilen gab es einen neuen Bommel. Legt ihr auch einen Keks für Krümel hin? Dann muss sie nie wieder heimlich naschen. Wo ein Bommel liegt, war ich da.",
+          "bild": "Bommi und Krümel sitzen nebeneinander auf einem Streichholzschachtel-Bänkchen und beißen jeder in eine Kekshälfte. Vor ihnen ein neuer hellbrauner Bommel."
+        }
+      ],
+      "aufbau": [
+        "Die kleine Keksdose offen hinstellen, Kekskrümel als Spur bis zu einem Schrank streuen.",
+        "Einen weißen Bommel neben die Dose legen, als hätte Bommi ihn verloren.",
+        "Hinter den Schrank einen halben Keks legen, dazu den Brief und einen hellbraunen Bommel."
+      ],
+      "brief": "Lieber Bommi, wer Hunger hat, traut sich manchmal nicht zu fragen. Halbiert schmeckt ein Keks doppelt. Deine Oma Mooswinkel"
+    },
+    {
+      "nr": 3,
+      "id": "blumentopf",
+      "titel": "Flitz buddelt im Blumentopf",
+      "pflicht": false,
+      "stand": "entwurf",
+      "wert": "Helfen und sich helfen lassen",
+      "haken": "Flitz will alles allein schaffen und nichts abgeben. Allein findet er nichts.",
+      "oma": "Vier Pfoten finden mehr als zwei.",
+      "mitmachen": "Fünf versteckte Nüsse suchen und beim Fegen helfen.",
+      "bommel": "grün",
+      "video": "Psst! Ich bin's, Bommi. Heute Nacht hat es im Blumentopf gerumpelt. Erde flog durch die Luft wie Schnee, nur eben braun. Und mittendrin: Flitz, das Eichhörnchen. Er hat im Herbst seine Nüsse vergraben und weiß nicht mehr, wo. Jetzt ist der Topf voller Löcher. Ich wollte ihm helfen, aber Flitz rief: „Das sind MEINE Nüsse!“ Also buddelte er allein weiter und fand gar nichts. Und wie das ausging? Blättert weiter!",
+      "bilder": [
+        {
+          "text": "Heute Nacht hat es im Blumentopf gerumpelt. Die Erde flog nur so durch die Luft, auf den Tisch, auf den Boden und sogar auf meine Mütze. Mittendrin buddelte Flitz, das Eichhörnchen, so schnell, dass man nur seinen buschigen Schwanz sah.",
+          "bild": "Ein großer Blumentopf auf der Fensterbank, Erde spritzt in hohem Bogen heraus. Nur Flitz' buschiger Schwanz und die Hinterpfoten ragen aus der Erde. Bommi duckt sich mit Erde auf der Mütze."
+        },
+        {
+          "text": "Flitz hatte im Herbst seine Nüsse versteckt, aber er wusste nicht mehr, wo. „Ich hab sie doch genau … äh … was wollte ich sagen?“ Der Topf hatte schon lauter Löcher, aber Nüsse waren keine drin.",
+          "bild": "Flitz sitzt ratlos zwischen lauter Löchern im Blumentopf, die zu große grüne Mütze über einem Auge, kratzt sich mit erdiger Pfote am Kopf.",
+          "stimmen": [{ "figur": "flitz", "satz": "Ich hab sie doch genau … äh … was wollte ich sagen?" }]
+        },
+        {
+          "text": "„Ich helfe dir suchen!“, rief ich. Aber Flitz schüttelte den buschigen Schwanz. „Das sind MEINE Nüsse!“ Also buddelte er allein weiter, immer schneller und immer tiefer. Er fand einen Knopf, einen Korken und eine alte Murmel, aber keine einzige Nuss.",
+          "bild": "Bommi hält Flitz hilfsbereit den kleinen Besen hin, Flitz dreht sich mit erhobener Nase und abwehrender Pfote weg. Im Hintergrund fliegt Erde.",
+          "stimmen": [{ "figur": "flitz", "satz": "Das sind MEINE Nüsse!" }]
+        },
+        {
+          "text": "Irgendwann plumpste Flitz in die Erde und seufzte: „Na gut. Helft mir.“ Wir suchten alle zusammen. Eine Nuss steckte im Gummistiefel, eine in der Teetasse und eine sogar in meinem Schuh.",
+          "bild": "Gemeinsame Suche: Krümel zieht eine Nuss aus einem kleinen Gummistiefel, Brummel fischt eine aus einer Teetasse, Bommi schüttelt eine Nuss aus seinem Schnabelschuh. Flitz freut sich mit gefüllten Backen.",
+          "stimmen": [{ "figur": "flitz", "satz": "Na gut. Helft mir." }]
+        },
+        {
+          "text": "Am Ende gab Flitz jedem eine Nuss ab, und ich fegte mit meinem kleinen Besen die Erde zusammen. Oma Mooswinkel sagt: „Vier Pfoten finden mehr als zwei.“ Fürs Helfen gab es einen neuen Bommel. Flitz hat aber noch fünf Nüsse bei euch versteckt. Findet ihr sie? Und helft ihr mir beim Fegen? Wo ein Bommel liegt, war ich da.",
+          "bild": "Flitz verteilt Nüsse an alle, Bommi fegt mit dem kleinen Reisigbesen ein Häufchen Erde zusammen. Auf der Gartenbank liegt ein neuer grüner Bommel."
+        }
+      ],
+      "aufbau": [
+        "Etwas Erde aus einem Blumentopf auf eine Unterlage streuen, die kleine Bank und den Besen danebenstellen.",
+        "Fünf Nüsse in der Wohnung verstecken, zum Beispiel in einem Hausschuh oder einer Tasse.",
+        "Den Brief und einen grünen Bommel auf die Bank legen."
+      ],
+      "brief": "Lieber Bommi, manchmal will man alles allein schaffen. Dabei geht es zusammen viel leichter. Vier Pfoten finden mehr als zwei. Deine Oma Mooswinkel"
+    },
+    {
+      "nr": 4,
+      "id": "waschtag",
+      "titel": "Der große Waschtag",
+      "pflicht": false,
+      "stand": "entwurf",
+      "wert": "Niemanden ausschließen",
+      "haken": "Krümel ist zu klein und darf nicht mitmachen. Keiner merkt es, bis Bommi hinsieht.",
+      "oma": "Ein Spiel ist erst gut, wenn alle mitspielen.",
+      "mitmachen": "Die Sockenpaare finden.",
+      "bommel": "hellblau",
+      "video": "Psst! Ich bin's, Bommi. Heute Nacht wollte ich Wäsche waschen. Leider ist mir die Flasche mit dem Waschmittel umgekippt. Schaum überall! Danach habe ich alle Socken an eine Leine gehängt, quer durchs Zimmer. Und dann kam mir die beste Idee der Welt: ein Sockenrennen! Flitz ist losgesaust, und alle haben gejubelt. Nur Krümel stand ganz unten und kam nicht hoch. Gemerkt hat das keiner. Ich auch nicht. Und wie das ausging? Blättert weiter!",
+      "bilder": [
+        {
+          "text": "Heute Nacht war Waschtag. Ich wollte alles ganz allein machen, da kippte die Flasche mit dem Waschmittel um. Plötzlich war überall Schaum, bis hoch zu meiner Mütze. Ich pustete, und die Blasen flogen wie kleine Wolken durchs Zimmer.",
+          "bild": "Eine umgekippte kleine Flasche, Schaumberge türmen sich wie Wolken. Bommi steckt bis zum Hals im Schaum, nur Gesicht und Mützenbommel schauen heraus, er grinst verlegen."
+        },
+        {
+          "text": "Dann hängte ich alle Socken an eine Leine quer durchs Zimmer und rief: „Sockenrennen!“ Wir sausten an den Socken entlang, und alle jubelten. Flitz war so schnell, dass er vergaß, wo das Ziel war.",
+          "bild": "Eine Wäscheleine aus Wollfaden quer durchs Bild, bunte Mini-Socken mit Klammern. Bommi und Flitz flitzen hangelnd daran entlang, Tiri flattert jubelnd daneben."
+        },
+        {
+          "text": "Nur Krümel stand ganz unten. Sie hüpfte und hüpfte, aber die Leine war zu hoch. „Darf ich auch mal?“, fragte sie leise. Keiner hörte es, weil alle so laut jubelten. Und ich? Ich war viel zu sehr mit Gewinnen beschäftigt.",
+          "bild": "Krümel steht klein unter der Leine und streckt die Pfoten nach oben, die anderen sind oben im Getümmel. Ihr gelber Schal hängt schlaff.",
+          "stimmen": [{ "figur": "kruemel", "satz": "Darf ich auch mal?" }]
+        },
+        {
+          "text": "Dann sah ich endlich nach unten. Krümel saß allein da, ganz still, und schaute traurig zu uns hoch. Da wurde mir warm und kalt zugleich. Da rief ich: „Stopp! Neue Regel: Wer klein ist, fährt im Wäschekorb!“",
+          "bild": "Bommi hängt an der Leine und schaut erschrocken nach unten zu Krümel. Mit ausgestrecktem Arm zeigt er auf einen kleinen geflochtenen Wäschekorb."
+        },
+        {
+          "text": "Wir zogen Krümel im Wäschekorb an der Leine entlang, und sie gewann sogar! Oma Mooswinkel sagt: „Ein Spiel ist erst gut, wenn alle mitspielen.“ Dafür gab es einen neuen Bommel. Jetzt brauche ich eure Hilfe: Die Socken sind ganz durcheinander. Findet ihr die Paare? Wo ein Bommel liegt, war ich da.",
+          "bild": "Krümel sitzt jubelnd im Wäschekorb, der an der Leine hängt, die anderen ziehen ihn. Unten liegt ein Haufen gemischter Mini-Socken und ein neuer hellblauer Bommel."
+        }
+      ],
+      "aufbau": [
+        "Eine Wollfaden-Leine zwischen zwei Gegenstände spannen und die kleinen Socken mit Klammern aufhängen.",
+        "Die Waschmittel-Vorlage oder eine kleine Flasche aus dem Kinderzimmer umgekippt hinlegen, etwas Watte als Schaum daneben.",
+        "Ein paar Socken durcheinander auf den Boden legen, dazu den Brief und einen hellblauen Bommel."
+      ],
+      "brief": "Lieber Bommi, schau beim Spielen ab und zu nach unten. Da steht vielleicht jemand, der auch mitmachen will. Ein Spiel ist erst gut, wenn alle mitspielen. Deine Oma Mooswinkel"
+    },
+    {
+      "nr": 5,
+      "id": "nachtbaustelle",
+      "titel": "Die Nachtbaustelle",
+      "pflicht": false,
+      "stand": "entwurf",
+      "wert": "Rücksicht, sich entschuldigen",
+      "haken": "Bommi meint es gut und stört trotzdem. Gut gemeint ist nicht automatisch gut.",
+      "oma": "Leise sein ist auch ein Geschenk.",
+      "mitmachen": "Ein Flüster-Frühstück machen und die Höhle für Brummel fertig bauen.",
+      "bommel": "gelb",
+      "video": "Psst! Ich bin's, Bommi. Heute Nacht habe ich eine Baustelle aufgemacht, mit Helm, Absperrband und Schildern, ganz echt. Es soll nämlich eine Überraschung werden. Also habe ich gehämmert und gesägt. Bumm, bumm, ritsch, ratsch! Ich war richtig fleißig, die ganze Nacht lang. Doch plötzlich stand Brummel vor mir, der Igel. Seine Stacheln waren ganz zerzaust, die Augen ganz klein. „Hrmpf! RUHE!“, brummte er. Oje. Und wie das ausging? Blättert weiter!",
+      "bilder": [
+        {
+          "text": "Heute Nacht habe ich eine Baustelle aufgemacht, mit Absperrband, Schildern und einem Helm, der mir ein bisschen zu groß ist. Was ich baue, ist geheim. Es soll eine Überraschung werden.",
+          "bild": "Eine Mini-Baustelle auf dem Teppich: rot-weißes Absperrband, kleine Schilder, Bauklötze. Bommi mit gelbem Bauhelm, der ihm über die Augen rutscht, über der Mütze. Nachtlicht."
+        },
+        {
+          "text": "Ich hämmerte und sägte, was das Zeug hielt. Bumm, bumm, ritsch, ratsch! Die Späne flogen, und ich pfiff dabei ein Lied. Ich fand mich sehr fleißig. Dass es mitten in der Nacht war, daran habe ich gar nicht gedacht.",
+          "bild": "Bommi schwingt einen kleinen Hammer, Holzspäne fliegen, Notenzeichen aus seinem Mund. Halb fertige Höhle aus Bauklötzen und Moos."
+        },
+        {
+          "text": "Plötzlich stand Brummel vor mir, der Igel. Seine Stacheln waren zerzaust, und er konnte kaum die Augen aufhalten. „Hrmpf! RUHE! Ein Igel braucht im Winter seinen Schlaf!“",
+          "bild": "Brummel in hellblauer Schlafmütze und kariertem Schal, die Stacheln stehen zerzaust ab, müde zusammengekniffene Augen, Pfoten in die Seiten gestemmt. Bommi erstarrt mit erhobenem Hammer.",
+          "stimmen": [{ "figur": "brummel", "satz": "Hrmpf! RUHE! Ein Igel braucht im Winter seinen Schlaf!" }]
+        },
+        {
+          "text": "Ich wurde ganz klein. „Entschuldigung, Brummel. Die Höhle ist doch für dich, damit du es warm hast.“ Gut gemeint ist eben noch nicht gut gemacht. Brummel schaute die Höhle lange an, mit Moos innen drin und einem Dach aus Holz. Seine Stacheln wurden langsam wieder glatt.",
+          "bild": "Bommi zieht verlegen den Helm vom Kopf und zeigt auf die halb fertige Höhle. Brummel schaut hinein, seine Stacheln legen sich, ein kleines Lächeln."
+        },
+        {
+          "text": "Wir haben dann ganz leise weitergebaut und nur noch geflüstert. Brummel kuschelte sich hinein und schlief schon bald ein, mit zwei Bommeln auf den Ohren. Er schnarchte ganz leise. Oma Mooswinkel sagt: „Leise sein ist auch ein Geschenk.“ Dafür gab es einen neuen Bommel. Macht ihr heute ein Flüster-Frühstück? Und baut ihr die Höhle für Brummel fertig? Wo ein Bommel liegt, war ich da.",
+          "bild": "Brummel schläft eingerollt in der fertigen Moos-Höhle, auf jedem Ohr ein weißer Bommel. Bommi und Krümel bauen auf Zehenspitzen weiter, Finger auf den Lippen. Davor ein neuer gelber Bommel."
+        }
+      ],
+      "aufbau": [
+        "Die Mini-Baustelle mit Absperrband und Schildern aufbauen, ein paar Bauklötze als halbe Höhle.",
+        "Einen Helm oder eine Kappe aus Papier dazulegen, etwas Moos oder Watte in die Höhle.",
+        "Den Brief und einen gelben Bommel vor die Höhle legen."
+      ],
+      "brief": "Lieber Bommi, eine Überraschung ist schön. Noch schöner ist sie, wenn niemand davon aufwacht. Leise sein ist auch ein Geschenk. Deine Oma Mooswinkel"
+    },
+    {
+      "nr": 6,
+      "id": "mehlschnee",
+      "titel": "Die Mehlschnee-Panne",
+      "pflicht": false,
+      "stand": "entwurf",
+      "wert": "Fehler zugeben",
+      "haken": "Bommi schämt sich und will abhauen.",
+      "oma": "Ein Fehler wird klein, wenn man ihn sagt.",
+      "mitmachen": "Einen Engel in den Mehlschnee malen.",
+      "bommel": "weiß",
+      "video": "Psst! Ich bin's, Bommi. Heute Nacht wollte ich Plätzchen backen, ganz allein, als Überraschung. Aber das Mehl ist mir aus der Tüte gerutscht und rieselte wie Schnee durch die Küche. Die Plätzchen wurden leider ein kleines bisschen schwarz. Und dann hab ich eine Weihnachtskugel vom Fensterbrett gestoßen. Klirr! Ich habe die Stücke versteckt und meinen Koffer gepackt. Ich will schnell weg, bevor es jemand merkt. Und wie das ausging? Blättert weiter!",
+      "bilder": [
+        {
+          "text": "Heute Nacht wollte ich Plätzchen backen, ganz allein, als Überraschung für euch. Aber die Mehltüte rutschte mir aus den Händen. Das Mehl rieselte durch die ganze Küche wie Schnee. Ich sah aus wie ein kleiner Schneemann mit roter Mütze.",
+          "bild": "Bommi in einer Mini-Backstube mit Schürze, eine riesige Mehltüte kippt, Mehl rieselt in dichten Flocken wie Schneefall. Bommi ist von Kopf bis Fuß weiß gepudert."
+        },
+        {
+          "text": "Die Plätzchen wurden leider ein bisschen schwarz. Und als ich das Blech wegtragen wollte, stieß ich mit dem Ellbogen eine Weihnachtskugel vom Fensterbrett. Klirr! Sie zerbrach in drei Stücke.",
+          "bild": "Ein kleines Backblech mit dunklen Plätzchen, Rauchwölkchen. Eine rote Weihnachtskugel fällt vom Fensterbrett, Bommi schaut mit offenem Mund hinterher. Keine scharfen Splitter, die Kugel bricht in drei große runde Stücke."
+        },
+        {
+          "text": "Ich bekam einen riesigen Schreck. Schnell schob ich die Stücke unter ein Geschirrtuch und packte meinen Koffer. Ich dachte: Wenn das jemand sieht, darf ich bestimmt nicht bleiben. Lieber gehe ich gleich, ganz leise, und keiner muss es je erfahren.",
+          "bild": "Bommi drückt hastig Kleidung in seinen braunen Koffer, der Mützenzipfel hängt traurig. Unter einem karierten Geschirrtuch beult sich etwas. Mehlspuren am Boden führen zum Koffer."
+        },
+        {
+          "text": "Da landete Tiri neben mir auf dem Koffer. „Geradeheraus gesagt: Weglaufen macht es nicht heil.“ Ich schluckte. Mein Herz klopfte ganz laut. Dann holte ich die Stücke hervor und sagte allen, was passiert war, auch das mit den Plätzchen.",
+          "bild": "Tiri sitzt auf dem Kofferdeckel und zeigt mit einem Flügel auf das Geschirrtuch. Bommi hebt das Tuch an, die Freunde schauen freundlich dazu.",
+          "stimmen": [{ "figur": "tiri", "satz": "Geradeheraus gesagt: Weglaufen macht es nicht heil." }]
+        },
+        {
+          "text": "Niemand war böse, nicht einmal ein kleines bisschen. Zusammen haben wir gefegt und die Kugel geklebt, jetzt trägt sie ein Pflaster. Oma Mooswinkel sagt: „Ein Fehler wird klein, wenn man ihn sagt.“ Fürs Zugeben gab es einen neuen Bommel. Malt ihr einen Engel in meinen Mehlschnee? Wo ein Bommel liegt, war ich da.",
+          "bild": "Die rote Kugel hängt wieder, mit einem bunten Pflaster quer darüber. Alle fegen lachend Mehl zusammen. Im Mehl auf dem Tisch ein gemalter Engel und ein neuer weißer Bommel."
+        }
+      ],
+      "aufbau": [
+        "Die Mini-Backstube auf ein Tablett stellen und etwas Mehl darüberstreuen.",
+        "Eine Papierkugel aus der Druckvorlage in drei Stücke reißen und unter ein Tuch legen. Bitte keine echte Glaskugel.",
+        "Den Koffer halb gepackt danebenstellen, dazu den Brief und einen weißen Bommel."
+      ],
+      "brief": "Lieber Bommi, jedem geht mal etwas kaputt. Verstecken macht es nur größer. Ein Fehler wird klein, wenn man ihn sagt. Deine Oma Mooswinkel"
+    },
+    {
+      "nr": 7,
+      "id": "fina",
+      "titel": "Fina kann alles besser",
+      "pflicht": false,
+      "stand": "entwurf",
+      "wert": "Neid, eigene Stärken",
+      "haken": "Neid. Bommi tut etwas Gemeines und fühlt sich danach schlechter, nicht besser.",
+      "oma": "Schau nicht auf den Bommel der anderen. Du hast deinen eigenen.",
+      "mitmachen": "Erzählen, was man selbst gut kann.",
+      "bommel": "violett",
+      "video": "Psst! Ich bin's, Bommi. Heute Nacht ist meine Cousine Fina zu Besuch gekommen. Sie hat einen Bommel aus Glitzer, und alle haben gestaunt. Dann haben wir gemalt. Ihr Bild war wunderschön, meins war krumm und schief. Da wurde ich so neidisch, dass mir ganz heiß wurde. Und dann hab ich etwas Gemeines gemacht. Ich hab Finas Glitzer-Bommel versteckt. Jetzt fühle ich mich gar nicht besser, eher schlechter. Und wie das ausging? Blättert weiter!",
+      "bilder": [
+        {
+          "text": "Heute Nacht kam meine Cousine Fina zu Besuch. An ihrer Mütze funkelt ein Bommel aus Glitzer, wie ein kleiner Stern. „Oh, wie schön!“, riefen alle, und keiner schaute mehr auf meinen. Dabei hatte ich meinen extra geschüttelt, damit er schön rund ist.",
+          "bild": "Fina mit roten Zöpfen und violetter Mütze, ihr Glitzer-Bommel strahlt kleine Lichtpunkte. Krümel, Flitz und Tiri staunen mit offenem Mund. Bommi steht etwas abseits."
+        },
+        {
+          "text": "Dann haben wir gemalt. Finas Bild war perfekt, mit Schnee und Sternen. Meins war krumm, und mein Tannenbaum sah aus wie eine Gurke. Ich wurde so neidisch, dass mir ganz heiß wurde.",
+          "bild": "Zwei kleine Staffeleien nebeneinander: links ein wunderschönes Winterbild, rechts ein krummer grüner Baum, der wie eine Gurke aussieht. Bommi mit rotem Kopf und zusammengekniffenem Mund."
+        },
+        {
+          "text": "Als alle schliefen, habe ich etwas Gemeines gemacht. Ich habe Finas Glitzer-Bommel genommen und in meinem Koffer versteckt. Danach konnte ich nicht schlafen. Ich dachte, ich würde mich jetzt besser fühlen, aber mir war ganz schwer im Bauch.",
+          "bild": "Nacht, nur eine Kerze. Bommi schleicht auf Zehenspitzen mit dem funkelnden Bommel zu seinem Koffer. Sein eigener Schatten an der Wand ist klein und krumm, nicht gruselig."
+        },
+        {
+          "text": "Am Morgen suchte Fina überall, dann setzte sie sich hin und weinte. „Bei mir zu Hause hab ich keine Freunde. Du hast so viele. Darum bin ich gekommen.“",
+          "bild": "Fina sitzt auf einem Fingerhut, die Mütze ohne Bommel in den Händen, eine Träne auf der Wange. Bommi steht hinter einem Pinseltopf und schaut betroffen.",
+          "stimmen": [{ "figur": "fina", "satz": "Bei mir zu Hause hab ich keine Freunde. Du hast so viele. Darum bin ich gekommen." }]
+        },
+        {
+          "text": "Ich gab ihr den Bommel zurück. „Entschuldigung, das war gemein von mir.“ Dann malten wir zusammen ein Bild, mit ihrem Schnee und meinem Gurkenbaum. Oma Mooswinkel sagt: „Schau nicht auf den Bommel der anderen. Du hast deinen eigenen.“ Dafür gab es einen neuen Bommel. Und was könnt ihr richtig gut? Erzählt es mir! Wo ein Bommel liegt, war ich da.",
+          "bild": "Bommi und Fina malen lachend an einem gemeinsamen Bild, darauf Schnee, Sterne und ein Gurkenbaum. Finas Glitzer-Bommel ist wieder an ihrer Mütze. Davor ein neuer violetter Bommel."
+        }
+      ],
+      "aufbau": [
+        "Die Mini-Malstube aufbauen, daneben zwei winzige Bilder, eins schön und eins krumm gemalt.",
+        "Einen Glitzer-Bommel oder ein Stück Alufolie halb in Bommis Koffer oder eine Schachtel stecken.",
+        "Den Brief und einen violetten Bommel neben die Bilder legen."
+      ],
+      "brief": "Lieber Bommi, jeder kann etwas, das ein anderer nicht kann. Schau nicht auf den Bommel der anderen. Du hast deinen eigenen. Deine Oma Mooswinkel"
+    },
+    {
+      "nr": 8,
+      "id": "bommel-kette",
+      "titel": "Die Bommel-Kette",
+      "pflicht": true,
+      "stand": "entwurf",
+      "wert": "Dankbarkeit, Freundschaft",
+      "haken": "Abschied. Bommi will bleiben und muss doch nach Hause.",
+      "oma": "Wer Freunde hat, findet immer nach Hause.",
+      "mitmachen": "Ein Abschiedsbild malen und die Bommel-Kette an den Baum hängen.",
+      "bommel": "golden",
+      "video": "Psst! Ich bin's, Bommi. Bald ist Weihnachten, und ich muss nach Hause in die Wichtelwerkstatt. Meine Ski sind schon gepackt. Aber draußen tobt ein Schneesturm. Tiri soll mich abholen und mir den Weg zeigen. Ich sehe sie da draußen, wie sie gegen den Wind kämpft. Sie findet unsere Tür nicht! Es ist so dunkel. Ich drücke meine Nase ans Fenster und weiß nicht, was ich tun soll. Und wie das ausging? Blättert weiter!",
+      "bilder": [
+        {
+          "text": "Bald ist Weihnachten, und dann gehört ein Wichtel in die Wichtelwerkstatt. Ich habe meine Ski gepackt. Doch draußen tobte ein Schneesturm, so wild, dass die Fenster klapperten.",
+          "bild": "Bommi auf dem Fensterbrett mit geschultertem Koffer und Holzski, draußen wirbelt dichter Schnee. Drinnen warmes Kerzenlicht."
+        },
+        {
+          "text": "Tiri sollte mich abholen und mir den Weg zeigen. Ich sah sie draußen im Wind flattern. Sie flog hin und her, mal nach links und mal nach rechts. Aber sie fand unsere Tür einfach nicht.",
+          "bild": "Draußen im Schneegestöber kämpft Tiri mit Posttasche und blauer Mütze gegen den Wind, die Flügel zerzaust. Das Haus ist nur als dunkler Umriss zu ahnen. Nicht bedrohlich, eher stürmisch."
+        },
+        {
+          "text": "Es war so dunkel, dass ich kaum etwas sah. Ich drückte meine Nase an die Scheibe. Ohne Tiri finde ich nie nach Hause. Und ohne Licht findet Tiri nie zu mir.",
+          "bild": "Bommi drückt Nase und Hände an die beschlagene Fensterscheibe, der Mützenzipfel hängt ratlos herab. Hinter ihm stehen die Freunde, besorgt, aber zusammen."
+        },
+        {
+          "text": "Da hatten meine Freunde eine Idee. Krümel, Flitz und Brummel flüsterten kurz miteinander. Sie hängten die Kette mit allen Bommeln, die ihr gesammelt habt, ins Fenster und machten die Lichterkette an. „Geradeheraus gesagt: Das war die beste Idee des Jahres!“, rief Tiri und landete sicher bei uns.",
+          "bild": "Im Fenster hängt die rote Wollschnur mit bunten Bommeln, dazwischen eine leuchtende Lichterkette. Das warme Licht strahlt in den Schneesturm. Tiri landet mit ausgebreiteten Flügeln auf dem Fensterbrett, alle jubeln.",
+          "stimmen": [{ "figur": "tiri", "satz": "Geradeheraus gesagt: Das war die beste Idee des Jahres!" }]
+        },
+        {
+          "text": "Dann war es Zeit. Wir haben uns lange gedrückt, alle zusammen. Ich habe euch meinen großen Mützenbommel aufs Fensterbrett gelegt. Den hole ich mir nächstes Jahr wieder ab. Oma Mooswinkel sagt: „Wer Freunde hat, findet immer nach Hause.“ Danke für alles! Malt ihr mir ein Abschiedsbild? Und hängt die Kette an euren Baum. Wo ein Bommel liegt, war ich da.",
+          "bild": "Bommi auf Ski winkt zum Abschied, neben ihm Tiri, im Morgenlicht. Seine Mütze hat keinen Bommel mehr. Auf dem Fensterbrett liegt der große weiße Mützenbommel neben einem neuen goldenen Bommel."
+        }
+      ],
+      "aufbau": [
+        "Die Bommel-Kette mit allen gesammelten Bommeln ins Fenster hängen, die Mini-Lichterkette dazu.",
+        "Die Mini-Ski an die Wichteltür lehnen, die Tür einen Spalt offen lassen.",
+        "Einen großen weißen Bommel, einen goldenen Bommel und den Brief aufs Fensterbrett legen."
+      ],
+      "brief": "Lieber Bommi, ich freue mich, dass du heimkommst. Ich weiß, dass du deine Freunde vermissen wirst. Wer Freunde hat, findet immer nach Hause. Deine Oma Mooswinkel"
+    }
+  ],
+  "trailer": {
+    "stand": "entwurf",
+    "laenge": "20 bis 30 Sekunden",
+    "sprecher": "bommi",
+    "szenen": [
+      { "sekunden": 3, "bild": "Kleine Wichteltür an der Wand, ein Bommel rollt ins Bild.", "spricht": "Psst! Ich bin's, Bommi." },
+      { "sekunden": 5, "bild": "Bommi tritt aus der Tür und grinst in die Kamera.", "spricht": "Im Advent ziehe ich bei euch ein, hinter einer kleinen Tür." },
+      { "sekunden": 9, "bild": "Drei schnelle Szenen: Krümelspur aus Nr. 2, Schaumberg aus Nr. 4, Baustelle aus Nr. 5.", "spricht": "Und nachts? Da ist was los! Kekskrümel überall. Schaum bis unter die Mütze. Eine Baustelle mitten im Zimmer!" },
+      { "sekunden": 4, "bild": "Die Bommel-Kette wächst Bommel um Bommel.", "spricht": "Für jede gute Tat wächst unsere Bommel-Kette. Seid ihr dabei?" },
+      { "sekunden": 5, "bild": "Texttafel auf warmem Hintergrund, Bommi winkt am Rand.", "tafel": "8 Wichtelgeschichten. Material zum Bestellen dabei. Gratis auf schatzweg.de" }
+    ]
+  }
+}
