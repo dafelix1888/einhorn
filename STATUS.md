@@ -4,6 +4,8 @@ Stand: 16. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern
 
 ## Wichtel Bommi (Schwerpunkt bis Start 27. November, STRAT-46)
 
+**21. November nachts, UNICORN-135 (Muster Geschichte 1):** Muster-Seite `app/themen/wichtel/muster/index.html` (noindex, nirgends verlinkt): Video 35 s (5,6 MB), Bildergeschichte mit „Bommi liest vor“, Stimmproben, Melodie, Bildvergleich. Bommis Stimme `svptHMXByWlhGYcu3wTj` steht in `stimmen.json`. Herstellungsweg und Kosten in `app/themen/wichtel/herstellung.md` (rund 9.000 Punkte je Geschichte), Video-Schnitt mit `stimmen/wichtel-video.sh`. Test `tests/wichtel-muster.test.cjs`.
+
 **20. November nachts, UNICORN-134:** Grundlagen in `app/themen/wichtel/`: `figurenblatt.md` (Stil, Größen, 6 Figuren plus Oma Mooswinkel, Bommel-Farben je Geschichte), `stimmen.json` (Stimmen-Plan: Bommi neu mit drei Proben, Flitz = Rudi, Brummel = Bruno, Fina = Alfonso aus der Einhorn-Tour, Krümel und Tiri aus der Bibliothek), `geschichten.json` (alle 8 Geschichten: Video-Text, 5 Bilder mit Text und Bildbeschreibung, Sätze der Figuren, Aufbau in 3 Schritten, Mini-Brief; dazu der Trailer). Nr. 1 fertig, Rest Entwurf. `tests/wichtel-texte.test.cjs` prüft Wortzahlen, feste Sätze, Omas Satz, verbotene Wörter. In Bildschirmtexten „Material“ statt „Einkaufsliste“ (Wortliste), Frage dazu an Strategist in UNICORN-134.
 
 ## Ziel und Arbeitsreihenfolge (STRAT-14)

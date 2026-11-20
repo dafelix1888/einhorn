@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Muster: Bommi zieht ein</title>
+<style>
+  :root { --papier:#fbf6ec; --tinte:#3b2f25; --rot:#b8322a; --gruen:#5d7a3a; --leise:#7a6a5a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--papier); color:var(--tinte); font:17px/1.5 Georgia, "Times New Roman", serif; }
+  main { max-width:480px; margin:0 auto; padding:16px 16px 48px; }
+  h1 { font-size:1.5rem; margin:.2em 0 .1em; }
+  h2 { font-size:1.15rem; margin:1.6em 0 .4em; }
+  .klein { color:var(--leise); font-size:.9rem; }
+  video { width:100%; aspect-ratio:9/16; background:#000; border-radius:12px; display:block; }
+  .seite img { width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:12px; display:block; }
+  .seite p { margin:.8em 0; min-height:6.5em; }
+  .knoepfe { display:flex; gap:8px; align-items:center; }
+  button { font:inherit; border:0; border-radius:999px; padding:10px 16px; background:var(--gruen); color:#fff; cursor:pointer; }
+  button.leise { background:#e8dfcf; color:var(--tinte); }
+  button[disabled] { opacity:.4; }
+  .zaehler { margin-left:auto; color:var(--leise); font-size:.9rem; }
+  audio { width:100%; margin:.2em 0 .8em; }
+  .vgl { display:flex; gap:8px; } .vgl figure { margin:0; flex:1; } .vgl img { width:100%; border-radius:8px; }
+  figcaption { font-size:.8rem; color:var(--leise); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Bommi zieht ein</h1>
+  <p class="klein">Muster für Geschichte 1 (UNICORN-135). Nur zur Abnahme, noch nicht für Eltern verlinkt.</p>
+
+  <h2>1. Video</h2>
+  <video id="video" src="g1-video.mp4" poster="g1-bild1.jpg" controls playsinline preload="metadata"></video>
+
+  <h2>2. Bildergeschichte</h2>
+  <div class="seite">
+    <img id="bild" src="g1-bild1.jpg" alt="">
+    <p id="text"></p>
+    <div class="knoepfe">
+      <button id="zurueck" class="leise" aria-label="Zurück">‹</button>
+      <button id="vorlesen">Bommi liest vor</button>
+      <button id="weiter" class="leise" aria-label="Weiter">›</button>
+      <span id="zaehler" class="zaehler"></span>
+    </div>
+  </div>
+
+  <h2>3. Für die Abnahme</h2>
+  <p class="klein">Bommis Stimme: drei Entwürfe mit demselben Text. Gewählt: Probe 1.</p>
+  <p>Probe 1 (gewählt)</p><audio controls preload="none" src="bommi-probe-1.mp3"></audio>
+  <p>Probe 2</p><audio controls preload="none" src="bommi-probe-2.mp3"></audio>
+  <p>Probe 3</p><audio controls preload="none" src="bommi-probe-3.mp3"></audio>
+  <p>Bommi-Melodie</p><audio controls preload="none" src="bommi-melodie.mp3"></audio>
+  <p class="klein">Bild 4 im Vergleich: links günstiges Modell (ein Fuß ohne Schuh), rechts teures Modell (genommen).</p>
+  <div class="vgl">
+    <figure><img src="g1-bild4-flash-vergleich.jpg" alt=""><figcaption>günstig</figcaption></figure>
+    <figure><img src="g1-bild4.jpg" alt=""><figcaption>teuer</figcaption></figure>
+  </div>
+</main>
+<script>
+(function(){
+  var seiten = [], i = 0, ton = new Audio();
+  var bild = document.getElementById('bild'), text = document.getElementById('text');
+  var zaehler = document.getElementById('zaehler'), vorlesen = document.getElementById('vorlesen');
+  var zurueck = document.getElementById('zurueck'), weiter = document.getElementById('weiter');
+  function zeige(n){
+    i = Math.max(0, Math.min(seiten.length - 1, n));
+    ton.pause();
+    bild.src = 'g1-bild' + (i + 1) + '.jpg';
+    text.textContent = seiten[i] ? seiten[i].text : '';
+    zaehler.textContent = (i + 1) + ' / ' + seiten.length;
+    zurueck.disabled = i === 0; weiter.disabled = i === seiten.length - 1;
+    vorlesen.textContent = 'Bommi liest vor';
+  }
+  vorlesen.onclick = function(){
+    if (!ton.paused) { ton.pause(); vorlesen.textContent = 'Bommi liest vor'; return; }
+    ton.src = 'g1-bild' + (i + 1) + '.mp3'; ton.play(); vorlesen.textContent = 'Pause';
+  };
+  ton.onended = function(){ vorlesen.textContent = 'Bommi liest vor'; };
+  zurueck.onclick = function(){ zeige(i - 1); };
+  weiter.onclick = function(){ zeige(i + 1); };
+  fetch('../geschichten.json').then(function(r){ return r.json(); }).then(function(d){
+    seiten = d.geschichten[0].bilder; zeige(0);
+  });
+})();
+</script>
+</body>
+</html>
