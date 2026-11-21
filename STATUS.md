@@ -4,6 +4,8 @@ Stand: 16. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern
 
 ## Wichtel Bommi (Schwerpunkt bis Start 27. November, STRAT-46)
 
+**21. November abends, UNICORN-138, Video Geschichte 2:** `app/themen/wichtel/g2/g2-video.mp4` (35 s, 4,7 MB) mit `stimmen/wichtel-video.sh` aus Bild 1 und 3 (JPG aus dem Repo als PNG), 3 Clips ohne Ton (Veo 3.1 Lite, Bausteine „G2 Clip 1..3“ im Ablauf `bUANepj8Eae68ZH1wxxY`), Melodie aus `muster/`, Ton aus „G2 Sprache Video“. Clip 1 ohne Figur (Kamera fährt von Bommi weg zur Keksdose). Verbrauch 4.363 Punkte. Test `wichtel-serie` verlangt das Video von Geschichte 2. Als Nächstes Videos 3 bis 8 genauso, dann der Trailer.
+
 **21. November nachmittags, UNICORN-138, Geschichte 8:** Bildergeschichte „Die Bommel-Kette“ in `app/themen/wichtel/g8/` (5 Bilder, 5 Töne; Bild 4 mit Tiris Satz in ihrer Stimme, 0,35 s Pausen). Bild 5: Bommis Mütze ohne Bommel, weißer und goldener Bommel auf dem Fensterbrett. ElevenLabs-Ablauf `ledSvsfuBGzs0eDtTYCW` („Wichtel G8 Bommel-Kette (UNICORN-138)“), Video-Text dort im Baustein „G8 Sprache Video“ (26 s). Verbrauch 4.790 Punkte. Damit sind alle 8 Bildergeschichten fertig; als Nächstes die Videos 2 bis 8 und der Trailer.
 
 **21. November nachmittags, UNICORN-138, Geschichte 7:** Bildergeschichte „Fina kann alles besser“ in `app/themen/wichtel/g7/` (5 Bilder, 5 Töne; Bild 4 mit Finas Satz in ihrer Stimme, 0,35 s Pause). Fina hat eine neue Stimme: „Skittle Bee“ aus der Bibliothek (`xLCJR8xcZX2YjImGFyGw`, jung, hell, kann traurig), statt Alfonso aus der Einhorn-Tour (`stimmen.json`). ElevenLabs-Ablauf `QAaLo0kpksV1ZGZd6Kzg` („Wichtel G7 Fina (UNICORN-138)“), Video-Text dort im Baustein „G7 Sprache Video“ (28 s). Verbrauch 4.803 Punkte.

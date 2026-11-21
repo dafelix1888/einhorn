@@ -29,5 +29,8 @@ ok(fertig.includes(5), 'Geschichte 5 ist da');
 ok(fertig.includes(6), 'Geschichte 6 ist da');
 ok(fertig.includes(7), 'Geschichte 7 ist da');
 ok(fertig.includes(8), 'Geschichte 8 ist da');
+const videos=fertig.filter(nr=>groesse(WK.medien(nr).video));
+ok(videos.includes(2), 'Geschichte 2 hat ein Video');
+console.log('Videos fertig: '+[1].concat(videos).join(', '));
 console.log('Bildergeschichten fertig: '+[1].concat(fertig).join(', '));
 process.exit(fehler?1:0);
