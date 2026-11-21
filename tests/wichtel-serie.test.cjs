@@ -27,5 +27,6 @@ ok(fertig.includes(3), 'Geschichte 3 ist da');
 ok(fertig.includes(4), 'Geschichte 4 ist da');
 ok(fertig.includes(5), 'Geschichte 5 ist da');
 ok(fertig.includes(6), 'Geschichte 6 ist da');
+ok(fertig.includes(7), 'Geschichte 7 ist da');
 console.log('Bildergeschichten fertig: '+[1].concat(fertig).join(', '));
 process.exit(fehler?1:0);
