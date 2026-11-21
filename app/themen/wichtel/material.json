@@ -1,6 +1,7 @@
 {
   "zweck": "Material je Geschichte für Wichtel Bommi (STRAT-41, Abschnitt 4). Eine Quelle für Zeitplan (UNICORN-141) und Material besorgen (UNICORN-137). Preise von einer Vergleichsseite, auf Amazon nicht geprüft.",
   "bestellen_tage_vorher": 4,
+  "kleinteile": "Kleinteile wie Bommel, Murmeln, Walnüsse oder Kastanien sind nichts für Kinder unter drei Jahren. Die Nüsse aus Geschichte 3 sind zum Suchen, nicht zum Essen. Achtet auf Allergien.",
   "standard": { "erster": "12-01", "letzter": "12-22" },
   "pakete": {
     "klein":  { "name": "Klein",  "zeile": "3 Geschichten", "nr": [1, 2, 8] },
