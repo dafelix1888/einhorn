@@ -8,7 +8,7 @@ let f=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) f++; };
     const c=await b.newContext({viewport:vp});
     await c.route(u=>!/^https?:\/\/(localhost|127\.0\.0\.1)/.test(u.toString()), r=>r.abort());
     const p=await c.newPage(), errs=[]; p.on('pageerror', e=>errs.push(e.message));
-    await p.goto(B+'/wichtel/'); await p.waitForURL(/app\/wichtel\.html/); await p.waitForSelector('#los');
+    await p.goto(B+'/wichtel/'); await p.click('a.cta'); await p.waitForURL(/app\/wichtel\.html/); await p.waitForSelector('#los');   // Landingpage → „Los geht's“ (UNICORN-148)
     ok(await p.locator('#s-start h1').innerText()==='Wichtel Bommi zieht bei euch ein', name+': Einstieg mit Überschrift');
     await p.click('#los');
     ok(await p.locator('#pakete button').count()===3, name+': drei Pakete');
