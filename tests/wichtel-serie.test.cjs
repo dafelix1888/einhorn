@@ -34,6 +34,8 @@ ok(videos.includes(2), 'Geschichte 2 hat ein Video');
 ok(videos.includes(3), 'Geschichte 3 hat ein Video');
 ok(videos.includes(4), 'Geschichte 4 hat ein Video');
 ok(videos.includes(5), 'Geschichte 5 hat ein Video');
+ok(videos.includes(6), 'Geschichte 6 hat ein Video');
+ok(videos.includes(7), 'Geschichte 7 hat ein Video');
 console.log('Videos fertig: '+[1].concat(videos).join(', '));
 console.log('Bildergeschichten fertig: '+[1].concat(fertig).join(', '));
 process.exit(fehler?1:0);
