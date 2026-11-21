@@ -23,5 +23,6 @@ for(let nr=2;nr<=8;nr++){
   else console.log('     Geschichte '+nr+': noch kein Video, Kinder-Ansicht zeigt gleich die Bilder');
 }
 ok(fertig.includes(2), 'Geschichte 2 ist da');
+ok(fertig.includes(3), 'Geschichte 3 ist da');
 console.log('Bildergeschichten fertig: '+[1].concat(fertig).join(', '));
 process.exit(fehler?1:0);
