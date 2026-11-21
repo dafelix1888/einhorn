@@ -59,15 +59,16 @@
     var titel={}; (geschichten.geschichten||geschichten).forEach(function(g){ titel[g.nr]=g; });
     var zeilen=nrs.map(function(nr){
       var e=wahl.eigene && wahl.eigene[nr];
-      return { nr:nr, titel:titel[nr]?titel[nr].titel:'Geschichte '+nr, wert:titel[nr]?titel[nr].wert:'', datum: gueltig(e)?e:auto[nr], eigen: gueltig(e), kaufen:[], basteln:[] };
+      return { nr:nr, titel:titel[nr]?titel[nr].titel:'Geschichte '+nr, wert:titel[nr]?titel[nr].wert:'', datum: gueltig(e)?e:auto[nr], eigen: gueltig(e), kaufen:[], basteln:[], material:[] };
     }).sort(function(a,b){ return a.datum<b.datum?-1:a.datum>b.datum?1:a.nr-b.nr; });
     var summe=0, offen=0;
     zeilen.forEach(function(z, i){
       material.artikel.forEach(function(a){
         if(!(a.nr===z.nr || (a.nr==='alle' && i===0))) return;
-        if(a.aus){ z.basteln.push(kauf.indexOf(a.aus)>=0 ? a.name+' bereitlegen' : a.selbst); return; }
+        if(a.aus){ var ausGekauft=kauf.indexOf(a.aus)>=0; z.basteln.push(ausGekauft ? a.name+' bereitlegen' : a.selbst); z.material.push({ id:a.id, name:a.name, gekauft:ausGekauft, selbst:a.selbst }); return; }
         if(kauf.indexOf(a.id)>=0){ z.kaufen.push(a); if(a.preis==null) offen++; else summe+=a.preis; }
         else z.basteln.push(a.selbst);
+        z.material.push({ id:a.id, name:a.name, gekauft:kauf.indexOf(a.id)>=0, selbst:a.selbst, extra:!!a.extra });
       });
       z.basteln.push('Brief von Oma Mooswinkel ausdrucken');
       z.bestellenBis = z.kaufen.length ? plus(z.datum, -vorher) : null;
@@ -113,8 +114,29 @@
     return { kaufen:kaufen, basteln:basteln, summe:p.summe, ohnePreis:p.ohnePreis };
   }
 
+  // Eltern-Ansicht (UNICORN-142). Gespielt = letztes Bild der Bildergeschichte geöffnet (sj.wichtel.gespielt, UNICORN-143).
+  function fortschritt(zeilen, gespielt){
+    var g=(gespielt||[]).map(Number), n=zeilen.filter(function(z){ return g.indexOf(z.nr)>=0; }).length, von=zeilen.length;
+    return { gespielt:n, von:von, text:n+' von '+von+(von===1?' Bommel':' Bommeln'), fertig: von>0 && n===von };
+  }
+  // Was heute und morgen dran ist (morgen = heute Abend aufbauen).
+  function dran(zeilen, heute){
+    var m=plus(heute, 1), r={ heute:null, morgen:null };
+    zeilen.forEach(function(z){ if(z.datum===heute && !r.heute) r.heute=z; if(z.datum===m && !r.morgen) r.morgen=z; });
+    return r;
+  }
+  // Vorbereitungs-Seite einer Geschichte: Aufbau in drei Schritten plus fester Bommel-Schritt, Material zum gewählten Weg, Mitmach-Aufgabe, Brief.
+  function vorbereitung(zeile, g){
+    g=g||{};
+    var farbe=g.bommel ? g.bommel+'en ' : '';
+    var aufbau=(g.aufbau||[]).slice(0,3);
+    aufbau.push('Zum Schluss: einen '+farbe+'Bommel dazulegen, falls er noch fehlt. Wo ein Bommel liegt, war Bommi da.');
+    return { nr:zeile.nr, titel:zeile.titel, datum:zeile.datum, bastelnBis:zeile.bastelnBis, aufbau:aufbau,
+      material:zeile.material.slice(), mitmachen:g.mitmachen||'', brief:g.brief||'', bommel:g.bommel||'' };
+  }
+
   function euro(x){ return x.toFixed(2).replace('.',',').replace(',00','')+' €'; }
 
-  var WK={ saison:saison, advent:advent, paket:paket, welchesPaket:welchesPaket, auswahl:auswahl, tage:tage, plan:plan, kurz:kurz, plus:plus, euro:euro, gueltig:gueltig, medien:medien, heutige:heutige, einkauf:einkauf, link:link };
+  var WK={ saison:saison, advent:advent, paket:paket, welchesPaket:welchesPaket, auswahl:auswahl, tage:tage, plan:plan, kurz:kurz, plus:plus, euro:euro, gueltig:gueltig, medien:medien, heutige:heutige, einkauf:einkauf, link:link, fortschritt:fortschritt, dran:dran, vorbereitung:vorbereitung };
   if(typeof module!=='undefined' && module.exports) module.exports=WK; else wurzel.WichtelKern=WK;
 })(this);
