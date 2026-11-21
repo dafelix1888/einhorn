@@ -32,6 +32,8 @@ ok(fertig.includes(8), 'Geschichte 8 ist da');
 const videos=fertig.filter(nr=>groesse(WK.medien(nr).video));
 ok(videos.includes(2), 'Geschichte 2 hat ein Video');
 ok(videos.includes(3), 'Geschichte 3 hat ein Video');
+ok(videos.includes(4), 'Geschichte 4 hat ein Video');
+ok(videos.includes(5), 'Geschichte 5 hat ein Video');
 console.log('Videos fertig: '+[1].concat(videos).join(', '));
 console.log('Bildergeschichten fertig: '+[1].concat(fertig).join(', '));
 process.exit(fehler?1:0);
