@@ -4,6 +4,8 @@ Stand: 16. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern
 
 ## Wichtel Bommi (Schwerpunkt bis Start 27. November, STRAT-46)
 
+**21. November vormittags, UNICORN-138, Geschichte 5:** Bildergeschichte „Die Nachtbaustelle“ in `app/themen/wichtel/g5/` (5 Bilder, 5 Töne; Bild 3 mit Brummels Satz in seiner Stimme, 0,35 s Pausen). ElevenLabs-Ablauf `6bsyG7lvwVmi7seqsiyT` („Wichtel G5 Nachtbaustelle“), Video-Text dort im Baustein „G5 Sprache Video“ (34 s). Verbrauch 4.774 Punkte. UNICORN-147 (Post-Bilder für Instagram): Unicorn darf das Marketer-Repo nicht lesen, Marketer hängt die Bilder an das Ticket.
+
 **21. November morgens, UNICORN-138, Geschichte 4:** Bildergeschichte „Der große Waschtag“ in `app/themen/wichtel/g4/` (5 Bilder, 5 Töne; Bild 3 mit Krümels Satz in ihrer Stimme, 0,35 s Pausen). Bild 5 einmal nachbearbeitet (Wollknäuel → hellblauer Bommel, 609 Punkte aus der Reserve). ElevenLabs-Ablauf `NjOsvZ6yl2rledyZ9Bo8` („Wichtel G4 Waschtag“), Video-Text dort im Baustein „G4 Sprache Video“ (31 s). Verbrauch 5.262 Punkte.
 
 **21. November morgens, UNICORN-138, Geschichte 3:** Bildergeschichte „Flitz buddelt im Blumentopf“ in `app/themen/wichtel/g3/` (5 Bilder, 5 Töne; Bild 2 bis 4 mit Flitz' Sätzen in seiner Stimme, 0,35 s Pausen). ElevenLabs-Ablauf `vpTePu7Dnf50XcSimDTZ` („Wichtel G3 Blumentopf“), Video-Text dort im Baustein „G3 Sprache Video“ (29 s). Verbrauch 4.698 Punkte.
