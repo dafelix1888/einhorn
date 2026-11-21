@@ -4,11 +4,9 @@ Stand: 16. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern
 
 ## Wichtel Bommi (Schwerpunkt bis Start 27. November, STRAT-46)
 
-<<<<<<< Updated upstream
-**21. November nachmittags, UNICORN-138, Geschichte 6:** Bildergeschichte „Die Mehlschnee-Panne“ in `app/themen/wichtel/g6/` (5 Bilder, 5 Töne; Bild 4 mit Tiris Satz in ihrer Stimme, 0,35 s Pausen). ElevenLabs-Ablauf `nsI6Rmrz5enMMRxkgLfE` („Wichtel G6 Mehlschnee (UNICORN-138)“), Video-Text dort im Baustein „G6 Sprache Video“ (29 s). Verbrauch 4.771 Punkte.
-=======
 **21. November nachmittags, UNICORN-148, Landingpage:** `wichtel/index.html` ist jetzt die Landingpage von Marketer (MAR-75, unverändert, sha256 im Test `tests/wichtel-landing.test.cjs`), „Los geht's“ führt zu `/app/wichtel.html`. `wichtel/teilen.jpg` mit Marketers Skript aus `bommi-vorlage.jpg` erzeugt. Bis UNICORN-146 bleibt `/wichtel` in `robots.txt` und `_headers` gesperrt; Sitemap-Eintrag und Startseiten-Kachel kommen erst mit UNICORN-146. Trailer: später nur `src` am `<video id="trailer">` tauschen.
->>>>>>> Stashed changes
+
+**21. November nachmittags, UNICORN-138, Geschichte 6:** Bildergeschichte „Die Mehlschnee-Panne“ in `app/themen/wichtel/g6/` (5 Bilder, 5 Töne; Bild 4 mit Tiris Satz in ihrer Stimme, 0,35 s Pausen). ElevenLabs-Ablauf `nsI6Rmrz5enMMRxkgLfE` („Wichtel G6 Mehlschnee (UNICORN-138)“), Video-Text dort im Baustein „G6 Sprache Video“ (29 s). Verbrauch 4.771 Punkte.
 
 **21. November mittags, UNICORN-147 (Post-Bilder):** 17 Bilder für Instagram und Pinterest in `app/themen/wichtel/posts/` (8 für den Start, 9 für 29.11. bis 4.12.), erzeugt mit den Skripten von Marketer aus UNICORN-147 (`motive.py`, `motive_woche1.py`, nicht im Repo) aus `muster/` und `g2/`, alle byte-gleich mit Marketers Prüfsummen. Nicht im Service Worker, nirgends verlinkt. Quellbilder in `muster/` und `g2/` nicht ändern, sonst stimmen neue Läufe nicht. Test `tests/wichtel-posts.test.cjs`. Service Worker v111.
 
