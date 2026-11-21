@@ -10,7 +10,12 @@
   function schreib(k,v){ try{ if(v==null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
   function konto(){ return root.Konto && Konto.aktiv() ? Konto : null; }
   function angemeldet(){ var k=konto(); return !!(k && k.angemeldet()); }
-  function lokal(){ return { wahl:lies('sj.wichtel'), gespielt:lies('sj.wichtel.gespielt')||[], zeit:+lies('sj.wichtel.zeit')||0 }; }
+  function lokal(){
+    var d={ wahl:lies('sj.wichtel'), gespielt:lies('sj.wichtel.gespielt')||[], zeit:+lies('sj.wichtel.zeit')||0 };
+    var m=root.WichtelMessung && WichtelMessung.stand();   // Familien-Kennung und Prüf-Markierung (UNICORN-140)
+    if(m && m.familie) d.familie=m.familie; if(m && m.pruefung) d.pruefung=m.pruefung;
+    return d;
+  }
 
   // Schranke: vor Geschichte 2 und später, solange der Server erreichbar ist und niemand angemeldet ist.
   function schranke(nr){ return WK.braucheKonto(nr) && !!konto() && !angemeldet(); }
@@ -32,6 +37,7 @@
       var vorher=JSON.stringify(lokal()), r=WK.abgleich(lokal(), z);
       if(r.daten.wahl) schreib('sj.wichtel', r.daten.wahl);
       schreib('sj.wichtel.gespielt', r.daten.gespielt); schreib('sj.wichtel.zeit', r.daten.zeit||null);
+      if(root.WichtelMessung) WichtelMessung.uebernehmen(r.daten);
       if(z) schreib('sj.wichtel.erinnern', !!z.erinnern);
       var p=r.hochladen ? hochladen() : Promise.resolve();
       return p.then(function(){ return JSON.stringify(lokal())!==vorher; });

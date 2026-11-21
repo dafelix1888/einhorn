@@ -75,7 +75,7 @@
   function neuMelden(u){
     if(!u || !u.id || !u.created_at || Date.now()-Date.parse(u.created_at)>=30*60000) return;
     if(lies('sj.konto.signup')===u.id) return;
-    schreib('sj.konto.signup', u.id); mkMelden('signup', /wichtel/.test(location.pathname) ? {herkunft:'wichtel'} : undefined);   // Wichtel-Bereich (UNICORN-144)
+    schreib('sj.konto.signup', u.id); mkMelden('signup', /wichtel/.test(location.pathname) ? (root.WichtelMessung ? root.WichtelMessung.signup() : {herkunft:'wichtel'}) : undefined);   // Wichtel-Bereich (UNICORN-144, UNICORN-140)
   }
   // Ereignis an Marketer (gleiche Schnittstelle wie m.js, ohne Cookies, nichts auf dem Gerät).
   // Seiten mit m.js nutzen dessen track(); das Spiel lädt m.js bewusst nicht und schickt nur seine wenigen Ereignisse direkt.
