@@ -14,6 +14,9 @@ for(let i=1;i<=5;i++){
 }
 ok(da('g1-video.mp4'), 'Video liegt da');
 ok(groesse('g1-video.mp4')<10*MB, 'Video ist kleiner als 10 MB ('+(groesse('g1-video.mp4')/MB).toFixed(1)+' MB)');
+// Schluss-Standbild aus dem Original-Bild 3, nicht aus dem letzten Clip-Bild (Abnahme UNICORN-135).
+const schnitt=fs.readFileSync(path.join(__dirname,'..','stimmen','wichtel-video.sh'),'utf8');
+ok(/-t 7\.5 -i "\$D\/b3\.png"/.test(schnitt) && !/c3_last/.test(schnitt), 'Schnitt nimmt als Schluss-Standbild das Original-Bild 3');
 ok(da('bommi-melodie.mp3'), 'Bommi-Melodie liegt da');
 ok(['bommi-probe-1.mp3','bommi-probe-2.mp3','bommi-probe-3.mp3'].every(da), 'Drei Stimmproben liegen da');
 
