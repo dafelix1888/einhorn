@@ -94,8 +94,27 @@
     return nr;
   }
 
+  // Material besorgen (UNICORN-137): Kauf-Artikel einmal je Artikel mit Link und frühestem Bestelltag, Basteln je Geschichte.
+  function link(a){
+    if(a.asin) return 'https://www.amazon.de/dp/'+a.asin;
+    return 'https://www.amazon.de/s?k='+encodeURIComponent(a.suche||a.name).replace(/%20/g,'+');
+  }
+  function einkauf(p){
+    var nach={}, kaufen=[], basteln=[];
+    p.zeilen.forEach(function(z){
+      z.kaufen.forEach(function(a){
+        var e=nach[a.id];
+        if(!e){ e=nach[a.id]={ id:a.id, name:a.name, preis:a.preis, geschaetzt:!!a.geschaetzt, link:link(a), selbst:a.selbst, extra:!!a.extra, nr:[], bis:z.bestellenBis }; kaufen.push(e); }
+        e.nr.push(z.nr); if(z.bestellenBis<e.bis) e.bis=z.bestellenBis;
+      });
+      basteln.push({ nr:z.nr, titel:z.titel, bis:z.bastelnBis, was:z.basteln.slice() });
+    });
+    kaufen.sort(function(a,b){ return a.bis<b.bis?-1:a.bis>b.bis?1:0; });
+    return { kaufen:kaufen, basteln:basteln, summe:p.summe, ohnePreis:p.ohnePreis };
+  }
+
   function euro(x){ return x.toFixed(2).replace('.',',').replace(',00','')+' €'; }
 
-  var WK={ saison:saison, advent:advent, paket:paket, welchesPaket:welchesPaket, auswahl:auswahl, tage:tage, plan:plan, kurz:kurz, plus:plus, euro:euro, gueltig:gueltig, medien:medien, heutige:heutige };
+  var WK={ saison:saison, advent:advent, paket:paket, welchesPaket:welchesPaket, auswahl:auswahl, tage:tage, plan:plan, kurz:kurz, plus:plus, euro:euro, gueltig:gueltig, medien:medien, heutige:heutige, einkauf:einkauf, link:link };
   if(typeof module!=='undefined' && module.exports) module.exports=WK; else wurzel.WichtelKern=WK;
 })(this);
