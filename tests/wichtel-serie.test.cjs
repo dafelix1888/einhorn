@@ -24,5 +24,6 @@ for(let nr=2;nr<=8;nr++){
 }
 ok(fertig.includes(2), 'Geschichte 2 ist da');
 ok(fertig.includes(3), 'Geschichte 3 ist da');
+ok(fertig.includes(4), 'Geschichte 4 ist da');
 console.log('Bildergeschichten fertig: '+[1].concat(fertig).join(', '));
 process.exit(fehler?1:0);

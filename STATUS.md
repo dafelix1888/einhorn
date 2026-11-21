@@ -4,6 +4,8 @@ Stand: 16. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern
 
 ## Wichtel Bommi (Schwerpunkt bis Start 27. November, STRAT-46)
 
+**21. November morgens, UNICORN-138, Geschichte 4:** Bildergeschichte „Der große Waschtag“ in `app/themen/wichtel/g4/` (5 Bilder, 5 Töne; Bild 3 mit Krümels Satz in ihrer Stimme, 0,35 s Pausen). Bild 5 einmal nachbearbeitet (Wollknäuel → hellblauer Bommel, 609 Punkte aus der Reserve). ElevenLabs-Ablauf `NjOsvZ6yl2rledyZ9Bo8` („Wichtel G4 Waschtag“), Video-Text dort im Baustein „G4 Sprache Video“ (31 s). Verbrauch 5.262 Punkte.
+
 **21. November morgens, UNICORN-138, Geschichte 3:** Bildergeschichte „Flitz buddelt im Blumentopf“ in `app/themen/wichtel/g3/` (5 Bilder, 5 Töne; Bild 2 bis 4 mit Flitz' Sätzen in seiner Stimme, 0,35 s Pausen). ElevenLabs-Ablauf `vpTePu7Dnf50XcSimDTZ` („Wichtel G3 Blumentopf“), Video-Text dort im Baustein „G3 Sprache Video“ (29 s). Verbrauch 4.698 Punkte.
 
 **21. November früh, UNICORN-138 (Serie), Geschichte 2:** Bildergeschichte „Der Keks-Krümel-Krimi“ in `app/themen/wichtel/g2/` (5 Bilder, 5 Töne; Bild 4 mit Krümels Satz in ihrer Stimme, 0,35 s Pausen). ElevenLabs-Ablauf `bUANepj8Eae68ZH1wxxY` („Wichtel G2 Keks-Krimi“), dort liegt auch der Video-Text (Baustein „G2 Sprache Video“, 31 s) für den späteren Video-Schnitt. Video folgt nach allen Bildergeschichten. Test `tests/wichtel-serie.test.cjs` prüft jede vorhandene Geschichte 2 bis 8. Je Geschichte etwa 4.650 Punkte (Bilder 3.045, Sprache 1.608).
