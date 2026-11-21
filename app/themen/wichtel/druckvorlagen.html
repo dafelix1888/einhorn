@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Wichtel Bommi · Druckvorlagen</title>
+<!-- UNICORN-137: Quelle für druckvorlagen.pdf. Neu erzeugen: node stimmen/wichtel-druck.cjs (braucht einen Server auf Port 8765). -->
+<style>
+  @page { size:A4; margin:0; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:11pt/1.4 Georgia, "Times New Roman", serif; color:#3b2f25; background:#fff; }
+  .seite { width:210mm; height:297mm; padding:14mm 14mm 12mm; position:relative; overflow:hidden; page-break-after:always; break-after:page; }
+  .seite:last-child { page-break-after:auto; break-after:auto; }
+  h1 { font-size:20pt; margin:0 0 3mm; }
+  h2 { font-size:15pt; margin:0 0 2mm; }
+  .zeile { color:#7a6a5a; font-size:10pt; margin:0 0 5mm; }
+  .fuss { position:absolute; left:14mm; right:14mm; bottom:8mm; font-size:8pt; color:#7a6a5a; display:flex; justify-content:space-between; }
+  .schneiden { border:.4mm dashed #9a8a7a; }
+  .hinweis { background:#f3e3b5; border-radius:3mm; padding:3mm 4mm; margin:4mm 0; }
+  ol.inhalt { padding-left:6mm; } ol.inhalt li { margin:1.5mm 0; }
+  .mitte { display:flex; justify-content:center; align-items:flex-start; gap:8mm; flex-wrap:wrap; }
+  .raster { display:grid; gap:6mm; }
+  .zwei { grid-template-columns:1fr 1fr; }
+  .drei { grid-template-columns:1fr 1fr 1fr; }
+  /* Willkommensschild */
+  .schild { height:110mm; border-radius:6mm; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:6mm; }
+  .hohl { font:bold 40pt/1.05 Georgia, serif; color:#fff; -webkit-text-stroke:.6mm #3b2f25; }
+  /* Etikett */
+  .etikett { height:52mm; border-radius:3mm; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3mm; }
+  .etikett b { font-size:15pt; color:#b8322a; display:block; }
+  .etikett span { font-size:9pt; }
+  /* Briefe */
+  .brief { height:116mm; padding:9mm 9mm 7mm; display:flex; flex-direction:column; background:#fffdf8; }
+  .brief .an { font-size:9pt; color:#7a6a5a; border-bottom:.3mm solid #e8dfcf; padding-bottom:1.5mm; margin-bottom:4mm; display:flex; justify-content:space-between; }
+  .brief p { font:italic 12.5pt/1.5 Georgia, serif; margin:0 0 2mm; }
+  .brief .gruss { margin-top:auto; text-align:right; font-style:italic; }
+  .brief .bommel { display:inline-block; width:4mm; height:4mm; border-radius:50%; border:.3mm solid #3b2f25; vertical-align:-.6mm; margin-right:1.5mm; }
+  /* Schilder */
+  .schildchen { display:flex; flex-direction:column; align-items:center; }
+  .schildchen small { font-size:8pt; color:#7a6a5a; text-align:center; margin-top:1mm; }
+</style>
+</head>
+<body>
+
+<!-- Seite 1: Übersicht -->
+<section class="seite">
+  <h1>Wichtel Bommi: Druckvorlagen</h1>
+  <p class="zeile">Alles zum Ausdrucken für die 8 Wichtelgeschichten. Druckt nur, was ihr braucht.</p>
+  <div class="hinweis"><b>Tipp:</b> Auf festeres Papier drucken (160 g, A4). Normales Papier geht auch, dann auf Karton kleben.</div>
+  <ol class="inhalt">
+    <li><b>Wichteltür</b> (Seite 2): für Geschichte 1, bleibt bis zum Schluss stehen.</li>
+    <li><b>Willkommensschild zum Ausmalen</b> (Seite 3): Mitmachen bei Geschichte 1.</li>
+    <li><b>Waschmittel-Etiketten</b> (Seite 4): für Geschichte 4, um eine kleine Flasche kleben.</li>
+    <li><b>Baustellenschilder und Bauhelm</b> (Seite 5): für Geschichte 5.</li>
+    <li><b>Weihnachtskugel aus Papier</b> (Seite 6): für Geschichte 6. Bitte keine echte Glaskugel.</li>
+    <li><b>Briefe von Oma Mooswinkel</b> (Seite 7 und 8): je Geschichte ein Brief.</li>
+  </ol>
+  <div class="hinweis"><b>Achtung:</b> Kleinteile wie Bommel, Nüsse oder Kastanien sind nichts für Kinder unter drei Jahren.</div>
+  <p class="zeile">Mit der Schere an den gestrichelten Linien ausschneiden. Die Briefe einmal falten.</p>
+  <div class="fuss"><span>schatzweg.de/wichtel</span><span>1</span></div>
+</section>
+
+<!-- Seite 2: Wichteltür -->
+<section class="seite">
+  <h2>Wichteltür</h2>
+  <p class="zeile">Ausschneiden, unten an der Linie nach hinten knicken, an die Wand stellen oder mit Klebeband festkleben.</p>
+  <div class="mitte">
+    <svg width="120mm" height="215mm" viewBox="0 0 120 215" aria-label="Wichteltür">
+      <path d="M8 200 V60 A52 52 0 0 1 112 60 V200 Z" fill="#fff" stroke="#9a8a7a" stroke-width=".5" stroke-dasharray="2 1.5"/>
+      <path d="M14 196 V62 A46 46 0 0 1 106 62 V196 Z" fill="#c98b4f" stroke="#3b2f25" stroke-width="1.2"/>
+      <g stroke="#8a5a2e" stroke-width=".8">
+        <line x1="32" y1="24" x2="32" y2="196"/><line x1="50" y1="17" x2="50" y2="196"/><line x1="70" y1="17" x2="70" y2="196"/><line x1="88" y1="24" x2="88" y2="196"/>
+      </g>
+      <rect x="14" y="88" width="92" height="7" fill="#5b4636"/><rect x="14" y="160" width="92" height="7" fill="#5b4636"/>
+      <circle cx="60" cy="52" r="14" fill="#f3e3b5" stroke="#3b2f25" stroke-width="1.2"/>
+      <line x1="60" y1="38" x2="60" y2="66" stroke="#3b2f25" stroke-width=".9"/><line x1="46" y1="52" x2="74" y2="52" stroke="#3b2f25" stroke-width=".9"/>
+      <circle cx="92" cy="128" r="4.5" fill="#e0b84a" stroke="#3b2f25" stroke-width=".9"/>
+      <rect x="35" y="108" width="50" height="16" rx="3" fill="#fffdf8" stroke="#3b2f25" stroke-width=".9"/>
+      <text x="60" y="119.5" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#b8322a" font-weight="bold">Bommi</text>
+      <line x1="8" y1="200" x2="112" y2="200" stroke="#3b2f25" stroke-width=".5"/>
+      <rect x="8" y="200" width="104" height="14" fill="#efe6d6" stroke="#9a8a7a" stroke-width=".5" stroke-dasharray="2 1.5"/>
+      <text x="60" y="209" text-anchor="middle" font-family="Georgia, serif" font-size="4.2" fill="#7a6a5a">hier nach hinten knicken</text>
+    </svg>
+  </div>
+  <div class="fuss"><span>Geschichte 1 · Bommi zieht ein</span><span>2</span></div>
+</section>
+
+<!-- Seite 3: Willkommensschild -->
+<section class="seite">
+  <h2>Willkommensschild zum Ausmalen</h2>
+  <p class="zeile">Die Kinder malen das Schild aus und stellen es vor Bommis Tür. Zwei Schilder, eins zum Üben.</p>
+  <div class="raster" style="gap:10mm">
+    <div class="schild schneiden"><div class="hohl">Willkommen,<br>Bommi!</div><p class="zeile" style="margin-top:6mm">Hier wohnt jetzt: ______________________</p></div>
+    <div class="schild schneiden"><div class="hohl">Schön, dass<br>du da bist!</div><p class="zeile" style="margin-top:6mm">Von: ______________________</p></div>
+  </div>
+  <div class="fuss"><span>Geschichte 1 · Mitmachen</span><span>3</span></div>
+</section>
+
+<!-- Seite 4: Waschmittel-Etiketten -->
+<section class="seite">
+  <h2>Waschmittel-Etiketten</h2>
+  <p class="zeile">Ein Etikett ausschneiden und um eine kleine Flasche aus dem Kinderzimmer kleben, zum Beispiel ein leeres Seifenblasen-Fläschchen.</p>
+  <div class="raster drei">
+    <div class="etikett schneiden"><b>Bommis Blitzblank</b><span>Wichtel-Waschmittel<br>für Socken aller Größen</span></div>
+    <div class="etikett schneiden"><b>Schaumwunder</b><span>wäscht weiß wie Schnee<br>nur 1 Tropfen!</span></div>
+    <div class="etikett schneiden"><b>Sockenfrisch</b><span>mit Duft von<br>Tannen und Keksen</span></div>
+    <div class="etikett schneiden"><b>Bommis Blitzblank</b><span>Wichtel-Waschmittel<br>für Socken aller Größen</span></div>
+    <div class="etikett schneiden"><b>Schaumwunder</b><span>wäscht weiß wie Schnee<br>nur 1 Tropfen!</span></div>
+    <div class="etikett schneiden"><b>Sockenfrisch</b><span>mit Duft von<br>Tannen und Keksen</span></div>
+  </div>
+  <div class="fuss"><span>Geschichte 4 · Der große Waschtag</span><span>4</span></div>
+</section>
+
+<!-- Seite 5: Baustelle -->
+<section class="seite">
+  <h2>Baustellenschilder und Bauhelm</h2>
+  <p class="zeile">Schilder ausschneiden und mit Klebeband an einen Zahnstocher kleben. Den Zahnstocher in Knete oder einen Korken stecken.</p>
+  <div class="raster drei" style="gap:8mm">
+    <div class="schildchen"><svg width="50mm" height="46mm" viewBox="0 0 50 46"><path d="M25 3 L47 42 H3 Z" fill="#fff" stroke="#b8322a" stroke-width="3.4" stroke-linejoin="round"/><text x="25" y="31" text-anchor="middle" font-size="16" font-weight="bold" fill="#3b2f25">!</text></svg><small>Achtung, Baustelle</small></div>
+    <div class="schildchen"><svg width="50mm" height="46mm" viewBox="0 0 50 46"><circle cx="25" cy="23" r="20" fill="#fff" stroke="#b8322a" stroke-width="3.4"/><text x="25" y="21" text-anchor="middle" font-size="6.5" font-weight="bold" fill="#3b2f25">Psst!</text><text x="25" y="29" text-anchor="middle" font-size="4.6" fill="#3b2f25">Brummel schläft</text></svg><small>Leise sein</small></div>
+    <div class="schildchen"><svg width="50mm" height="46mm" viewBox="0 0 50 46"><rect x="3" y="8" width="44" height="30" rx="2" fill="#e0b84a" stroke="#3b2f25" stroke-width="1"/><text x="25" y="21" text-anchor="middle" font-size="6.2" font-weight="bold" fill="#3b2f25">Wichtel</text><text x="25" y="29" text-anchor="middle" font-size="6.2" font-weight="bold" fill="#3b2f25">bei der Arbeit</text></svg><small>Bauschild</small></div>
+    <div class="schildchen"><svg width="50mm" height="46mm" viewBox="0 0 50 46"><path d="M25 3 L47 42 H3 Z" fill="#fff" stroke="#b8322a" stroke-width="3.4" stroke-linejoin="round"/><text x="25" y="31" text-anchor="middle" font-size="16" font-weight="bold" fill="#3b2f25">!</text></svg><small>Achtung, Baustelle</small></div>
+    <div class="schildchen"><svg width="50mm" height="46mm" viewBox="0 0 50 46"><circle cx="25" cy="23" r="20" fill="#fff" stroke="#b8322a" stroke-width="3.4"/><text x="25" y="21" text-anchor="middle" font-size="6.5" font-weight="bold" fill="#3b2f25">Psst!</text><text x="25" y="29" text-anchor="middle" font-size="4.6" fill="#3b2f25">Brummel schläft</text></svg><small>Leise sein</small></div>
+    <div class="schildchen"><svg width="50mm" height="46mm" viewBox="0 0 50 46"><g><rect x="2" y="16" width="46" height="12" fill="#fff" stroke="#3b2f25" stroke-width=".6"/><path d="M6 16 L14 16 L8 28 L2 28 Z M20 16 L28 16 L22 28 L14 28 Z M34 16 L42 16 L36 28 L28 28 Z M48 16 L48 28 L42 28 Z" fill="#b8322a"/></g></svg><small>Absperrband</small></div>
+  </div>
+  <h2 style="margin-top:8mm">Bauhelm für Bommi</h2>
+  <div class="mitte">
+    <svg width="70mm" height="44mm" viewBox="0 0 70 44" aria-label="Bauhelm"><path d="M8 34 A27 27 0 0 1 62 34 Z" fill="#e0b84a" stroke="#3b2f25" stroke-width="1"/><rect x="3" y="34" width="64" height="5" rx="2.5" fill="#e0b84a" stroke="#3b2f25" stroke-width="1"/><rect x="32" y="9" width="6" height="25" fill="#f0cf6a" stroke="#3b2f25" stroke-width=".6"/></svg>
+  </div>
+  <p class="zeile" style="text-align:center">Ausschneiden und an Bommis Platz legen.</p>
+  <div class="fuss"><span>Geschichte 5 · Die Nachtbaustelle</span><span>5</span></div>
+</section>
+
+<!-- Seite 6: Weihnachtskugel -->
+<section class="seite">
+  <h2>Weihnachtskugel aus Papier</h2>
+  <p class="zeile">Kugel ausmalen, ausschneiden und an den Linien in drei Stücke reißen. Unter ein Tuch legen, so sieht sie zerbrochen aus. Bitte keine echte Glaskugel nehmen.</p>
+  <div class="mitte">
+    <svg width="140mm" height="160mm" viewBox="0 0 140 160" aria-label="Weihnachtskugel">
+      <rect x="60" y="6" width="20" height="12" rx="2" fill="#e0b84a" stroke="#3b2f25" stroke-width="1"/>
+      <path d="M66 6 A4 4 0 0 1 74 6" fill="none" stroke="#3b2f25" stroke-width="1"/>
+      <circle cx="70" cy="86" r="66" fill="#fff" stroke="#3b2f25" stroke-width="1.4"/>
+      <path d="M8 70 Q70 52 132 70" fill="none" stroke="#3b2f25" stroke-width=".8"/>
+      <path d="M8 104 Q70 122 132 104" fill="none" stroke="#3b2f25" stroke-width=".8"/>
+      <g fill="none" stroke="#3b2f25" stroke-width=".7"><path d="M30 86 l6 -8 l6 8 l-6 8 Z"/><path d="M64 86 l6 -8 l6 8 l-6 8 Z"/><path d="M98 86 l6 -8 l6 8 l-6 8 Z"/></g>
+      <g stroke="#9a8a7a" stroke-width=".7" stroke-dasharray="2.4 1.6" fill="none"><path d="M70 20 L62 60 L78 92 L66 152"/><path d="M78 92 L135 104"/></g>
+    </svg>
+  </div>
+  <p class="zeile" style="text-align:center">Gestrichelt = hier reißen.</p>
+  <div class="fuss"><span>Geschichte 6 · Die Mehlschnee-Panne</span><span>6</span></div>
+</section>
+
+<!-- Seite 7 und 8: Briefe, werden aus geschichten.json gefüllt -->
+<section class="seite" id="briefe-1"><h2>Briefe von Oma Mooswinkel</h2><p class="zeile">Je Geschichte ein Brief. Ausschneiden, einmal falten und zum Bommel legen.</p><div class="raster zwei" data-briefe="1,2,3,4"></div><div class="fuss"><span>Geschichte 1 bis 4</span><span>7</span></div></section>
+<section class="seite" id="briefe-2"><h2>Briefe von Oma Mooswinkel</h2><p class="zeile">Je Geschichte ein Brief. Ausschneiden, einmal falten und zum Bommel legen.</p><div class="raster zwei" data-briefe="5,6,7,8"></div><div class="fuss"><span>Geschichte 5 bis 8</span><span>8</span></div></section>
+
+<script>
+(function(){
+  var FARBE={ 'rot':'#c8332b', 'hellbraun':'#c89a6a', 'grün':'#5d9a3a', 'hellblau':'#8cc4e8', 'gelb':'#f1cf3a', 'weiß':'#ffffff', 'violett':'#8a5bb8', 'golden':'#d8a93a' };
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  fetch('geschichten.json').then(function(r){ return r.json(); }).then(function(G){
+    var nach={}; G.geschichten.forEach(function(g){ nach[g.nr]=g; });
+    [].forEach.call(document.querySelectorAll('[data-briefe]'), function(feld){
+      feld.innerHTML=feld.getAttribute('data-briefe').split(',').map(function(n){
+        var g=nach[+n], t=g.brief.replace(/^Lieber Bommi,\s*/, ''), gruss='Deine Oma Mooswinkel';
+        t=t.replace(/\s*Deine Oma Mooswinkel\s*$/, '');
+        var b=(g.bommel||'').split(' ')[0];
+        return '<div class="brief schneiden" data-nr="'+g.nr+'"><div class="an"><span>An Bommi</span><span><i class="bommel" style="background:'+(FARBE[b]||'#fff')+'"></i>'+g.nr+'. '+esc(g.titel)+'</span></div>'+
+          '<p>Lieber Bommi,</p><p>'+esc(t)+'</p><div class="gruss">'+gruss+'</div></div>';
+      }).join('');
+    });
+    document.body.setAttribute('data-fertig','1');
+  });
+})();
+</script>
+</body>
+</html>

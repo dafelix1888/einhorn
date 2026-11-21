@@ -50,6 +50,22 @@
   .plan .zeit dd { margin:0; }
   .plan .knapp { color:var(--rot); font-weight:700; }
   .hinweis { background:var(--gelb); border-radius:12px; padding:10px 12px; font-size:.92rem; margin:10px 0; }
+  h3 { font-size:1.08rem; margin:1.1em 0 .3em; }
+  .wege { display:flex; gap:6px; flex-wrap:wrap; margin:6px 0; }
+  .wege button { font:inherit; font-size:.88rem; color:inherit; background:var(--karte); border:1.5px solid var(--linie); border-radius:999px; padding:6px 12px; min-height:40px; cursor:pointer; }
+  .wege button[aria-pressed=true] { border-color:var(--rot); background:#fff6f2; font-weight:700; }
+  ul.kauf, ul.bast { list-style:none; padding:0; margin:6px 0 0; display:grid; gap:8px; }
+  ul.kauf li, ul.bast li { background:var(--karte); border:1px solid var(--linie); border-radius:14px; padding:10px 14px; }
+  ul.kauf .kopf { display:flex; gap:8px; align-items:baseline; }
+  ul.kauf .kopf b { flex:1; }
+  ul.kauf .preis { font-weight:700; white-space:nowrap; }
+  ul.kauf .wann { color:var(--leise); font-size:.9rem; }
+  ul.kauf .wann.knapp { color:var(--rot); font-weight:700; }
+  ul.kauf .zeile2 { display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-top:6px; }
+  ul.kauf .selbst { font-size:.88rem; color:var(--leise); flex:1 1 180px; }
+  ul.kauf a.knopf { min-height:42px; padding:8px 16px; font-size:.92rem; }
+  ul.bast b { display:block; }
+  ul.bast span { font-size:.92rem; }
   .druck-kopf, .druck-tabelle { display:none; }
   [hidden] { display:none !important; }
   #recht-fuss { color:var(--leise); }
@@ -112,8 +128,24 @@
     <div class="unten">
       <button class="knopf leer" type="button" data-zurueck>Zurück</button>
       <button class="knopf leer" type="button" id="drucken">Plan ausdrucken</button>
-      <button class="knopf" type="button" id="material" disabled title="Kommt in Kürze">Material besorgen</button>
+      <button class="knopf" type="button" id="material">Material besorgen</button>
     </div>
+  </section>
+
+  <!-- Schritt 4: Material besorgen (UNICORN-137) -->
+  <section id="s-material" data-schritt="4" hidden>
+    <h2>Material besorgen</h2>
+    <div class="wege" id="wege" role="group" aria-label="Material-Weg"></div>
+    <p class="leise" id="mat-zeile"></p>
+    <h3>Bestellen</h3>
+    <ul class="kauf" id="kauf"></ul>
+    <h3>Basteln und drucken</h3>
+    <p><a class="knopf leer" id="vorlagen" href="themen/wichtel/druckvorlagen.pdf" target="_blank" rel="noopener">Druckvorlagen öffnen (PDF)</a></p>
+    <p class="leise">Tür, Willkommensschild, Etiketten, Baustellenschilder, Papierkugel und die Briefe von Oma Mooswinkel. Am besten auf festeres Papier drucken.</p>
+    <ul class="bast" id="bast"></ul>
+    <div class="hinweis" id="kleinteile"></div>
+    <p class="leise">Preise ungefähr, auf Amazon noch nicht geprüft. Die Geschichten nennen keine Marke, ein ähnliches Set passt genauso.</p>
+    <div class="unten"><button class="knopf leer" type="button" data-zurueck>Zum Zeitplan</button></div>
   </section>
 
   <!-- nur beim Drucken: eine Seite -->
@@ -142,7 +174,7 @@
   function zeige(n){
     wahl.schritt=n; merken();
     [].forEach.call(document.querySelectorAll('section[data-schritt]'), function(s){ s.hidden = +s.getAttribute('data-schritt')!==n; });
-    if(n===1) auswahlZeichnen(); if(n===2) szenarienZeichnen(); if(n===3) planZeichnen();
+    if(n===1) auswahlZeichnen(); if(n===2) szenarienZeichnen(); if(n===3) planZeichnen(); if(n===4) materialZeichnen();
     window.scrollTo(0,0);
   }
 
@@ -206,6 +238,38 @@
     });
   }
 
+  function materialZeichnen(){
+    var h=heute(), r=WK.plan(M, G, opt(), h), e=WK.einkauf(r);
+    var w=$('wege'); w.innerHTML='';
+    Object.keys(M.szenarien).forEach(function(k){
+      var s=WK.plan(M, G, { nr:wahl.nr, szenario:k, erster:wahl.erster, letzter:wahl.letzter }, null);
+      var b=document.createElement('button'); b.type='button'; b.setAttribute('data-weg', k); b.setAttribute('aria-pressed', String(r.szenario===k));
+      b.textContent=M.szenarien[k].name.replace(/ \(.*\)$/, '')+' · '+(s.summe>0?'ca. '+WK.euro(s.summe):'0 €');
+      b.onclick=function(){ wahl.szenario=k; merken(); materialZeichnen(); };
+      w.appendChild(b);
+    });
+    $('mat-zeile').textContent = e.kaufen.length
+      ? e.kaufen.length+(e.kaufen.length===1?' Teil':' Teile')+' bestellen, zusammen ca. '+WK.euro(e.summe)+(e.ohnePreis?' (dazu '+e.ohnePreis+' ohne Preis)':'')+'.'
+      : 'Ihr kauft nichts. Alles bastelt ihr selbst oder nehmt es von zu Hause.';
+    var k=$('kauf'); k.innerHTML='';
+    if(!e.kaufen.length) k.innerHTML='<li class="leise">Nichts zu bestellen.</li>';
+    e.kaufen.forEach(function(a){
+      var li=document.createElement('li'); li.setAttribute('data-id', a.id);
+      var knapp=a.bis<h;
+      li.innerHTML='<div class="kopf"><b>'+esc(a.name)+'</b><span class="preis">'+(a.preis==null?'Preis offen':(a.geschaetzt?'ca. ':'')+WK.euro(a.preis))+'</span></div>'+
+        '<div class="wann'+(knapp?' knapp':'')+'">'+(knapp?'Bestelltag vorbei, schnell bestellen oder selbst machen':'Bestellen bis '+WK.kurz(a.bis))+' · für Geschichte '+a.nr.join(', ')+(a.extra?' · Extra':'')+'</div>'+
+        '<div class="zeile2"><span class="selbst">Oder selbst: '+esc(a.selbst)+'</span><a class="knopf" href="'+esc(a.link)+'" target="_blank" rel="noopener">Bei Amazon ansehen</a></div>';
+      k.appendChild(li);
+    });
+    var b=$('bast'); b.innerHTML='';
+    e.basteln.forEach(function(z){
+      var li=document.createElement('li'); li.setAttribute('data-nr', z.nr);
+      li.innerHTML='<b>'+z.nr+'. '+esc(z.titel)+'</b><span>Bis '+WK.kurz(z.bis)+': '+esc(z.was.join(', '))+'</span>';
+      b.appendChild(li);
+    });
+    $('kleinteile').textContent=M.kleinteile;
+  }
+
   function tagGeaendert(feld){
     return function(e){ if(!WK.gueltig(e.target.value)) return; wahl[feld]=e.target.value; wahl.eigene={}; merken(); planZeichnen(); };
   }
@@ -220,7 +284,8 @@
       [].forEach.call(document.querySelectorAll('[data-zurueck]'), function(b){ b.onclick=function(){ zeige(wahl.schritt-1); }; });
       $('erster').onchange=tagGeaendert('erster'); $('letzter').onchange=tagGeaendert('letzter');
       $('drucken').onclick=function(){ planZeichnen(); window.print(); };
-      zeige(Math.max(0, Math.min(3, +wahl.schritt||0)));
+      $('material').onclick=function(){ zeige(4); };
+      zeige(Math.max(0, Math.min(4, +wahl.schritt||0)));
     });
 })();
 </script>
