@@ -19,7 +19,7 @@ let f=0; const ok=(c,t)=>{ console.log((c?'ok   ':'FEHLER ')+t); if(!c) f++; };
 (async()=>{
   const b=await chromium.launch(), errs=[];
   async function geraet(){ const c=await b.newContext({viewport:{width:393,height:852}}); await c.route('https://efdjomgubucdnvgtuqmp.supabase.co/**', r=>r.abort()); await c.addInitScript(()=>{ window.KONTO_TEST={url:'https://test.supabase.co', key:'anon'}; }); await c.route(S+'/**', mock); const p=await c.newPage(); p.on('pageerror',e=>errs.push(e.message)); return p; }
-  const heute=new Date().toISOString().slice(0,10);
+  const heute=new Date(Date.now()-864e5).toISOString().slice(0,10);   // gestern: sonst ist die Party kurz nach Mitternacht noch nicht vorbei
   const party={format:1,thema:'einhorn',kind:{name:'Emma',alter:5},datum:heute,start:'00:01',kinder:6,helfer:2,vorausgeher:true,ort:'draussen',planB:true,ausdrucke:true,erledigt:{},einkauf:{}};
   const a=await geraet(); await a.goto(B+'party.html?thema=einhorn');
   await a.evaluate(p=>{ localStorage.setItem('sj.party.einhorn',JSON.stringify(p)); }, party);
