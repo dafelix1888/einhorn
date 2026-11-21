@@ -93,7 +93,10 @@ jobs:
             if curl -fsS "https://schatzweg.de/app/fehler.js?p=$V-$i" | grep -q "'$V'"; then ok=1; break; fi
             sleep 10
           done
-          w=$(curl -sSL -o /tmp/w.html -w '%{http_code} %{url_effective}' "https://schatzweg.de/wichtel?p=$V")
+          # /wichtel ist eine Weiterleitungsseite (meta refresh) auf /app/wichtel.html
+          w=$(curl -sSL -o /tmp/w0.html -w '%{http_code}' "https://schatzweg.de/wichtel?p=$V")
+          grep -q 'app/wichtel.html' /tmp/w0.html && w="$w, leitet weiter" || w="$w, ohne Weiterleitung"
+          curl -sSL -o /tmp/w.html "https://schatzweg.de/app/wichtel.html?p=$V"
           grep -q 'Wichtel Bommi zieht bei euch ein' /tmp/w.html && wt=ja || wt=nein
           {
             echo "### Live-Prüfung schatzweg.de"
