@@ -1,0 +1,29 @@
+{
+  "zweck": "Material je Geschichte für Wichtel Bommi (STRAT-41, Abschnitt 4). Eine Quelle für Zeitplan (UNICORN-141) und Material besorgen (UNICORN-137). Preise von einer Vergleichsseite, auf Amazon nicht geprüft.",
+  "bestellen_tage_vorher": 4,
+  "standard": { "erster": "12-01", "letzter": "12-22" },
+  "pakete": {
+    "klein":  { "name": "Klein",  "zeile": "3 Geschichten", "nr": [1, 2, 8] },
+    "advent": { "name": "Advent", "zeile": "4 Geschichten, an den Adventssonntagen", "nr": [1, 2, 5, 8], "sonntage": true },
+    "ganz":   { "name": "Ganz",   "zeile": "alle 8 Geschichten", "nr": [1, 2, 3, 4, 5, 6, 7, 8] }
+  },
+  "szenarien": {
+    "kaufen":    { "name": "Alles kaufen", "zeile": "Alle Mini-Sets kommen fertig ins Haus." },
+    "gemischt":  { "name": "Gemischt (empfohlen)", "zeile": "Tür, Bommel und Lichterkette kaufen, den Rest bastelt ihr.", "kauf": ["tuer", "bommel", "papier", "lichterkette"] },
+    "selbst":    { "name": "Alles selbst machen", "zeile": "Nichts kaufen. Druckvorlagen und was ihr zu Hause habt." }
+  },
+  "artikel": [
+    { "id": "tuer", "nr": 1, "name": "Wichteltür-Set mit Baustelle (64 Teile)", "preis": 15.19, "asin": "B0DB8DTL6W", "selbst": "Tür aus Pappe oder Druckvorlage" },
+    { "id": "karton", "nr": 1, "name": "Mini-Umzugskarton mit Sackkarre", "preis": 7.89, "asin": "B0HC6KX99T", "selbst": "Streichholzschachtel mit Paketschnur", "extra": true },
+    { "id": "bommel", "nr": "alle", "name": "Bommel bunt (Pompons)", "preis": 4, "geschaetzt": true, "suche": "pompons bunt", "selbst": "Bommel aus Wollresten wickeln" },
+    { "id": "papier", "nr": "alle", "name": "Festeres Papier, 160 g, A4", "preis": null, "suche": "druckerpapier 160g a4", "selbst": "Normales Papier auf Karton kleben" },
+    { "id": "keksdose", "nr": 2, "name": "Mini-Keksdose mit Keksen", "preis": 5.99, "asin": "B01CTYMGI8", "selbst": "Flaschendeckel als Dose, echte Keksbrösel" },
+    { "id": "garten", "nr": 3, "name": "Mini-Garten (Bank, Gummistiefel, Besen)", "preis": 9.59, "asin": "B0BS1PYQHT", "selbst": "Bank aus Eisstielen, Besen aus Zahnstocher und Wollfaden" },
+    { "id": "waesche", "nr": 4, "name": "Wichtel-Kleidung mit Wäscheleine", "preis": null, "asin": "B0D83SRHPS", "selbst": "Leine aus Wollfaden, Büroklammern, eine kleine Flasche aus dem Kinderzimmer" },
+    { "id": "baustelle", "nr": 5, "name": "Baustelle aus dem Tür-Set", "preis": 0, "aus": "tuer", "selbst": "Bauklotz, Zahnstocher, rot-weißes Klebeband" },
+    { "id": "backstube", "nr": 6, "name": "Mini-Backstube (21 Teile)", "preis": 6.99, "asin": "B0F891GWPB", "selbst": "Nudelholz aus Wattestäbchen, Backblech aus Alufolie" },
+    { "id": "malstube", "nr": 7, "name": "Mini-Malstube (Klemmbrett, Buntstifte)", "preis": 8.49, "asin": "B0817YXXTT", "selbst": "Bild in Briefmarken-Größe malen" },
+    { "id": "lichterkette", "nr": 8, "name": "Mini-Lichterkette, 90 cm", "preis": 3.39, "asin": "B0D8PYZPWP", "selbst": "Normale Lichterkette oder Taschenlampe" },
+    { "id": "ski", "nr": 8, "name": "Mini-Ski", "preis": 4.49, "asin": "B0CN7446FV", "selbst": "Ski aus zwei Eisstielen" }
+  ]
+}

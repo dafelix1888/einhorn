@@ -19,3 +19,10 @@
   X-Robots-Tag: noindex
 /app/druck.html
   X-Robots-Tag: noindex
+# Wichtel Bommi bis zum Start nicht in Suchmaschinen (UNICORN-141, frei mit UNICORN-146)
+/wichtel/*
+  X-Robots-Tag: noindex
+/app/wichtel.html
+  X-Robots-Tag: noindex
+/app/wichtel
+  X-Robots-Tag: noindex
