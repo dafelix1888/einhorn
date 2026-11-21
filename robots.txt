@@ -9,5 +9,8 @@ Disallow: /app/vorausgeher.html
 Disallow: /app/bereit.html
 Disallow: /app/druck.html
 Disallow: /original.html
+# Wichtel Bommi bis zum Start nur über den direkten Link (UNICORN-141, frei mit UNICORN-146)
+Disallow: /wichtel
+Disallow: /app/wichtel.html
 
 Sitemap: https://schatzweg.de/sitemap.xml
