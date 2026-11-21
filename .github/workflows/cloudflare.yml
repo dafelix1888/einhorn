@@ -83,3 +83,21 @@ jobs:
           if [ -n "$ELEVENLABS_API_KEY" ]; then printf '%s' "$ELEVENLABS_API_KEY" | $W secret put ELEVENLABS_API_KEY --config worker/wrangler.toml; fi
           # Aufräumen: ein früherer Lauf hat den Schlüssel versehentlich an den App-Worker gehängt
           yes | $W secret delete ELEVENLABS_API_KEY --name schnitzeljagd-app 2>/dev/null || true
+      # UNICORN-141: Geplante Läufe können schatzweg.de nicht aufrufen. Deshalb prüft GitHub nach jeder
+      # Veröffentlichung selbst, ob der neue Stand live ist. Ergebnis steht in der Zusammenfassung des Laufs.
+      - name: Live prüfen
+        if: env.HAT_TOKEN == 'true'
+        run: |
+          V=${GITHUB_SHA::7}; ok=0
+          for i in $(seq 1 12); do
+            if curl -fsS "https://schatzweg.de/app/fehler.js?p=$V-$i" | grep -q "'$V'"; then ok=1; break; fi
+            sleep 10
+          done
+          w=$(curl -sSL -o /tmp/w.html -w '%{http_code} %{url_effective}' "https://schatzweg.de/wichtel?p=$V")
+          grep -q 'Wichtel Bommi zieht bei euch ein' /tmp/w.html && wt=ja || wt=nein
+          {
+            echo "### Live-Prüfung schatzweg.de"
+            echo "- Version $V live: $([ $ok = 1 ] && echo ja || echo nein)"
+            echo "- /wichtel: $w, Überschrift gefunden: $wt"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          [ $ok = 1 ] || { echo "::error::Version $V ist auf schatzweg.de nicht angekommen"; exit 1; }
