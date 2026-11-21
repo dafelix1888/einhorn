@@ -69,7 +69,7 @@ const seite=fs.readFileSync(path.join(R,'app','wichtel.html'),'utf8');
 ok(/name="robots" content="noindex/.test(seite), 'Seite hat noindex');
 ok(/Disallow: \/wichtel/.test(fs.readFileSync(path.join(R,'robots.txt'),'utf8')), 'robots.txt sperrt /wichtel');
 ok(/app\/wichtel\.html/.test(fs.readFileSync(path.join(R,'wichtel','index.html'),'utf8')), '/wichtel leitet zur Seite');
-const verlinkt=fs.readdirSync(path.join(R,'app')).filter(f=>f.endsWith('.html') && f!=='wichtel.html').filter(f=>/wichtel/i.test(fs.readFileSync(path.join(R,'app',f),'utf8')));
+const verlinkt=fs.readdirSync(path.join(R,'app')).filter(f=>f.endsWith('.html') && !/^wichtel(-[a-z]+)?\.html$/.test(f)).filter(f=>/wichtel/i.test(fs.readFileSync(path.join(R,'app',f),'utf8')));
 ok(!verlinkt.length, 'Keine andere Seite verlinkt Wichtel '+verlinkt.join(', '));
 ok(!/wichtel/.test(fs.readFileSync(path.join(R,'sitemap.xml'),'utf8')), 'Nicht in der Sitemap');
 
