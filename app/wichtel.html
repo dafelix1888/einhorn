@@ -66,7 +66,26 @@
   ul.kauf a.knopf { min-height:42px; padding:8px 16px; font-size:.92rem; }
   ul.bast b { display:block; }
   ul.bast span { font-size:.92rem; }
-  .druck-kopf, .druck-tabelle { display:none; }
+  .fortschritt { display:flex; align-items:center; gap:10px; background:var(--karte); border:1px solid var(--linie); border-radius:14px; padding:10px 14px; margin:8px 0; }
+  .fortschritt .punkte { display:flex; gap:4px; flex-wrap:wrap; }
+  .fortschritt .punkte i { width:16px; height:16px; border-radius:50%; background:var(--linie); display:inline-block; }
+  .fortschritt .punkte i.an { background:var(--rot); }
+  .fortschritt b { margin-left:auto; white-space:nowrap; }
+  ul.vorb { list-style:none; padding:0; margin:10px 0 0; display:grid; gap:8px; }
+  ul.vorb button { font:inherit; color:inherit; text-align:left; width:100%; background:var(--karte); border:1px solid var(--linie); border-radius:14px; padding:10px 14px; cursor:pointer; min-height:56px; display:flex; gap:10px; align-items:center; }
+  ul.vorb button span { flex:1; }
+  ul.vorb button small { display:block; color:var(--leise); font-size:.88rem; }
+  ul.vorb button .bommel { width:22px; height:22px; border-radius:50%; flex:0 0 auto; border:1.5px solid var(--linie); }
+  ul.vorb button .gespielt { color:var(--gruen); font-size:.85rem; font-weight:700; white-space:nowrap; }
+  ul.vorb button.dran { border:2px solid var(--rot); }
+  ol.aufbau { padding-left:1.4em; margin:.4em 0; }
+  ol.aufbau li { margin:.35em 0; }
+  .platz { border:1.5px dashed var(--linie); border-radius:14px; padding:18px 12px; text-align:center; color:var(--leise); font-size:.9rem; margin:8px 0; }
+  ul.mat { list-style:none; padding:0; margin:6px 0 0; display:grid; gap:6px; }
+  ul.mat li { background:var(--karte); border:1px solid var(--linie); border-radius:12px; padding:8px 12px; font-size:.95rem; }
+  ul.mat small { display:block; color:var(--leise); font-size:.85rem; }
+  .brief { background:#fffaf0; border:1px solid var(--linie); border-radius:14px; padding:14px 16px; font-style:italic; }
+  .druck-kopf, .druck-tabelle, .druck-brief { display:none; }
   [hidden] { display:none !important; }
   #recht-fuss { color:var(--leise); }
   @media print {
@@ -80,6 +99,8 @@
     .druck-tabelle th, .druck-tabelle td { border-bottom:.3mm solid #ccc; padding:1.6mm 1.5mm; text-align:left; vertical-align:top; }
     .druck-tabelle th { font-size:9pt; color:#555; }
     .druck-tabelle td small { display:block; color:#555; font-size:8.5pt; }
+    body.brief-druck .druck-kopf, body.brief-druck .druck-tabelle { display:none !important; }
+    body.brief-druck .druck-brief { display:block; border:.4mm dashed #999; padding:8mm; width:95mm; font-size:12pt; font-style:italic; }
   }
 </style>
 </head>
@@ -128,7 +149,8 @@
     <div class="unten">
       <button class="knopf leer" type="button" data-zurueck>Zurück</button>
       <button class="knopf leer" type="button" id="drucken">Plan ausdrucken</button>
-      <button class="knopf" type="button" id="material">Material besorgen</button>
+      <button class="knopf leer" type="button" id="material">Material besorgen</button>
+      <button class="knopf" type="button" id="vorbereiten">Vorbereiten</button>
     </div>
   </section>
 
@@ -145,12 +167,40 @@
     <ul class="bast" id="bast"></ul>
     <div class="hinweis" id="kleinteile"></div>
     <p class="leise">Preise ungefähr, auf Amazon noch nicht geprüft. Die Geschichten nennen keine Marke, ein ähnliches Set passt genauso.</p>
-    <div class="unten"><button class="knopf leer" type="button" data-zurueck>Zum Zeitplan</button></div>
+    <div class="unten"><button class="knopf leer" type="button" data-zurueck>Zum Zeitplan</button><button class="knopf" type="button" data-vorbereiten>Vorbereiten</button></div>
+  </section>
+
+  <!-- Schritt 5: Eltern-Ansicht, Übersicht (UNICORN-142) -->
+  <section id="s-vorb" data-schritt="5" hidden>
+    <h2>Vorbereiten</h2>
+    <div class="fortschritt" id="fortschritt"></div>
+    <div class="hinweis" id="dran" hidden></div>
+    <p class="leise">Am Vorabend die Geschichte antippen. In zwei Minuten ist alles aufgebaut.</p>
+    <ul class="vorb" id="vorb"></ul>
+    <div class="unten"><button class="knopf leer" type="button" id="vorb-plan">Zum Zeitplan</button><button class="knopf leer" type="button" id="vorb-material">Material besorgen</button></div>
+  </section>
+
+  <!-- Schritt 6: Vorbereitung einer Geschichte (UNICORN-142) -->
+  <section id="s-geschichte" data-schritt="6" hidden>
+    <p class="leise" id="vg-wann"></p>
+    <h2 id="vg-titel"></h2>
+    <h3>Aufbau</h3>
+    <div class="platz" id="vg-bild">Beispielbild folgt</div>
+    <ol class="aufbau" id="vg-aufbau"></ol>
+    <h3>Material</h3>
+    <ul class="mat" id="vg-material"></ul>
+    <h3>Mitmachen</h3>
+    <p id="vg-mitmachen"></p>
+    <h3>Brief von Oma Mooswinkel</h3>
+    <div class="brief" id="vg-brief"></div>
+    <p><button class="knopf leer" type="button" id="vg-drucken">Brief drucken</button></p>
+    <div class="unten"><button class="knopf leer" type="button" id="vg-zurueck">Alle Geschichten</button><a class="knopf" id="vg-kinder" href="wichtel-kind.html">Den Kindern zeigen</a></div>
   </section>
 
   <!-- nur beim Drucken: eine Seite -->
   <div class="druck-kopf"><h1>Wichtel Bommi: unser Zeitplan</h1><p id="druck-zeile"></p></div>
   <div class="druck-tabelle"><table><thead><tr><th>Tag</th><th>Geschichte</th><th>Bestellen bis</th><th>Basteln bis</th></tr></thead><tbody id="druck-zeilen"></tbody></table></div>
+  <div class="druck-brief" id="druck-brief"></div>
 </main>
 <script src="wichtel-kern.js"></script>
 <script src="recht.js"></script>
@@ -167,14 +217,14 @@
 
   function neu(){
     var j=WK.saison(heute());
-    return { schritt:0, paket:'ganz', nr:WK.paket(M,'ganz'), szenario:'gemischt', erster:j+'-'+M.standard.erster, letzter:j+'-'+M.standard.letzter, eigene:{} };
+    return { schritt:0, paket:'ganz', nr:WK.paket(M,'ganz'), szenario:'gemischt', erster:j+'-'+M.standard.erster, letzter:j+'-'+M.standard.letzter, eigene:{}, vorbNr:null };
   }
   function opt(){ return { nr:wahl.nr, szenario:wahl.szenario, erster:wahl.erster, letzter:wahl.letzter, sonntage: wahl.paket==='advent', eigene:wahl.eigene }; }
 
   function zeige(n){
     wahl.schritt=n; merken();
     [].forEach.call(document.querySelectorAll('section[data-schritt]'), function(s){ s.hidden = +s.getAttribute('data-schritt')!==n; });
-    if(n===1) auswahlZeichnen(); if(n===2) szenarienZeichnen(); if(n===3) planZeichnen(); if(n===4) materialZeichnen();
+    if(n===1) auswahlZeichnen(); if(n===2) szenarienZeichnen(); if(n===3) planZeichnen(); if(n===4) materialZeichnen(); if(n===5) vorbZeichnen(); if(n===6) geschichteZeichnen();
     window.scrollTo(0,0);
   }
 
@@ -270,6 +320,43 @@
     $('kleinteile').textContent=M.kleinteile;
   }
 
+  // Eltern-Ansicht (UNICORN-142)
+  var FARBE={rot:'#c0392b',hellbraun:'#c9a27a',gruen:'#5d9b3a','grün':'#5d9b3a',hellblau:'#8ec5e8',gelb:'#f2c94c','weiß':'#ffffff',violett:'#8e5bb5',golden:'#d4a72c'};
+  function gespielt(){ try{ return JSON.parse(localStorage.getItem('sj.wichtel.gespielt')||'[]')||[]; }catch(e){ return []; } }
+  function geschichte(nr){ return G.geschichten.filter(function(g){ return g.nr===nr; })[0]||{}; }
+  function vorbZeichnen(){
+    var h=heute(), r=WK.plan(M, G, opt(), h), gesp=gespielt().map(Number), f=WK.fortschritt(r.zeilen, gesp), d=WK.dran(r.zeilen, h);
+    var punkte=r.zeilen.map(function(z){ return '<i'+(gesp.indexOf(z.nr)>=0?' class="an"':'')+'></i>'; }).join('');
+    $('fortschritt').innerHTML='<span class="punkte" aria-hidden="true">'+punkte+'</span><b>'+esc(f.text)+'</b>';
+    var t=[];
+    if(d.heute && gesp.indexOf(d.heute.nr)<0) t.push('Heute ist „'+d.heute.titel+'“ dran.');
+    if(d.morgen) t.push('Morgen ist „'+d.morgen.titel+'“ dran. Heute Abend aufbauen.');
+    $('dran').hidden=!t.length; $('dran').textContent=t.join(' ');
+    var u=$('vorb'); u.innerHTML='';
+    r.zeilen.forEach(function(z){
+      var g=geschichte(z.nr), li=document.createElement('li'), b=document.createElement('button');
+      b.type='button'; b.setAttribute('data-nr', z.nr);
+      if((d.heute && d.heute.nr===z.nr) || (d.morgen && d.morgen.nr===z.nr)) b.className='dran';
+      b.innerHTML='<i class="bommel" style="background:'+(FARBE[g.bommel]||'#ddd')+'"></i><span><b>'+z.nr+'. '+esc(z.titel)+'</b><small>'+WK.kurz(z.datum)+' · aufbauen am Vorabend</small></span>'+(gesp.indexOf(z.nr)>=0?'<span class="gespielt">gespielt</span>':'');
+      b.onclick=function(){ wahl.vorbNr=z.nr; zeige(6); };
+      li.appendChild(b); u.appendChild(li);
+    });
+  }
+  function geschichteZeichnen(){
+    var r=WK.plan(M, G, opt(), heute()), z=r.zeilen.filter(function(x){ return x.nr===+wahl.vorbNr; })[0]||r.zeilen[0];
+    var g=geschichte(z.nr), v=WK.vorbereitung(z, g);
+    $('vg-wann').textContent=WK.kurz(v.datum)+' · aufbauen bis zum Vorabend ('+WK.kurz(v.bastelnBis)+')';
+    $('vg-titel').textContent=v.nr+'. '+v.titel;
+    $('vg-aufbau').innerHTML=v.aufbau.map(function(a){ return '<li>'+esc(a)+'</li>'; }).join('');
+    $('vg-material').innerHTML=v.material.length ? v.material.map(function(m){
+      return m.gekauft ? '<li data-id="'+m.id+'"><b>'+esc(m.name)+'</b><small>Bestellt. Sonst: '+esc(m.selbst)+'</small></li>'
+                       : '<li data-id="'+m.id+'"><b>'+esc(m.selbst)+'</b><small>Selbst gemacht'+(m.extra?', Extra':'')+'. Statt: '+esc(m.name)+'</small></li>';
+    }).join('') : '<li>Nichts Besonderes, nur der Brief und der Bommel.</li>';
+    $('vg-mitmachen').textContent=v.mitmachen;
+    $('vg-brief').textContent=v.brief; $('druck-brief').textContent=v.brief;
+    $('vg-kinder').href='wichtel-kind.html?nr='+v.nr;
+  }
+
   function tagGeaendert(feld){
     return function(e){ if(!WK.gueltig(e.target.value)) return; wahl[feld]=e.target.value; wahl.eigene={}; merken(); planZeichnen(); };
   }
@@ -283,9 +370,15 @@
       [].forEach.call(document.querySelectorAll('[data-weiter]'), function(b){ b.onclick=function(){ zeige(wahl.schritt+1); }; });
       [].forEach.call(document.querySelectorAll('[data-zurueck]'), function(b){ b.onclick=function(){ zeige(wahl.schritt-1); }; });
       $('erster').onchange=tagGeaendert('erster'); $('letzter').onchange=tagGeaendert('letzter');
-      $('drucken').onclick=function(){ planZeichnen(); window.print(); };
       $('material').onclick=function(){ zeige(4); };
-      zeige(Math.max(0, Math.min(4, +wahl.schritt||0)));
+      $('vorbereiten').onclick=function(){ zeige(5); };
+      [].forEach.call(document.querySelectorAll('[data-vorbereiten]'), function(b){ b.onclick=function(){ zeige(5); }; });
+      $('vorb-plan').onclick=function(){ zeige(3); }; $('vorb-material').onclick=function(){ zeige(4); };
+      $('vg-zurueck').onclick=function(){ zeige(5); };
+      $('vg-drucken').onclick=function(){ document.body.classList.add('brief-druck'); window.print(); };
+      window.addEventListener('afterprint', function(){ document.body.classList.remove('brief-druck'); });
+      $('drucken').onclick=function(){ document.body.classList.remove('brief-druck'); planZeichnen(); window.print(); };
+      zeige(Math.max(0, Math.min(6, +wahl.schritt||0)));
     });
 })();
 </script>
