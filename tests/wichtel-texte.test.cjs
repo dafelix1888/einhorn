@@ -51,11 +51,19 @@ ok(/Geradeheraus gesagt:/.test(alles), 'Tiri beginnt mit „Geradeheraus gesagt:
 ok(/Bommel von meinem Schuh/.test(alles), 'Bommi verliert einen Schuh-Bommel');
 // Schluss nennt keine Zahl, sondern „alle Bommel, die ihr gesammelt habt“.
 ok(/allen Bommeln, die ihr gesammelt habt/.test(g.geschichten[7].bilder.map(b=>b.text).join(' ')), 'Nr. 8 sagt „alle Bommel, die ihr gesammelt habt“');
+// Nachbesserungen aus der Abnahme (UNICORN-134, Strategist 21.11.)
+ok(/Wichtelwerkstatt/.test(g.geschichten[0].bilder[0].text) && /Weihnachten/.test(g.geschichten[0].bilder[0].text), 'Nr. 1 nennt Wichtelwerkstatt und Weihnachten in Bild 1');
+ok(/nicht zum Essen/.test(g.geschichten[2].aufbau.join(' ')), 'Nr. 3: Nüsse im Aufbau nur zum Suchen, nicht zum Essen');
+const material=JSON.parse(fs.readFileSync(path.join(ORDNER,'material.json'),'utf8'));
+ok(/Walnüsse/.test(material.kleinteile||'') && /Allergien/.test(material.kleinteile||''), 'Material: Kleinteile-Hinweis nennt Nüsse und Allergien');
+ok(!/\bDa\b[^.!?]*[.!?]\s*Da\b/.test(g.geschichten[3].bilder[3].text), 'Nr. 4, Bild 4: kein doppeltes „Da“');
 // Trailer
 const t=g.trailer, sek=t.szenen.reduce((s,x)=>s+x.sekunden,0);
 ok(sek>=20 && sek<=30, 'Trailer dauert '+sek+' Sekunden');
 ok(t.szenen[0].spricht===R.video_anfang, 'Trailer beginnt mit „'+R.video_anfang+'“');
 ok(/schatzweg\.de/.test(t.szenen[t.szenen.length-1].tafel||''), 'Trailer endet mit Texttafel und schatzweg.de');
+ok(/statt 24 Tage Stress/.test(t.szenen[t.szenen.length-1].tafel||''), 'Trailer-Tafel nach STRAT-44 Nr. 45');
+ok(t.szenen.some(x=>/zwei Minuten/.test(x.spricht||'') && /morgens/.test(x.spricht||'')), 'Trailer sagt: abends zwei Minuten aufbauen, morgens erzählt Bommi');
 // Stimmen-Plan
 ok(stimmen.figuren.bommi.proben.length>=2 && stimmen.figuren.bommi.proben.length<=3, 'Zwei bis drei Stimmproben für Bommi');
 ok(['kruemel','flitz','brummel','tiri','fina'].every(f=>stimmen.figuren[f] && stimmen.figuren[f].voice_id), 'Jede Freundes-Figur hat eine Stimme');

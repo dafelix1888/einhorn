@@ -1,6 +1,6 @@
 {
   "zweck": "Texte für Wichtel Bommi (UNICORN-134). Vorgaben: STRAT-42 (Skizze), STRAT-44 (Details). Stil und Figuren: figurenblatt.md. Prüfung: tests/wichtel-texte.test.cjs.",
-  "stand": "Nr. 1 fertig, Nr. 2 bis 8 und Trailer im Entwurf",
+  "stand": "Alle Texte fertig, von Strategist abgenommen (UNICORN-134), Nachbesserungen eingebaut",
   "regeln": {
     "video_anfang": "Psst! Ich bin's, Bommi.",
     "video_ende": "Und wie das ausging? Blättert weiter!",
@@ -24,7 +24,7 @@
       "video": "Psst! Ich bin's, Bommi. Heute Nacht bin ich bei euch eingezogen. Mit meinem Koffer stand ich im Schnee vor eurer Haustür. Riesig war die! Drinnen hab ich mich gleich verlaufen. Erst bin ich in einen Hausschuh geplumpst, dann in einen Blumentopf und dann, hoppla, in die Keksdose. Jetzt sitze ich vor meiner neuen kleinen Tür. Aber ich kenne hier niemanden. Darf ich überhaupt bleiben? Ich trau mich nicht mal anzuklopfen. Und wie das ausging? Blättert weiter!",
       "bilder": [
         {
-          "text": "Mitten in der Nacht stand ich mit meinem Koffer vor eurer Haustür. Der Schnee reichte mir bis zum Bauch, und die Tür war so hoch wie ein Berg. Zum Glück passt ein kleiner Wichtel wie ich durch jeden Spalt.",
+          "text": "Mitten in der Nacht stand ich mit meinem Koffer vor eurer Haustür. Ich komme aus der Wichtelwerkstatt und bleibe bei euch, bis Weihnachten ist. Die Tür war so hoch wie ein Berg, doch ein Wichtel passt durch jeden Spalt.",
           "bild": "Nacht, Schneefall. Bommi steht klein mit seinem braunen Koffer im tiefen Schnee vor einer riesigen hölzernen Haustür mit Tannenkranz. Warmes Licht fällt durch den Türspalt. Bommi schaut staunend nach oben."
         },
         {
@@ -57,7 +57,7 @@
       "id": "keks-krimi",
       "titel": "Der Keks-Krümel-Krimi",
       "pflicht": false,
-      "stand": "entwurf",
+      "stand": "fertig",
       "wert": "Teilen, nicht vorschnell beschuldigen",
       "haken": "Bommi wird zu Unrecht beschuldigt und ist beleidigt. Dann ist er selbst kurz davor, Krümel anzuschreien.",
       "oma": "Halbiert schmeckt ein Keks doppelt.",
@@ -99,7 +99,7 @@
       "id": "blumentopf",
       "titel": "Flitz buddelt im Blumentopf",
       "pflicht": false,
-      "stand": "entwurf",
+      "stand": "fertig",
       "wert": "Helfen und sich helfen lassen",
       "haken": "Flitz will alles allein schaffen und nichts abgeben. Allein findet er nichts.",
       "oma": "Vier Pfoten finden mehr als zwei.",
@@ -133,7 +133,7 @@
       ],
       "aufbau": [
         "Etwas Erde aus einem Blumentopf auf eine Unterlage streuen, die kleine Bank und den Besen danebenstellen.",
-        "Fünf Nüsse in der Wohnung verstecken, zum Beispiel in einem Hausschuh oder einer Tasse.",
+        "Fünf Walnüsse in der Schale oder Kastanien in der Wohnung verstecken, zum Beispiel in einem Hausschuh oder einer Tasse. Sie sind zum Suchen, nicht zum Essen.",
         "Den Brief und einen grünen Bommel auf die Bank legen."
       ],
       "brief": "Lieber Bommi, manchmal will man alles allein schaffen. Dabei geht es zusammen viel leichter. Vier Pfoten finden mehr als zwei. Deine Oma Mooswinkel"
@@ -143,7 +143,7 @@
       "id": "waschtag",
       "titel": "Der große Waschtag",
       "pflicht": false,
-      "stand": "entwurf",
+      "stand": "fertig",
       "wert": "Niemanden ausschließen",
       "haken": "Krümel ist zu klein und darf nicht mitmachen. Keiner merkt es, bis Bommi hinsieht.",
       "oma": "Ein Spiel ist erst gut, wenn alle mitspielen.",
@@ -165,7 +165,7 @@
           "stimmen": [{ "figur": "kruemel", "satz": "Darf ich auch mal?" }]
         },
         {
-          "text": "Dann sah ich endlich nach unten. Krümel saß allein da, ganz still, und schaute traurig zu uns hoch. Da wurde mir warm und kalt zugleich. Da rief ich: „Stopp! Neue Regel: Wer klein ist, fährt im Wäschekorb!“",
+          "text": "Dann sah ich endlich nach unten. Krümel saß allein da, ganz still, und schaute traurig zu uns hoch. Da wurde mir warm und kalt zugleich. Ich rief laut: „Stopp! Neue Regel: Wer klein ist, fährt im Wäschekorb!“",
           "bild": "Bommi hängt an der Leine und schaut erschrocken nach unten zu Krümel. Mit ausgestrecktem Arm zeigt er auf einen kleinen geflochtenen Wäschekorb."
         },
         {
@@ -185,7 +185,7 @@
       "id": "nachtbaustelle",
       "titel": "Die Nachtbaustelle",
       "pflicht": false,
-      "stand": "entwurf",
+      "stand": "fertig",
       "wert": "Rücksicht, sich entschuldigen",
       "haken": "Bommi meint es gut und stört trotzdem. Gut gemeint ist nicht automatisch gut.",
       "oma": "Leise sein ist auch ein Geschenk.",
@@ -227,7 +227,7 @@
       "id": "mehlschnee",
       "titel": "Die Mehlschnee-Panne",
       "pflicht": false,
-      "stand": "entwurf",
+      "stand": "fertig",
       "wert": "Fehler zugeben",
       "haken": "Bommi schämt sich und will abhauen.",
       "oma": "Ein Fehler wird klein, wenn man ihn sagt.",
@@ -269,7 +269,7 @@
       "id": "fina",
       "titel": "Fina kann alles besser",
       "pflicht": false,
-      "stand": "entwurf",
+      "stand": "fertig",
       "wert": "Neid, eigene Stärken",
       "haken": "Neid. Bommi tut etwas Gemeines und fühlt sich danach schlechter, nicht besser.",
       "oma": "Schau nicht auf den Bommel der anderen. Du hast deinen eigenen.",
@@ -311,7 +311,7 @@
       "id": "bommel-kette",
       "titel": "Die Bommel-Kette",
       "pflicht": true,
-      "stand": "entwurf",
+      "stand": "fertig",
       "wert": "Dankbarkeit, Freundschaft",
       "haken": "Abschied. Bommi will bleiben und muss doch nach Hause.",
       "oma": "Wer Freunde hat, findet immer nach Hause.",
@@ -350,15 +350,15 @@
     }
   ],
   "trailer": {
-    "stand": "entwurf",
+    "stand": "fertig",
     "laenge": "20 bis 30 Sekunden",
     "sprecher": "bommi",
     "szenen": [
       { "sekunden": 3, "bild": "Kleine Wichteltür an der Wand, ein Bommel rollt ins Bild.", "spricht": "Psst! Ich bin's, Bommi." },
       { "sekunden": 5, "bild": "Bommi tritt aus der Tür und grinst in die Kamera.", "spricht": "Im Advent ziehe ich bei euch ein, hinter einer kleinen Tür." },
       { "sekunden": 9, "bild": "Drei schnelle Szenen: Krümelspur aus Nr. 2, Schaumberg aus Nr. 4, Baustelle aus Nr. 5.", "spricht": "Und nachts? Da ist was los! Kekskrümel überall. Schaum bis unter die Mütze. Eine Baustelle mitten im Zimmer!" },
-      { "sekunden": 4, "bild": "Die Bommel-Kette wächst Bommel um Bommel.", "spricht": "Für jede gute Tat wächst unsere Bommel-Kette. Seid ihr dabei?" },
-      { "sekunden": 5, "bild": "Texttafel auf warmem Hintergrund, Bommi winkt am Rand.", "tafel": "8 Wichtelgeschichten. Material zum Bestellen dabei. Gratis auf schatzweg.de" }
+      { "sekunden": 7, "bild": "Abends stellt eine Hand eine kleine Szene vor die Wichteltür. Schnitt: Morgen, Bommi erzählt. Die Bommel-Kette wächst Bommel um Bommel.", "spricht": "Abends zwei Minuten aufbauen, morgens erzähle ich euch, was passiert ist. Für jede gute Tat wächst unsere Bommel-Kette!" },
+      { "sekunden": 5, "bild": "Texttafel auf warmem Hintergrund, Bommi winkt am Rand.", "tafel": "8 Wichtelgeschichten statt 24 Tage Stress. Gratis auf schatzweg.de" }
     ]
   }
 }
