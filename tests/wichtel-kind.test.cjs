@@ -16,7 +16,7 @@ const namen=p=>p.evaluate(()=>window.wichtelMessung.map(e=>e.name+':'+(e.props.f
     await p.goto(B+'/app/wichtel-kind.html?nr=1');
     await p.waitForSelector('#start:not([hidden])', {timeout:10000});
     ok(await sichtbar(p,'s-video') && !(await sichtbar(p,'s-bilder')), name+': zuerst das Video, keine Bilder');
-    ok(await p.locator('a, nav, ul').count()===0, name+': kein Menü, keine Liste');
+    ok(await p.locator('a:visible, nav:visible, ul:visible').count()===0, name+': kein Menü, keine Liste');
     const vb=await p.locator('#video').boundingBox();
     ok(vb.height<=vp.height+1 && vb.width<=vp.width+1, name+': Video passt auf den Bildschirm');
     ok(Math.abs((vb.x+vb.width/2)-vp.width/2)<2, name+': Video steht mittig');

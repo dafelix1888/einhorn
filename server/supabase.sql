@@ -433,3 +433,33 @@ revoke all on function public.meinung_melden() from public, anon, authenticated;
 drop trigger if exists meinung_melden on public.meinungen;
 create trigger meinung_melden before insert on public.meinungen
   for each row execute function public.meinung_melden();
+
+-- ---------- Wichtel Bommi (UNICORN-144): Plan je Konto ----------
+-- Geschichte 1 läuft ohne Konto. Ab Geschichte 2 melden sich Eltern mit demselben Konto an wie bei der Einhorn-Tour.
+-- Eine Zeile je Konto: Auswahl, Material-Weg, Zeitplan und gespielte Geschichten (daten), dazu das Häkchen
+-- „Bommi darf mich erinnern“ (erinnern, nie vorausgewählt). Die Mails (UNICORN-139) lesen nur Zeilen mit erinnern = true.
+create table if not exists public.wichtel (
+  owner        uuid primary key default auth.uid() references auth.users(id) on delete cascade,
+  daten        jsonb not null,
+  erinnern     boolean not null default false,
+  erinnern_seit timestamptz,
+  erstellt     timestamptz not null default now(),
+  aktualisiert timestamptz not null default now(),
+  constraint wichtel_groesse check (pg_column_size(daten) < 50000)
+);
+drop trigger if exists wichtel_zeit on public.wichtel;
+create trigger wichtel_zeit before update on public.wichtel for each row execute function public.zeit_setzen();
+alter table public.wichtel enable row level security;
+drop policy if exists "eigener Wichtel" on public.wichtel;
+create policy "eigener Wichtel" on public.wichtel for all to authenticated
+  using (owner = auth.uid()) with check (owner = auth.uid());
+revoke all on public.wichtel from anon;
+grant select, insert, update, delete on public.wichtel to authenticated;
+-- Wichtel-Plan nach der Saison löschen: am 31. Januar (Datenschutzerklärung, Abschnitt „Bommi“).
+do $$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    perform cron.unschedule(jobid) from cron.job where jobname = 'alte-wichtel';
+    perform cron.schedule('alte-wichtel', '47 3 31 1 *', $c$delete from public.wichtel$c$);
+  end if;
+end $$;

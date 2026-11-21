@@ -49,10 +49,35 @@
   #bommel { flex:0 0 auto; width:54px; height:54px; border-radius:50%; box-shadow:inset -6px -6px 0 rgba(0,0,0,.12); }
   #ende b { display:block; }
   #ende p { margin:.2em 0 0; font-size:1rem; }
+
+  /* Schranke vor Geschichte 2 (UNICORN-144): für die Eltern, freundlich, ohne Druck */
+  #s-schranke { min-height:100%; background:var(--papier); }
+  #s-schranke .buch { max-width:480px; }
+  #s-schranke img { width:132px; height:132px; object-fit:cover; border-radius:50%; display:block; margin:0 auto 10px; background:var(--linie); }
+  #s-schranke h1 { font-size:1.6rem; text-align:center; margin:.2em 0 .4em; }
+  #s-schranke p { font-size:1.02rem; margin:.5em 0; }
+  #s-schranke .haken { display:flex; gap:12px; align-items:flex-start; background:#fff; border:1.5px solid var(--linie); border-radius:14px; padding:12px 14px; margin:16px 0; cursor:pointer; font-size:1rem; }
+  #s-schranke .haken input { width:24px; height:24px; margin:2px 0 0; accent-color:var(--rot); flex:0 0 auto; }
+  #s-schranke .haken small { display:block; color:var(--leise); font-size:.88rem; }
+  #anmelden { width:100%; border:0; border-radius:999px; min-height:54px; background:var(--rot); color:#fff; font-weight:700; }
+  #s-schranke .klein { color:var(--leise); font-size:.86rem; text-align:center; }
+  #s-schranke a { color:var(--tinte); }
 </style>
 </head>
 <body>
 <button type="button" id="erw" aria-label="Für Erwachsene: 2 Sekunden halten, um zurückzugehen"><span class="fill"></span><span>Erwachsene</span></button>
+
+<section id="s-schranke" hidden>
+  <div class="buch">
+    <img id="schranke-bild" alt="">
+    <h1>Bommi bleibt bei euch</h1>
+    <p>Die erste Geschichte war geschenkt. Ab jetzt meldet ihr euch einmal an. Dann liegt euer Plan im Konto und ist auf Handy und Tablet gleich.</p>
+    <p>Kein Passwort: Ihr bekommt einen Code per E-Mail. Es ist dasselbe Konto wie für die Einhorn-Tour.</p>
+    <label class="haken"><input type="checkbox" id="erinnern"><span>Bommi darf mich erinnern<small>Eine Mail am Vorabend jeder Geschichte und zwei Mails mit der Bitte um eure Meinung. Jederzeit abbestellbar.</small></span></label>
+    <button type="button" id="anmelden">Anmelden und weiter</button>
+    <p class="klein"><a href="datenschutz.html#bommi">Datenschutz</a></p>
+  </div>
+</section>
 
 <section id="s-video" hidden>
   <video id="video" playsinline preload="metadata"></video>
@@ -80,6 +105,8 @@
 </section>
 
 <script src="wichtel-kern.js"></script>
+<script src="konto.js"></script>
+<script src="wichtel-konto.js"></script>
 <script>
 (function(){
   'use strict';
@@ -143,7 +170,7 @@
     var letzte=seite===anzahl-1;
     $('ende').hidden=!letzte;
     if(letzte){
-      var gesp=lies('sj.wichtel.gespielt')||[]; if(gesp.indexOf(nr)<0){ gesp.push(nr); schreib('sj.wichtel.gespielt', gesp); }
+      var gesp=lies('sj.wichtel.gespielt')||[]; if(gesp.indexOf(nr)<0){ gesp.push(nr); schreib('sj.wichtel.gespielt', gesp); if(window.WichtelKonto) WichtelKonto.geaendert(); }
       messen('wichtel_story_completed', {geschichte:nr, format:'bilder'}, 'b-ende');
     }
     if(vorlesenAn) abspielen();
@@ -190,7 +217,16 @@
       var satz=(G.regeln && G.regeln.geschichte_ende)||'Wo ein Bommel liegt, war ich da.';
       $('satz').textContent=satz;
       vorlesenSetzen(vorlesenAn);
-      if(new URLSearchParams(location.search).get('ab')==='bilder') bilderZeigen(); else videoZeigen();
+      function los(){ $('s-schranke').hidden=true; if(new URLSearchParams(location.search).get('ab')==='bilder') bilderZeigen(); else videoZeigen(); }
+      // Ab Geschichte 2: erst anmelden (UNICORN-144). Angemeldet: Plan im Hintergrund abgleichen.
+      if(window.WichtelKonto && WichtelKonto.schranke(nr)){
+        $('schranke-bild').src=WK.medien(1).bilder[0].bild;
+        $('s-schranke').hidden=false; document.body.classList.add('bilder');
+        $('anmelden').onclick=function(){ WichtelKonto.anmelden($('erinnern').checked, los); };
+        return;
+      }
+      if(window.WichtelKonto) WichtelKonto.abgleichen();
+      los();
     });
 })();
 </script>
