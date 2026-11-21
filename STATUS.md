@@ -4,6 +4,8 @@ Stand: 16. November 2026 (schatzweg.de live). Das Konzept zum Ablauf für Eltern
 
 ## Wichtel Bommi (Schwerpunkt bis Start 27. November, STRAT-46)
 
+**21. November nachmittags, UNICORN-138, Geschichte 7:** Bildergeschichte „Fina kann alles besser“ in `app/themen/wichtel/g7/` (5 Bilder, 5 Töne; Bild 4 mit Finas Satz in ihrer Stimme, 0,35 s Pause). Fina hat eine neue Stimme: „Skittle Bee“ aus der Bibliothek (`xLCJR8xcZX2YjImGFyGw`, jung, hell, kann traurig), statt Alfonso aus der Einhorn-Tour (`stimmen.json`). ElevenLabs-Ablauf `QAaLo0kpksV1ZGZd6Kzg` („Wichtel G7 Fina (UNICORN-138)“), Video-Text dort im Baustein „G7 Sprache Video“ (28 s). Verbrauch 4.803 Punkte.
+
 **21. November nachmittags, UNICORN-148, Landingpage:** `wichtel/index.html` ist jetzt die Landingpage von Marketer (MAR-75, unverändert, sha256 im Test `tests/wichtel-landing.test.cjs`), „Los geht's“ führt zu `/app/wichtel.html`. `wichtel/teilen.jpg` mit Marketers Skript aus `bommi-vorlage.jpg` erzeugt. Bis UNICORN-146 bleibt `/wichtel` in `robots.txt` und `_headers` gesperrt; Sitemap-Eintrag und Startseiten-Kachel kommen erst mit UNICORN-146. Trailer: später nur `src` am `<video id="trailer">` tauschen.
 
 **21. November nachmittags, UNICORN-138, Geschichte 6:** Bildergeschichte „Die Mehlschnee-Panne“ in `app/themen/wichtel/g6/` (5 Bilder, 5 Töne; Bild 4 mit Tiris Satz in ihrer Stimme, 0,35 s Pausen). ElevenLabs-Ablauf `nsI6Rmrz5enMMRxkgLfE` („Wichtel G6 Mehlschnee (UNICORN-138)“), Video-Text dort im Baustein „G6 Sprache Video“ (29 s). Verbrauch 4.771 Punkte.

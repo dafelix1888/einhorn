@@ -80,14 +80,8 @@
     },
     "fina": {
       "beschreibung": "Fina, Bommis Cousine: helles Mädchen, erst stolz, dann leise und traurig",
-      "voice_id": "HwlyvBfjL4YoUAPEjX6e",
-      "herkunft": "Einhorn-Tour: Alfonso (hoch, kichernd). Klingt sie im Muster zu albern, nimmt die Serie eine neue Stimme (Entwurf wie bei Bommi).",
-      "einstellungen": {
-        "stability": 0.55,
-        "similarity_boost": 0.8,
-        "style": 0.3,
-        "use_speaker_boost": true
-      }
+      "voice_id": "xLCJR8xcZX2YjImGFyGw",
+      "herkunft": "Bibliothek: Skittle Bee (jung, frisch, kann traurig und ängstlich). Gewählt in der Serie (UNICORN-138, Geschichte 7), weil Alfonso aus der Einhorn-Tour kichernd klingt und Finas einziger Satz leise und traurig ist. Vorher geplant: Alfonso (HwlyvBfjL4YoUAPEjX6e)."
     },
     "oma": {
       "beschreibung": "Oma Mooswinkel spricht nie selbst. Bommi liest ihre Briefe vor.",
