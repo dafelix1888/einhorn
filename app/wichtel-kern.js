@@ -78,8 +78,24 @@
     return { zeilen:zeilen, szenario:szen, summe:Math.round(summe*100)/100, ohnePreis:offen };
   }
 
+  // Dateien einer Geschichte (UNICORN-143). Geschichte 1 liegt noch im Muster-Ordner, die übrigen kommen nach themen/wichtel/g<nr>/ (UNICORN-138).
+  var ORDNER={1:'themen/wichtel/muster/'};
+  function medien(nr){
+    nr=+nr; var o=ORDNER[nr]||('themen/wichtel/g'+nr+'/'), b=[];
+    for(var i=1;i<=5;i++) b.push({ bild:o+'g'+nr+'-bild'+i+'.jpg', ton:o+'g'+nr+'-bild'+i+'.mp3' });
+    return { video:o+'g'+nr+'-video.mp4', bilder:b, ersatz:'themen/wichtel/einstieg.jpg' };
+  }
+
+  // Welche Geschichte ist heute dran: ?nr= gewinnt, sonst die letzte im Zeitplan, deren Tag erreicht ist, sonst die erste.
+  function heutige(zeilen, heute, wunsch){
+    wunsch=+wunsch; if(wunsch>=1 && wunsch<=8) return wunsch;
+    if(!zeilen || !zeilen.length) return 1;
+    var nr=zeilen[0].nr; zeilen.forEach(function(z){ if(z.datum<=heute) nr=z.nr; });
+    return nr;
+  }
+
   function euro(x){ return x.toFixed(2).replace('.',',').replace(',00','')+' €'; }
 
-  var WK={ saison:saison, advent:advent, paket:paket, welchesPaket:welchesPaket, auswahl:auswahl, tage:tage, plan:plan, kurz:kurz, plus:plus, euro:euro, gueltig:gueltig };
+  var WK={ saison:saison, advent:advent, paket:paket, welchesPaket:welchesPaket, auswahl:auswahl, tage:tage, plan:plan, kurz:kurz, plus:plus, euro:euro, gueltig:gueltig, medien:medien, heutige:heutige };
   if(typeof module!=='undefined' && module.exports) module.exports=WK; else wurzel.WichtelKern=WK;
 })(this);
