@@ -210,6 +210,8 @@
 <script src="recht.js"></script>
 <script src="konto.js"></script>
 <script src="wichtel-konto.js"></script>
+<script src="wichtel-messung.js"></script>
+<script src="https://efdjomgubucdnvgtuqmp.supabase.co/functions/v1/track/m.js" data-key="45d4d32f10391d24b7e915bd19d6790a4152644ef418aa07" defer></script>
 <script>
 (function(){
   'use strict';
@@ -231,7 +233,13 @@
   }
   function opt(){ return { nr:wahl.nr, szenario:wahl.szenario, erster:wahl.erster, letzter:wahl.letzter, sonntage: wahl.paket==='advent', eigene:wahl.eigene }; }
 
+  // Messpunkte (MAR-77, UNICORN-140)
+  function messen(name, props, einmal){ if(window.WichtelMessung) WichtelMessung.messen(name, props, einmal); }
   function zeige(n){
+    var vorher=wahl.schritt;
+    if(n===3 && vorher===2) messen('wichtel_package_chosen', {anzahl:wahl.nr.length, material:wahl.szenario}, 'paket');
+    if(vorher===3 && n>3) messen('wichtel_schedule_created', {anzahl:wahl.nr.length}, 'plan');
+    if(n===4) messen('wichtel_shopping_list_opened', {}, 'liste');
     wahl.schritt=n; merken();
     [].forEach.call(document.querySelectorAll('section[data-schritt]'), function(s){ s.hidden = +s.getAttribute('data-schritt')!==n; });
     if(n===1) auswahlZeichnen(); if(n===2) szenarienZeichnen(); if(n===3) planZeichnen(); if(n===4) materialZeichnen(); if(n===5) vorbZeichnen(); if(n===6) geschichteZeichnen();
@@ -319,6 +327,7 @@
       li.innerHTML='<div class="kopf"><b>'+esc(a.name)+'</b><span class="preis">'+(a.preis==null?'Preis offen':(a.geschaetzt?'ca. ':'')+WK.euro(a.preis))+'</span></div>'+
         '<div class="wann'+(knapp?' knapp':'')+'">'+(knapp?'Bestelltag vorbei, schnell bestellen oder selbst machen':'Bestellen bis '+WK.kurz(a.bis))+' · für Geschichte '+a.nr.join(', ')+(a.extra?' · Extra':'')+'</div>'+
         '<div class="zeile2"><span class="selbst">Oder selbst: '+esc(a.selbst)+'</span><a class="knopf" href="'+esc(a.link)+'" target="_blank" rel="noopener">Bei Amazon ansehen</a></div>';
+      li.querySelector('a.knopf').addEventListener('click', function(){ messen('wichtel_amazon_clicked', {artikel:a.id, geschichte:a.nr[0]}, 'amazon-'+a.id); });
       k.appendChild(li);
     });
     var b=$('bast'); b.innerHTML='';
@@ -396,9 +405,10 @@
       [].forEach.call(document.querySelectorAll('[data-vorbereiten]'), function(b){ b.onclick=function(){ zeige(5); }; });
       $('vorb-plan').onclick=function(){ zeige(3); }; $('vorb-material').onclick=function(){ zeige(4); };
       $('vg-zurueck').onclick=function(){ zeige(5); };
-      $('vg-drucken').onclick=function(){ document.body.classList.add('brief-druck'); window.print(); };
+      $('vg-drucken').onclick=function(){ messen('wichtel_template_downloaded', {geschichte:+wahl.vorbNr||undefined}, 'brief-'+wahl.vorbNr); document.body.classList.add('brief-druck'); window.print(); };
+      $('vorlagen').addEventListener('click', function(){ messen('wichtel_template_downloaded', {}, 'vorlagen'); });
       window.addEventListener('afterprint', function(){ document.body.classList.remove('brief-druck'); });
-      $('drucken').onclick=function(){ document.body.classList.remove('brief-druck'); planZeichnen(); window.print(); };
+      $('drucken').onclick=function(){ messen('wichtel_schedule_created', {anzahl:wahl.nr.length}, 'plan'); document.body.classList.remove('brief-druck'); planZeichnen(); window.print(); };
       zeige(Math.max(0, Math.min(6, +wahl.schritt||0)));
       // Angemeldet: Plan mit dem Konto abgleichen. Kam vom Konto etwas Neueres, neu zeichnen (zweites Gerät).
       if(window.WichtelKonto && WichtelKonto.angemeldet()) WichtelKonto.abgleichen().then(function(neu){

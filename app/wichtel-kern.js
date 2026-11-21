@@ -147,8 +147,11 @@
     var gesp=[]; (lokal.gespielt||[]).concat(s&&s.gespielt||[]).forEach(function(n){ n=+n; if(n>=1 && n<=8 && gesp.indexOf(n)<0) gesp.push(n); });
     gesp.sort(function(a,b){ return a-b; });
     var daten={ wahl: vomKonto ? sw : lw, gespielt:gesp, zeit: vomKonto ? +s.zeit||0 : +lokal.zeit||0 };
-    if(!daten.wahl && !gesp.length) return { daten:daten, hochladen:false, vomKonto:false };
-    var gleich=!!s && JSON.stringify({w:s.wahl||null, g:(s.gespielt||[]).slice().sort(function(a,b){ return a-b; }), z:+s.zeit||0})===JSON.stringify({w:daten.wahl||null, g:gesp, z:daten.zeit});
+    // Messung (UNICORN-140): Familien-Kennung und Prüf-Markierung gehören zum Konto; was im Konto steht, gilt.
+    var fam=(s&&s.familie)||lokal.familie||null, pr=(s&&s.pruefung)||lokal.pruefung||null;
+    if(fam) daten.familie=fam; if(pr) daten.pruefung=pr;
+    if(!daten.wahl && !gesp.length && !fam) return { daten:daten, hochladen:false, vomKonto:false };
+    var gleich=!!s && JSON.stringify({w:s.wahl||null, g:(s.gespielt||[]).slice().sort(function(a,b){ return a-b; }), z:+s.zeit||0, f:s.familie||null, p:s.pruefung||null})===JSON.stringify({w:daten.wahl||null, g:gesp, z:daten.zeit, f:fam, p:pr});
     return { daten:daten, hochladen:!gleich, vomKonto:vomKonto };
   }
 

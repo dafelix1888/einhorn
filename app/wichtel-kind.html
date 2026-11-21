@@ -107,6 +107,8 @@
 <script src="wichtel-kern.js"></script>
 <script src="konto.js"></script>
 <script src="wichtel-konto.js"></script>
+<script src="wichtel-messung.js"></script>
+<script src="https://efdjomgubucdnvgtuqmp.supabase.co/functions/v1/track/m.js" data-key="45d4d32f10391d24b7e915bd19d6790a4152644ef418aa07" defer></script>
 <script>
 (function(){
   'use strict';
@@ -116,13 +118,10 @@
   function lies(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
   function schreib(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 
-  // Messpunkte (Namen aus MAR-77, Senden über marketer.track, sobald UNICORN-140 es einbindet). Höchstens einmal je Seitenaufruf.
-  var gemessen={}; window.wichtelMessung=[];
+  // Messpunkte (Namen aus MAR-77, UNICORN-140): wichtel-messung.js. Höchstens einmal je Seitenaufruf.
   function messen(name, props, einmal){
-    if(einmal){ if(gemessen[einmal]) return; gemessen[einmal]=true; }
-    var p=Object.assign({produkt:'wichtel'}, props||{});
-    window.wichtelMessung.push({name:name, props:p});
-    if(window.marketer && window.marketer.track){ try{ window.marketer.track(name, p); }catch(e){} }
+    if(window.WichtelMessung) WichtelMessung.messen(name, props, einmal);
+    if(name==='wichtel_story_completed' && props.geschichte===1 && window.WichtelMessung) WichtelMessung.g1();
   }
 
   var nr, g, m, seite=0, ton=window.wichtelTon=new Audio(), vorlesenAn=!!lies('sj.wichtel.vorlesen');
