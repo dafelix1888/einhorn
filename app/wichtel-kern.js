@@ -135,8 +135,25 @@
       material:zeile.material.slice(), mitmachen:g.mitmachen||'', brief:g.brief||'', bommel:g.bommel||'' };
   }
 
+  // Konto ab Geschichte 2 (UNICORN-144): Geschichte 1 ist geschenkt, ab Nr. 2 braucht es die Anmeldung.
+  function braucheKonto(nr){ return +nr>=2; }
+  // Abgleich Gerät ↔ Konto. lokal und server.daten: { wahl, gespielt:[Nr.], zeit:ms der letzten Änderung }.
+  // Die neuere Wahl gewinnt (ohne Wahl auf dem Gerät immer die vom Konto), gespielte Geschichten werden vereinigt.
+  // hochladen = das Ergebnis weicht vom Konto ab.
+  function abgleich(lokal, server){
+    lokal=lokal||{}; var s=(server&&server.daten)||null;
+    var lw=lokal.wahl&&lokal.wahl.nr ? lokal.wahl : null, sw=s&&s.wahl&&s.wahl.nr ? s.wahl : null;
+    var vomKonto=!!sw && (!lw || (+s.zeit||0)>(+lokal.zeit||0));
+    var gesp=[]; (lokal.gespielt||[]).concat(s&&s.gespielt||[]).forEach(function(n){ n=+n; if(n>=1 && n<=8 && gesp.indexOf(n)<0) gesp.push(n); });
+    gesp.sort(function(a,b){ return a-b; });
+    var daten={ wahl: vomKonto ? sw : lw, gespielt:gesp, zeit: vomKonto ? +s.zeit||0 : +lokal.zeit||0 };
+    if(!daten.wahl && !gesp.length) return { daten:daten, hochladen:false, vomKonto:false };
+    var gleich=!!s && JSON.stringify({w:s.wahl||null, g:(s.gespielt||[]).slice().sort(function(a,b){ return a-b; }), z:+s.zeit||0})===JSON.stringify({w:daten.wahl||null, g:gesp, z:daten.zeit});
+    return { daten:daten, hochladen:!gleich, vomKonto:vomKonto };
+  }
+
   function euro(x){ return x.toFixed(2).replace('.',',').replace(',00','')+' €'; }
 
-  var WK={ saison:saison, advent:advent, paket:paket, welchesPaket:welchesPaket, auswahl:auswahl, tage:tage, plan:plan, kurz:kurz, plus:plus, euro:euro, gueltig:gueltig, medien:medien, heutige:heutige, einkauf:einkauf, link:link, fortschritt:fortschritt, dran:dran, vorbereitung:vorbereitung };
+  var WK={ saison:saison, advent:advent, paket:paket, welchesPaket:welchesPaket, auswahl:auswahl, tage:tage, plan:plan, kurz:kurz, plus:plus, euro:euro, gueltig:gueltig, medien:medien, heutige:heutige, einkauf:einkauf, link:link, fortschritt:fortschritt, dran:dran, vorbereitung:vorbereitung, braucheKonto:braucheKonto, abgleich:abgleich };
   if(typeof module!=='undefined' && module.exports) module.exports=WK; else wurzel.WichtelKern=WK;
 })(this);

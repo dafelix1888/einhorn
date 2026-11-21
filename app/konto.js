@@ -75,7 +75,7 @@
   function neuMelden(u){
     if(!u || !u.id || !u.created_at || Date.now()-Date.parse(u.created_at)>=30*60000) return;
     if(lies('sj.konto.signup')===u.id) return;
-    schreib('sj.konto.signup', u.id); mkMelden('signup');
+    schreib('sj.konto.signup', u.id); mkMelden('signup', /wichtel/.test(location.pathname) ? {herkunft:'wichtel'} : undefined);   // Wichtel-Bereich (UNICORN-144)
   }
   // Ereignis an Marketer (gleiche Schnittstelle wie m.js, ohne Cookies, nichts auf dem Gerät).
   // Seiten mit m.js nutzen dessen track(); das Spiel lädt m.js bewusst nicht und schickt nur seine wenigen Ereignisse direkt.
@@ -98,6 +98,18 @@
     if(!j.refresh_token) return null;
     sitzungMerken(j);
     return anfrage('/auth/v1/user', {token:j.access_token}).then(function(u){ var s=sitzung(); s.email=u.email; s.id=u.id; schreib(SITZUNG, s); neuMelden(u); return s; }, function(){ return sitzung(); });
+  }
+
+  // ---------- Wichtel Bommi (UNICORN-144): eine Zeile je Konto ----------
+  // Fehlt die Tabelle noch oder klemmt der Server, bleibt alles auf dem Gerät (Aufrufer fangen den Fehler ab).
+  function wichtelHolen(){
+    return token().then(function(t){ return anfrage('/rest/v1/wichtel?select=daten,erinnern', {token:t}); }).then(function(l){ return (l&&l[0])||null; });
+  }
+  function wichtelSpeichern(daten, erinnern){
+    var s=sitzung(), body={owner:s&&s.id, daten:daten};
+    if(!body.owner) return Promise.reject(new Error('nicht angemeldet'));
+    if(erinnern!=null){ body.erinnern=!!erinnern; body.erinnern_seit=erinnern ? new Date().toISOString() : null; }
+    return token().then(function(t){ return anfrage('/rest/v1/wichtel?on_conflict=owner', {method:'POST', token:t, prefer:'resolution=merge-duplicates,return=minimal', body:body}); });
   }
 
   // ---------- Party speichern ----------
@@ -389,11 +401,11 @@
     function schritt1(fehler){
       dlg.innerHTML='<form method="dialog" id="kd1">'+held+'<h2>'+esc(opt.titel||'Erst deine Party speichern')+'</h2>'+
         '<p class="unter">'+esc(opt.text||'Mit deiner eigenen E-Mail-Adresse. Den Link zum Weiterschicken bekommst du gleich danach.')+'</p>'+
-        '<ul class="kd-vorteile">'+
+        (opt.vorteile===false ? '' : '<ul class="kd-vorteile">'+
           '<li><span class="ic">'+IC.schloss+'</span><span><b>Eure Tour ist geschützt</b><small>Route und Treffpunkt sieht nur, wer euren Link hat.</small></span></li>'+
           '<li><span class="ic">'+IC.teilen+'</span><span><b>Links für Tablet und Gäste</b><small>Die brauchen kein Konto, ein Tipp auf den Link reicht.</small></span></li>'+
-          '<li><span class="ic">'+IC.brief+'</span><span><b>Code statt Passwort</b><small>Wir schicken dir einen Code per E-Mail.</small></span></li></ul>'+
-        '<label class="kd-wer" for="kd-mail"><b>Deine</b> E-Mail-Adresse, nicht die vom Empfänger. Dorthin kommt der Code.</label>'+
+          '<li><span class="ic">'+IC.brief+'</span><span><b>Code statt Passwort</b><small>Wir schicken dir einen Code per E-Mail.</small></span></li></ul>')+
+        '<label class="kd-wer" for="kd-mail">'+(opt.wer||'<b>Deine</b> E-Mail-Adresse, nicht die vom Empfänger. Dorthin kommt der Code.')+'</label>'+
         '<input type="email" id="kd-mail" autocomplete="email" inputmode="email" placeholder="deine@email.de" aria-label="Deine eigene E-Mail-Adresse" required value="'+esc(email)+'">'+
         '<div class="fehler" id="kd-f">'+esc(fehler||'')+'</div>'+
         '<button class="los" id="kd-los" type="submit">Code schicken</button><button class="neben" type="button" id="kd-zu">Später</button></form>';
@@ -419,7 +431,7 @@
       var warte=null;   // Code-Länge kann 6 bis 10 Ziffern sein: nach kurzer Tipp-Pause selbst prüfen
       feld.addEventListener('input', function(){ var c=feld.value.replace(/\D/g,''); if(c!==feld.value) feld.value=c; clearTimeout(warte);
         if(c.length>=6 && !feld.dataset.los) warte=setTimeout(function(){ feld.dataset.los='1'; dlg.querySelector('#kd2').requestSubmit ? dlg.querySelector('#kd2').requestSubmit() : dlg.querySelector('#kd-ok').click(); }, c.length>=10?0:900); });
-      dlg.querySelector('#kd2').onsubmit=function(ev){ ev.preventDefault();
+      dlg.querySelector('#kd2').onsubmit=function(ev){ ev.preventDefault(); clearTimeout(warte); feld.dataset.los='1';
         var c=feld.value.replace(/\D/g,''), b=dlg.querySelector('#kd-ok');
         if(c.length<6){ dlg.querySelector('#kd-f').textContent='Der Code hat mindestens 6 Ziffern.'; return; }
         b.disabled=true; b.textContent='Prüft …';
@@ -450,7 +462,7 @@
     function fertig(){
       if(opt.teilen && opt.weiter && root.Party && (Party.lesen(thema)||{}).server){ jetztTeilen(thema, opt.weiter); return; }   // gespeichert: jetzt mit eigenem Tipp teilen (UNICORN-36)
       dlg.innerHTML='<div class="kd-fertig"><div class="haken">'+IC.haken+'</div><h2>Geschafft!</h2><p class="unter" style="margin:0">'+esc(opt.fertig||'Eure Party ist gesichert.')+'</p></div>';
-      setTimeout(function(){ if(dlg.open) dlg.close(); }, 1400);
+      setTimeout(function(){ if(dlg.open) dlg.close(); if(opt.danach) opt.danach(); }, 1400);
     }
     schritt1();
     if(!dlg.open) dlg.showModal();
@@ -637,5 +649,5 @@
     antwortGeben:antwortGeben, einladungGesehen:einladungGesehen, gaeste:gaeste, gaesteGemerkt:gaesteGemerkt, gastEntfernen:gastEntfernen, gaesteKurz:gaesteKurz, gaesteZeile:gaesteZeile,
     namenStand:namenStand, namenErzeugen:namenErzeugen, namenHolen:namenHolen,
     linkRolle:linkRolle, linkStand:linkStand, aufbauMelden:aufbauMelden, aufbauLesen:aufbauLesen, aufbauBeobachten:aufbauBeobachten,
-    codeSchicken:codeSchicken, codePruefen:codePruefen, nachMailLink:function(thema){ mailLinkGenutzt=true; return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};
+    codeSchicken:codeSchicken, wichtelHolen:wichtelHolen, wichtelSpeichern:wichtelSpeichern, codePruefen:codePruefen, nachMailLink:function(thema){ mailLinkGenutzt=true; return mailLink ? mailLink.then(function(){ return angemeldetWeiter(thema); }) : null; }};
 })(this);

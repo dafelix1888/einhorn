@@ -49,6 +49,9 @@
   .plan .zeit dt { color:var(--leise); }
   .plan .zeit dd { margin:0; }
   .plan .knapp { color:var(--rot); font-weight:700; }
+  .konto { background:var(--karte); border:1px solid var(--linie); border-radius:14px; padding:10px 14px; margin:14px 0 4px; font-size:.92rem; }
+  .konto label { display:flex; gap:10px; align-items:flex-start; cursor:pointer; margin-top:6px; }
+  .konto input { width:22px; height:22px; margin:1px 0 0; accent-color:var(--rot); flex:0 0 auto; }
   .hinweis { background:var(--gelb); border-radius:12px; padding:10px 12px; font-size:.92rem; margin:10px 0; }
   h3 { font-size:1.08rem; margin:1.1em 0 .3em; }
   .wege { display:flex; gap:6px; flex-wrap:wrap; margin:6px 0; }
@@ -177,6 +180,7 @@
     <div class="hinweis" id="dran" hidden></div>
     <p class="leise">Am Vorabend die Geschichte antippen. In zwei Minuten ist alles aufgebaut.</p>
     <ul class="vorb" id="vorb"></ul>
+    <div class="konto" id="konto-zeile"></div>
     <div class="unten"><button class="knopf leer" type="button" id="vorb-plan">Zum Zeitplan</button><button class="knopf leer" type="button" id="vorb-material">Material besorgen</button></div>
   </section>
 
@@ -204,6 +208,8 @@
 </main>
 <script src="wichtel-kern.js"></script>
 <script src="recht.js"></script>
+<script src="konto.js"></script>
+<script src="wichtel-konto.js"></script>
 <script>
 (function(){
   'use strict';
@@ -213,7 +219,11 @@
   function heute(){ var t=new Date(); return t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2); }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function laden(){ try{ return JSON.parse(localStorage.getItem(SCHLUESSEL)||'null'); }catch(e){ return null; } }
-  function merken(){ try{ localStorage.setItem(SCHLUESSEL, JSON.stringify(wahl)); }catch(e){} }
+  // Nur echte Änderungen am Plan (nicht das Blättern zwischen den Schritten) gehen ins Konto (UNICORN-144).
+  function kern(w){ var k={}; for(var x in w) if(x!=='schritt' && x!=='vorbNr') k[x]=w[x]; return JSON.stringify(k); }
+  var zuletzt=null;
+  function merken(){ try{ localStorage.setItem(SCHLUESSEL, JSON.stringify(wahl)); }catch(e){}
+    var k=kern(wahl); if(zuletzt!==null && k!==zuletzt && window.WichtelKonto) WichtelKonto.geaendert(); zuletzt=k; }
 
   function neu(){
     var j=WK.saison(heute());
@@ -324,7 +334,18 @@
   var FARBE={rot:'#c0392b',hellbraun:'#c9a27a',gruen:'#5d9b3a','grün':'#5d9b3a',hellblau:'#8ec5e8',gelb:'#f2c94c','weiß':'#ffffff',violett:'#8e5bb5',golden:'#d4a72c'};
   function gespielt(){ try{ return JSON.parse(localStorage.getItem('sj.wichtel.gespielt')||'[]')||[]; }catch(e){ return []; } }
   function geschichte(nr){ return G.geschichten.filter(function(g){ return g.nr===nr; })[0]||{}; }
+  // Konto (UNICORN-144): angemeldet → Adresse und Häkchen „Bommi darf mich erinnern“, sonst kurzer Hinweis.
+  function kontoZeichnen(){
+    var e=$('konto-zeile'), WKo=window.WichtelKonto; if(!e) return;
+    if(!WKo || !window.Konto || !Konto.aktiv()){ e.hidden=true; return; }
+    e.hidden=false;
+    if(!WKo.angemeldet()){ e.innerHTML='Die erste Geschichte geht ohne Konto. Ab der zweiten meldet ihr euch einmal an, dann ist euer Plan auf Handy und Tablet gleich.'; return; }
+    e.innerHTML='Im Konto gespeichert: <b>'+esc((Konto.sitzung()||{}).email||'')+'</b>'+
+      '<label><input type="checkbox" id="konto-erinnern"'+(WKo.erinnertGemerkt()?' checked':'')+'><span>Bommi darf mich erinnern<br><small class="leise">Eine Mail am Vorabend jeder Geschichte und zwei Mails mit der Bitte um eure Meinung.</small></span></label>';
+    $('konto-erinnern').onchange=function(ev){ WKo.erinnern(ev.target.checked); };
+  }
   function vorbZeichnen(){
+    kontoZeichnen();
     var h=heute(), r=WK.plan(M, G, opt(), h), gesp=gespielt().map(Number), f=WK.fortschritt(r.zeilen, gesp), d=WK.dran(r.zeilen, h);
     var punkte=r.zeilen.map(function(z){ return '<i'+(gesp.indexOf(z.nr)>=0?' class="an"':'')+'></i>'; }).join('');
     $('fortschritt').innerHTML='<span class="punkte" aria-hidden="true">'+punkte+'</span><b>'+esc(f.text)+'</b>';
@@ -379,6 +400,11 @@
       window.addEventListener('afterprint', function(){ document.body.classList.remove('brief-druck'); });
       $('drucken').onclick=function(){ document.body.classList.remove('brief-druck'); planZeichnen(); window.print(); };
       zeige(Math.max(0, Math.min(6, +wahl.schritt||0)));
+      // Angemeldet: Plan mit dem Konto abgleichen. Kam vom Konto etwas Neueres, neu zeichnen (zweites Gerät).
+      if(window.WichtelKonto && WichtelKonto.angemeldet()) WichtelKonto.abgleichen().then(function(neu){
+        var a=laden(); if(neu && a && a.nr && WK.gueltig(a.erster) && WK.gueltig(a.letzter)){ var s=wahl.schritt; for(var k in wahl) if(a[k]!==undefined) wahl[k]=a[k]; wahl.nr=WK.auswahl(wahl.nr); zuletzt=kern(wahl); zeige(s||5); }
+        else kontoZeichnen();
+      });
     });
 })();
 </script>
